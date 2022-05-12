@@ -1,0 +1,55 @@
+squad od do 5 coveka koji mora da se spare s bluetooth da bi bilu u squad
+
+razmena dobara s bilo kim kad su blizu (s bluetooth)
+
+baza za sqaud s resursi
+
+svako nosi odredjeni broj resursi kao u backpack
+
+backpack, baza, totem,(skills(radius detection totem u prolazu...), kupovina moc(otkriti totem u radius) ) se upgrejduju
+
+totem,baza se stite ulaganjem resusra-> tezi quest ili veci broj
+
+totem se osvaja resavnjem questa
+
+tipovi quest setanje, odgovor na pitanje....
+
+market za powerups (svaki dan nova lokacija)
+
+cilj sto vise poena-dnevno nedeljno
+
+poeni se dobijaju osvajanjem tudjih sakrvenih totetma i sto boljim sakrivanjem sopstvenih totema tj vreme dok se ne osvoje
+
+poeni samo za rangiranje
+
+baze su pojedinca exor squad
+
+igrac menja lokaciju baze na neki period
+
+svaki igrac ima pravo na 1 guess za tudje baze na neki period; ako pogodi u radiusu baza se otkriva i moze da se pridje i da se osvoji ali je zasticena; nakom pokusaja osvajanja javlja se vlasniku/squadu prilikom sledeceg prilaska; nemoguce je osvojiti bazu ukoliku je vlasnik u radiusu
+
+svi igraci su vidljivi na mapi
+
+background servis salju poziciju i stize push notifikacija da totem i blizinu nekog drugog igraca(birati za sta stize notifikacija)
+
+resursi mogu da se odbace na mapu i mogu da se skupe ako ima mesto u backpack
+
+resursi se nalaze na sepcificna mesta(menja se na dnevnom nivou) i ogranicena su mesta
+
+pinovanje u okviru tima(ili pojedinca ako nema tim) (opis za banku,totem, cisto ono)
+
+izbacivenje iz squad ako se 51% tima slozi
+
+odrenjeni broj totema na broj coveka (inicijalno 1) ako se ne plantuje za neki period ide u market
+
+inicijalno bex resursi
+
+prodaja i kupovina totema i resursa
+
+trading sa definisane odnos resursa u market
+
+totem se upgrade kad se plantuje a kad osvajas tudji dobijas level 0
+
+
+
+inkrement--> special event na neki vremenski period u vidu takmicenja na nekom ogranicenom prostoru
