@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         setContent {
             AppTheme {
               //  window.navigationBarColor = color // Set color of system navigationBar same as BottomNavigationView
@@ -62,7 +63,18 @@ class MainActivity : ComponentActivity() {
                         when (event) {
                             Lifecycle.Event.ON_RESUME -> {
                                 Toast.makeText(this,"resume",Toast.LENGTH_SHORT).show()
+                                       val btn= findViewById<Button>(R.id.button)
+                                       btn.setOnClickListener{
+                                           Toast.makeText(this,"aaaaaaaa",Toast.LENGTH_SHORT).show()
+                                           val per= Array<String>(5) { "it = $it" }
+                                           per[0] = Manifest.permission.ACCESS_FINE_LOCATION
 
+                                           per[1] = Manifest.permission.ACCESS_COARSE_LOCATION
+                                           per[2] = Manifest.permission.CAMERA
+                                           ActivityCompat.requestPermissions(this,per,1)
+
+
+                                       }
                                 }
                             else                      -> { /* other stuff */ }
                         }
@@ -78,7 +90,7 @@ class MainActivity : ComponentActivity() {
         }*/
         reqPermission()
 
-        this.registerForActivityResult(
+/*        this.registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             Log.d("AAAAAAAAA",permissions.toString())
             permissions.entries.forEach {x->
@@ -86,7 +98,7 @@ class MainActivity : ComponentActivity() {
                 if(x.value==false) Log.i("nece", x.key)
                 else Log.i("ocve",x.key+"KAO OCE")
             }
-        }
+        }*/
 
     }
 
@@ -136,7 +148,9 @@ fun MapLayout(){
 
             val btn= view.findViewById<Button>(R.id.button)
 
-            btn.setOnClickListener{Toast.makeText(context,"aaaaaaaa",Toast.LENGTH_SHORT).show()}
+            btn.setOnClickListener{
+                Toast.makeText(context,"aaaaaaaa",Toast.LENGTH_SHORT).show()
+            }
 
 
             getInstance().load(context, androidx.preference.PreferenceManager.getDefaultSharedPreferences(context));
