@@ -29,30 +29,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                MapContainer()
             }
         }
-    }
-}
-
-
-@Composable
-fun MapContainer(
-    modifier: Modifier = Modifier.fillMaxHeight().fillMaxWidth(), viewModel: TestViewModel = hiltViewModel()
-) {
-
-    MapUI(modifier, state = viewModel.state)
-
-    Button(onClick = {
-        viewModel.state.addMarker("id", x = 0.5, y = 0.5) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = null,
-                modifier = Modifier.size(50.dp),
-            )
-        }
-    }) {
-        Text(text = "Simple Button")
     }
 }
 
