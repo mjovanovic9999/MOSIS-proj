@@ -22,19 +22,6 @@ import javax.inject.Inject
 @HiltViewModel
 class TestViewModel @Inject constructor(private val appContext: Application) : ViewModel() {
 
-   /* val tileStreamProvider =
-        TileStreamProvider { row, col, zoomLvl ->
-
-            val bitmapTarget = Glide.with(appContext).asBitmap().load( "https://www.thecrazyprogrammer.com/wp-content/uploads/2015/09/Neeraj-Mishra.png").submit(24,24)
-            val bitmap = bitmapTarget.get()
-            var byteBuffer = ByteBuffer.allocate(bitmap.allocationByteCount)
-            bitmap.copyPixelsToBuffer(byteBuffer)
-            val byteArray = ByteArrayInputStream(byteBuffer.array())
-            Glide.with(appContext).clear(bitmapTarget);
-
-            byteArray
-        }*/
-
     val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
         try {
             val image = Glide.with(appContext)
