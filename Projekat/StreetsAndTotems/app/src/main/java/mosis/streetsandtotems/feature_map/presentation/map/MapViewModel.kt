@@ -1,7 +1,6 @@
-package mosis.streetsandtotems
+package mosis.streetsandtotems.feature_map.presentation.map
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -9,19 +8,13 @@ import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ovh.plrapps.mapcompose.api.addLayer
 import ovh.plrapps.mapcompose.api.enableRotation
-import ovh.plrapps.mapcompose.core.LayerPlacement
 import ovh.plrapps.mapcompose.core.TileStreamProvider
 import ovh.plrapps.mapcompose.ui.state.MapState
-import java.io.BufferedInputStream
-import java.io.ByteArrayInputStream
 import java.io.FileInputStream
-import java.net.HttpURLConnection
-import java.net.URL
-import java.nio.ByteBuffer
 import javax.inject.Inject
 
 @HiltViewModel
-class TestViewModel @Inject constructor(private val appContext: Application) : ViewModel() {
+class MapViewModel @Inject constructor(private val appContext: Application) : ViewModel() {
 
     val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
         try {
