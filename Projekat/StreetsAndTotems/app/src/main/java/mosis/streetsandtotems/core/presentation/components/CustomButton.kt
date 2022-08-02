@@ -32,6 +32,7 @@ fun CustomButton(
         0.dp,
         Color.Transparent
     ) else ButtonDefaults.outlinedButtonBorder,
+    enabled: Boolean = true,
     icon: ImageVector? = null,
     iconPosition: IconPosition = IconPosition.Start
 ) {
@@ -40,7 +41,8 @@ fun CustomButton(
             onClick = clickHandler,
             modifier = buttonModifier,
             colors = colors,
-            border = border
+            border = border,
+            enabled = enabled
         ) {
             ButtonContent(text = text, icon = icon, iconPosition = iconPosition)
         }
@@ -48,7 +50,8 @@ fun CustomButton(
             onClick = clickHandler,
             modifier = buttonModifier,
             colors = colors,
-            border = border
+            border = border,
+            enabled = enabled
         ) {
             ButtonContent(text = text, icon = icon, iconPosition = iconPosition)
         }
@@ -56,7 +59,8 @@ fun CustomButton(
             onClick = clickHandler,
             modifier = buttonModifier,
             colors = colors,
-            border = border
+            border = border,
+            enabled = enabled
         ) {
             ButtonContent(text = text, icon = icon, iconPosition = iconPosition)
         }
@@ -81,5 +85,17 @@ private fun ButtonContent(text: String, icon: ImageVector?, iconPosition: IconPo
             contentDescription = null,
             modifier = Modifier.size(ButtonDefaults.IconSize)
         )
+    }
+}
+
+@Composable
+fun CustomIconButton(
+    clickHandler: () -> Unit,
+    buttonModifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    icon: ImageVector? = null
+){
+    IconButton(onClick = clickHandler, modifier = buttonModifier, enabled= enabled){
+        icon?.let { Icon(imageVector = it, contentDescription = "") }
     }
 }

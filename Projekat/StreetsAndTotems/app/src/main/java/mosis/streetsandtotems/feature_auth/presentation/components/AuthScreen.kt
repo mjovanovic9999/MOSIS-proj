@@ -1,27 +1,39 @@
 package mosis.streetsandtotems.feature_auth.presentation.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import com.dsc.form_builder.Validators
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.coroutines.launch
+import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.presentation.components.CustomButton
-import mosis.streetsandtotems.core.presentation.components.CustomButtonType
+import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
+import mosis.streetsandtotems.core.presentation.components.form.Form
+import mosis.streetsandtotems.core.presentation.components.form.formfields.TextFormField
+import mosis.streetsandtotems.core.presentation.states.FormState
 
+@RootNavGraph(start = true)
+@Destination
 @Composable
-fun AuthScreen(){
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        CustomButton(clickHandler = { /*TODO*/ })
-        CustomButton(clickHandler = { /*TODO*/ }, buttonType = CustomButtonType.Outlined, text = "Kurc")
-        CustomButton(clickHandler = { /*TODO*/ }, buttonType = CustomButtonType.Text, text = "Pozivce", icon = Icons.Filled.Call)
-        CustomButton(clickHandler = { /*TODO*/ }, buttonType = CustomButtonType.Text, text = "TEST")
-        TextButton(onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors()) {
-            Text(text = "test")
-        }
-    }
+fun AuthScreen(viewModel: AuthViewModel) {
+
 }
+
