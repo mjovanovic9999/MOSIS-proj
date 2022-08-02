@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name=".StreetsAndTotemsApp"
+        android:name=".core.StreetsAndTotemsApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -20,9 +20,10 @@
         android:theme="@style/Theme.StreetsAndTotems"
         tools:targetApi="31">
         <activity
-            android:name=".feature_map.presentation.MainActivity"
+            android:name=".core.presentation.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.StreetsAndTotems">
+            android:theme="@style/Theme.StreetsAndTotems"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
