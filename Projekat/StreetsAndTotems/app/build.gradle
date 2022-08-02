@@ -90,7 +90,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
 
     //Google Accompanist
-    implementation "com.google.accompanist:accompanist-systemuicontroller:0.25.0"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:$google_accompanist_verison"
+    implementation "com.google.accompanist:accompanist-permissions:$google_accompanist_verison"
 
     //Dagger Hilt
     implementation 'com.google.dagger:hilt-android:2.43'

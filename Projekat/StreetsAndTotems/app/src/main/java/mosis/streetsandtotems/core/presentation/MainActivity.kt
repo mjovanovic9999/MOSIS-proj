@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import dagger.hilt.android.AndroidEntryPoint
-import mosis.streetsandtotems.core.presentation.navigation.AppNavigation
+import mosis.streetsandtotems.core.presentation.components.CustomRequestPermissions
 import mosis.streetsandtotems.feature_map.presentation.map.MapScreen
 import mosis.streetsandtotems.ui.theme.AppTheme
 
@@ -15,8 +15,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
-                AppNavigation()
-                /*MapScreen()*/
+                CustomRequestPermissions()
+                /*AppNavigation()*/
+                MapScreen()
             }
         }
     }
