@@ -38,7 +38,8 @@ class MapViewModel @Inject constructor(private val appContext: Application) : Vi
             67108864,
             workerCount = 16
         ) {
-            scale(0f)//0.0001f mali zoom
+            scale(0.25f)
+            scroll(0.560824, 0.366227)
         }.apply {
             addLayer(tileStreamProvider)
             enableRotation()
