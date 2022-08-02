@@ -15,14 +15,14 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun FAB(resourceId: Int, onClick: () -> Unit, offset: DpOffset, modifier: Modifier = Modifier) {
+fun FAB(resourceId: Int, onClick: () -> Unit={}, modifier: Modifier = Modifier) {
 
-    FloatingActionButton(onClick = onClick,Modifier.offset(offset.x,offset.y)) {
+    FloatingActionButton(onClick = onClick, Modifier.padding(7.dp)) {
         Image(
             painter = painterResource(resourceId),
             contentDescription = null,
             modifier.height(40.dp)
         )
-        //}
+
     }
 }

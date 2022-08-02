@@ -15,7 +15,7 @@ import ovh.plrapps.mapcompose.ui.MapUI
 import ovh.plrapps.mapcompose.ui.state.markers.model.RenderingStrategy
 
 @Composable
-fun MapContainer(
+fun MapComponent(
     modifier: Modifier = Modifier
         .fillMaxHeight()
         .fillMaxWidth(),
