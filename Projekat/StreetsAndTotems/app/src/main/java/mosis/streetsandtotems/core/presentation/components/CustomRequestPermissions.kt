@@ -21,7 +21,7 @@ fun CustomRequestPermissions(
     val permissionsState = rememberMultiplePermissionsState(permissions = permissions)
 
     val lifecycleOwner = LocalLifecycleOwner.current
-    
+
     DisposableEffect(
         key1 = lifecycleOwner,
         effect = {

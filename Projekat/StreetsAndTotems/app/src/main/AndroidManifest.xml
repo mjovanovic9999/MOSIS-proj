@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="mosis.streetsandtotems">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -24,8 +24,8 @@
         <activity
             android:name=".core.presentation.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.StreetsAndTotems"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.StreetsAndTotems">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
