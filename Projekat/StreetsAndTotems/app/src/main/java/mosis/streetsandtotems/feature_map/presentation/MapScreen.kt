@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,6 +56,7 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
                 val context = LocalContext.current
 
                 CustomFAB(R.drawable.locate_me, {
+                    locateUser(context, mapViewModel)
                     /*    mapViewModel.viewModelScope.launch {
                             mapViewModel.state.centerOnMarker(
                                 "prvi",
@@ -68,6 +70,17 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
             }
         }
 
+    }
+}
+
+fun locateUser(context: Context, viewModel: MapViewModel) /*:Location*/ {
+    viewModel.LoadLocation {
+        Toast.makeText(
+            context,
+            viewModel.locationState.AccuracyMeters.toString(),
+            Toast.LENGTH_SHORT
+        )
+            .show()
     }
 }
 

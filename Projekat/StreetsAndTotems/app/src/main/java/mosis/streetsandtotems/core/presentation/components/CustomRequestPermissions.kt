@@ -13,12 +13,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import mosis.streetsandtotems.core.domain.util.getActivity
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CustomRequestPermissions(
     context: Context,
-    activity: Activity,
     permissions: List<String> = listOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -58,7 +58,7 @@ fun CustomRequestPermissions(
         }
     )
     CustomLocationDialog(
-        activity = activity,
+        activity = context.getActivity(),
         locationDialogOpenState = locationDialogOpenState
     )
 }

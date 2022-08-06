@@ -52,23 +52,14 @@ fun MainScreen() {
 }
 
 @Composable
-private fun DrawerContent(){
+private fun DrawerContent() {
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DrawerScreen(navController: NavHostController, drawerState: DrawerState){
-                    CustomRequestPermissions(LocalContext.current, this)
-                Column {
-                    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    val context = LocalContext.current
-                    Button(onClick = {
-                        locateUser(context)
-                    }) {
-                        Text(text = "LOCATEME")
-                    }
-                }
+private fun DrawerScreen(navController: NavHostController, drawerState: DrawerState) {
+    CustomRequestPermissions(LocalContext.current)
     Scaffold(bottomBar = {
         BottomBar(
             navController = navController,
@@ -87,15 +78,6 @@ private fun DrawerScreen(navController: NavHostController, drawerState: DrawerSt
     }
 
 
-
 }
 
-fun locateUser(context: Context) /*:Location*/ {
-    viewModel.LoadLocation {
-        Toast.makeText(
-            context,
-            viewModel.locationState.AccuracyMeters.toString(),
-            Toast.LENGTH_SHORT
-        )
-            .show()
-    }}
+

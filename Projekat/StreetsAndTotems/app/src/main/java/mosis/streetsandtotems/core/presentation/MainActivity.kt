@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
 
                 /*AppNavigation()*/
 
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     AppNavigation()
                 }
             }
@@ -79,21 +79,19 @@ class MainActivity : ComponentActivity() {
     }
 
 
+    /*       Toast.makeText(this, viewModel.locationState.Latitude.toString(), Toast.LENGTH_SHORT)
+           .show()
+           Toast.makeText(this, viewModel.locationState.Longitude.toString(), Toast.LENGTH_SHORT)
+               .show()*/
 
 
-        /*       Toast.makeText(this, viewModel.locationState.Latitude.toString(), Toast.LENGTH_SHORT)
-               .show()
-               Toast.makeText(this, viewModel.locationState.Longitude.toString(), Toast.LENGTH_SHORT)
-                   .show()*/
+    /*val perm = listOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+    )
 
-
-        /*val perm = listOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION
-        )
-
-        *//*    if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    *//*    if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0)
                 Toast.makeText(this, "majok", Toast.LENGTH_SHORT)
                     .show()
@@ -148,37 +146,37 @@ class MainActivity : ComponentActivity() {
 //        }
 
 
-        /* if (ContextCompat.checkSelfPermission(
-                 this.applicationContext,
-                 Manifest.permission.ACCESS_FINE_LOCATION
-             ) != PackageManager.PERMISSION_GRANTED
-         )
-             return
+    /* if (ContextCompat.checkSelfPermission(
+             this.applicationContext,
+             Manifest.permission.ACCESS_FINE_LOCATION
+         ) != PackageManager.PERMISSION_GRANTED
+     )
+         return
 
-         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-         val locationResult = fusedLocationProviderClient.lastLocation
-         locationResult.addOnCompleteListener { task ->
-             if (task.isSuccessful) {
-                 val lastKnownLocation = task.result
+     val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+     val locationResult = fusedLocationProviderClient.lastLocation
+     locationResult.addOnCompleteListener { task ->
+         if (task.isSuccessful) {
+             val lastKnownLocation = task.result
 
-                 if (lastKnownLocation != null) {
-                     LatLng(
-                         lastKnownLocation.latitude,
-                         lastKnownLocation.longitude
-                     )
-                     Toast.makeText(this, lastKnownLocation.latitude.toString(), Toast.LENGTH_SHORT)
-                         .show()
-                     Toast.makeText(this, lastKnownLocation.longitude.toString(), Toast.LENGTH_SHORT)
-                         .show()
+             if (lastKnownLocation != null) {
+                 LatLng(
+                     lastKnownLocation.latitude,
+                     lastKnownLocation.longitude
+                 )
+                 Toast.makeText(this, lastKnownLocation.latitude.toString(), Toast.LENGTH_SHORT)
+                     .show()
+                 Toast.makeText(this, lastKnownLocation.longitude.toString(), Toast.LENGTH_SHORT)
+                     .show()
 
-                 } else {
-                     Toast.makeText(this, "NULL", Toast.LENGTH_SHORT).show()
-
-                 }
              } else {
-                 Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+                 Toast.makeText(this, "NULL", Toast.LENGTH_SHORT).show()
+
              }
-         }*/
+         } else {
+             Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+         }
+     }*/
 
 
 }
