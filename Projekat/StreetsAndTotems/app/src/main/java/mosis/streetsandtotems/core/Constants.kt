@@ -8,10 +8,6 @@ object ButtonConstants{
     const val NO_ACCOUNT="Don't have an account?"
 }
 
-object NavigationConstants{
-    const val AUTH_SCREEN = "Authentication"
-}
-
 object MessageConstants{
 
 }

@@ -5,16 +5,27 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.ramcosta.composedestinations.annotation.Destination
+import kotlinx.coroutines.launch
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.presentation.components.CustomFAB
+import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_map.presentation.map.components.MapComponent
 
+@OptIn(ExperimentalMaterial3Api::class)
+@MainNavGraph(start = true)
+@Destination
 @Composable
-fun MapScreen(/*mapViewModel: MapViewModel,*/ modifier: Modifier = Modifier) {
+fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
+    val scope = rememberCoroutineScope()
+
     Box(Modifier) {
         MapComponent(
             Modifier
@@ -26,9 +37,9 @@ fun MapScreen(/*mapViewModel: MapViewModel,*/ modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.End
             ) {
-
-                CustomFAB(R.drawable.menu, {})
-                CustomFAB(R.drawable.layers, {})
+                val context = LocalContext.current
+                CustomFAB(R.drawable.menu, { scope.launch { drawerState.open() } })
+                CustomFAB(R.drawable.layers, { Toast.makeText(context, drawerState.isOpen.toString(), Toast.LENGTH_LONG).show()})
             }
             Column(
                 Modifier.fillMaxSize(),
