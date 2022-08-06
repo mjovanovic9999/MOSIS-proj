@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.feature_map.presentation.map
+package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
 import androidx.compose.runtime.getValue
@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.feature_map.domain.LocationDTO
@@ -40,7 +39,7 @@ class MapViewModel @Inject constructor(
             null
         }
     }
-    val state: MapState by mutableStateOf(
+    val mapState: MapState by mutableStateOf(
         MapState(
             19,
             67108864,
@@ -56,31 +55,17 @@ class MapViewModel @Inject constructor(
     )
 
 
-    var locationState by mutableStateOf(LocationDTO(-1.0, -1.0))
+    var locationState by mutableStateOf(LocationDTO(-1.0, -1.0,-1.0f))
         private set
 
-    fun LoadLocation() {
+    fun LoadLocation(cb:()->Unit) {
         viewModelScope.launch {
             locationTracker.getCurrentLocation()?.let { location ->
-                locationState = locationState.copy(location.latitude, location.longitude)
-
+                locationState = locationState.copy(location.latitude, location.longitude,location.accuracy)
+                cb()
             } ?: kotlin.run {
-                locationState = locationState.copy(-1.1, -1.1)
+                locationState = locationState.copy(-1.1, -1.1,-1.1f)
             }
         }
     }
 }
-
-
-/*.pointerInput(Unit) {
-        detectTapGestures(onTap = {
-            viewModel.state.addMarker("id", x =it.x.toDouble(), y = it.y.toDouble() ) {
-                Image(
-                    painter=painterResource(R.drawable.pin_tiki),
-                    contentDescription = null,
-                    modifier = Modifier.size(50.dp),
-                )
-                Toast.makeText(LocalContext.current, it.x.toString(), Toast.LENGTH_SHORT).show()
-                Toast.makeText(LocalContext.current, it.y.toString(), Toast.LENGTH_SHORT).show()
-            }})
-    }*/

@@ -2,10 +2,10 @@ package mosis.streetsandtotems.core.presentation
 
 import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
+import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,14 +15,13 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.core.content.ContextCompat
-import androidx.core.content.getSystemService
+import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import dagger.hilt.android.AndroidEntryPoint
 import mosis.streetsandtotems.core.presentation.components.CustomRequestPermissions
-import mosis.streetsandtotems.feature_map.presentation.map.MapScreen
-import mosis.streetsandtotems.feature_map.presentation.map.MapViewModel
+import mosis.streetsandtotems.feature_map.presentation.MapViewModel
+import mosis.streetsandtotems.feature_map.presentation.MapScreen
 import mosis.streetsandtotems.ui.theme.AppTheme
 
 @AndroidEntryPoint
@@ -34,26 +33,33 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        permissionLauncher = registerForActivityResult(
-//            ActivityResultContracts.RequestMultiplePermissions()
-//        ) {
-//            viewModel.LoadLocation()
-//        }
-//        permissionLauncher.launch(
-//            arrayOf(
-//                Manifest.permission.ACCESS_FINE_LOCATION,
-//                Manifest.permission.ACCESS_COARSE_LOCATION,
-//            )
-//        )
+/*        permissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) {
+            viewModel.LoadLocation()
+        }
+
+
+        permissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+            )//samo prvi put
+        )*/
 
         locationEnable()
 
 
         setContent {
             AppTheme {
-                //CustomRequestPermissions()
+                CustomRequestPermissions(LocalContext.current, this)
                 Column {
-                    Button(onClick = { LocateUser() }) {
+                    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    val context = LocalContext.current
+                    Button(onClick = {
+                        LocateUser()
+//                        context.startActivity(intent)
+                    }) {
                         Text(text = "LOCATEME")
                     }
                     MapScreen()
@@ -66,19 +72,32 @@ class MainActivity : ComponentActivity() {
     }
 
     fun locationEnable() {
-        val a = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if (a.isProviderEnabled(LocationManager.GPS_PROVIDER))
-            Toast.makeText(this, "paok", Toast.LENGTH_SHORT)
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+            Toast.makeText(this, "paok gps", Toast.LENGTH_SHORT)
                 .show()
-        else Toast.makeText(this, "majokkkkkkk", Toast.LENGTH_SHORT)
-            .show()
+        if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            Toast.makeText(this, "network", Toast.LENGTH_SHORT)
+                .show()
+        }
+
     }
 
     fun LocateUser() /*:Location*/ {
-        Toast.makeText(this, viewModel.locationState.Latitude.toString(), Toast.LENGTH_SHORT)
-            .show()
-        Toast.makeText(this, viewModel.locationState.Longitude.toString(), Toast.LENGTH_SHORT)
-            .show()
+        viewModel.LoadLocation {
+            Toast.makeText(
+                this,
+                viewModel.locationState.AccuracyMeters.toString(),
+                Toast.LENGTH_SHORT
+            )
+                .show()
+        }
+
+
+        /*       Toast.makeText(this, viewModel.locationState.Latitude.toString(), Toast.LENGTH_SHORT)
+               .show()
+               Toast.makeText(this, viewModel.locationState.Longitude.toString(), Toast.LENGTH_SHORT)
+                   .show()*/
 
 
         /*val perm = listOf(
@@ -107,33 +126,39 @@ class MainActivity : ComponentActivity() {
             }*/
 
 
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        val res =
-            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_LOW_POWER, null)
-
-        res.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val lastKnownLocation = task.result
-
-                if (lastKnownLocation != null) {
-                /*    LatLng(
-                        lastKnownLocation.latitude,
-                        lastKnownLocation.longitude
-                    )*/
-                    Toast.makeText(this, lastKnownLocation.latitude.toString(), Toast.LENGTH_SHORT)
-                        .show()
-                    Toast.makeText(this, lastKnownLocation.longitude.toString(), Toast.LENGTH_SHORT)
-                        .show()
-
-                } else {
-                    Toast.makeText(this, "NULL", Toast.LENGTH_SHORT).show()
-
-                }
-            } else {
-                Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
-            }
-        }
+//        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+//
+//        val res =
+//            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_LOW_POWER, null)
+//
+//        res.addOnCompleteListener { task ->
+//            if (task.isSuccessful) {
+//                val lastKnownLocation = task.result
+//
+//                if (lastKnownLocation != null) {
+//                    /*    LatLng(
+//                        lastKnownLocation.latitude,
+//                        lastKnownLocation.longitude
+//                   )*/
+///*                    Toast.makeText(this, lastKnownLocation.latitude.toString(), Toast.LENGTH_SHORT)
+//                        .show()
+//                    Toast.makeText(this, lastKnownLocation.longitude.toString(), Toast.LENGTH_SHORT)
+//                        .show()*/
+//                    Toast.makeText(
+//                        this,
+//                        lastKnownLocation.accuracy.toString() + "low",
+//                        Toast.LENGTH_SHORT
+//                    )
+//
+//                } else {
+//                    Toast.makeText(this, "NULL", Toast.LENGTH_SHORT).show()
+//
+//                }
+//            } else {
+//                Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
+//            }
+//
+//        }
 
 
         /* if (ContextCompat.checkSelfPermission(
@@ -167,5 +192,6 @@ class MainActivity : ComponentActivity() {
                  Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
              }
          }*/
+
     }
 }

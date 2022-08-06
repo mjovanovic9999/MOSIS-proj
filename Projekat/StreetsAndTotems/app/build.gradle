@@ -65,6 +65,7 @@ dependencies {
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.13.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.2'
+
     //MapCompose
     implementation 'ovh.plrapps:mapcompose:2.1.4'
 
@@ -85,10 +86,9 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 
-
     //Firebase
     implementation platform('com.google.firebase:firebase-bom:30.3.1')
-    implementation 'com.google.firebase:firebase-auth-ktx:21.0.6'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.0.7'
 
     //Google Accompanist
     implementation "com.google.accompanist:accompanist-systemuicontroller:$google_accompanist_verison"
@@ -99,7 +99,6 @@ dependencies {
     kapt 'com.google.dagger:hilt-compiler:2.43.1'
     kapt "androidx.hilt:hilt-compiler:1.0.0"
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
-
 
     //Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
@@ -118,9 +117,9 @@ dependencies {
     //Dialogs
     implementation "io.github.vanpra.compose-material-dialogs:core:0.7.2"
 
-
     // Location Services
-   implementation 'com.google.android.gms:play-services-location:20.0.0'
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
+    implementation 'androidx.lifecycle:lifecycle-service:2.5.1'
 
 }
 

@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.feature_map.presentation.map.components
+package mosis.streetsandtotems.feature_map.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height

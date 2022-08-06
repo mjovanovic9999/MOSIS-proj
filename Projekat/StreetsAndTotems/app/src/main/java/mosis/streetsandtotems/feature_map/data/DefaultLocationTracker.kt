@@ -7,7 +7,11 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Granularity.GRANULARITY_PERMISSION_LEVEL
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.Priority
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mosis.streetsandtotems.feature_map.domain.LocationTracker
@@ -37,12 +41,21 @@ class DefaultLocationTracker @Inject constructor(
         val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) ||
                 locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
 
-        if (!hasAccessCoarseLocationPermission || !hasAccessFineLocationPermission || !isGpsEnabled) {
-            return null
-        }
+        /*       if (!hasAccessCoarseLocationPermission || !hasAccessFineLocationPermission || !isGpsEnabled) {
+                   return null
+               }*/
 
         return suspendCancellableCoroutine { cont ->
-            locationClient.lastLocation.apply {
+            val req= CurrentLocationRequest.Builder()
+            req.setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+            req.setGranularity(GRANULARITY_PERMISSION_LEVEL)
+            req.setMaxUpdateAgeMillis(1000)
+
+            //LocationRequest.create().setInterval(1000).setPriority(Priority.PRIORITY_HIGH_ACCURACY) as CurrentLocationRequest
+
+
+            locationClient.getCurrentLocation(req.build(), null).apply {
+            //locationClient.getCurrentLocation(Priority.PRIORITY_LOW_POWER, null).apply {
                 if (isComplete) {
                     if (isSuccessful) {
                         cont.resume(result)
