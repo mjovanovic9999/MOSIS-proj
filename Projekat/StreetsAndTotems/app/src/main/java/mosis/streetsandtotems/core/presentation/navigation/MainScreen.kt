@@ -1,5 +1,9 @@
 package mosis.streetsandtotems.core.presentation.navigation
 
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BackHand
@@ -10,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -24,9 +29,10 @@ import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.spec.Route
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.NavGraphs
+import mosis.streetsandtotems.core.presentation.components.CustomRequestPermissions
 import mosis.streetsandtotems.destinations.MainScreenDestination
 import mosis.streetsandtotems.destinations.MapScreenDestination
-import mosis.streetsandtotems.feature_map.presentation.map.MapViewModel
+import mosis.streetsandtotems.feature_map.presentation.MapViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RootNavGraph
@@ -53,6 +59,16 @@ private fun DrawerContent(){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DrawerScreen(navController: NavHostController, drawerState: DrawerState){
+                    CustomRequestPermissions(LocalContext.current, this)
+                Column {
+                    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    val context = LocalContext.current
+                    Button(onClick = {
+                        locateUser(context)
+                    }) {
+                        Text(text = "LOCATEME")
+                    }
+                }
     Scaffold(bottomBar = {
         BottomBar(
             navController = navController,
@@ -69,4 +85,17 @@ private fun DrawerScreen(navController: NavHostController, drawerState: DrawerSt
             })
 
     }
+
+
+
 }
+
+fun locateUser(context: Context) /*:Location*/ {
+    viewModel.LoadLocation {
+        Toast.makeText(
+            context,
+            viewModel.locationState.AccuracyMeters.toString(),
+            Toast.LENGTH_SHORT
+        )
+            .show()
+    }}

@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 
 @Composable
-fun LocationDialog(activity: Activity, locationDialogOpenState: MutableState<Boolean>) {
+fun CustomLocationDialog(activity: Activity, locationDialogOpenState: MutableState<Boolean>) {
     if (locationDialogOpenState.value) {
         AlertDialog(
             onDismissRequest = { },

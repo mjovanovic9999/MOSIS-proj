@@ -57,7 +57,7 @@ fun CustomRequestPermissions(
             }
         }
     )
-    LocationDialog(
+    CustomLocationDialog(
         activity = activity,
         locationDialogOpenState = locationDialogOpenState
     )
