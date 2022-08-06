@@ -16,10 +16,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.ui.platform.LocalContext
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import mosis.streetsandtotems.core.presentation.components.CustomRequestPermissions
+import mosis.streetsandtotems.core.presentation.navigation.AppNavigation
 import mosis.streetsandtotems.feature_map.presentation.MapViewModel
 import mosis.streetsandtotems.feature_map.presentation.MapScreen
 import mosis.streetsandtotems.ui.theme.AppTheme
@@ -52,21 +55,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AppTheme {
-                CustomRequestPermissions(LocalContext.current, this)
-                Column {
-                    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    val context = LocalContext.current
-                    Button(onClick = {
-                        LocateUser()
-//                        context.startActivity(intent)
-                    }) {
-                        Text(text = "LOCATEME")
-                    }
-                    MapScreen()
-                }
+
 
                 /*AppNavigation()*/
 
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                    AppNavigation()
+                }
             }
         }
     }
@@ -83,15 +78,7 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    fun LocateUser() /*:Location*/ {
-        viewModel.LoadLocation {
-            Toast.makeText(
-                this,
-                viewModel.locationState.AccuracyMeters.toString(),
-                Toast.LENGTH_SHORT
-            )
-                .show()
-        }
+
 
 
         /*       Toast.makeText(this, viewModel.locationState.Latitude.toString(), Toast.LENGTH_SHORT)
@@ -193,5 +180,5 @@ class MainActivity : ComponentActivity() {
              }
          }*/
 
-    }
+
 }
