@@ -1,39 +1,26 @@
 package mosis.streetsandtotems.feature_auth.presentation.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.unit.dp
-import com.dsc.form_builder.Validators
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import kotlinx.coroutines.launch
-import mosis.streetsandtotems.R
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.navigation.popUpTo
 import mosis.streetsandtotems.core.presentation.components.CustomButton
-import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
-import mosis.streetsandtotems.core.presentation.components.form.Form
-import mosis.streetsandtotems.core.presentation.components.form.formfields.TextFormField
-import mosis.streetsandtotems.core.presentation.states.FormState
+import mosis.streetsandtotems.core.presentation.navigation.navgraphs.AuthNavGraph
+import mosis.streetsandtotems.destinations.AuthScreenDestination
+import mosis.streetsandtotems.destinations.MainScreenDestination
 
-@RootNavGraph(start = true)
+@AuthNavGraph(start = true)
 @Destination
 @Composable
-fun AuthScreen(viewModel: AuthViewModel) {
-
+fun AuthScreen(viewModel: AuthViewModel, destinationsNavigator: DestinationsNavigator) {
+        CustomButton(clickHandler = {
+            destinationsNavigator.navigate(MainScreenDestination) {
+                popUpTo(AuthScreenDestination) { inclusive = true }
+            }
+        }, text = "TEST")
 }
 
