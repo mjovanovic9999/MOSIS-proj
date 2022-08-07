@@ -73,12 +73,11 @@ class TextFormField(
                 maxLines = maxLines,
                 visualTransformation = visualTransformation
             )
-            if (fieldState.hasError)
-                Text(
-                    text = fieldState.errorMessage,
-                    color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Left
-                )
+            Text(
+                text = if(fieldState.hasError) fieldState.errorMessage else "",
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Left
+            )
         }
     }
 }

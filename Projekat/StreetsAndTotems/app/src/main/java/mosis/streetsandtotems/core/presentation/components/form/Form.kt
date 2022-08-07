@@ -18,7 +18,7 @@ import mosis.streetsandtotems.core.presentation.states.FormState
 @Composable
 fun <T : Any> Form(
     formState: FormState<T>,
-    spacing: Dp = 10.dp,
+    spacing: Dp = 5.dp,
     modifier: Modifier = Modifier.fillMaxWidth(),
     scrollState: ScrollState = rememberScrollState()
 ) {
