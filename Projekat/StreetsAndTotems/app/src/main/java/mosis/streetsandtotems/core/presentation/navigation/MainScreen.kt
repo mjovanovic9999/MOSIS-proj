@@ -28,9 +28,12 @@ fun MainScreen(locationPermissionRequest: ActivityResultLauncher<Array<String>>)
 
     val scope = rememberCoroutineScope()
 
-    locationPermissionRequest.launch(arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION))
+    locationPermissionRequest.launch(
+        arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+    )
 
     ModalNavigationDrawer(
         drawerState = drawerState,
