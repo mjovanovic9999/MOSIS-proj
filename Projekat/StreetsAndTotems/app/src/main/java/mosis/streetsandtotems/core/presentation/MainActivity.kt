@@ -5,8 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
@@ -76,65 +75,71 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     )
-                    permissionsState.permissions.forEach { perm ->
-                        when (perm.permission) {
-                            Manifest.permission.ACCESS_COARSE_LOCATION -> {
-                                when {
-                                    perm.status.isGranted -> {
-                                        Text(text = "ACCESS_COARSE_LOCATION accepted")
-                                    }
-                                    perm.status.shouldShowRationale -> {
-                                        Text(
-                                            text = "ACCESS_COARSE_LOCATION ratioanle"
-                                        )
-                                    }
-                                    else -> {
-                                        Text(
-                                            text = "ACCESS_COARSE_LOCATION was permanently"
-                                        )
-                                    }
-                                }
-                            }
-                            Manifest.permission.ACCESS_FINE_LOCATION -> {
-                                when {
-                                    perm.status.isGranted -> {
-                                        Text(text = "ACCESS_FINE_LOCATION permission accepted")
-                                    }
-                                    perm.status.shouldShowRationale -> {
-                                        Text(
-                                            text = "ACCESS_FINE_LOCATION rationale"
-                                        )
-                                    }
-                                    else -> {
-                                        Text(
-                                            text = "ACCESS_FINE_LOCATION permission was permanently denied. "
-                                        )
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        permissionsState.permissions.forEach { perm ->
+                            when (perm.permission) {
+                                Manifest.permission.ACCESS_COARSE_LOCATION -> {
+                                    when {
+                                        perm.status.isGranted -> {
+                                            Text(text = "ACCESS_COARSE_LOCATION accepted")
+                                        }
+                                        perm.status.shouldShowRationale -> {
+                                            Text(
+                                                text = "ACCESS_COARSE_LOCATION ratioanle"
+                                            )
+                                        }
+                                        !perm.status.isGranted && !perm.status.shouldShowRationale -> {
+                                            Text(
+                                                text = "ACCESS_COARSE_LOCATION was permanently"
+                                            )
+                                        }
                                     }
                                 }
-                            }
-                            Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
-                                when {
-                                    perm.status.isGranted -> {
-                                        Text(text = "ACCESS_BACKGROUND_LOCATION permission accepted")
+                                Manifest.permission.ACCESS_FINE_LOCATION -> {
+                                    when {
+                                        perm.status.isGranted -> {
+                                            Text(text = "ACCESS_FINE_LOCATION permission accepted")
+                                        }
+                                        perm.status.shouldShowRationale -> {
+                                            Text(
+                                                text = "ACCESS_FINE_LOCATION rationale"
+                                            )
+                                        }
+                                        !perm.status.isGranted && !perm.status.shouldShowRationale -> {
+                                            Text(
+                                                text = "ACCESS_FINE_LOCATION permission was permanently denied. "
+                                            )
+                                        }
                                     }
-                                    perm.status.shouldShowRationale -> {
-                                        Text(
-                                            text = "ACCESS_BACKGROUND_LOCATION rationale"
-                                        )
-                                    }
-                                    else -> {
-                                        Text(
-                                            text = "ACCESS_BACKGROUND_LOCATION was permanently denied. You can enable it in the app settings."
-                                        )
+                                }
+                                Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
+                                    when {
+                                        perm.status.isGranted -> {
+                                            Text(text = "ACCESS_BACKGROUND_LOCATION permission accepted")
+                                        }
+                                        perm.status.shouldShowRationale -> {
+                                            Text(
+                                                text = "ACCESS_BACKGROUND_LOCATION rationale"
+                                            )
+                                        }
+                                        !perm.status.isGranted && !perm.status.shouldShowRationale -> {
+                                            Text(
+                                                text = "ACCESS_BACKGROUND_LOCATION was permanently denied. You can enable it in the app settings."
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    /* if(permissionsEnabled.enabled)
-                         AppNavigation(locationPermissionRequest)
-                     else TikiScreen()*/
+                        /* if(permissionsEnabled.enabled)
+                             AppNavigation(locationPermissionRequest)
+                         else TikiScreen()*/
+                    }
                 }
             }
         }
