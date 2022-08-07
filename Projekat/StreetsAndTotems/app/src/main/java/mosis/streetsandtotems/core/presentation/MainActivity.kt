@@ -1,33 +1,17 @@
 package mosis.streetsandtotems.core.presentation
 
 import android.Manifest
-import android.content.Context
-import android.content.Intent
-import android.location.LocationManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.core.app.ActivityCompat
 import dagger.hilt.android.AndroidEntryPoint
-import mosis.streetsandtotems.core.presentation.components.CustomRequestPermissions
 import mosis.streetsandtotems.core.presentation.navigation.AppNavigation
 import mosis.streetsandtotems.core.presentation.screens.TikiScreen
-import mosis.streetsandtotems.feature_map.presentation.MapViewModel
-import mosis.streetsandtotems.feature_map.presentation.MapScreen
 import mosis.streetsandtotems.ui.theme.AppTheme
 
 @AndroidEntryPoint

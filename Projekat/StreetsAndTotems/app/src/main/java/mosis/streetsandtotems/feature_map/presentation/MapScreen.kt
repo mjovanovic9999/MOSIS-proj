@@ -2,9 +2,11 @@ package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Activity
 import android.content.Context
-import android.util.DisplayMetrics
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -12,7 +14,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.ramcosta.composedestinations.annotation.Destination
@@ -34,9 +35,7 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
 
     Box(Modifier) {
         MapComponent(
-            Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(.88f)
+            Modifier.fillMaxSize()
         )
         Box(modifier = Modifier.matchParentSize()) {
             Column(
@@ -81,7 +80,7 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
                 CustomFAB(R.drawable.add_pin, {
                     Toast.makeText(context, "Ako ima vreme za cutom pin", Toast.LENGTH_LONG).show()
                 })
-                Spacer(modifier = Modifier.height(5.dp))
+
             }
         }
 
