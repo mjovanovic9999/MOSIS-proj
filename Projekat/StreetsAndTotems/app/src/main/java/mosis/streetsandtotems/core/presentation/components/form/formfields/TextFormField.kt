@@ -28,7 +28,7 @@ class TextFormField(
     validators: List<Validators> = emptyList(),
     transform: Transform<String>? = null,
     private val textFieldType: CustomTextFieldType = CustomTextFieldType.Basic,
-    private val modifier: Modifier = Modifier,
+    private val modifier: Modifier = Modifier.fillMaxWidth(),
     private val enabled: Boolean = true,
     private val readOnly: Boolean = false,
     private val label: String = "",

@@ -20,7 +20,8 @@ fun <T : Any> Form(
     formState: FormState<T>,
     spacing: Dp = 5.dp,
     modifier: Modifier = Modifier.fillMaxWidth(),
-    scrollState: ScrollState = rememberScrollState()
+    scrollState: ScrollState = rememberScrollState(),
+
 ) {
 
     Column(

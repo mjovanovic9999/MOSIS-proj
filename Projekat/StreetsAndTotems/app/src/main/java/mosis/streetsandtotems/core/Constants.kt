@@ -12,6 +12,11 @@ object ImageContentDescriptionConstants {
     const val LOGO_TEXT = "Streets and totems logo"
 }
 
-object MessageConstants {
+object VisualTransformationConstants{
+    const val PASSWORD = "*"
+}
 
+object MessageConstants {
+    const val USERNAME_REQUIRED = "Username is required!"
+    const val PASSWORD_REQUIRED = "Password is required!"
 }
