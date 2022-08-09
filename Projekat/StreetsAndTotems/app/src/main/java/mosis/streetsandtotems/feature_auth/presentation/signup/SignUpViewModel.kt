@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_auth.presentation.signup
 
+import android.util.Log
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.AnnotatedString
@@ -45,7 +46,13 @@ class SignupViewModel @Inject constructor() : ViewModel() {
             TextFormField(
                 initial = "",
                 name = "phoneNumber",
-                validators = listOf(Validators.Custom(MessageConstants.INVALID_PHONE_NUMBER, ::validatePhoneNumber), Validators.Required(MessageConstants.PHONE_NUMBER_REQUIRED)),
+
+                validators = listOf(
+                    Validators.Custom(
+                        MessageConstants.INVALID_PHONE_NUMBER,
+                        ::validatePhoneNumber
+                    ), Validators.Required(MessageConstants.PHONE_NUMBER_REQUIRED)
+                ),
                 label = FormFieldConstants.PHONE_NUMBER,
                 placeholder = FormFieldConstants.PHONE_NUMBER,
                 textFieldType = CustomTextFieldType.Outlined,
@@ -91,6 +98,10 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                 initial = "",
                 name = "repeatPassword",
                 validators = listOf(
+                    Validators.Custom(
+                        MessageConstants.PASSWORDS_DO_NOT_MATCH,
+                        ::validateRepeatedPassword
+                    ),
                     Validators.Min(
                         FormFieldLengthConstants.PASSWORD,
                         MessageConstants.PASSWORD_LENGTH
@@ -126,9 +137,13 @@ class SignupViewModel @Inject constructor() : ViewModel() {
         formState.getDataWithValidation()
     }
 
-    private fun validatePhoneNumber(value: Any) : Boolean{
+    private fun validatePhoneNumber(value: Any): Boolean {
         val pattern = Regex(RegexConstants.PHONE_NUMBER)
         return pattern.containsMatchIn(value as String)
+    }
+
+    private fun validateRepeatedPassword(value: Any): Boolean {
+        return formState.getData().password == value.toString()
     }
 }
 

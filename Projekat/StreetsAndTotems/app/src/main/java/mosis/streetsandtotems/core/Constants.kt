@@ -59,7 +59,7 @@ object MessageConstants {
         "In order to use Streets And Totems Location has to be turned on!"
     const val DIALOG_LOCATION_CONFIRM_BUTTON = "Turn on location"
     const val DIALOG_LOCATION_DISMISS_BUTTON = "Close app"
-
+    const val PASSWORDS_DO_NOT_MATCH = "Passwords don't match!"
 }
 
 object TitleConstants {
@@ -90,3 +90,4 @@ object RegexConstants {
 object PathConstants {
     const val IMAGES = "image/*"
 }
+

@@ -3,6 +3,7 @@ package mosis.streetsandtotems.core.presentation.navigation
 import android.Manifest
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
@@ -43,8 +44,11 @@ fun MainScreen() {
 }
 
 @Composable
-private fun DrawerContent() {
 
+private fun DrawerContent() {
+    Row() {
+
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,7 +61,9 @@ private fun DrawerScreen(navController: NavHostController, drawerState: DrawerSt
             BottomBarDestinations.DefaultDestinations()
         )
     }) {
-        Box(modifier = Modifier.fillMaxSize().padding(it)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(it)) {
             DestinationsNavHost(
                 navGraph = NavGraphs.main,
                 navController = navController,
