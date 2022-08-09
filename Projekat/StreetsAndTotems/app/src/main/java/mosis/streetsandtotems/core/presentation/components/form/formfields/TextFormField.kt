@@ -65,7 +65,7 @@ class TextFormField(
                 label = label,
                 placeholder = placeholder,
                 leadingIcon = leadingIcon,
-                trailingIcon = trailingIcon,
+                trailingIcon = if(clearable && fieldState.value != "") trailingIcon else null,
                 onTrailingIconClicked = { fieldState.change("") },
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,

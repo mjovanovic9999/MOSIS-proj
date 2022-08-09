@@ -26,16 +26,11 @@ enum class AuthButtonsType {
 @Composable
 fun AuthButtons(type: AuthButtonsType) {
     Column() {
-        when (type) {
-            AuthButtonsType.SignUp -> {
-
-            }
-            AuthButtonsType.SignIn -> {
                 CustomButton(
                     matchParentWidth = true,
                     clickHandler = { /*TODO*/ },
                     buttonType = CustomButtonType.Filled,
-                    text = ButtonConstants.SIGN_IN_GOOGLE,
+                    text = if(type == AuthButtonsType.SignUp) ButtonConstants.SIGN_UP_GOOGLE else ButtonConstants.SIGN_IN_GOOGLE,
                     icon = ImageVector.vectorResource(
                         id = R.drawable.google
                     ),
@@ -50,7 +45,7 @@ fun AuthButtons(type: AuthButtonsType) {
                     matchParentWidth = true,
                     clickHandler = { /*TODO*/ },
                     buttonType = CustomButtonType.Filled,
-                    text = ButtonConstants.SIGN_IN_FACEBOOK,
+                    text = if(type == AuthButtonsType.SignUp) ButtonConstants.SIGN_UP_FACEBOOK else ButtonConstants.SIGN_IN_FACEBOOK,
                     icon = ImageVector.vectorResource(id = R.drawable.facebook),
                     iconSize = MaterialTheme.sizes.icon,
                     colors = ButtonDefaults.buttonColors(
@@ -59,7 +54,5 @@ fun AuthButtons(type: AuthButtonsType) {
                     ),
                     textStyle = MaterialTheme.typography.titleMedium
                 )
-            }
-        }
     }
 }

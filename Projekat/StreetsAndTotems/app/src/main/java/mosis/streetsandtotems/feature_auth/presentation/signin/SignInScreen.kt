@@ -17,6 +17,8 @@ import mosis.streetsandtotems.core.presentation.components.CustomButton
 import mosis.streetsandtotems.core.presentation.components.CustomButtonType
 import mosis.streetsandtotems.core.presentation.components.form.Form
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.AuthNavGraph
+import mosis.streetsandtotems.destinations.SignInScreenDestination
+import mosis.streetsandtotems.destinations.SignUpScreenDestination
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtons
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtonsType
 import mosis.streetsandtotems.ui.theme.sizes
@@ -44,7 +46,7 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
                     clickHandler = { /*TODO*/ },
                     text = ButtonConstants.FORGOT_PASSWORD,
                     buttonType = CustomButtonType.Text,
-                    buttonModifier = Modifier.align(Alignment.End),
+                    buttonModifier = Modifier.align(Alignment.Start),
                     textStyle = MaterialTheme.typography.labelMedium,
                 )
             }
@@ -60,7 +62,7 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
             AuthButtons(type = AuthButtonsType.SignIn)
 
             CustomButton(
-                clickHandler = { /*TODO*/ },
+                clickHandler = { destinationsNavigator.navigate(SignUpScreenDestination) },
                 text = ButtonConstants.NO_ACCOUNT,
                 buttonType = CustomButtonType.Text,
                 buttonModifier = Modifier.align(Alignment.CenterHorizontally),

@@ -32,10 +32,10 @@ fun CustomButton(
     clickHandler: () -> Unit,
     text: String = "",
     buttonType: CustomButtonType = CustomButtonType.Filled,
-    buttonModifier: Modifier = if(matchParentWidth) Modifier.fillMaxWidth() else Modifier,
+    buttonModifier: Modifier = if (matchParentWidth) Modifier.fillMaxWidth() else Modifier,
     colors: ButtonColors = if (buttonType == CustomButtonType.Filled) ButtonDefaults.buttonColors() else if (buttonType == CustomButtonType.Text) ButtonDefaults.textButtonColors() else ButtonDefaults.outlinedButtonColors(),
     border: BorderStroke = if (buttonType != CustomButtonType.Outlined) BorderStroke(
-        0.dp,
+        MaterialTheme.sizes.none,
         Color.Transparent
     ) else ButtonDefaults.outlinedButtonBorder,
     enabled: Boolean = true,
@@ -60,7 +60,7 @@ fun CustomButton(
                 iconPosition = iconPosition,
                 iconSize,
                 textStyle,
-                if(matchParentWidth) Modifier.fillMaxWidth() else Modifier
+                if (matchParentWidth) Modifier.fillMaxWidth() else Modifier
             )
         }
         CustomButtonType.Outlined -> OutlinedButton(
@@ -77,13 +77,21 @@ fun CustomButton(
                 iconPosition = iconPosition,
                 iconSize,
                 textStyle,
-                if(matchParentWidth) Modifier.fillMaxWidth() else Modifier
+                if (matchParentWidth) Modifier.fillMaxWidth() else Modifier
             )
         }
         CustomButtonType.Text -> TextButton(
-            contentPadding = if(contentPadding != ButtonDefaults.ContentPadding) contentPadding else PaddingValues(top = MaterialTheme.sizes.none, bottom = MaterialTheme.sizes.none, start = 5.dp, end = 5.dp),
+            contentPadding = if (contentPadding != ButtonDefaults.ContentPadding) contentPadding else PaddingValues(
+                top = MaterialTheme.sizes.none,
+                bottom = MaterialTheme.sizes.none,
+                start = MaterialTheme.sizes.text_button_side_padding,
+                end = MaterialTheme.sizes.text_button_side_padding
+            ),
             onClick = clickHandler,
-            modifier = buttonModifier.defaultMinSize(ButtonDefaults.MinWidth, MaterialTheme.sizes.text_button_min_heigth),
+            modifier = buttonModifier.defaultMinSize(
+                ButtonDefaults.MinWidth,
+                MaterialTheme.sizes.text_button_min_heigth
+            ),
             colors = colors,
             border = border,
             enabled = enabled
@@ -94,7 +102,7 @@ fun CustomButton(
                 iconPosition = iconPosition,
                 iconSize,
                 textStyle,
-                if(matchParentWidth) Modifier.fillMaxWidth() else Modifier
+                if (matchParentWidth) Modifier.fillMaxWidth() else Modifier
             )
         }
     }
@@ -109,28 +117,28 @@ private fun ButtonContent(
     textStyle: TextStyle,
     textModifier: Modifier,
 ) {
-        if (icon != null && iconPosition == IconPosition.Start) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(iconSize)
-            )
-            Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-        }
-        Text(
-            text = text,
-            style = textStyle,
-            textAlign = TextAlign.Center,
-            modifier = textModifier
+    if (icon != null && iconPosition == IconPosition.Start) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(iconSize)
         )
-        if (icon != null && iconPosition == IconPosition.End) {
-            Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(iconSize)
-            )
-        }
+        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+    }
+    Text(
+        text = text,
+        style = textStyle,
+        textAlign = TextAlign.Center,
+        modifier = textModifier
+    )
+    if (icon != null && iconPosition == IconPosition.End) {
+        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(iconSize)
+        )
+    }
 }
 
 @Composable

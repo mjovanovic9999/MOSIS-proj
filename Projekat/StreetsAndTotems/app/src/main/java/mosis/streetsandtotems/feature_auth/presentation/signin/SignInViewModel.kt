@@ -7,6 +7,8 @@ import androidx.compose.ui.text.input.*
 import androidx.lifecycle.ViewModel
 import com.dsc.form_builder.Validators
 import dagger.hilt.android.lifecycle.HiltViewModel
+import mosis.streetsandtotems.core.FormFieldConstants
+import mosis.streetsandtotems.core.FormFieldLenghtConstants
 import mosis.streetsandtotems.core.MessageConstants
 import mosis.streetsandtotems.core.VisualTransformationConstants
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
@@ -22,8 +24,8 @@ class SignInViewModel @Inject constructor() : ViewModel() {
                 initial = "",
                 name = "username",
                 validators = listOf(Validators.Required(MessageConstants.USERNAME_REQUIRED)),
-                label = "Username",
-                placeholder = "Username",
+                label = FormFieldConstants.USERNAME,
+                placeholder = FormFieldConstants.USERNAME,
                 textFieldType = CustomTextFieldType.Outlined,
                 singleLine = true,
                 clearable = true,
@@ -32,27 +34,35 @@ class SignInViewModel @Inject constructor() : ViewModel() {
             TextFormField(
                 initial = "",
                 name = "password",
-                validators = listOf(Validators.Required(MessageConstants.PASSWORD_REQUIRED)),
-                label = "Password",
-                placeholder = "Password",
+                validators = listOf(
+                    Validators.Min(
+                        FormFieldLenghtConstants.PASSWORD, MessageConstants.PASSWORD_LENGTH
+                    ),
+                    Validators.Required(MessageConstants.PASSWORD_REQUIRED),
+                ),
+                label = FormFieldConstants.PASSWORD,
+                placeholder = FormFieldConstants.PASSWORD,
                 textFieldType = CustomTextFieldType.Outlined,
                 singleLine = true,
                 clearable = true,
-                visualTransformation = VisualTransformation { text -> TransformedText(
-                    AnnotatedString(VisualTransformationConstants.PASSWORD.repeat(text.length)),
-                    OffsetMapping.Identity
-                )},
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
-                keyboardActions = KeyboardActions(onDone = {submit()})
+                visualTransformation = { text ->
+                    TransformedText(
+                        AnnotatedString(VisualTransformationConstants.PASSWORD.repeat(text.length)),
+                        OffsetMapping.Identity
+                    )
+                },
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Password
+                ),
+                keyboardActions = KeyboardActions(onDone = { submit() })
             )
         ),
         Credentials::class
     )
 
     fun submit() {
-        if (formState.validate()) {
-            val data = formState.getData()
-        }
+        formState.getDataWithValidation()
     }
 
 }

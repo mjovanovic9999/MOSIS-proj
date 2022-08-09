@@ -11,7 +11,9 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.dependency
 import mosis.streetsandtotems.NavGraphs
 import mosis.streetsandtotems.destinations.SignInScreenDestination
+import mosis.streetsandtotems.destinations.SignUpScreenDestination
 import mosis.streetsandtotems.feature_auth.presentation.signin.SignInViewModel
+import mosis.streetsandtotems.feature_auth.presentation.signup.SignupViewModel
 
 
 @Composable
@@ -20,6 +22,7 @@ fun AppNavigation() {
     {
         DestinationsNavHost(navGraph = NavGraphs.root, dependenciesContainerBuilder = {
             dependency(SignInScreenDestination) { hiltViewModel<SignInViewModel>() }
+            dependency(SignUpScreenDestination) { hiltViewModel<SignupViewModel>()}
         })
     }
 }
