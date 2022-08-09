@@ -8,6 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import mosis.streetsandtotems.core.MessageConstants.DIALOG_LOCATION_CONFIRM_BUTTON
+import mosis.streetsandtotems.core.MessageConstants.DIALOG_LOCATION_DISMISS_BUTTON
+import mosis.streetsandtotems.core.MessageConstants.DIALOG_LOCATION_TEXT
+import mosis.streetsandtotems.core.MessageConstants.DIALOG_LOCATION_TITLE
 
 @Composable
 fun CustomLocationDialog(activity: Activity, locationDialogOpenState: MutableState<Boolean>) {
@@ -16,12 +20,12 @@ fun CustomLocationDialog(activity: Activity, locationDialogOpenState: MutableSta
             onDismissRequest = { },
             title = {
                 Text(
-                    "Location disabled",
+                    DIALOG_LOCATION_TITLE,
                 )
             },
             text = {
                 Text(
-                    "In order to use Streets And Totems Location has to be turned on!",
+                    DIALOG_LOCATION_TEXT,
                 )
             },
             confirmButton = {
@@ -31,7 +35,7 @@ fun CustomLocationDialog(activity: Activity, locationDialogOpenState: MutableSta
                         activity.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                     }
                 ) {
-                    Text("Turn on Location")
+                    Text(DIALOG_LOCATION_CONFIRM_BUTTON)
                 }
             },
             dismissButton = {
@@ -40,7 +44,7 @@ fun CustomLocationDialog(activity: Activity, locationDialogOpenState: MutableSta
                         activity.finishAndRemoveTask()
                     }
                 ) {
-                    Text("Close app")
+                    Text(DIALOG_LOCATION_DISMISS_BUTTON)
                 }
             }
         )

@@ -4,15 +4,12 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import mosis.streetsandtotems.ui.theme.sizes
 
 enum class CustomButtonType {
@@ -90,7 +87,7 @@ fun CustomButton(
             onClick = clickHandler,
             modifier = buttonModifier.defaultMinSize(
                 ButtonDefaults.MinWidth,
-                MaterialTheme.sizes.text_button_min_heigth
+                MaterialTheme.sizes.text_button_min_height
             ),
             colors = colors,
             border = border,

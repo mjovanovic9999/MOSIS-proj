@@ -15,14 +15,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import mosis.streetsandtotems.core.domain.util.getActivity
 
 @Composable
-fun CustomRequestPermissions(
+fun CustomRequestLocation(
     context: Context,
-    locationPermissionRequest: ActivityResultLauncher<Array<String>>,
-    permissions: Array<String> = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION
-    )
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 

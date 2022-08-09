@@ -18,7 +18,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.dependency
 import mosis.streetsandtotems.NavGraphs
-import mosis.streetsandtotems.core.presentation.components.CustomRequestPermissions
+import mosis.streetsandtotems.core.presentation.components.CustomRequestLocation
 import mosis.streetsandtotems.destinations.MapScreenDestination
 import mosis.streetsandtotems.feature_map.presentation.MapViewModel
 
@@ -26,18 +26,12 @@ import mosis.streetsandtotems.feature_map.presentation.MapViewModel
 @RootNavGraph
 @Destination
 @Composable
-fun MainScreen(locationPermissionRequest: ActivityResultLauncher<Array<String>>) {
+fun MainScreen() {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val scope = rememberCoroutineScope()
 
-    locationPermissionRequest.launch(
-        arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-    )
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -45,7 +39,7 @@ fun MainScreen(locationPermissionRequest: ActivityResultLauncher<Array<String>>)
         content = { DrawerScreen(navController = navController, drawerState = drawerState) }
     )
 
-    CustomRequestPermissions(LocalContext.current, locationPermissionRequest)
+    CustomRequestLocation(LocalContext.current)
 }
 
 @Composable

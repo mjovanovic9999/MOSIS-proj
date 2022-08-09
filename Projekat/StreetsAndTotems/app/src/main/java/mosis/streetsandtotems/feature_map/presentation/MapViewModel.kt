@@ -1,8 +1,10 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -55,17 +57,20 @@ class MapViewModel @Inject constructor(
     )
 
 
-    var locationState by mutableStateOf(LocationDTO(-1.0, -1.0,-1.0f))
+    var locationState by mutableStateOf(LocationDTO(-1.0, -1.0, -1.0f))
         private set
 
-    fun LoadLocation(cb:()->Unit) {
+    fun LoadLocation(cb: () -> Unit) {
         viewModelScope.launch {
             locationTracker.getCurrentLocation()?.let { location ->
-                locationState = locationState.copy(location.latitude, location.longitude,location.accuracy)
+                locationState =
+                    locationState.copy(location.latitude, location.longitude, location.accuracy)
                 cb()
             } ?: kotlin.run {
-                locationState = locationState.copy(-1.1, -1.1,-1.1f)
+                locationState = locationState.copy(-1.1, -1.1, -1.1f)
             }
         }
     }
+
+
 }

@@ -45,7 +45,7 @@ class SignupViewModel @Inject constructor() : ViewModel() {
             TextFormField(
                 initial = "",
                 name = "phoneNumber",
-                validators = listOf(Validators.Custom(MessageConstants.IVALID_PHONE_NUMBER, ::validatePhoneNumber), Validators.Required(MessageConstants.PHONE_NUMBER_REQUIRED)),
+                validators = listOf(Validators.Custom(MessageConstants.INVALID_PHONE_NUMBER, ::validatePhoneNumber), Validators.Required(MessageConstants.PHONE_NUMBER_REQUIRED)),
                 label = FormFieldConstants.PHONE_NUMBER,
                 placeholder = FormFieldConstants.PHONE_NUMBER,
                 textFieldType = CustomTextFieldType.Outlined,
@@ -92,7 +92,7 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                 name = "repeatPassword",
                 validators = listOf(
                     Validators.Min(
-                        FormFieldLenghtConstants.PASSWORD,
+                        FormFieldLengthConstants.PASSWORD,
                         MessageConstants.PASSWORD_LENGTH
                     ),
                     Validators.Required(MessageConstants.REPEAT_PASSWORD_REQUIRED),

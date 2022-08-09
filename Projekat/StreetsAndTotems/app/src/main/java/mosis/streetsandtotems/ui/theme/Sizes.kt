@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 
 data class Sizes (
     val auth_screen_form_width: Float = 0.75f,
-    val text_button_min_heigth: Dp = 12.dp,
+    val text_button_min_height: Dp = 12.dp,
     val none: Dp = 0.dp,
     val forgot_password_top_padding: Dp = (-20).dp,
     val icon: Dp = 24.dp,
@@ -17,7 +17,7 @@ data class Sizes (
     val sign_up_form_height: Float = 0.54f,
     val form_default_spacing: Dp = 5.dp,
     val text_button_side_padding: Dp = 5.dp,
-    val fab_image_heigth: Dp = 40.dp,
+    val fab_image_height: Dp = 40.dp,
     val fab_padding: Dp = 10.dp,
     val image_select_size: Dp = 200.dp,
     val image_select_corner: Dp = 15.dp,

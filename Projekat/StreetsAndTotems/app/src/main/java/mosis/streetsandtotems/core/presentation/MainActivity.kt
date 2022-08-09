@@ -1,65 +1,86 @@
 package mosis.streetsandtotems.core.presentation
 
 import android.Manifest
-import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import mosis.streetsandtotems.core.MessageConstants
+import mosis.streetsandtotems.core.MessageConstants.DIALOG_PERMISSION_CONFIRM_BUTTON
+import mosis.streetsandtotems.core.MessageConstants.DIALOG_PERMISSION_DISMISS_BUTTON
+import mosis.streetsandtotems.core.MessageConstants.DIALOG_PERMISSION_TEXT
+import mosis.streetsandtotems.core.MessageConstants.DIALOG_PERMISSION_TITLE
 import mosis.streetsandtotems.core.presentation.navigation.AppNavigation
-import mosis.streetsandtotems.feature_map.presentation.MapViewModel
 import mosis.streetsandtotems.ui.theme.AppTheme
 
 
 @AndroidEntryPoint
 class MainActivity() : ComponentActivity() {
 
-    val mainActivityViewModel = MainActivityViewModel()
+    //private val mainActivityViewModel = MainActivityViewModel()
+    private lateinit var startForResult: ActivityResultLauncher<Intent>
+
+    private var permissionState =  mutableStateOf(false)
+    private lateinit var locationPermissionRequest: ActivityResultLauncher<Array<String>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//<<<<<<< HEAD
-//
 
         Log.d("tag", "aj")
 
 
-//
-//
-//
-//
+        startForResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+            {
+                launchPermissionRequest()
+            }
 
-        mainActivityViewModel.locationPermissionRequest = registerForActivityResult(
+
+        locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
             when {
                 permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
                     Log.d("tag", "fine")
+                    permissionState.value = true
+
                 }
                 permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
                     Log.d("tag", "coarse")
+                    permissionState.value = true
 
                 }
                 else -> {
                     Log.d("tag", "else")
-
-//                    permissionsEnabled.enabled = false
+                    permissionState.value = false
 
                 }
             }
         }
 
+        launchPermissionRequest()
+
         installSplashScreen().apply {
         }
         setContent {
             AppTheme {
-                AppNavigation()
+                if (permissionState.value) {
+                    AppNavigation()
+                } else {
+                    CustomDialogRequestPermissions()
+                }
             }
         }
     }
@@ -163,6 +184,60 @@ class MainActivity() : ComponentActivity() {
              Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
          }
      }*/
+
+    @Composable
+    fun CustomDialogRequestPermissions() {
+
+        AlertDialog(
+            onDismissRequest = { },
+            title = {
+                Text(
+                    MessageConstants.DIALOG_PERMISSION_TITLE,
+                )
+            },
+            text = {
+                Text(
+                    MessageConstants.DIALOG_PERMISSION_TEXT,
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val intent =
+                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        val uri: Uri =
+                            Uri.fromParts("package", packageName, null)
+                        intent.data = uri
+
+                        startForResult.launch(intent)
+                    }
+                ) {
+                    Text(MessageConstants.DIALOG_PERMISSION_CONFIRM_BUTTON)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        finishAndRemoveTask()
+                    }
+                ) {
+                    Text(MessageConstants.DIALOG_PERMISSION_DISMISS_BUTTON)
+                }
+            }
+        )
+    }
+
+    private fun launchPermissionRequest(
+        permissions: Array<String> = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            //Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        )
+    ) {
+        locationPermissionRequest.launch(
+            permissions
+        )
+    }
 
 
 }
