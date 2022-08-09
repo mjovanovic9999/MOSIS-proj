@@ -9,22 +9,25 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
     <application
         android:name=".core.StreetsAndTotemsApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/logo_only_tiki"
+        android:icon="@drawable/tiki"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/logo_only_tiki"
+        android:roundIcon="@drawable/tiki"
         android:supportsRtl="true"
-        android:theme="@style/Theme.StreetsAndTotems"
+        android:theme="@style/Theme.AppSplash"
         tools:targetApi="31">
         <activity
             android:name=".core.presentation.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.StreetsAndTotems"
+            android:theme="@style/Theme.AppSplash"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,6 +35,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.canhub.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
     </application>
 
 

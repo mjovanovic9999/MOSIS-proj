@@ -60,3 +60,6 @@ val md_theme_dark_shadow = Color(0xFF000000)
 
 val seed = Color(0xFF006b5c)
 val error = Color(0xFFba1b1b)
+
+val google_sign_in = Color(0xFFFF4444)
+val facebook_sign_in = Color(0xFF4462FF)

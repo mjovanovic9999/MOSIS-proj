@@ -28,7 +28,7 @@ class TextFormField(
     validators: List<Validators> = emptyList(),
     transform: Transform<String>? = null,
     private val textFieldType: CustomTextFieldType = CustomTextFieldType.Basic,
-    private val modifier: Modifier = Modifier,
+    private val modifier: Modifier = Modifier.fillMaxWidth(),
     private val enabled: Boolean = true,
     private val readOnly: Boolean = false,
     private val label: String = "",
@@ -65,7 +65,7 @@ class TextFormField(
                 label = label,
                 placeholder = placeholder,
                 leadingIcon = leadingIcon,
-                trailingIcon = trailingIcon,
+                trailingIcon = if(clearable && fieldState.value != "") trailingIcon else null,
                 onTrailingIconClicked = { fieldState.change("") },
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
@@ -73,12 +73,11 @@ class TextFormField(
                 maxLines = maxLines,
                 visualTransformation = visualTransformation
             )
-            if (fieldState.hasError)
-                Text(
-                    text = fieldState.errorMessage,
-                    color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Left
-                )
+            Text(
+                text = if(fieldState.hasError) fieldState.errorMessage else "",
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Left
+            )
         }
     }
 }
