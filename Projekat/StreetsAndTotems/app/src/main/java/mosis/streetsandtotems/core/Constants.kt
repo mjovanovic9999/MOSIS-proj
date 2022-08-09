@@ -32,6 +32,7 @@ object MessageConstants {
     const val PHONE_NUMBER_REQUIRED = "Phone number is required!"
     const val IVALID_PHONE_NUMBER = "Invalid phone number!"
     const val REPEAT_PASSWORD_REQUIRED = "Repeating password is required!"
+    const val PASSWORDS_DO_NOT_MATCH = "Passwords don't match!"
 }
 
 object TitleConstants {
@@ -57,8 +58,4 @@ object NavBarConstants {
 
 object RegexConstants{
     const val PHONE_NUMBER = "^\\+?[0-9]+\$"
-}
-
-object PathConstants{
-    const val IMAGES = "image/*"
 }
