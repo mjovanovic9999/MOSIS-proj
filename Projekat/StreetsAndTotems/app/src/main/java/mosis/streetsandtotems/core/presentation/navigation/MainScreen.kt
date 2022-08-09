@@ -47,7 +47,9 @@ fun MainScreen() {
 
 @Composable
 private fun DrawerContent(){
-
+    Row() {
+        
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
