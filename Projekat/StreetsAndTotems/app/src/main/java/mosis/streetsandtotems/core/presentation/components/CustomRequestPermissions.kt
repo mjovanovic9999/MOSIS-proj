@@ -3,6 +3,7 @@ package mosis.streetsandtotems.core.presentation.components
 import android.Manifest
 import android.content.Context
 import android.location.LocationManager
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -25,21 +26,27 @@ fun CustomRequestPermissions(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val locationDialogOpenState = remember { mutableStateOf(false) }
+    val locationDialogOpenState = remember { mutableStateOf(true) }
+
+
+    Log.d("tag",locationDialogOpenState.value.toString()+"custom")
 
     DisposableEffect(
         key1 = lifecycleOwner,
         effect = {
             val observer = LifecycleEventObserver { _, event ->
-                if (event == Lifecycle.Event.ON_RESUME) {
-                    locationPermissionRequest.launch(permissions)
+                if (event == Lifecycle.Event.ON_CREATE) {
+                    //locationPermissionRequest.launch(permissions)
+TODO("SAMO OBRADITI KAD USER IDE DENY TJ ELSE")
+                Log.d("tag","ON CREATE")
 
-                    val locationManager =
-                        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-                    locationDialogOpenState.value =
-                        !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                                && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+//                    val locationManager =
+//                        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+//                    locationDialogOpenState.value =
+//                        !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+//                                && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
                     //context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
 
@@ -52,8 +59,8 @@ fun CustomRequestPermissions(
             }
         }
     )
-    CustomLocationDialog(
+    /*CustomLocationDialog(
         activity = context.getActivity(),
         locationDialogOpenState = locationDialogOpenState
-    )
+    )*/
 }

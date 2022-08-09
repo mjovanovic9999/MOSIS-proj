@@ -1,7 +1,10 @@
 package mosis.streetsandtotems.core.presentation
 
 import android.Manifest
+import android.app.Activity
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,36 +17,55 @@ import mosis.streetsandtotems.core.presentation.navigation.AppNavigation
 import mosis.streetsandtotems.core.presentation.screens.TikiScreen
 import mosis.streetsandtotems.ui.theme.AppTheme
 
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var permissionsEnabled = object { var enabled = true }
-
-
+        val permissionsEnabled = object {
+            var enabled = true
+        }
+        Log.d("tag", "aj")
 
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
             when {
                 permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                    Log.d("tag", "fine")
                 }
                 permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                    Log.d("tag", "coarse")
+
                 }
                 else -> {
-                    permissionsEnabled.enabled=false
+                    Log.d("tag", "else")
+
+                    permissionsEnabled.enabled = false
+                    setContent {
+                        AppTheme {
+                            TikiScreen()
+                        }
+                    }
                 }
             }
         }
+
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
 
 
         setContent {
             AppTheme {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    if(permissionsEnabled.enabled)
+//                    if (permissionsEnabled.enabled)
                         AppNavigation(locationPermissionRequest)
-                    else TikiScreen()
+//                    else TikiScreen()
                 }
             }
         }
