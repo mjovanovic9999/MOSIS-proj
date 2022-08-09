@@ -7,6 +7,7 @@ import mosis.streetsandtotems.destinations.DirectionDestination
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.ui.res.vectorResource
 import mosis.streetsandtotems.R
+import mosis.streetsandtotems.core.NavBarConstants
 import mosis.streetsandtotems.destinations.BackpackScreenDestination
 import mosis.streetsandtotems.destinations.MapScreenDestination
 import mosis.streetsandtotems.destinations.TotemsScreenDestination
@@ -26,13 +27,13 @@ sealed class BottomBarDestinations(open val destinations: List<BottomBarDestinat
                         id = R.drawable.backpack
                     )
                 },
-                "Backpack"
+                NavBarConstants.BACKPACK
             ),
             BottomBarDestination(
                 MapScreenDestination, {
                     Icons.Outlined.Map
                 },
-                "Map"
+                NavBarConstants.MAP
             ),
             BottomBarDestination(
                 TotemsScreenDestination, {
@@ -40,7 +41,7 @@ sealed class BottomBarDestinations(open val destinations: List<BottomBarDestinat
                         id = R.drawable.totem
                     )
                 },
-                "Totems"
+                NavBarConstants.TOTEMS
             ),
         )
     ) : BottomBarDestinations(destinations)

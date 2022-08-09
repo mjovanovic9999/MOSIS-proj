@@ -8,27 +8,34 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mosis.streetsandtotems.core.presentation.navigation.AppNavigation
-import mosis.streetsandtotems.core.presentation.screens.TikiScreen
+import mosis.streetsandtotems.feature_map.presentation.MapViewModel
 import mosis.streetsandtotems.ui.theme.AppTheme
 
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity() : ComponentActivity() {
+
+    val mainActivityViewModel = MainActivityViewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//<<<<<<< HEAD
+//
 
-        val permissionsEnabled = object {
-            var enabled = true
-        }
         Log.d("tag", "aj")
 
-        val locationPermissionRequest = registerForActivityResult(
+
+//
+//
+//
+//
+
+        mainActivityViewModel.locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
             when {
@@ -42,31 +49,17 @@ class MainActivity : ComponentActivity() {
                 else -> {
                     Log.d("tag", "else")
 
-                    permissionsEnabled.enabled = false
-                    setContent {
-                        AppTheme {
-                            TikiScreen()
-                        }
-                    }
+//                    permissionsEnabled.enabled = false
+
                 }
             }
         }
 
-        locationPermissionRequest.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        )
-
-
+        installSplashScreen().apply {
+        }
         setContent {
             AppTheme {
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-//                    if (permissionsEnabled.enabled)
-                        AppNavigation(locationPermissionRequest)
-//                    else TikiScreen()
-                }
+                AppNavigation()
             }
         }
     }
