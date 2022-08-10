@@ -1,11 +1,16 @@
-package mosis.streetsandtotems.feature_map.presentation.map
+package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import mosis.streetsandtotems.feature_map.domain.LocationDTO
+import mosis.streetsandtotems.feature_map.domain.LocationTracker
 import ovh.plrapps.mapcompose.api.addLayer
 import ovh.plrapps.mapcompose.api.enableRotation
 import ovh.plrapps.mapcompose.core.TileStreamProvider
@@ -14,7 +19,10 @@ import java.io.FileInputStream
 import javax.inject.Inject
 
 @HiltViewModel
-class MapViewModel @Inject constructor(private val appContext: Application) : ViewModel() {
+class MapViewModel @Inject constructor(
+    private val appContext: Application,
+    private val locationTracker: LocationTracker
+) : ViewModel() {
 
     val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
         try {
@@ -31,7 +39,7 @@ class MapViewModel @Inject constructor(private val appContext: Application) : Vi
             null
         }
     }
-    val state: MapState by mutableStateOf(
+    val mapState: MapState by mutableStateOf(
         MapState(
             19,
             67108864,
@@ -46,17 +54,21 @@ class MapViewModel @Inject constructor(private val appContext: Application) : Vi
         }
     )
 
-}
 
-/*.pointerInput(Unit) {
-        detectTapGestures(onTap = {
-            viewModel.state.addMarker("id", x =it.x.toDouble(), y = it.y.toDouble() ) {
-                Image(
-                    painter=painterResource(R.drawable.pin_tiki),
-                    contentDescription = null,
-                    modifier = Modifier.size(50.dp),
-                )
-                Toast.makeText(LocalContext.current, it.x.toString(), Toast.LENGTH_SHORT).show()
-                Toast.makeText(LocalContext.current, it.y.toString(), Toast.LENGTH_SHORT).show()
-            }})
-    }*/
+    var locationState by mutableStateOf(LocationDTO(-1.0, -1.0, -1.0f))
+        private set
+
+    fun LoadLocation(cb: () -> Unit) {
+        viewModelScope.launch {
+            locationTracker.getCurrentLocation()?.let { location ->
+                locationState =
+                    locationState.copy(location.latitude, location.longitude, location.accuracy)
+                cb()
+            } ?: kotlin.run {
+                locationState = locationState.copy(-1.1, -1.1, -1.1f)
+            }
+        }
+    }
+
+
+}
