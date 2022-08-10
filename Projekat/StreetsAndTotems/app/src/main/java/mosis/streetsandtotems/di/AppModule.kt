@@ -1,5 +1,8 @@
 package mosis.streetsandtotems.di
 
+import android.app.Application
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -33,5 +36,12 @@ object AppModule {
     //Use Cases
     @Provides
     @Singleton
-    fun proviceAuthUseCases(authRepository: AuthRepository) = AuthUseCases(emailAndPasswoedSignIn = EmailAndPasswordSignIn(authRepository))
+    fun proviceAuthUseCases(authRepository: AuthRepository) =
+        AuthUseCases(emailAndPasswoedSignIn = EmailAndPasswordSignIn(authRepository))
+
+    @Provides
+    @Singleton
+    fun provideFusedLocationProviderClient(app: Application): FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(app)
+    }
 }

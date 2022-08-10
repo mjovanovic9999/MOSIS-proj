@@ -46,9 +46,10 @@ class SignupViewModel @Inject constructor() : ViewModel() {
             TextFormField(
                 initial = "",
                 name = "phoneNumber",
+
                 validators = listOf(
                     Validators.Custom(
-                        MessageConstants.IVALID_PHONE_NUMBER,
+                        MessageConstants.INVALID_PHONE_NUMBER,
                         ::validatePhoneNumber
                     ), Validators.Required(MessageConstants.PHONE_NUMBER_REQUIRED)
                 ),
@@ -97,9 +98,12 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                 initial = "",
                 name = "repeatPassword",
                 validators = listOf(
-                    Validators.Custom(MessageConstants.PASSWORDS_DO_NOT_MATCH, ::validateRepeatedPassword),
+                    Validators.Custom(
+                        MessageConstants.PASSWORDS_DO_NOT_MATCH,
+                        ::validateRepeatedPassword
+                    ),
                     Validators.Min(
-                        FormFieldLenghtConstants.PASSWORD,
+                        FormFieldLengthConstants.PASSWORD,
                         MessageConstants.PASSWORD_LENGTH
                     ),
                     Validators.Required(MessageConstants.REPEAT_PASSWORD_REQUIRED),

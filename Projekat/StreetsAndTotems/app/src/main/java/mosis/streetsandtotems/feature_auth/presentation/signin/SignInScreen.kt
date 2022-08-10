@@ -42,7 +42,7 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
                 painter = painterResource(id = R.drawable.logo_text),
                 contentDescription = ImageContentDescriptionConstants.LOGO_TEXT
             )
-            Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.sizes.forgot_password_top_padding)){
+            Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.sizes.forgot_password_top_padding)) {
                 Form(formState = viewModel.formState, spacing = MaterialTheme.sizes.none)
                 CustomButton(
                     clickHandler = { /*TODO*/ },
@@ -54,7 +54,7 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
             }
             CustomButton(
                 matchParentWidth = true,
-                clickHandler = { destinationsNavigator.navigate(MainScreenDestination)},
+                clickHandler = { destinationsNavigator.navigate(MainScreenDestination) },
                 text = ButtonConstants.SIGN_IN,
                 buttonType = CustomButtonType.Outlined,
                 buttonModifier = Modifier,

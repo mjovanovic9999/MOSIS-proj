@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.dsc.form_builder.Validators
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mosis.streetsandtotems.core.FormFieldConstants
-import mosis.streetsandtotems.core.FormFieldLenghtConstants
+import mosis.streetsandtotems.core.FormFieldLengthConstants
 import mosis.streetsandtotems.core.MessageConstants
 import mosis.streetsandtotems.core.VisualTransformationConstants
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
@@ -36,7 +36,7 @@ class SignInViewModel @Inject constructor() : ViewModel() {
                 name = "password",
                 validators = listOf(
                     Validators.Min(
-                        FormFieldLenghtConstants.PASSWORD, MessageConstants.PASSWORD_LENGTH
+                        FormFieldLengthConstants.PASSWORD, MessageConstants.PASSWORD_LENGTH
                     ),
                     Validators.Required(MessageConstants.PASSWORD_REQUIRED),
                 ),

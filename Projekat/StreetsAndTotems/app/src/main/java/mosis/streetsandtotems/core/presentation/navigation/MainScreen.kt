@@ -43,10 +43,21 @@ fun MainScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
 
+    var myLocation = remember { mutableStateOf(LocationDTO(-1.0, -1.0, -1.0f)) }
+
+
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = { DrawerContent(Modifier.align(Alignment.CenterHorizontally)) },
         content = { DrawerScreen(navController = navController, drawerState = drawerState) }
+    )
+    CustomRequestPermission(
+        arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        )
     )
 }
 
@@ -211,14 +222,19 @@ private fun DrawerScreen(navController: NavHostController, drawerState: DrawerSt
             destinations = BottomBarDestinations.DefaultDestinations()
         )
     }) {
-        DestinationsNavHost(
-            navGraph = NavGraphs.main,
-            navController = navController,
-            dependenciesContainerBuilder = {
-                dependency(MapScreenDestination) { drawerState }
-                dependency(MapScreenDestination) { hiltViewModel<MapViewModel>() }
-            })
-
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
+            DestinationsNavHost(
+                navGraph = NavGraphs.main,
+                navController = navController,
+                dependenciesContainerBuilder = {
+                    dependency(MapScreenDestination) { drawerState }
+                    dependency(MapScreenDestination) { hiltViewModel<MapViewModel>() }
+                })
+        }
     }
 }
 
@@ -290,4 +306,3 @@ fun DrawerIconSelection(label: String) {
             )
         }
     }
-}

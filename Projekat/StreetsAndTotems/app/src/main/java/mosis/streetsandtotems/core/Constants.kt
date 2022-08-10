@@ -19,11 +19,28 @@ object ImageContentDescriptionConstants {
     const val LEADERBOARD = "Leaderboard icon"
 }
 
+object PinConstants {
+    const val MY_PIN = "0"
+}
+
+object LocationConstants {
+    const val ACTION_START_OR_RESUME_SERVICE = "ACTION_START_OR_RESUME_SERVICE"
+    const val ACTION_PAUSE_SERVICE = "ACTION_PAUSE_SERVICE"
+    const val ACTION_STOP_SERVICE = "ACTION_STOP_SERVICE"
+    const val ACTION_SHOW_TRACKING_FRAGMENT = "ACTION_SHOW_TRACKING_FRAGMENT"
+}
+
+object NotificationConstants {
+    const val NOTIFICATION_CHANNEL_ID = "tracking_channel"
+    const val NOTIFICATION_CHANNEL_NAME = "Tracking"
+    const val NOTIFICATION_ID = 1
+}
+
 object VisualTransformationConstants {
     const val PASSWORD = "*"
 }
 
-object FormFieldLenghtConstants {
+object FormFieldLengthConstants {
     const val PASSWORD = 8
 }
 
@@ -34,8 +51,18 @@ object MessageConstants {
     const val FIRST_NAME_REQUIRED = "First name is required!"
     const val LAST_NAME_REQUIRED = "Last name is required!"
     const val PHONE_NUMBER_REQUIRED = "Phone number is required!"
-    const val IVALID_PHONE_NUMBER = "Invalid phone number!"
+    const val INVALID_PHONE_NUMBER = "Invalid phone number!"
     const val REPEAT_PASSWORD_REQUIRED = "Repeating password is required!"
+    const val DIALOG_PERMISSION_TITLE = "Location permission is disabled"
+    const val DIALOG_PERMISSION_TEXT =
+        "In order to use Streets And Totems location permission has to be granted!"
+    const val DIALOG_PERMISSION_CONFIRM_BUTTON = "Turn on permissions"
+    const val DIALOG_PERMISSION_DISMISS_BUTTON = "Close app"
+    const val DIALOG_LOCATION_TITLE = "Location disabled"
+    const val DIALOG_LOCATION_TEXT =
+        "In order to use Streets And Totems Location has to be turned on!"
+    const val DIALOG_LOCATION_CONFIRM_BUTTON = "Turn on location"
+    const val DIALOG_LOCATION_DISMISS_BUTTON = "Close app"
     const val PASSWORDS_DO_NOT_MATCH = "Passwords don't match!"
 }
 
@@ -60,7 +87,7 @@ object NavBarConstants {
     const val TOTEMS = "Totems"
 }
 
-object RegexConstants{
+object RegexConstants {
     const val PHONE_NUMBER = "^\\+?[0-9]+\$"
 }
 
