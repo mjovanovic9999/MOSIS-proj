@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.feature_map.presentation
 
-import android.app.Activity
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -14,12 +13,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.R
-import mosis.streetsandtotems.core.domain.util.getActivity
 import mosis.streetsandtotems.core.presentation.components.CustomFAB
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
@@ -68,7 +64,6 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
                 val context = LocalContext.current
 
                 CustomFAB(R.drawable.locate_me, {
-                    askPermission(context.getActivity())
                     locateUser(context, mapViewModel)
                     /*    mapViewModel.viewModelScope.launch {
                             mapViewModel.state.centerOnMarker(
@@ -98,39 +93,3 @@ fun locateUser(context: Context, viewModel: MapViewModel) /*:Location*/ {
     }
 }
 
-
-fun askPermission(activity: Activity) {
-    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity)
-
-    val res =
-        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_LOW_POWER, null)
-
-    res.addOnCompleteListener { task ->
-        if (task.isSuccessful) {
-            val lastKnownLocation = task.result
-
-            if (lastKnownLocation != null) {
-                /*    LatLng(
-                    lastKnownLocation.latitude,
-                    lastKnownLocation.longitude
-               )*/
-/*                    Toast.makeText(this, lastKnownLocation.latitude.toString(), Toast.LENGTH_SHORT)
-                        .show()
-                    Toast.makeText(this, lastKnownLocation.longitude.toString(), Toast.LENGTH_SHORT)
-                        .show()*/
-                Toast.makeText(
-                    activity,
-                    lastKnownLocation.accuracy.toString() + "low",
-                    Toast.LENGTH_SHORT
-                )
-
-            } else {
-                Toast.makeText(activity, "NULL", Toast.LENGTH_SHORT).show()
-
-            }
-        } else {
-            Toast.makeText(activity, "ERROR", Toast.LENGTH_SHORT).show()
-        }
-
-    }
-}

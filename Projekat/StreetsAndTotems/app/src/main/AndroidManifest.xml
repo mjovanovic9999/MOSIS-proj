@@ -37,6 +37,7 @@
         </activity>
 <!--        <service-->
 <!--            android:name=".services.LocationService"-->
+<!--            android:enabled="true"-->
 <!--            android:foregroundServiceType="location" />-->
         <activity android:name="com.canhub.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>

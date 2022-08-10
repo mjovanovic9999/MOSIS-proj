@@ -1,10 +1,8 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
