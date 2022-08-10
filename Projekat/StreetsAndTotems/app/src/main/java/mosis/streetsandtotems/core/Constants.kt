@@ -13,6 +13,10 @@ object ButtonConstants {
 
 object ImageContentDescriptionConstants {
     const val LOGO_TEXT = "Streets and totems logo"
+    const val SETTINGS = "Settings icon"
+    const val BULLET = "Numbering dot"
+    const val ACCOUNT = "Account icon"
+    const val LEADERBOARD = "Leaderboard icon"
 }
 
 object VisualTransformationConstants {
@@ -58,4 +62,18 @@ object NavBarConstants {
 
 object RegexConstants{
     const val PHONE_NUMBER = "^\\+?[0-9]+\$"
+}
+
+object DrawerConstants{
+    const val SETTINGS = "Settings"
+    const val NOTIFIACTIONS = "Enable notifications"
+    const val RUN_IN_BACKGROUND = "Run in background"
+    const val SHOW_PHONE_NUMBER = "Show my phone number"
+    const val CALL_SETTINGS = "Who can call me"
+    const val SMS_SETTINGS = "Who can message me"
+    const val LEADERBOARD = "Leaderboard"
+    const val PROFILE = "Visit profile"
+    const val LEAVE_SQUAD = "Leave squad"
+    const val SIGN_OUT = "Sign out"
+    val DROPDOWN_SELECT_LIST = listOf("Everyone", "Only squad members", "No one")
 }

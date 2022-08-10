@@ -17,6 +17,7 @@ import mosis.streetsandtotems.core.presentation.components.CustomButton
 import mosis.streetsandtotems.core.presentation.components.CustomButtonType
 import mosis.streetsandtotems.core.presentation.components.form.Form
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.AuthNavGraph
+import mosis.streetsandtotems.destinations.MainScreenDestination
 import mosis.streetsandtotems.destinations.MapScreenDestination
 import mosis.streetsandtotems.destinations.SignInScreenDestination
 import mosis.streetsandtotems.destinations.SignUpScreenDestination
@@ -53,7 +54,7 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
             }
             CustomButton(
                 matchParentWidth = true,
-                clickHandler = { destinationsNavigator.navigate(MapScreenDestination)},
+                clickHandler = { destinationsNavigator.navigate(MainScreenDestination)},
                 text = ButtonConstants.SIGN_IN,
                 buttonType = CustomButtonType.Outlined,
                 buttonModifier = Modifier,

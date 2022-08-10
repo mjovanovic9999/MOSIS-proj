@@ -1,9 +1,6 @@
 package mosis.streetsandtotems.core.presentation.navigation
 
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.ramcosta.composedestinations.navigation.navigate
@@ -11,7 +8,6 @@ import com.ramcosta.composedestinations.navigation.popBackStack
 import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
 import mosis.streetsandtotems.NavGraph
-
 import mosis.streetsandtotems.appCurrentDestinationAsState
 import mosis.streetsandtotems.destinations.Destination
 import mosis.streetsandtotems.destinations.MainScreenDestination
@@ -26,11 +22,12 @@ fun BottomBar(
     val currentDestination: Destination = navController.appCurrentDestinationAsState().value
         ?: navGrahp.startAppDestination
 
-    NavigationBar() {
+    NavigationBar {
         destinations.destinations.forEach { destination ->
             val isCurrentDestOnBackStack = navController.isRouteOnBackStack(destination.direction)
+            val selected = currentDestination == destination.direction
             NavigationBarItem(
-                selected = currentDestination == destination.direction,
+                selected = selected,
                 onClick = {
                     if (isCurrentDestOnBackStack) {
                         navController.popBackStack(destination.direction, false)
@@ -47,8 +44,19 @@ fun BottomBar(
                         restoreState = true
                     }
                 },
-                icon = { Icon(destination.icon(), contentDescription = destination.label)},
-                label = { Text(destination.label) },
+                icon = {
+                    Icon(
+                        destination.icon(),
+                        contentDescription = destination.label,
+                        tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary
+                    )
+                },
+                label = {
+                    Text(
+                        destination.label,
+                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary
+                    )
+                },
             )
         }
     }

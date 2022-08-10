@@ -42,7 +42,7 @@ fun CustomImageSelectorAndCropper() {
             .size(MaterialTheme.sizes.image_select_size)
             .background(
                 MaterialTheme.colorScheme.secondaryContainer,
-                RoundedCornerShape(MaterialTheme.sizes.image_select_corner)
+                RoundedCornerShape(MaterialTheme.sizes.image_corner)
             )
             .clickable {
                 imageCropLauncher.launch(options {
@@ -54,7 +54,7 @@ fun CustomImageSelectorAndCropper() {
         if (imageUri != null) {
             GlideImage(
                 imageModel = imageUri,
-                modifier = Modifier.clip(RoundedCornerShape(MaterialTheme.sizes.image_select_corner))
+                modifier = Modifier.clip(RoundedCornerShape(MaterialTheme.sizes.image_corner))
             )
         } else {
             Column(

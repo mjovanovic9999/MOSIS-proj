@@ -31,7 +31,7 @@ fun SignUpScreen(viewModel: SignupViewModel) {
         Text(
             text = TitleConstants.SIGN_UP,
             style = MaterialTheme.typography.displaySmall.plus(TextStyle(fontWeight = FontWeight.ExtraBold)),
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Box(
             modifier = Modifier
