@@ -29,7 +29,7 @@ fun CustomRequestPermission(
         Manifest.permission.ACCESS_BACKGROUND_LOCATION
     )
 ) {
-    var permissionGrantedState = remember { mutableStateOf(false) }
+    val permissionGrantedState = remember { mutableStateOf(true) }
 
     val permissionRequest = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()

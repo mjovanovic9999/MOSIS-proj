@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.core.presentation.navigation
 
+import android.Manifest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +12,8 @@ import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -31,7 +34,9 @@ import mosis.streetsandtotems.core.DrawerConstants
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
 import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.destinations.MapScreenDestination
-import mosis.streetsandtotems.feature_map.presentation.map.MapViewModel
+import mosis.streetsandtotems.feature_map.domain.LocationDTO
+import mosis.streetsandtotems.feature_map.presentation.MapViewModel
+import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestPermission
 import mosis.streetsandtotems.ui.theme.sizes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -306,3 +311,4 @@ fun DrawerIconSelection(label: String) {
             )
         }
     }
+}
