@@ -1,6 +1,7 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,7 @@ import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.presentation.components.CustomFAB
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
+import mosis.streetsandtotems.services.LocationService
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +66,8 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
                 val context = LocalContext.current
 
                 CustomFAB(R.drawable.locate_me, {
-                    locateUser(context, mapViewModel)
+                    context.startForegroundService(Intent(context, LocationService::class.java))
+                    //locateUser(context, mapViewModel)
                     /*    mapViewModel.viewModelScope.launch {
                             mapViewModel.state.centerOnMarker(
                                 "prvi",
@@ -74,6 +77,7 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
                 })
                 CustomFAB(R.drawable.add_pin, {
                     Toast.makeText(context, "Ako ima vreme za cutom pin", Toast.LENGTH_LONG).show()
+                    context.stopService(Intent(context, LocationService::class.java))
                 })
 
             }

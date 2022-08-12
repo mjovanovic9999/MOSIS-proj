@@ -1,6 +1,116 @@
-/*
 package mosis.streetsandtotems.services
 
+import android.app.Application
+import android.app.Service
+import android.content.Intent
+import android.location.Location
+import android.os.*
+import android.util.Log
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import mosis.streetsandtotems.core.presentation.utils.notification.NotificationService
+import java.util.*
+import javax.inject.Inject
+
+@AndroidEntryPoint
+class LocationService : Service() {
+    @Inject
+    lateinit var context: Application
+    @Inject
+    lateinit var notificationService: NotificationService
+    private val NOTIFICATION_CHANNEL_ID = "my_notification_location"
+    private val TAG = "mosis.streetsandtotems.services.LocationService"
+
+    private val serviceJob = Job()
+    private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
+
+    override fun onCreate() {
+        super.onCreate()
+        isServiceStarted = true
+
+//        val builder: NotificationCompat.Builder =
+//            NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+//                .setOngoing(false)
+//                .setSmallIcon(R.drawable.logo_only_tiki)
+//                .setContentText("AAAAAAAAAAAALO")
+//
+//
+//        val notificationManager: NotificationManager =
+//            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+//
+//        val notificationChannel = NotificationChannel(
+//            NOTIFICATION_CHANNEL_ID,
+//            NOTIFICATION_CHANNEL_ID, NotificationManager.IMPORTANCE_LOW
+//        )
+//        notificationChannel.description = NOTIFICATION_CHANNEL_ID
+//        notificationChannel.setSound(null, null)
+//        notificationChannel.enableVibration(true)
+//        notificationManager.createNotificationChannel(notificationChannel)
+        startForeground(
+            1,
+            notificationService.returnDisableBackgroundServiceNotification().build()
+        )
+
+    }
+
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        val timer = Timer()
+        LocationHelper().startListeningUserLocation(
+            this, object : MyLocationListener {
+                override fun onLocationChanged(location: Location?) {
+                    mLocation = location
+                    mLocation?.let {
+                        serviceScope.launch {
+                            Log.d("tag", it.accuracy.toString())
+//                            val apiClient = ApiClient.getInstance(this@LocationService)
+//                                .create(ApiClient::class.java)
+//                            val response = apiClient.updateLocation()
+//                            response.enqueue(object : Callback<LocationResponse> {
+//                                override fun onResponse(
+//                                    call: Call<LocationResponse>,
+//                                    response: Response<LocationResponse>
+//                                ) {
+//                                    Log.d(TAG, "onLocationChanged: Latitude ${it.latitude} , Longitude ${it.longitude}")
+//                                    Log.d(TAG, "run: Running = Location Update Successful")
+//                                }
+//
+//                                override fun onFailure(call: Call<LocationResponse>, t: Throwable) {
+//                                    Log.d(TAG, "run: Running = Location Update Failed")
+//
+//                                }
+//                            })
+
+                        }
+                    }
+                }
+            })
+        return START_STICKY
+    }
+
+
+    override fun onBind(intent: Intent): IBinder? {
+        return null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        notificationService.cancelDisableBackgroundServiceNotification()
+        isServiceStarted = false
+        serviceJob.cancel()
+
+    }
+
+
+    companion object {
+        var mLocation: Location? = null
+        var isServiceStarted = false
+    }
+}
+
+/*
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -36,7 +146,7 @@ import mosis.streetsandtotems.feature_map.domain.LocationDTO
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class LocationService:LifecycleService(){
+class mosis.streetsandtotems.services.LocationService:LifecycleService(){
 
 
     var isFirstRun = true
@@ -146,12 +256,12 @@ class LocationService:LifecycleService(){
     private fun updateNotificationTrackingState(isTracking: Boolean) {
         val notificationActionText = if(isTracking) "Pause" else "Resume"
         val pendingIntent = if(isTracking) {
-            val pauseIntent = Intent(this, LocationService::class.java).apply {
+            val pauseIntent = Intent(this, mosis.streetsandtotems.services.LocationService::class.java).apply {
                 action = LocationConstants.ACTION_PAUSE_SERVICE
             }
             PendingIntent.getService(this, 1, pauseIntent, FLAG_UPDATE_CURRENT)
         } else {
-            val resumeIntent = Intent(this, LocationService::class.java).apply {
+            val resumeIntent = Intent(this, mosis.streetsandtotems.services.LocationService::class.java).apply {
                 action = LocationConstants.ACTION_START_OR_RESUME_SERVICE
             }
             PendingIntent.getService(this, 2, resumeIntent, FLAG_UPDATE_CURRENT)
@@ -257,3 +367,4 @@ class LocationService:LifecycleService(){
         notificationManager.createNotificationChannel(channel)
     }
 }*/
+

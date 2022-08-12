@@ -10,6 +10,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mosis.streetsandtotems.core.presentation.utils.notification.NotificationService
 import mosis.streetsandtotems.feature_auth.data.data_source.FirebaseAuthDataSource
 import mosis.streetsandtotems.feature_auth.domain.repository.AuthRepository
 import mosis.streetsandtotems.feature_auth.domain.use_case.AuthUseCases
@@ -43,5 +44,12 @@ object AppModule {
     @Singleton
     fun provideFusedLocationProviderClient(app: Application): FusedLocationProviderClient {
         return LocationServices.getFusedLocationProviderClient(app)
+    }
+
+    //Notifications
+    @Provides
+    @Singleton
+    fun provideNotificationService(app: Application): NotificationService{
+        return NotificationService(app)
     }
 }

@@ -54,6 +54,11 @@ object MessageConstants {
         "In order to use Streets And Totems location permission has to be granted!"
     const val DIALOG_PERMISSION_CONFIRM_BUTTON = "Turn on permissions"
     const val DIALOG_PERMISSION_DISMISS_BUTTON = "Close app"
+    const val DIALOG_BACKGROUND_PERMISSION_TITLE = "Background location permission is disabled"
+    const val DIALOG_BACKGROUND_PERMISSION_TEXT =
+        "In order to use Streets And Totems in background, background location permission has to be granted!"
+    const val DIALOG_BACKGROUND_PERMISSION_CONFIRM_BUTTON = "Grant"
+    const val DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON = "Don't grant"
     const val DIALOG_LOCATION_TITLE = "Location disabled"
     const val DIALOG_LOCATION_TEXT =
         "In order to use Streets And Totems Location has to be turned on!"
@@ -89,5 +94,21 @@ object RegexConstants {
 
 object PathConstants {
     const val IMAGES = "image/*"
+}
+
+object WorkerKeys {
+    const val NEW_LOCATION = "newLocation"
+    const val ERROR = "error"
+    const val LOCATION_DISABLED = "locationDisabled"
+}
+
+object NotificationsConstants {
+    const val CHANNEL_ID = "StreetsAndTotems_channel"
+    const val CHANNEL_NAME = "Streets And Totems Notifications"
+    const val DISABLE_BACKGROUND_SERVICE_TITLE = "Application is running in the background"
+    const val DISABLE_BACKGROUND_SERVICE_TEXT =
+        "If you disable this you wont be able to get push notifications"
+    const val DISABLE_BACKGROUND_SERVICE_BUTTON = "DISABLE"
+    const val DISABLE_BACKGROUND_SERVICE_ID=1
 }
 

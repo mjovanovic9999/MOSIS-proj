@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -14,22 +15,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import mosis.streetsandtotems.core.MessageConstants
 
 @Composable
 fun CustomRequestPermission(
-    permissionsArray: Array<String> = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION
-    )
+    permissionsArray: Array<String>,
+    requestBackgroundLocationPermission: MutableState<Boolean>,
 ) {
-    var permissionGrantedState = remember { mutableStateOf(false) }
+    val permissionGrantedState = remember { mutableStateOf(true) }
+    val permissionBackgroundGrantedState = remember { mutableStateOf(false) }
 
     val permissionRequest = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -45,16 +41,22 @@ fun CustomRequestPermission(
                 permissionGrantedState.value = true
 
             }
-            permissions.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false) -> {
-                Log.d("tag", "bck")
-                if (Manifest.permission.ACCESS_BACKGROUND_LOCATION in permissionsArray)
-                    permissionGrantedState.value = true
-
-            }
             else -> {
                 Log.d("tag", "else")
                 permissionGrantedState.value = false
             }
+        }
+    }
+
+    val permissionBackgroundRequest = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Log.d("tag", "back Permission provided by user")
+            permissionBackgroundGrantedState.value = true
+        } else {
+            Log.d("tag", "back  Permission denied by user")
+            permissionBackgroundGrantedState.value = false
         }
     }
 
@@ -64,8 +66,16 @@ fun CustomRequestPermission(
             permissionRequest.launch(permissionsArray)
         }
 
+    val launchPermissionBackgroundActivityResult =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult())
+        {
+            permissionBackgroundRequest.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+
+
     SideEffect {
         permissionRequest.launch(permissionsArray)
+        permissionBackgroundRequest.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
     }
 
     if (!permissionGrantedState.value) {
@@ -73,13 +83,23 @@ fun CustomRequestPermission(
             LocalContext.current,
             launchPermissionActivityResult
         )
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && requestBackgroundLocationPermission.value && !permissionBackgroundGrantedState.value) {
+        Log.d("tag", "abe valjda je teka za stariji androriirdi")
+
+        CustomRequestBackgroundPermissionsDialog(
+            LocalContext.current,
+            permissionBackgroundRequest,
+            requestBackgroundLocationPermission
+        )
     }
+
 }
+
 
 @Composable
 fun CustomRequestPermissionsDialog(
     context: Context,
-    launchPermissionActivityResult: ManagedActivityResultLauncher<Intent, ActivityResult>
+    launchPermissionActivityResult: ManagedActivityResultLauncher<Intent, ActivityResult>,
 ) {
     AlertDialog(
         onDismissRequest = { },
@@ -115,6 +135,45 @@ fun CustomRequestPermissionsDialog(
                 }
             ) {
                 Text(MessageConstants.DIALOG_PERMISSION_DISMISS_BUTTON)
+            }
+        }
+    )
+}
+
+@Composable
+fun CustomRequestBackgroundPermissionsDialog(
+    context: Context,
+    permissionBackgroundRequest: ManagedActivityResultLauncher<String, Boolean>,
+    requestBackgroundLocationPermission: MutableState<Boolean>
+) {
+    AlertDialog(
+        onDismissRequest = { },
+        title = {
+            Text(
+                MessageConstants.DIALOG_BACKGROUND_PERMISSION_TITLE,
+            )
+        },
+        text = {
+            Text(
+                MessageConstants.DIALOG_BACKGROUND_PERMISSION_TEXT,
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    permissionBackgroundRequest.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                }
+            ) {
+                Text(MessageConstants.DIALOG_BACKGROUND_PERMISSION_CONFIRM_BUTTON)
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    requestBackgroundLocationPermission.value = false
+                }
+            ) {
+                Text(MessageConstants.DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON)
             }
         }
     )

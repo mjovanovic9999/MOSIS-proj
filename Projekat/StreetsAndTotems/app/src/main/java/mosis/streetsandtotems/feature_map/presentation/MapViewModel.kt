@@ -44,7 +44,7 @@ class MapViewModel @Inject constructor(
             19,
             67108864,
             67108864,
-            workerCount = 16
+            workerCount = 32
         ) {
             scale(0.25f)
             scroll(0.560824, 0.366227)

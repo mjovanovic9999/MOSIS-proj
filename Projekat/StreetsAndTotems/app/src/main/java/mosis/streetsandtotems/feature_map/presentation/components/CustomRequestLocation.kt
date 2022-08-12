@@ -12,18 +12,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import mosis.streetsandtotems.core.MessageConstants
 
 @Composable
 fun CustomRequestLocation(
-    context: Context,
+//    context: Context,
 //    myLocation: MutableState<LocationDTO>
 ) {
+    val locationEnabledState = remember { mutableStateOf(true) }
+    val context = LocalContext.current
 
+//(getSystemService(Context.LOCATION_SERVICE) as LocationManager).isProviderEnabled(LocationManager.GPS_PROVIDER)
 
-    val locationDialogOpenState = remember { mutableStateOf(true) }
 
 
 //    CustomLocationDialog(
@@ -108,41 +111,38 @@ lifecycleOwner.lifecycle.removeObserver(observer)
 
 @Composable
 fun CustomRequestLocationDialog(
-    activity: Activity,
-    locationDialogOpenState: MutableState<Boolean>
 ) {
-    if (locationDialogOpenState.value) {
-        AlertDialog(
-            onDismissRequest = { },
-            title = {
-                Text(
-                    MessageConstants.DIALOG_LOCATION_TITLE,
-                )
-            },
-            text = {
-                Text(
-                    MessageConstants.DIALOG_LOCATION_TEXT,
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        locationDialogOpenState.value = false
-                        activity.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                    }
-                ) {
-                    Text(MessageConstants.DIALOG_LOCATION_CONFIRM_BUTTON)
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = { },
+        title = {
+            Text(
+                MessageConstants.DIALOG_LOCATION_TITLE,
+            )
+        },
+        text = {
+            Text(
+                MessageConstants.DIALOG_LOCATION_TEXT,
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                 }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        activity.finishAndRemoveTask()
-                    }
-                ) {
-                    Text(MessageConstants.DIALOG_LOCATION_DISMISS_BUTTON)
-                }
+            ) {
+                Text(MessageConstants.DIALOG_LOCATION_CONFIRM_BUTTON)
             }
-        )
-    }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    (context as Activity).finishAndRemoveTask()
+                }
+            ) {
+                Text(MessageConstants.DIALOG_LOCATION_DISMISS_BUTTON)
+            }
+        }
+    )
+
 }
