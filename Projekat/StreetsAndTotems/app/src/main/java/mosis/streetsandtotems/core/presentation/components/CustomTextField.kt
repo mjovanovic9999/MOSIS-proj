@@ -6,7 +6,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 
 enum class CustomTextFieldType {
@@ -33,7 +32,8 @@ fun CustomTextField(
     keyboardActions: KeyboardActions = KeyboardActions(),
     singleLine: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
-    visualTransformation: VisualTransformation = VisualTransformation.None
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    colors: TextFieldColors = if(textFieldType == CustomTextFieldType.Basic) TextFieldDefaults.textFieldColors() else TextFieldDefaults.outlinedTextFieldColors()
 ) {
     when (textFieldType) {
         CustomTextFieldType.Basic -> {
@@ -52,7 +52,8 @@ fun CustomTextField(
                 keyboardActions = keyboardActions,
                 singleLine = singleLine,
                 maxLines = maxLines,
-                visualTransformation = visualTransformation
+                visualTransformation = visualTransformation,
+                colors = colors
             )
         }
         CustomTextFieldType.Outlined -> {
@@ -71,7 +72,8 @@ fun CustomTextField(
                 keyboardActions = keyboardActions,
                 singleLine = singleLine,
                 maxLines = maxLines,
-                visualTransformation = visualTransformation
+                visualTransformation = visualTransformation,
+                colors = colors
             )
         }
     }

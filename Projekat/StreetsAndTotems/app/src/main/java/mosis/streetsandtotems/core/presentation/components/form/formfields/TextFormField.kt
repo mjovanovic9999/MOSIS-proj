@@ -7,10 +7,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -22,7 +19,7 @@ import com.dsc.form_builder.Validators
 import mosis.streetsandtotems.core.presentation.components.CustomTextField
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 
-class TextFormField(
+class TextFormField @OptIn(ExperimentalMaterial3Api::class) constructor(
     initial: String,
     name: String,
     validators: List<Validators> = emptyList(),
@@ -42,21 +39,30 @@ class TextFormField(
     private val keyboardActions: KeyboardActions = KeyboardActions(),
     private val singleLine: Boolean = false,
     private val maxLines: Int = Int.MAX_VALUE,
-    private val visualTransformation: VisualTransformation = VisualTransformation.None
-) : FormField {
+    private val visualTransformation: VisualTransformation = VisualTransformation.None,
+    private val colors: @Composable () -> TextFieldColors = { if (textFieldType == CustomTextFieldType.Basic) TextFieldDefaults.textFieldColors() else TextFieldDefaults.outlinedTextFieldColors() },
+    private val showErrorMessage: Boolean = true,
+) : FormField() {
     override val fieldState: TextFieldState = TextFieldState(
         name = name,
         initial = initial,
         validators = validators,
         transform = transform
     )
+    override var onValueChanged: (Any) -> Unit = {}
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         Column() {
             CustomTextField(
                 value = fieldState.value,
-                onValueChange = { fieldState.change(it) },
+                onValueChange = {
+                    fieldState.change(it)
+                    onValueChanged.invoke(
+                        it
+                    )
+                },
                 isError = fieldState.hasError,
                 textFieldType = textFieldType,
                 modifier = modifier,
@@ -65,19 +71,26 @@ class TextFormField(
                 label = label,
                 placeholder = placeholder,
                 leadingIcon = leadingIcon,
-                trailingIcon = if(clearable && fieldState.value != "") trailingIcon else null,
-                onTrailingIconClicked = { fieldState.change("") },
+                trailingIcon = if (clearable && fieldState.value != "") trailingIcon else null,
+                onTrailingIconClicked = {
+                    fieldState.change("")
+                    onValueChanged.invoke(
+                        ""
+                    )
+                },
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
                 singleLine = singleLine,
                 maxLines = maxLines,
-                visualTransformation = visualTransformation
+                visualTransformation = visualTransformation,
+                colors = colors()
             )
-            Text(
-                text = if(fieldState.hasError) fieldState.errorMessage else "",
-                color = MaterialTheme.colorScheme.error,
-                textAlign = TextAlign.Left
-            )
+            if (showErrorMessage)
+                Text(
+                    text = if (fieldState.hasError) fieldState.errorMessage else "",
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Left
+                )
         }
     }
 }

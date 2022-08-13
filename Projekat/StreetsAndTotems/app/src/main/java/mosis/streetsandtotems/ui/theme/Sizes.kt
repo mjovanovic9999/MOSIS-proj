@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 data class Sizes (
-    val auth_screen_form_width: Float = 0.75f,
+    val default_form_width: Float = 0.75f,
     val text_button_min_height: Dp = 12.dp,
     val none: Dp = 0.dp,
     val forgot_password_top_padding: Dp = (-20).dp,
@@ -33,6 +33,9 @@ data class Sizes (
     val drawer_leave_buttons_spacing: Dp = 20.dp,
     val drawer_select_height: Dp = 60.dp,
     val drawer_last_divider_top_padding: Dp = 8.dp,
+    val profile_screen_spacing: Dp = 20.dp,
+    val default_dialog_corner: Dp = 15.dp,
+    val title_icon: Dp = 60.dp
 )
 
 val LocalWidth = compositionLocalOf { Sizes() }

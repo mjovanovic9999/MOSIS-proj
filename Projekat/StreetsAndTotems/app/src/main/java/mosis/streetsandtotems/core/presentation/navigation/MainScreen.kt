@@ -21,29 +21,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.dependency
 import mosis.streetsandtotems.NavGraphs
 import mosis.streetsandtotems.core.DrawerConstants
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
 import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.destinations.MapScreenDestination
+import mosis.streetsandtotems.destinations.ProfileScreenDestination
 import mosis.streetsandtotems.feature_map.domain.LocationDTO
 import mosis.streetsandtotems.feature_map.presentation.MapViewModel
 import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestPermission
 import mosis.streetsandtotems.ui.theme.sizes
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @RootNavGraph
 @Destination
 @Composable
-fun MainScreen() {
+fun MainScreen(destinationsNavigator: DestinationsNavigator) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
@@ -54,20 +56,19 @@ fun MainScreen() {
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = { DrawerContent(Modifier.align(Alignment.CenterHorizontally)) },
+        drawerContent = { DrawerContent(Modifier.align(Alignment.CenterHorizontally), destinationsNavigator) },
         content = { DrawerScreen(navController = navController, drawerState = drawerState) }
     )
     CustomRequestPermission(
         arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION
         )
     )
 }
 
 @Composable
-private fun DrawerContent(modifier: Modifier) {
+private fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigator) {
     Column(
         modifier = modifier
             .fillMaxWidth(MaterialTheme.sizes.drawer_column_width)
@@ -93,7 +94,7 @@ private fun DrawerContent(modifier: Modifier) {
                 ) {
                 }
                 CustomButton(
-                    clickHandler = { /*TODO*/ },
+                    clickHandler = { destinationsNavigator.navigate(ProfileScreenDestination) },
                     buttonType = CustomButtonType.Text,
                     text = DrawerConstants.PROFILE
                 )
@@ -172,7 +173,8 @@ private fun DrawerContent(modifier: Modifier) {
                     fontWeight = FontWeight.Bold
                 )
             ),
-            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.tertiary)
+            colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.tertiary),
+            iconContentDescription = ImageContentDescriptionConstants.LEADERBOARD
         )
         Box(
             modifier = Modifier

@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import mosis.streetsandtotems.R
@@ -18,8 +17,6 @@ import mosis.streetsandtotems.core.presentation.components.CustomButtonType
 import mosis.streetsandtotems.core.presentation.components.form.Form
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.AuthNavGraph
 import mosis.streetsandtotems.destinations.MainScreenDestination
-import mosis.streetsandtotems.destinations.MapScreenDestination
-import mosis.streetsandtotems.destinations.SignInScreenDestination
 import mosis.streetsandtotems.destinations.SignUpScreenDestination
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtons
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtonsType
@@ -29,11 +26,12 @@ import mosis.streetsandtotems.ui.theme.sizes
 @Destination
 @Composable
 fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: DestinationsNavigator) {
+
     Box(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(MaterialTheme.sizes.auth_screen_form_width)
+                .fillMaxWidth(MaterialTheme.sizes.default_form_width)
                 .align(Alignment.TopCenter),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
@@ -58,7 +56,8 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
                 text = ButtonConstants.SIGN_IN,
                 buttonType = CustomButtonType.Outlined,
                 buttonModifier = Modifier,
-                textStyle = MaterialTheme.typography.titleMedium
+                textStyle = MaterialTheme.typography.titleMedium,
+                enabled = viewModel.formState.isFormFilled.value
             )
 
             AuthButtons(type = AuthButtonsType.SignIn)

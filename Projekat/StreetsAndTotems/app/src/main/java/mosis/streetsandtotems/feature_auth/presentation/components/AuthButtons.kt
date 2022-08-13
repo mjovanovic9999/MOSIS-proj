@@ -18,6 +18,7 @@ import mosis.streetsandtotems.ui.theme.facebook_sign_in
 import mosis.streetsandtotems.ui.theme.google_sign_in
 import mosis.streetsandtotems.ui.theme.sizes
 
+
 enum class AuthButtonsType {
     SignIn,
     SignUp
