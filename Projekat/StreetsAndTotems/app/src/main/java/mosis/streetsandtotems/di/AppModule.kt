@@ -10,7 +10,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mosis.streetsandtotems.core.presentation.utils.notification.NotificationService
+import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.feature_auth.data.data_source.FirebaseAuthDataSource
 import mosis.streetsandtotems.feature_auth.domain.repository.AuthRepository
 import mosis.streetsandtotems.feature_auth.domain.use_case.AuthUseCases
@@ -37,7 +37,7 @@ object AppModule {
     //Use Cases
     @Provides
     @Singleton
-    fun proviceAuthUseCases(authRepository: AuthRepository) =
+    fun provideAuthUseCases(authRepository: AuthRepository) =
         AuthUseCases(emailAndPasswoedSignIn = EmailAndPasswordSignIn(authRepository))
 
     @Provides
@@ -49,7 +49,7 @@ object AppModule {
     //Notifications
     @Provides
     @Singleton
-    fun provideNotificationService(app: Application): NotificationService{
-        return NotificationService(app)
+    fun provideNotificationService(app: Application): NotificationProvider{
+        return NotificationProvider(app)
     }
 }

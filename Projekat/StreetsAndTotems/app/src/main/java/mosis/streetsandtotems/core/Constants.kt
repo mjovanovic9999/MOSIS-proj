@@ -107,8 +107,8 @@ object NotificationsConstants {
     const val CHANNEL_NAME = "Streets And Totems Notifications"
     const val DISABLE_BACKGROUND_SERVICE_TITLE = "Application is running in the background"
     const val DISABLE_BACKGROUND_SERVICE_TEXT =
-        "If you disable this you wont be able to get push notifications"
+        "If you disable this you won't be able to get push notifications"
     const val DISABLE_BACKGROUND_SERVICE_BUTTON = "DISABLE"
-    const val DISABLE_BACKGROUND_SERVICE_ID=1
+    const val DISABLE_BACKGROUND_SERVICE_ID = 1
 }
 

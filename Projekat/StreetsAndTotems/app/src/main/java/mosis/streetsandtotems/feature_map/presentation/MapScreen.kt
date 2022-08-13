@@ -67,7 +67,6 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
 
                 CustomFAB(R.drawable.locate_me, {
                     context.startForegroundService(Intent(context, LocationService::class.java))
-                    //locateUser(context, mapViewModel)
                     /*    mapViewModel.viewModelScope.launch {
                             mapViewModel.state.centerOnMarker(
                                 "prvi",
@@ -85,15 +84,3 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
 
     }
 }
-
-fun locateUser(context: Context, viewModel: MapViewModel) /*:Location*/ {
-    viewModel.LoadLocation {
-        Toast.makeText(
-            context,
-            viewModel.locationState.AccuracyMeters.toString(),
-            Toast.LENGTH_SHORT
-        )
-            .show()
-    }
-}
-

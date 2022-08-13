@@ -14,6 +14,5 @@ class NotificationReceiver : BroadcastReceiver() {
         BackgroundServicesEnabled.isEnabled = false//da l se ovde poziva????
         context.stopService(Intent(context, LocationService::class.java))
 
-        Log.d("tag","disabled")
     }
 }
