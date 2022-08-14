@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.core.presentation.navigation
+package mosis.streetsandtotems.core.presentation.navigation.components
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -9,6 +9,7 @@ import com.ramcosta.composedestinations.navigation.popUpTo
 import com.ramcosta.composedestinations.utils.isRouteOnBackStack
 import mosis.streetsandtotems.NavGraph
 import mosis.streetsandtotems.appCurrentDestinationAsState
+import mosis.streetsandtotems.core.presentation.navigation.BottomBarDestinations
 import mosis.streetsandtotems.destinations.Destination
 import mosis.streetsandtotems.destinations.MainScreenDestination
 import mosis.streetsandtotems.startAppDestination

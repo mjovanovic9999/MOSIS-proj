@@ -5,6 +5,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -24,10 +25,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastSumBy
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
+
 
 fun Modifier.drawVerticalScrollbar(
     state: ScrollState,
@@ -152,6 +155,42 @@ private fun Modifier.drawScrollbar(
         }
 }
 
-private val Thickness = 4.dp
+fun Modifier.drawVerticalScrollbar(
+    state: LazyListState,
+    reverseScrolling: Boolean = false
+): Modifier = drawScrollbar(state, Orientation.Vertical, reverseScrolling)
+
+private fun Modifier.drawScrollbar(
+    state: LazyListState,
+    orientation: Orientation,
+    reverseScrolling: Boolean
+): Modifier = drawScrollbar(
+    orientation, reverseScrolling
+) { reverseDirection, atEnd, thickness, color, alpha ->
+    val layoutInfo = state.layoutInfo
+    val viewportSize = layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset
+    val items = layoutInfo.visibleItemsInfo
+    val itemsSize = items.fastSumBy { it.size }
+    val showScrollbar = items.size < layoutInfo.totalItemsCount || itemsSize > viewportSize
+    val estimatedItemSize = if (items.isEmpty()) 0f else itemsSize.toFloat() / items.size
+    val totalSize = estimatedItemSize * layoutInfo.totalItemsCount
+    val canvasSize = if (orientation == Orientation.Horizontal) size.width else size.height
+    val thumbSize = viewportSize / totalSize * canvasSize
+    val startOffset = if (items.isEmpty()) 0f else items
+        .first()
+        .run {
+            (estimatedItemSize * index - offset) / totalSize * canvasSize
+        }
+    val drawScrollbar = onDrawScrollbar(
+        orientation, reverseDirection, atEnd, showScrollbar,
+        thickness, color, alpha, thumbSize, startOffset
+    )
+    onDrawWithContent {
+        drawContent()
+        drawScrollbar()
+    }
+}
+
+private val Thickness = 6.dp
 private val FadeOutAnimationSpec =
     tween<Float>(durationMillis = ViewConfiguration.getScrollBarFadeDuration())

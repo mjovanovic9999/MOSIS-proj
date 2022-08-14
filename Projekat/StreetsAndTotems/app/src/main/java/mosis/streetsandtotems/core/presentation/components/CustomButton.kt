@@ -12,6 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import mosis.streetsandtotems.ui.theme.sizes
 
+
 enum class CustomButtonType {
     Filled,
     Outlined,
@@ -39,8 +40,9 @@ fun CustomButton(
     icon: ImageVector? = null,
     iconPosition: IconPosition = IconPosition.Start,
     iconSize: Dp = ButtonDefaults.IconSize,
+    iconContentDescription: String? = null,
     textStyle: TextStyle = TextStyle.Default,
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding
+    contentPadding: PaddingValues? = null
 ) {
     when (buttonType) {
         CustomButtonType.Filled -> Button(
@@ -49,15 +51,16 @@ fun CustomButton(
             colors = colors,
             border = border,
             enabled = enabled,
-            contentPadding = contentPadding
+            contentPadding = contentPadding ?: ButtonDefaults.ContentPadding
         ) {
             ButtonContent(
                 text = text,
                 icon = icon,
                 iconPosition = iconPosition,
-                iconSize,
-                textStyle,
-                if (matchParentWidth) Modifier.fillMaxWidth() else Modifier
+                iconSize = iconSize,
+                textStyle = textStyle,
+                iconContentDescription = iconContentDescription,
+                textModifier = if (matchParentWidth) Modifier.fillMaxWidth() else Modifier
             )
         }
         CustomButtonType.Outlined -> OutlinedButton(
@@ -66,24 +69,26 @@ fun CustomButton(
             colors = colors,
             border = border,
             enabled = enabled,
-            contentPadding = contentPadding
+            contentPadding = contentPadding ?: ButtonDefaults.ContentPadding
         ) {
             ButtonContent(
                 text = text,
                 icon = icon,
                 iconPosition = iconPosition,
-                iconSize,
-                textStyle,
-                if (matchParentWidth) Modifier.fillMaxWidth() else Modifier
+                iconSize = iconSize,
+                textStyle = textStyle,
+                iconContentDescription = iconContentDescription,
+                textModifier = if (matchParentWidth) Modifier.fillMaxWidth() else Modifier
             )
         }
         CustomButtonType.Text -> TextButton(
-            contentPadding = if (contentPadding != ButtonDefaults.ContentPadding) contentPadding else PaddingValues(
-                top = MaterialTheme.sizes.none,
-                bottom = MaterialTheme.sizes.none,
-                start = MaterialTheme.sizes.text_button_side_padding,
-                end = MaterialTheme.sizes.text_button_side_padding
-            ),
+            contentPadding = contentPadding
+                ?: PaddingValues(
+                    top = MaterialTheme.sizes.none,
+                    bottom = MaterialTheme.sizes.none,
+                    start = MaterialTheme.sizes.text_button_side_padding,
+                    end = MaterialTheme.sizes.text_button_side_padding
+                ),
             onClick = clickHandler,
             modifier = buttonModifier.defaultMinSize(
                 ButtonDefaults.MinWidth,
@@ -97,9 +102,10 @@ fun CustomButton(
                 text = text,
                 icon = icon,
                 iconPosition = iconPosition,
-                iconSize,
-                textStyle,
-                if (matchParentWidth) Modifier.fillMaxWidth() else Modifier
+                iconSize = iconSize,
+                textStyle = textStyle,
+                iconContentDescription = iconContentDescription,
+                textModifier = if (matchParentWidth) Modifier.fillMaxWidth() else Modifier
             )
         }
     }
@@ -113,11 +119,12 @@ private fun ButtonContent(
     iconSize: Dp,
     textStyle: TextStyle,
     textModifier: Modifier,
+    iconContentDescription: String?
 ) {
     if (icon != null && iconPosition == IconPosition.Start) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = iconContentDescription,
             modifier = Modifier.size(iconSize)
         )
         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
@@ -132,7 +139,7 @@ private fun ButtonContent(
         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = iconContentDescription,
             modifier = Modifier.size(iconSize)
         )
     }
@@ -143,9 +150,10 @@ fun CustomIconButton(
     clickHandler: () -> Unit,
     buttonModifier: Modifier = Modifier,
     enabled: Boolean = true,
-    icon: ImageVector? = null
+    icon: ImageVector? = null,
+    iconContentDescription: String? = null,
 ) {
     IconButton(onClick = clickHandler, modifier = buttonModifier, enabled = enabled) {
-        icon?.let { Icon(imageVector = it, contentDescription = "") }
+        icon?.let { Icon(imageVector = it, contentDescription = iconContentDescription) }
     }
 }

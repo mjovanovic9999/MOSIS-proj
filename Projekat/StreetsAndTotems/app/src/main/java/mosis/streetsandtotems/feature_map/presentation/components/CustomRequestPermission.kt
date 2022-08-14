@@ -25,8 +25,7 @@ import mosis.streetsandtotems.core.MessageConstants
 fun CustomRequestPermission(
     permissionsArray: Array<String> = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        Manifest.permission.ACCESS_COARSE_LOCATION
     )
 ) {
     val permissionGrantedState = remember { mutableStateOf(true) }
