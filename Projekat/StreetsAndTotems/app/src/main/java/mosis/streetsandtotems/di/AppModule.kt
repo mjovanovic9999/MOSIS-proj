@@ -10,10 +10,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.feature_auth.data.data_source.FirebaseAuthDataSource
 import mosis.streetsandtotems.feature_auth.domain.repository.AuthRepository
 import mosis.streetsandtotems.feature_auth.domain.use_case.AuthUseCases
 import mosis.streetsandtotems.feature_auth.domain.use_case.EmailAndPasswordSignIn
+import mosis.streetsandtotems.services.NetworkManager
 import javax.inject.Singleton
 
 @Module
@@ -36,12 +38,26 @@ object AppModule {
     //Use Cases
     @Provides
     @Singleton
-    fun proviceAuthUseCases(authRepository: AuthRepository) =
+    fun provideAuthUseCases(authRepository: AuthRepository) =
         AuthUseCases(emailAndPasswoedSignIn = EmailAndPasswordSignIn(authRepository))
 
     @Provides
     @Singleton
     fun provideFusedLocationProviderClient(app: Application): FusedLocationProviderClient {
         return LocationServices.getFusedLocationProviderClient(app)
+    }
+
+    //Notifications
+    @Provides
+    @Singleton
+    fun provideNotificationService(app: Application): NotificationProvider {
+        return NotificationProvider(app)
+    }
+
+    //Network manager
+    @Provides
+    @Singleton
+    fun provideNetworkManager(app: Application): NetworkManager {
+        return NetworkManager(app)
     }
 }

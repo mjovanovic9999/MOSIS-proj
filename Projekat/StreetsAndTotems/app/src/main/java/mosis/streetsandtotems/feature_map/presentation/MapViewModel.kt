@@ -3,14 +3,9 @@ package mosis.streetsandtotems.feature_map.presentation
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import mosis.streetsandtotems.feature_map.domain.LocationDTO
-import mosis.streetsandtotems.feature_map.domain.LocationTracker
 import ovh.plrapps.mapcompose.api.addLayer
 import ovh.plrapps.mapcompose.api.enableRotation
 import ovh.plrapps.mapcompose.core.TileStreamProvider
@@ -21,7 +16,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val appContext: Application,
-    private val locationTracker: LocationTracker
 ) : ViewModel() {
 
     val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
@@ -44,7 +38,7 @@ class MapViewModel @Inject constructor(
             19,
             67108864,
             67108864,
-            workerCount = 16
+            workerCount = 32
         ) {
             scale(0.25f)
             scroll(0.560824, 0.366227)
@@ -53,22 +47,4 @@ class MapViewModel @Inject constructor(
             enableRotation()
         }
     )
-
-
-    var locationState by mutableStateOf(LocationDTO(-1.0, -1.0, -1.0f))
-        private set
-
-    fun LoadLocation(cb: () -> Unit) {
-        viewModelScope.launch {
-            locationTracker.getCurrentLocation()?.let { location ->
-                locationState =
-                    locationState.copy(location.latitude, location.longitude, location.accuracy)
-                cb()
-            } ?: kotlin.run {
-                locationState = locationState.copy(-1.1, -1.1, -1.1f)
-            }
-        }
-    }
-
-
 }

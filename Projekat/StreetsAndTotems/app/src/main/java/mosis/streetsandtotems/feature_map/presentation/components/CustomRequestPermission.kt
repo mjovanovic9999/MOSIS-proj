@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -14,20 +15,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import mosis.streetsandtotems.core.ButtonConstants.DIALOG_PERMISSION_CONFIRM_BUTTON
+import mosis.streetsandtotems.core.ButtonConstants.DIALOG_PERMISSION_DISMISS_BUTTON
 import mosis.streetsandtotems.core.MessageConstants
 
 @Composable
 fun CustomRequestPermission(
-    permissionsArray: Array<String> = arrayOf(
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION
-    )
+    permissionsArray: Array<String>,
 ) {
     val permissionGrantedState = remember { mutableStateOf(true) }
 
@@ -40,17 +36,11 @@ fun CustomRequestPermission(
                 permissionGrantedState.value = true
 
             }
-            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                Log.d("tag", "coarse")
-                permissionGrantedState.value = true
-
-            }
-            permissions.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false) -> {
-                Log.d("tag", "bck")
-                if (Manifest.permission.ACCESS_BACKGROUND_LOCATION in permissionsArray)
-                    permissionGrantedState.value = true
-
-            }
+//            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+//                Log.d("tag", "coarse")
+//                permissionGrantedState.value = true
+//
+//            }
             else -> {
                 Log.d("tag", "else")
                 permissionGrantedState.value = false
@@ -64,6 +54,7 @@ fun CustomRequestPermission(
             permissionRequest.launch(permissionsArray)
         }
 
+
     SideEffect {
         permissionRequest.launch(permissionsArray)
     }
@@ -74,12 +65,14 @@ fun CustomRequestPermission(
             launchPermissionActivityResult
         )
     }
+
 }
+
 
 @Composable
 fun CustomRequestPermissionsDialog(
     context: Context,
-    launchPermissionActivityResult: ManagedActivityResultLauncher<Intent, ActivityResult>
+    launchPermissionActivityResult: ManagedActivityResultLauncher<Intent, ActivityResult>,
 ) {
     AlertDialog(
         onDismissRequest = { },
@@ -105,7 +98,7 @@ fun CustomRequestPermissionsDialog(
                     launchPermissionActivityResult.launch(intent)
                 }
             ) {
-                Text(MessageConstants.DIALOG_PERMISSION_CONFIRM_BUTTON)
+                Text(DIALOG_PERMISSION_CONFIRM_BUTTON)
             }
         },
         dismissButton = {
@@ -114,7 +107,7 @@ fun CustomRequestPermissionsDialog(
                     (context as Activity).finishAndRemoveTask()
                 }
             ) {
-                Text(MessageConstants.DIALOG_PERMISSION_DISMISS_BUTTON)
+                Text(DIALOG_PERMISSION_DISMISS_BUTTON)
             }
         }
     )

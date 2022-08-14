@@ -9,6 +9,13 @@ object ButtonConstants {
     const val SIGN_UP_GOOGLE = "Sign up with Google"
     const val SIGN_UP_FACEBOOK = "Sign up with Facebook"
     const val SIGN_UP = "Sign Up"
+    const val DIALOG_PERMISSION_CONFIRM_BUTTON = "Turn on permissions"
+    const val DIALOG_PERMISSION_DISMISS_BUTTON = "Close app"
+    const val DIALOG_LOCATION_CONFIRM_BUTTON = "Turn on location"
+    const val DIALOG_LOCATION_DISMISS_BUTTON = "Close app"
+    const val TURN_OFF_BACKGROUND_SERVICE_BUTTON = "TURN OFF"
+    const val DIALOG_NETWORK_DISMISS_BUTTON = "Close app"
+
 }
 
 object ImageContentDescriptionConstants {
@@ -21,19 +28,6 @@ object ImageContentDescriptionConstants {
 
 object PinConstants {
     const val MY_PIN = "0"
-}
-
-object LocationConstants {
-    const val ACTION_START_OR_RESUME_SERVICE = "ACTION_START_OR_RESUME_SERVICE"
-    const val ACTION_PAUSE_SERVICE = "ACTION_PAUSE_SERVICE"
-    const val ACTION_STOP_SERVICE = "ACTION_STOP_SERVICE"
-    const val ACTION_SHOW_TRACKING_FRAGMENT = "ACTION_SHOW_TRACKING_FRAGMENT"
-}
-
-object NotificationConstants {
-    const val NOTIFICATION_CHANNEL_ID = "tracking_channel"
-    const val NOTIFICATION_CHANNEL_NAME = "Tracking"
-    const val NOTIFICATION_ID = 1
 }
 
 object VisualTransformationConstants {
@@ -56,13 +50,12 @@ object MessageConstants {
     const val DIALOG_PERMISSION_TITLE = "Location permission is disabled"
     const val DIALOG_PERMISSION_TEXT =
         "In order to use Streets And Totems location permission has to be granted!"
-    const val DIALOG_PERMISSION_CONFIRM_BUTTON = "Turn on permissions"
-    const val DIALOG_PERMISSION_DISMISS_BUTTON = "Close app"
     const val DIALOG_LOCATION_TITLE = "Location disabled"
     const val DIALOG_LOCATION_TEXT =
         "In order to use Streets And Totems Location has to be turned on!"
-    const val DIALOG_LOCATION_CONFIRM_BUTTON = "Turn on location"
-    const val DIALOG_LOCATION_DISMISS_BUTTON = "Close app"
+    const val DIALOG_NETWORK_TITLE = "Network is unavailable"
+    const val DIALOG_NETWORK_TEXT =
+        "Please check network connectivity in order to use Streets And Totems!"
     const val PASSWORDS_DO_NOT_MATCH = "Passwords don't match!"
 }
 
@@ -103,4 +96,23 @@ object DrawerConstants{
     const val LEAVE_SQUAD = "Leave squad"
     const val SIGN_OUT = "Sign out"
     val DROPDOWN_SELECT_LIST = listOf("Everyone", "Only squad members", "No one")
+}
+
+object WorkerKeys {
+    const val NEW_LOCATION = "newLocation"
+    const val ERROR = "error"
+    const val LOCATION_DISABLED = "locationDisabled"
+}
+
+object NotificationConstants {
+    const val CHANNEL_ID = "StreetsAndTotems_channel"
+    const val CHANNEL_NAME = "Streets And Totems Notifications"
+    const val DISABLE_BACKGROUND_SERVICE_TITLE = "Application is running in the background"
+    const val DISABLE_BACKGROUND_SERVICE_TEXT =
+        "If you disable this you won't be able to get push notifications"
+    const val DISABLE_BACKGROUND_SERVICE_ID = 1
+
+
+    const val CHANNEL_ID2 = "StreetsAndTotems_channel2"
+    const val CHANNEL_NAME2 = "Streets And Totems Notifications2"
 }

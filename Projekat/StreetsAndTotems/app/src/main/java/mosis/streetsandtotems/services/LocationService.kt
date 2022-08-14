@@ -1,259 +1,175 @@
-/*
 package mosis.streetsandtotems.services
 
-import android.annotation.SuppressLint
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.NotificationManager.IMPORTANCE_LOW
-import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.app.Application
+import android.app.Service
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.location.Location
-import android.os.Build
-import android.os.Looper
+import android.location.LocationManager
+import android.os.*
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
-import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
+import androidx.compose.runtime.mutableStateOf
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.PendingResult
+import com.google.android.gms.location.*
+import com.google.android.gms.tasks.Task
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import mosis.streetsandtotems.R
-import mosis.streetsandtotems.core.LocationConstants
-import mosis.streetsandtotems.core.NotificationConstants
-import mosis.streetsandtotems.feature_map.domain.LocationDTO
+import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
+import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import javax.inject.Inject
 
+
 @AndroidEntryPoint
-class LocationService:LifecycleService(){
+class LocationService : Service() {
+    @Inject
+    lateinit var context: Application
 
-
-    var isFirstRun = true
-    var serviceKilled = false
+    @Inject
+    lateinit var notificationProvider: NotificationProvider
 
     @Inject
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
-    private val timeRunInSeconds = MutableLiveData<Long>()
+    lateinit var locationCallback: LocationCallback
 
-    @Inject
-    lateinit var baseNotificationBuilder: NotificationCompat.Builder
 
-    lateinit var curNotificationBuilder: NotificationCompat.Builder
-
-    companion object {
-        val timeRunInMillis = MutableLiveData<Long>()
-        val isTracking = MutableLiveData<Boolean>()
-//        val pathPoints = MutableLiveData<Polylines>()
-    }
-
-    private fun postInitialValues() {
-        isTracking.postValue(false)
-//        pathPoints.postValue(mutableListOf())
-        timeRunInSeconds.postValue(0L)
-        timeRunInMillis.postValue(0L)
-    }
+    private val serviceJob = Job()
+    private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
 
     override fun onCreate() {
         super.onCreate()
-        curNotificationBuilder = baseNotificationBuilder
-        postInitialValues()
-        fusedLocationProviderClient = FusedLocationProviderClient(this)
+        isServiceStarted = true
+        startForeground(
+            1,
+            notificationProvider.returnDisableBackgroundServiceNotification(false)
+        )
 
-        isTracking.observe(this, Observer {
-            updateLocationTracking(it)
-            updateNotificationTrackingState(it)
-        })
+        registerReceiver(
+            LocationBroadcastReceiver(),
+            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+        )
     }
 
-    private fun killService() {
-        serviceKilled = true
-        isFirstRun = true
-        pauseService()
-        postInitialValues()
-        stopForeground(true)
-        stopSelf()
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        startListeningUserLocation(this)
+        return START_STICKY_COMPATIBILITY
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        intent?.let {
-            when (it.action) {
-                LocationConstants.ACTION_START_OR_RESUME_SERVICE -> {
-                    if (isFirstRun) {
-                        startForegroundService()
-                        isFirstRun = false
-                    } else {
-                        Log.d("1","Resuming service...")
-                        startTimer()
+
+    override fun onBind(intent: Intent): IBinder? {
+        return null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+        Log.d("tag", "ugasennnn")
+        isServiceStarted = false
+        serviceJob.cancel()
+
+    }
+
+
+    private fun startListeningUserLocation(context: Context) {
+
+        val locationRequest = LocationRequest.create()
+            .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+            .setWaitForAccurateLocation(true)
+            .setInterval(4000)
+        //.setSmallestDisplacement(2f)
+
+        Log.d("tag", "skloniti komenatr za smallest displacement")
+
+
+        val locationSettingsRequest =
+            LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest)
+                .setAlwaysShow(true) //sta je bre ovoo???????? //https://stackoverflow.com/questions/29861580/locationservices-settingsapi-reset-settings-change-unavailable-flag
+                .build()
+//mozda ovako il sa location manager
+
+
+        //svuda na close app mora se explicitno pozove close service
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                Log.d(
+                    "tag",
+                    "NEW LOCATION: ${result.lastLocation?.latitude}, ${result.lastLocation?.longitude}, ${result.lastLocation?.accuracy}"
+                )
+                mLocation = result.lastLocation
+                mLocation?.let {
+                    serviceScope.launch {
+                        //            Log.d("tag", it.accuracy.toString())
+//                            val apiClient = ApiClient.getInstance(this@LocationService)
+//                                .create(ApiClient::class.java)
+//                            val response = apiClient.updateLocation()
+//                            response.enqueue(object : Callback<LocationResponse> {
+//                                override fun onResponse(
+//                                    call: Call<LocationResponse>,
+//                                    response: Response<LocationResponse>
+//                                ) {
+//                                    Log.d(TAG, "onLocationChanged: Latitude ${it.latitude} , Longitude ${it.longitude}")
+//                                    Log.d(TAG, "run: Running = Location Update Successful")
+//                                }
+//
+//                                override fun onFailure(call: Call<LocationResponse>, t: Throwable) {
+//                                    Log.d(TAG, "run: Running = Location Update Failed")
+//
+//                                }
+//                            })
+
                     }
-                }
-                LocationConstants.ACTION_PAUSE_SERVICE -> {
-                    Log.d("2","Paused service")
-                    pauseService()
-                }
-                LocationConstants.ACTION_STOP_SERVICE -> {
-                    Log.d("3","Stopped service")
-                    killService()
+
                 }
             }
         }
-        return super.onStartCommand(intent, flags, startId)
-    }
 
-    private var isTimerEnabled = false
-    private var lapTime = 0L
-    private var timeRun = 0L
-    private var timeStarted = 0L
-    private var lastSecondTimestamp = 0L
 
-    private fun startTimer() {
-//        addEmptyPolyline()
-        isTracking.postValue(true)
-        timeStarted = System.currentTimeMillis()
-        isTimerEnabled = true
-        CoroutineScope(Dispatchers.Main).launch {
-            while (isTracking.value!!) {
-                // time difference between now and timeStarted
-                lapTime = System.currentTimeMillis() - timeStarted
-                // post the new lapTime
-                timeRunInMillis.postValue(timeRun + lapTime)
-                if (timeRunInMillis.value!! >= lastSecondTimestamp + 1000L) {
-                    timeRunInSeconds.postValue(timeRunInSeconds.value!! + 1)
-                    lastSecondTimestamp += 1000L
-                }
-                delay(5000)
-            }
-            timeRun += lapTime
-        }
-    }
+        val task =
+            LocationServices.getSettingsClient(this).checkLocationSettings(locationSettingsRequest)
 
-    private fun pauseService() {
-        isTracking.postValue(false)
-        isTimerEnabled = false
-    }
+        task.addOnCompleteListener {
+            if (it.isSuccessful) {
 
-    private fun updateNotificationTrackingState(isTracking: Boolean) {
-        val notificationActionText = if(isTracking) "Pause" else "Resume"
-        val pendingIntent = if(isTracking) {
-            val pauseIntent = Intent(this, LocationService::class.java).apply {
-                action = LocationConstants.ACTION_PAUSE_SERVICE
-            }
-            PendingIntent.getService(this, 1, pauseIntent, FLAG_UPDATE_CURRENT)
-        } else {
-            val resumeIntent = Intent(this, LocationService::class.java).apply {
-                action = LocationConstants.ACTION_START_OR_RESUME_SERVICE
-            }
-            PendingIntent.getService(this, 2, resumeIntent, FLAG_UPDATE_CURRENT)
-        }
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        curNotificationBuilder.javaClass.getDeclaredField("mActions").apply {
-            isAccessible = true
-            set(curNotificationBuilder, ArrayList<NotificationCompat.Action>())
-        }
-        if(!serviceKilled) {
-            curNotificationBuilder = baseNotificationBuilder
-                .addAction(R.drawable.logo_text, notificationActionText, pendingIntent)
-            notificationManager.notify(*/
-/*NOTIFICATION_ID*//*
-1, curNotificationBuilder.build())
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun updateLocationTracking(isTracking: Boolean) {
-       */
-/* if (isTracking) {
-            if (TrackingUtility.hasLocationPermissions(this)) {
-                val request = LocationRequest().apply {
-                    interval = LOCATION_UPDATE_INTERVAL
-                    fastestInterval = FASTEST_LOCATION_INTERVAL
-                    priority = PRIORITY_HIGH_ACCURACY
-                }
                 fusedLocationProviderClient.requestLocationUpdates(
-                    request,
+                    locationRequest,
                     locationCallback,
                     Looper.getMainLooper()
                 )
-            }
-        } else {
-            fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-        }*//*
 
-    }
+                val settings = it.result
 
-    val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(result: LocationResult) {
-            super.onLocationResult(result)
-            if (isTracking.value!!) {
-                result?.locations?.let { locations ->
-                    for (location in locations) {
-                        addPathPoint(location)
-                        Log.d("10","NEW LOCATION: ${location.latitude}, ${location.longitude}")
-                    }
-                }
+                isLocationEnabled.value = true
+                Log.d("tag", "isLocationEnabled = true")
+
+            } else {
+                isLocationEnabled.value = false
+                Log.d("tag", "isLocationEnabled = false")
+                this.stopSelf()
             }
         }
-    }
 
-    private fun addPathPoint(location: Location?) {
-        location?.let {
-            val pos = LocationDTO(location.latitude, location.longitude,location.accuracy)
-//            pathPoints.value?.apply {
-//                last().add(pos)
-//                pathPoints.postValue(this)
-//            }
-        }
-    }
-
-//    private fun addEmptyPolyline() = pathPoints.value?.apply {
-//        add(mutableListOf())
-//        pathPoints.postValue(this)
-//    } ?: pathPoints.postValue(mutableListOf(mutableListOf()))
-
-    private fun startForegroundService() {
-        startTimer()
-        isTracking.postValue(true)
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
-                as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel(notificationManager)
-        }
-
-        startForeground(NotificationConstants.NOTIFICATION_ID, baseNotificationBuilder.build())
-
- */
-/*       timeRunInSeconds.observe(this, Observer {
-            if(!serviceKilled) {
-                val notification = curNotificationBuilder
-                    .setContentText(TrackingUtility.getFormattedStopWatchTime(it * 1000L))
-                notificationManager.notify(NOTIFICATION_ID, notification.build())
-            }
-        })*//*
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(notificationManager: NotificationManager) {
-        val channel = NotificationChannel(
-            NotificationConstants.NOTIFICATION_CHANNEL_ID,
-            NotificationConstants.NOTIFICATION_CHANNEL_NAME,
-            IMPORTANCE_LOW
-        )
-        notificationManager.createNotificationChannel(channel)
+    fun stopLocationService() {
+        if (isServiceStarted)
+            this.stopSelf()
     }
-}*/
+
+    companion object {
+        var mLocation: Location? = null
+        var isServiceStarted = false
+        var isLocationEnabled = mutableStateOf(false)
+
+
+    }
+}

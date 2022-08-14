@@ -22,9 +22,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+//import androidx.work.*
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -34,10 +37,11 @@ import mosis.streetsandtotems.core.DrawerConstants
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
 import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.destinations.MapScreenDestination
-import mosis.streetsandtotems.feature_map.domain.LocationDTO
 import mosis.streetsandtotems.feature_map.presentation.MapViewModel
 import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestPermission
 import mosis.streetsandtotems.ui.theme.sizes
+
+//import mosis.streetsandtotems.services.LocationWorker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RootNavGraph
@@ -48,21 +52,15 @@ fun MainScreen() {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
 
-    var myLocation = remember { mutableStateOf(LocationDTO(-1.0, -1.0, -1.0f)) }
+    val context = LocalContext.current
 
+    val scope = rememberCoroutineScope()
 
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = { DrawerContent(Modifier.align(Alignment.CenterHorizontally)) },
         content = { DrawerScreen(navController = navController, drawerState = drawerState) }
-    )
-    CustomRequestPermission(
-        arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION
-        )
     )
 }
 
