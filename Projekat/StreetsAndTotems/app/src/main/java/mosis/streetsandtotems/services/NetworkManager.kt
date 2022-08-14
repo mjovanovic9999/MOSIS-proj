@@ -45,7 +45,9 @@ class NetworkManager(var context: Application) {
         })
     }
 
+    fun ok(){}
+
     companion object {
-        var isNetworkConnectivityValid = mutableStateOf(false)
+        var isNetworkConnectivityValid = mutableStateOf(true)
     }
 }

@@ -49,11 +49,6 @@ class LocationService : Service() {
             1,
             notificationProvider.returnDisableBackgroundServiceNotification(false)
         )
-
-        registerReceiver(
-            LocationBroadcastReceiver(),
-            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
-        )
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -168,7 +163,7 @@ class LocationService : Service() {
     companion object {
         var mLocation: Location? = null
         var isServiceStarted = false
-        var isLocationEnabled = mutableStateOf(false)
+        var isLocationEnabled = mutableStateOf(true)
 
 
     }

@@ -4,6 +4,8 @@ import android.Manifest
 import android.app.Service.STOP_FOREGROUND_REMOVE
 import android.content.ComponentName
 import android.content.Intent
+import android.content.IntentFilter
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -12,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.core.app.ServiceCompat.stopForeground
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dagger.hilt.android.AndroidEntryPoint
+import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
 import mosis.streetsandtotems.core.presentation.navigation.AppNavigation
 import mosis.streetsandtotems.core.presentation.utils.notification.BackgroundServicesEnabled
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
@@ -36,8 +39,10 @@ class MainActivity() : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-
+        registerReceiver(
+            LocationBroadcastReceiver(),
+            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+        )
 
         installSplashScreen().apply {}
         setContent {
