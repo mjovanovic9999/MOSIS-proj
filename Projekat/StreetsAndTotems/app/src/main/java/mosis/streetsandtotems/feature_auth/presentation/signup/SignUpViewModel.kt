@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.feature_auth.presentation.signup
 
-import android.util.Log
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.AnnotatedString
@@ -12,41 +11,43 @@ import androidx.lifecycle.ViewModel
 import com.dsc.form_builder.Validators
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mosis.streetsandtotems.core.*
+import mosis.streetsandtotems.core.domain.validators.validatePhoneNumber
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 import mosis.streetsandtotems.core.presentation.components.form.formfields.TextFormField
 import mosis.streetsandtotems.core.presentation.states.FormState
+import mosis.streetsandtotems.feature_auth.domain.model.SignUpFields
+import mosis.streetsandtotems.feature_auth.domain.model.SignUpFieldsEmpty
 import javax.inject.Inject
 
 @HiltViewModel
 class SignupViewModel @Inject constructor() : ViewModel() {
-    val formState = FormState(
+    val formState: FormState<SignUpFields> = FormState(
         fields = listOf(
             TextFormField(
                 initial = "",
-                name = "firstName",
+                name = FormFieldNamesConstants.FIRST_NAME,
                 validators = listOf(Validators.Required(MessageConstants.FIRST_NAME_REQUIRED)),
                 label = FormFieldConstants.FIRST_NAME,
                 placeholder = FormFieldConstants.FIRST_NAME,
                 textFieldType = CustomTextFieldType.Outlined,
                 singleLine = true,
                 clearable = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             ),
             TextFormField(
                 initial = "",
-                name = "lastName",
+                name = FormFieldNamesConstants.LAST_NAME,
                 validators = listOf(Validators.Required(MessageConstants.LAST_NAME_REQUIRED)),
                 label = FormFieldConstants.LAST_NAME,
                 placeholder = FormFieldConstants.LAST_NAME,
                 textFieldType = CustomTextFieldType.Outlined,
                 singleLine = true,
                 clearable = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             ),
             TextFormField(
                 initial = "",
-                name = "phoneNumber",
-
+                name = FormFieldNamesConstants.PHONE_NUMBER,
                 validators = listOf(
                     Validators.Custom(
                         MessageConstants.INVALID_PHONE_NUMBER,
@@ -58,11 +59,11 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                 textFieldType = CustomTextFieldType.Outlined,
                 singleLine = true,
                 clearable = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             ),
             TextFormField(
                 initial = "",
-                name = "username",
+                name = FormFieldNamesConstants.USERNAME,
                 validators = listOf(Validators.Required(MessageConstants.USERNAME_REQUIRED)),
                 label = FormFieldConstants.USERNAME,
                 placeholder = FormFieldConstants.USERNAME,
@@ -73,7 +74,7 @@ class SignupViewModel @Inject constructor() : ViewModel() {
             ),
             TextFormField(
                 initial = "",
-                name = "password",
+                name = FormFieldNamesConstants.PASSWORD,
                 validators = listOf(
                     Validators.Required(MessageConstants.PASSWORD_REQUIRED),
                     Validators.Min(8, MessageConstants.PASSWORD_LENGTH)
@@ -92,11 +93,11 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next,
                     keyboardType = KeyboardType.Password
-                )
+                ),
             ),
             TextFormField(
                 initial = "",
-                name = "repeatPassword",
+                name = FormFieldNamesConstants.REPEAT_PASSWORD,
                 validators = listOf(
                     Validators.Custom(
                         MessageConstants.PASSWORDS_DO_NOT_MATCH,
@@ -123,10 +124,11 @@ class SignupViewModel @Inject constructor() : ViewModel() {
                     imeAction = ImeAction.Done,
                     keyboardType = KeyboardType.Password
                 ),
-                keyboardActions = KeyboardActions(onDone = { validate() })
+                keyboardActions = KeyboardActions(onDone = { validate() }),
             )
         ),
-        UserSignUpData::class
+        SignUpFields::class,
+        SignUpFieldsEmpty()
     )
 
     private fun validate() {
@@ -137,21 +139,9 @@ class SignupViewModel @Inject constructor() : ViewModel() {
         formState.getDataWithValidation()
     }
 
-    private fun validatePhoneNumber(value: Any): Boolean {
-        val pattern = Regex(RegexConstants.PHONE_NUMBER)
-        return pattern.containsMatchIn(value as String)
-    }
-
-    private fun validateRepeatedPassword(value: Any): Boolean {
-        return formState.getData().password == value.toString()
+    private fun validateRepeatedPassword(repeatedPassword: Any): Boolean {
+        return formState.getData().password == repeatedPassword.toString()
     }
 }
 
-data class UserSignUpData(
-    val firstName: String,
-    val lastName: String,
-    val phoneNumber: String,
-    val username: String,
-    val password: String,
-    val repeatPassword: String
-)
+

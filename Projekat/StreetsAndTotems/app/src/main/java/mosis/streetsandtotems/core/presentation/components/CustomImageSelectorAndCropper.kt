@@ -23,6 +23,7 @@ import com.skydoves.landscapist.glide.GlideImage
 import mosis.streetsandtotems.core.FormFieldConstants
 import mosis.streetsandtotems.ui.theme.sizes
 
+
 @Composable
 fun CustomImageSelectorAndCropper() {
     var imageUri by remember {
@@ -42,7 +43,7 @@ fun CustomImageSelectorAndCropper() {
             .size(MaterialTheme.sizes.image_select_size)
             .background(
                 MaterialTheme.colorScheme.secondaryContainer,
-                RoundedCornerShape(MaterialTheme.sizes.image_corner)
+                RoundedCornerShape(MaterialTheme.sizes.default_shape_corner)
             )
             .clickable {
                 imageCropLauncher.launch(options {
@@ -54,7 +55,7 @@ fun CustomImageSelectorAndCropper() {
         if (imageUri != null) {
             GlideImage(
                 imageModel = imageUri,
-                modifier = Modifier.clip(RoundedCornerShape(MaterialTheme.sizes.image_corner))
+                modifier = Modifier.clip(RoundedCornerShape(MaterialTheme.sizes.default_shape_corner))
             )
         } else {
             Column(
