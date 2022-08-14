@@ -1,10 +1,7 @@
 package mosis.streetsandtotems.feature_totems.presentation
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -35,7 +32,10 @@ fun TotemsScreen(viewModel: TotemsViewModel) {
         titleContent = {
             Image(
                 imageVector = ImageVector.vectorResource(id = R.drawable.tiki),
-                contentDescription = ImageContentDescriptionConstants.TOTEM
+                contentDescription = ImageContentDescriptionConstants.TOTEM,
+                modifier = Modifier
+                    .fillMaxHeight(MaterialTheme.sizes.totems_tiki_height)
+                    .aspectRatio(MaterialTheme.sizes.default_aspect_ratio)
             )
         },
         content = {
