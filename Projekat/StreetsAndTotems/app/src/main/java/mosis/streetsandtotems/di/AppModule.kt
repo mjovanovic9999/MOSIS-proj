@@ -15,6 +15,7 @@ import mosis.streetsandtotems.feature_auth.data.data_source.FirebaseAuthDataSour
 import mosis.streetsandtotems.feature_auth.domain.repository.AuthRepository
 import mosis.streetsandtotems.feature_auth.domain.use_case.AuthUseCases
 import mosis.streetsandtotems.feature_auth.domain.use_case.EmailAndPasswordSignIn
+import mosis.streetsandtotems.services.NetworkManager
 import javax.inject.Singleton
 
 @Module
@@ -49,7 +50,14 @@ object AppModule {
     //Notifications
     @Provides
     @Singleton
-    fun provideNotificationService(app: Application): NotificationProvider{
+    fun provideNotificationService(app: Application): NotificationProvider {
         return NotificationProvider(app)
+    }
+
+    //Network manager
+    @Provides
+    @Singleton
+    fun provideNetworkManager(app: Application): NetworkManager {
+        return NetworkManager(app)
     }
 }

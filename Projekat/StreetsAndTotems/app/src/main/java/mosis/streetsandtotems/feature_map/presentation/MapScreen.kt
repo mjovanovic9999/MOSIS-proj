@@ -66,7 +66,6 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
                 val context = LocalContext.current
 
                 CustomFAB(R.drawable.locate_me, {
-                    context.startForegroundService(Intent(context, LocationService::class.java))
                     /*    mapViewModel.viewModelScope.launch {
                             mapViewModel.state.centerOnMarker(
                                 "prvi",
@@ -76,7 +75,6 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
                 })
                 CustomFAB(R.drawable.add_pin, {
                     Toast.makeText(context, "Ako ima vreme za cutom pin", Toast.LENGTH_LONG).show()
-                    context.stopService(Intent(context, LocationService::class.java))
                 })
 
             }

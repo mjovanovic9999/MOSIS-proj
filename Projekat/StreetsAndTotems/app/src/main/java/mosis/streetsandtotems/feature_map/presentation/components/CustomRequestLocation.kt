@@ -21,16 +21,11 @@ import mosis.streetsandtotems.core.MessageConstants
 
 @Composable
 fun CustomRequestLocation(
-//    context: Context,
-//    myLocation: MutableState<LocationDTO>
+    isLocationEnabled: MutableState<Boolean>
 ) {
-    val locationEnabledState = remember { mutableStateOf(true) }
-    val context = LocalContext.current
-
-
+    if (!isLocationEnabled.value) {
         CustomRequestLocationDialog()
-
-
+    }
 }
 
 @Composable

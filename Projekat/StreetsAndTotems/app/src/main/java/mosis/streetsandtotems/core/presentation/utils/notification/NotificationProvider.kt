@@ -9,12 +9,13 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import mosis.streetsandtotems.R
-import mosis.streetsandtotems.core.ButtonConstants.DISABLE_BACKGROUND_SERVICE_BUTTON
-import mosis.streetsandtotems.core.NotificationsConstants
-import mosis.streetsandtotems.core.NotificationsConstants.CHANNEL_ID
-import mosis.streetsandtotems.core.NotificationsConstants.DISABLE_BACKGROUND_SERVICE_ID
-import mosis.streetsandtotems.core.NotificationsConstants.DISABLE_BACKGROUND_SERVICE_TEXT
-import mosis.streetsandtotems.core.NotificationsConstants.DISABLE_BACKGROUND_SERVICE_TITLE
+import mosis.streetsandtotems.core.ButtonConstants.TURN_OFF_BACKGROUND_SERVICE_BUTTON
+import mosis.streetsandtotems.core.NotificationConstants
+import mosis.streetsandtotems.core.NotificationConstants.CHANNEL_ID
+import mosis.streetsandtotems.core.NotificationConstants.DISABLE_BACKGROUND_SERVICE_ID
+import mosis.streetsandtotems.core.NotificationConstants.DISABLE_BACKGROUND_SERVICE_TEXT
+import mosis.streetsandtotems.core.NotificationConstants.DISABLE_BACKGROUND_SERVICE_TITLE
+
 
 class NotificationProvider(private val context: Context) {
 
@@ -30,14 +31,26 @@ class NotificationProvider(private val context: Context) {
 
         val channel = NotificationChannel(
             CHANNEL_ID,
-            NotificationsConstants.CHANNEL_NAME,
+            NotificationConstants.CHANNEL_NAME,
             NotificationManager.IMPORTANCE_DEFAULT
         )
-        channel.description = NotificationsConstants.CHANNEL_NAME
+        channel.description = NotificationConstants.CHANNEL_NAME
         channel.enableVibration(false)
         channel.setSound(null, null)
 
         notificationManager.createNotificationChannel(channel)
+
+//        val channel2 = NotificationChannel(
+//            CHANNEL_ID2,
+//            NotificationsConstants.CHANNEL_NAME2,
+//            NotificationManager.IMPORTANCE_DEFAULT
+//        )
+//        channel2.description = NotificationsConstants.CHANNEL_NAME2
+//
+//        notificationManager.createNotificationChannel(channel2)
+
+
+
     }
 
 
@@ -60,7 +73,7 @@ class NotificationProvider(private val context: Context) {
             )
             notificationBuilder.addAction(
                 R.drawable.logo_only_tiki,
-                DISABLE_BACKGROUND_SERVICE_BUTTON,
+                TURN_OFF_BACKGROUND_SERVICE_BUTTON,
                 disableBackgroundServiceIntent
             )
         }
@@ -76,7 +89,7 @@ class NotificationProvider(private val context: Context) {
         )
     }
 
-//    fun cancelDisableBackgroundServiceNotification() {
-//        notificationManager.cancel(DISABLE_BACKGROUND_SERVICE_ID)
-//    }
+    fun cancelDisableBackgroundServiceNotification() {
+        notificationManager.cancel(DISABLE_BACKGROUND_SERVICE_ID)
+    }
 }

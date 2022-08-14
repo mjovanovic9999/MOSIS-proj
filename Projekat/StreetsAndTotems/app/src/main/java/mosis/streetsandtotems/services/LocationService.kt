@@ -2,6 +2,7 @@ package mosis.streetsandtotems.services
 
 import android.app.Application
 import android.app.Service
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -45,7 +46,7 @@ class LocationService : Service() {
         super.onCreate()
         isServiceStarted = true
         startForeground(
-            1,//constants.......
+            1,
             notificationProvider.returnDisableBackgroundServiceNotification(false)
         )
 
@@ -56,11 +57,8 @@ class LocationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-
-
         startListeningUserLocation(this)
-
-        return START_STICKY
+        return START_STICKY_COMPATIBILITY
     }
 
 
@@ -72,12 +70,12 @@ class LocationService : Service() {
         super.onDestroy()
 
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-        //notificationService.cancelDisableBackgroundServiceNotification() //za svaki slucaj ovo
         Log.d("tag", "ugasennnn")
         isServiceStarted = false
         serviceJob.cancel()
 
     }
+
 
     private fun startListeningUserLocation(context: Context) {
 
@@ -96,10 +94,6 @@ class LocationService : Service() {
                 .setAlwaysShow(true) //sta je bre ovoo???????? //https://stackoverflow.com/questions/29861580/locationservices-settingsapi-reset-settings-change-unavailable-flag
                 .build()
 //mozda ovako il sa location manager
-
-
-
-        //provera da l ovo lepo radi s razlicite permisije na android12
 
 
         //svuda na close app mora se explicitno pozove close service
@@ -159,18 +153,6 @@ class LocationService : Service() {
             } else {
                 isLocationEnabled.value = false
                 Log.d("tag", "isLocationEnabled = false")
-
-                val x = it.exception as ApiException
-                when (x.statusCode) {
-                    LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
-                        Log.d("tag", "resolution")
-
-
-                    }
-                    LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE -> {
-                        Log.d("tag", "Settings change unavailable.")
-                    }
-                }
                 this.stopSelf()
             }
         }
@@ -178,9 +160,16 @@ class LocationService : Service() {
 
     }
 
+    fun stopLocationService() {
+        if (isServiceStarted)
+            this.stopSelf()
+    }
+
     companion object {
         var mLocation: Location? = null
         var isServiceStarted = false
         var isLocationEnabled = mutableStateOf(false)
+
+
     }
 }

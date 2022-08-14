@@ -36,11 +36,11 @@ fun CustomRequestPermission(
                 permissionGrantedState.value = true
 
             }
-            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                Log.d("tag", "coarse")
-                permissionGrantedState.value = true
-
-            }
+//            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+//                Log.d("tag", "coarse")
+//                permissionGrantedState.value = true
+//
+//            }
             else -> {
                 Log.d("tag", "else")
                 permissionGrantedState.value = false
