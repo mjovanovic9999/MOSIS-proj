@@ -36,8 +36,6 @@ fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigat
 
     Column(
         modifier = modifier
-            .fillMaxWidth(MaterialTheme.sizes.drawer_column_width)
-            .padding(top = MaterialTheme.sizes.drawer_spacing)
             .clickable(
                 indication = null,
                 interactionSource = MutableInteractionSource()

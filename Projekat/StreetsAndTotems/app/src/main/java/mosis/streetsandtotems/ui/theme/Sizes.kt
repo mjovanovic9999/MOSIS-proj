@@ -21,7 +21,7 @@ data class Sizes(
     val image_select_size: Dp = 200.dp,
     val default_shape_corner: Dp = 15.dp,
     val sign_up_button_top_padding: Dp = 5.dp,
-    val drawer_column_width: Float = 0.9f,
+    val drawer_column_padding: Dp = 15.dp,
     val drawer_switch_scale_factor: Float = 0.75f,
     val drawer_spacing: Dp = 10.dp,
     val drawer_image_size: Dp = 100.dp,
