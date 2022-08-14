@@ -9,6 +9,12 @@ object ButtonConstants {
     const val SIGN_UP_GOOGLE = "Sign up with Google"
     const val SIGN_UP_FACEBOOK = "Sign up with Facebook"
     const val SIGN_UP = "Sign Up"
+    const val DIALOG_PERMISSION_CONFIRM_BUTTON = "Turn on permissions"
+    const val DIALOG_PERMISSION_DISMISS_BUTTON = "Close app"
+    const val DIALOG_LOCATION_CONFIRM_BUTTON = "Turn on location"
+    const val DIALOG_LOCATION_DISMISS_BUTTON = "Close app"
+    const val DISABLE_BACKGROUND_SERVICE_BUTTON = "DISABLE"
+
 }
 
 object ImageContentDescriptionConstants {
@@ -52,18 +58,9 @@ object MessageConstants {
     const val DIALOG_PERMISSION_TITLE = "Location permission is disabled"
     const val DIALOG_PERMISSION_TEXT =
         "In order to use Streets And Totems location permission has to be granted!"
-    const val DIALOG_PERMISSION_CONFIRM_BUTTON = "Turn on permissions"
-    const val DIALOG_PERMISSION_DISMISS_BUTTON = "Close app"
-    const val DIALOG_BACKGROUND_PERMISSION_TITLE = "Background location permission is disabled"
-    const val DIALOG_BACKGROUND_PERMISSION_TEXT =
-        "In order to use Streets And Totems in background, background location permission has to be granted!"
-    const val DIALOG_BACKGROUND_PERMISSION_CONFIRM_BUTTON = "Grant"
-    const val DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON = "Don't grant"
     const val DIALOG_LOCATION_TITLE = "Location disabled"
     const val DIALOG_LOCATION_TEXT =
         "In order to use Streets And Totems Location has to be turned on!"
-    const val DIALOG_LOCATION_CONFIRM_BUTTON = "Turn on location"
-    const val DIALOG_LOCATION_DISMISS_BUTTON = "Close app"
     const val PASSWORDS_DO_NOT_MATCH = "Passwords don't match!"
 }
 
@@ -108,7 +105,6 @@ object NotificationsConstants {
     const val DISABLE_BACKGROUND_SERVICE_TITLE = "Application is running in the background"
     const val DISABLE_BACKGROUND_SERVICE_TEXT =
         "If you disable this you won't be able to get push notifications"
-    const val DISABLE_BACKGROUND_SERVICE_BUTTON = "DISABLE"
     const val DISABLE_BACKGROUND_SERVICE_ID = 1
 }
 

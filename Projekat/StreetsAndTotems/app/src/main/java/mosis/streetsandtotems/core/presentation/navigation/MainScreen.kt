@@ -36,19 +36,11 @@ fun MainScreen() {
 
     val scope = rememberCoroutineScope()
 
-    val requestBackgroundLocationPermission = remember { mutableStateOf(!true) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = { DrawerContent() },
         content = { DrawerScreen(navController = navController, drawerState = drawerState) }
-    )
-    CustomRequestPermission(
-        arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-        ),
-        requestBackgroundLocationPermission
     )
 }
 

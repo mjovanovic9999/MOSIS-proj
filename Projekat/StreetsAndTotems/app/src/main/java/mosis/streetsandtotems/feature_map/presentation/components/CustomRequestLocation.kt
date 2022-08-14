@@ -15,6 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import mosis.streetsandtotems.core.ButtonConstants.DIALOG_LOCATION_CONFIRM_BUTTON
+import mosis.streetsandtotems.core.ButtonConstants.DIALOG_LOCATION_DISMISS_BUTTON
 import mosis.streetsandtotems.core.MessageConstants
 
 @Composable
@@ -25,89 +27,11 @@ fun CustomRequestLocation(
     val locationEnabledState = remember { mutableStateOf(true) }
     val context = LocalContext.current
 
-//(getSystemService(Context.LOCATION_SERVICE) as LocationManager).isProviderEnabled(LocationManager.GPS_PROVIDER)
 
+        CustomRequestLocationDialog()
 
-
-//    CustomLocationDialog(
-//        activity = context.getActivity(),
-//        locationDialogOpenState = locationDialogOpenState
-//    )
-
-
-    fun LocateMe(context: Context) {
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-
-        val locationResult =
-            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_LOW_POWER, null)
-
-        locationResult.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val lastKnownLocation = task.result
-
-                if (lastKnownLocation != null) {
-/*                    Toast.makeText(this, lastKnownLocation.latitude.toString(), Toast.LENGTH_SHORT)
-                        .show()
-                    Toast.makeText(this, lastKnownLocation.longitude.toString(), Toast.LENGTH_SHORT)
-                        .show()*/
-//                    myLocation.value = LocationDTO(
-//                        lastKnownLocation.latitude,
-//                        lastKnownLocation.longitude,
-//                        lastKnownLocation.accuracy
-//                    )
-                    Toast.makeText(
-                        context,
-                        lastKnownLocation.accuracy.toString() + "low",
-                        Toast.LENGTH_SHORT
-                    )
-
-                } else {
-                    Toast.makeText(context, "NULL", Toast.LENGTH_SHORT).show()
-
-                }
-            } else {
-                Toast.makeText(context, "ERROR", Toast.LENGTH_SHORT).show()
-            }
-
-        }
-    }
-    LocateMe(context)
 
 }
-
-/*
-val lifecycleOwner = LocalLifecycleOwner.current
-
-Log.d("tag", locationDialogOpenState.value.toString() + "custom")
-
-DisposableEffect(
-key1 = lifecycleOwner,
-effect = {
-val observer = LifecycleEventObserver { _, event ->
-if (event == Lifecycle.Event.ON_RESUME) {
-//locationPermissionRequest.launch(permissions)
-//TODO("SAMO OBRADITI KAD USER IDE DENY TJ ELSE")
-Log.d("tag", "ON resume")
-
-
-//                    val locationManager =
-//                        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-//                    locationDialogOpenState.value =
-//                        !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-//                                && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-
-//context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-
-}
-}
-lifecycleOwner.lifecycle.addObserver(observer)
-
-onDispose {
-lifecycleOwner.lifecycle.removeObserver(observer)
-}
-}
-)*/
 
 @Composable
 fun CustomRequestLocationDialog(
@@ -131,7 +55,7 @@ fun CustomRequestLocationDialog(
                     context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                 }
             ) {
-                Text(MessageConstants.DIALOG_LOCATION_CONFIRM_BUTTON)
+                Text(DIALOG_LOCATION_CONFIRM_BUTTON)
             }
         },
         dismissButton = {
@@ -140,7 +64,7 @@ fun CustomRequestLocationDialog(
                     (context as Activity).finishAndRemoveTask()
                 }
             ) {
-                Text(MessageConstants.DIALOG_LOCATION_DISMISS_BUTTON)
+                Text(DIALOG_LOCATION_DISMISS_BUTTON)
             }
         }
     )
