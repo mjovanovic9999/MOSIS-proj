@@ -13,8 +13,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import mosis.streetsandtotems.core.*
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 import mosis.streetsandtotems.core.presentation.components.form.formfields.TextFormField
-import mosis.streetsandtotems.core.presentation.states.FieldsEmpty
 import mosis.streetsandtotems.core.presentation.states.FormState
+import mosis.streetsandtotems.feature_auth.domain.model.SignInFields
+import mosis.streetsandtotems.feature_auth.domain.model.SignInFieldsEmpty
 import javax.inject.Inject
 
 @HiltViewModel
@@ -71,27 +72,3 @@ class SignInViewModel @Inject constructor() : ViewModel() {
 
 }
 
- data class SignInFieldsEmpty(
-    var username: Boolean = true,
-    var password: Boolean = true
-) : FieldsEmpty {
-    override fun setFieldEmpty(name: String, empty: Boolean) {
-        when (name) {
-            FormFieldNamesConstants.USERNAME -> {
-                username = empty
-            }
-            FormFieldNamesConstants.PASSWORD -> {
-                password = empty
-            }
-        }
-    }
-
-    override fun anyFieldIsEmpty(): Boolean {
-        return username || password
-    }
-}
-
-data class SignInFields(
-    val username: String,
-    val password: String
-)

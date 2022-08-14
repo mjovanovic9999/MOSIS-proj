@@ -21,8 +21,11 @@ import mosis.streetsandtotems.core.*
 import mosis.streetsandtotems.core.domain.validators.validatePhoneNumber
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 import mosis.streetsandtotems.core.presentation.components.form.formfields.TextFormField
-import mosis.streetsandtotems.core.presentation.states.FieldsEmpty
 import mosis.streetsandtotems.core.presentation.states.FormState
+import mosis.streetsandtotems.feature_auth.domain.model.EditPasswordFields
+import mosis.streetsandtotems.feature_auth.domain.model.EditPasswordFieldsEmpty
+import mosis.streetsandtotems.feature_auth.domain.model.ProfileFields
+import mosis.streetsandtotems.feature_auth.domain.model.ProfileFieldsEmpty
 import javax.inject.Inject
 
 @HiltViewModel
@@ -243,64 +246,4 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
     }
 }
 
-private data class ProfileFieldsEmpty(
-    var firstName: Boolean = false,
-    var lastName: Boolean = false,
-    var phoneNumber: Boolean = false
-) : FieldsEmpty {
-    override fun setFieldEmpty(name: String, empty: Boolean) {
-        when (name) {
-            FormFieldNamesConstants.FIRST_NAME -> {
-                firstName = empty
-            }
-            FormFieldNamesConstants.LAST_NAME -> {
-                lastName = empty
-            }
-            FormFieldNamesConstants.PHONE_NUMBER -> {
-                phoneNumber = empty
-            }
-        }
-    }
 
-    override fun anyFieldIsEmpty(): Boolean {
-        return firstName || lastName || phoneNumber
-    }
-
-}
-
-data class ProfileFields(
-    val firstName: String,
-    val lastName: String,
-    val phoneNumber: String,
-)
-
-private data class EditPasswordFieldsEmpty(
-    var currentPassword: Boolean = true,
-    var newPassword: Boolean = true,
-    var repeatNewPassword: Boolean = true
-) : FieldsEmpty {
-    override fun setFieldEmpty(name: String, empty: Boolean) {
-        when (name) {
-            FormFieldNamesConstants.CURRENT_PASSWORD -> {
-                currentPassword = empty
-            }
-            FormFieldNamesConstants.NEW_PASSWORD -> {
-                newPassword = empty
-            }
-            FormFieldNamesConstants.REPEAT_PASSWORD -> {
-                repeatNewPassword = empty
-            }
-        }
-    }
-
-    override fun anyFieldIsEmpty(): Boolean {
-        return currentPassword || newPassword || repeatNewPassword
-    }
-
-}
-
-data class EditPasswordFields(
-    val currentPassword: String,
-    val newPassword: String,
-    val repeatNewPassword: String
-)

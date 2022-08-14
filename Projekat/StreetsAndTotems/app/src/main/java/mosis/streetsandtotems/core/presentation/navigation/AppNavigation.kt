@@ -29,6 +29,7 @@ fun AppNavigation() {
             dependency(SignInScreenDestination) { hiltViewModel<SignInViewModel>() }
             dependency(SignUpScreenDestination) { hiltViewModel<SignupViewModel>()}
             dependency(ProfileScreenDestination) { hiltViewModel<ProfileViewModel>()}
+
         })
     }
 }

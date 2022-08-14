@@ -10,6 +10,8 @@ import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -49,7 +51,6 @@ class TextFormField @OptIn(ExperimentalMaterial3Api::class) constructor(
         validators = validators,
         transform = transform
     )
-    override var onValueChanged: (Any) -> Unit = {}
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -65,7 +66,7 @@ class TextFormField @OptIn(ExperimentalMaterial3Api::class) constructor(
                 },
                 isError = fieldState.hasError,
                 textFieldType = textFieldType,
-                modifier = modifier,
+                modifier = modifier.focusRequester(focusRequester),
                 enabled = enabled,
                 readOnly = readOnly,
                 label = label,

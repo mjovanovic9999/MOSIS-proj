@@ -1,25 +1,16 @@
 package mosis.streetsandtotems.core.presentation.components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.toSize
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,18 +23,16 @@ fun CustomSelect(
     defaultSelectedIndex: Int? = null,
     height: Dp? = null
 ) {
+    val focusManager = LocalFocusManager.current
     val expanded = remember { mutableStateOf(false) }
     val selectedText =
         remember { mutableStateOf(if ((defaultSelectedIndex != null) && (selectList.size > defaultSelectedIndex) && (defaultSelectedIndex >= 0)) selectList[defaultSelectedIndex] else "") }
-    val textFieldSize = remember { mutableStateOf(Size.Zero) }
-    val textFieldModifier = Modifier
-        .fillMaxWidth()
-        .onGloballyPositioned { coordinates ->
-            textFieldSize.value = coordinates.size.toSize()
-        }
 
-
-    Column(modifier = modifier) {
+    ExposedDropdownMenuBox(
+        expanded = expanded.value,
+        onExpandedChange = { expanded.value = !expanded.value },
+        modifier = modifier
+    ) {
         CustomTextField(
             value = selectedText.value,
             onValueChange = { selectedText.value = it },
@@ -51,22 +40,27 @@ fun CustomSelect(
             readOnly = readOnly,
             label = label,
             trailingIcon = if (expanded.value) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
-            onTrailingIconClicked = { expanded.value = !expanded.value },
             singleLine = true,
-            modifier = if (height != null) textFieldModifier.height(height) else textFieldModifier
+            modifier = if (height != null) Modifier.height(height) else Modifier,
+            colors = if (type == CustomTextFieldType.Basic) ExposedDropdownMenuDefaults.textFieldColors() else ExposedDropdownMenuDefaults.outlinedTextFieldColors()
         )
+        val filteringOptions =
+            selectList.filter { it.contains(selectedText.value, ignoreCase = true) }
+        if (filteringOptions.isNotEmpty()) {
 
-        DropdownMenu(
-            expanded = expanded.value,
-            onDismissRequest = { expanded.value = false },
-            modifier = Modifier.width(with(
-                LocalDensity.current
-            ) { textFieldSize.value.width.toDp() })
-        ) {
-            selectList.forEach {
-                DropdownMenuItem(
-                    text = { Text(text = it) },
-                    onClick = { selectedText.value = it; expanded.value = false })
+            ExposedDropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false },
+            ) {
+                selectList.forEach {
+                    DropdownMenuItem(
+                        text = { Text(text = it) },
+                        onClick = {
+                            selectedText.value = it
+                            expanded.value = false
+                            focusManager.clearFocus()
+                        })
+                }
             }
         }
     }

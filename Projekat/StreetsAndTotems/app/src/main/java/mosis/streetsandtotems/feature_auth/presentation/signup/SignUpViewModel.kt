@@ -14,8 +14,9 @@ import mosis.streetsandtotems.core.*
 import mosis.streetsandtotems.core.domain.validators.validatePhoneNumber
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 import mosis.streetsandtotems.core.presentation.components.form.formfields.TextFormField
-import mosis.streetsandtotems.core.presentation.states.FieldsEmpty
 import mosis.streetsandtotems.core.presentation.states.FormState
+import mosis.streetsandtotems.feature_auth.domain.model.SignUpFields
+import mosis.streetsandtotems.feature_auth.domain.model.SignUpFieldsEmpty
 import javax.inject.Inject
 
 @HiltViewModel
@@ -143,48 +144,4 @@ class SignupViewModel @Inject constructor() : ViewModel() {
     }
 }
 
-private data class SignUpFieldsEmpty(
-    var firstName: Boolean = true,
-    var lastName: Boolean = true,
-    var phoneNumber: Boolean = true,
-    var username: Boolean = true,
-    var password: Boolean = true,
-    var repeatPassword: Boolean = true
-) : FieldsEmpty {
-    override fun setFieldEmpty(name: String, empty: Boolean) {
-        when (name) {
-            FormFieldNamesConstants.FIRST_NAME -> {
-                firstName = empty
-            }
-            FormFieldNamesConstants.LAST_NAME -> {
-                lastName = empty
-            }
-            FormFieldNamesConstants.PHONE_NUMBER -> {
-                phoneNumber = empty
-            }
-            FormFieldNamesConstants.USERNAME -> {
-                username = empty
-            }
-            FormFieldNamesConstants.PASSWORD -> {
-                password = empty
-            }
-            FormFieldNamesConstants.REPEAT_PASSWORD -> {
-                repeatPassword = empty
-            }
-        }
-    }
 
-    override fun anyFieldIsEmpty(): Boolean {
-        return firstName || lastName || phoneNumber || username || password || repeatPassword
-    }
-}
-
-
-data class SignUpFields(
-    val firstName: String,
-    val lastName: String,
-    val phoneNumber: String,
-    val username: String,
-    val password: String,
-    val repeatPassword: String
-)

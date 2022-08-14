@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.core.presentation.states
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.dsc.form_builder.FormState
@@ -26,6 +25,12 @@ class FormState<T : Any>(
 
     fun validate(): Boolean {
         return formState.validate()
+    }
+
+    fun validateAndFocusFirstInvalidField(): Boolean {
+        val valid = formState.validate()
+        if (!valid) fields.first { field -> field.fieldState.hasError }.focusRequester.requestFocus()
+        return valid
     }
 
     fun getDataWithValidation(): T? {
