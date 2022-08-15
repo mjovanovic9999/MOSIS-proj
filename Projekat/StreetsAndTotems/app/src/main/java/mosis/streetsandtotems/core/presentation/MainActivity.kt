@@ -37,10 +37,7 @@ class MainActivity() : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        registerReceiver(
-            locationBroadcastReceiver,
-            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
-        )
+
 
 
 
@@ -64,12 +61,18 @@ class MainActivity() : ComponentActivity() {
     override fun onResume() {
         super.onResume()
 
+        registerReceiver(
+            locationBroadcastReceiver,
+            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+        )
 
         Log.d("tag", "onResumeActivity")
 
 
         if (!LocationService.isServiceStarted)//treb si ostane ugasen i onova dugme
         {
+            Log.d("tag", "startuje servis")
+
             startForegroundService(Intent(this, LocationService::class.java))
 
         } else {
@@ -92,15 +95,15 @@ class MainActivity() : ComponentActivity() {
             stopService(Intent(this, LocationService::class.java))
         }
 
-
+        unregisterReceiver(
+            locationBroadcastReceiver,
+        )
 
         super.onPause()
     }
 
     override fun onDestroy() {
-        unregisterReceiver(
-            locationBroadcastReceiver,
-        )
+
 
         super.onDestroy()
     }

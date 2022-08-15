@@ -42,8 +42,6 @@ class LocationService : Service() {
     @Inject
     lateinit var networkManager: NetworkManager
 
-    private val locationBroadcastReceiver = LocationBroadcastReceiver()
-
 
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
@@ -55,11 +53,6 @@ class LocationService : Service() {
             1,
             notificationProvider.returnDisableBackgroundServiceNotification(false)
         )
-
-//        registerReceiver(
-//            locationBroadcastReceiver,
-//            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
-//        )
 
     }
 
@@ -77,11 +70,7 @@ class LocationService : Service() {
         notificationProvider.cancelDisableBackgroundServiceNotification()
         isServiceStarted = false
         networkManager.unregister()
-//
-//        unregisterReceiver(
-//            locationBroadcastReceiver,
-//        )
-
+        
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
         Log.d("tag", "ugasennnn")
         serviceJob.cancel()

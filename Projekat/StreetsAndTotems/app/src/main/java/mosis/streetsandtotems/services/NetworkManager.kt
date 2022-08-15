@@ -60,6 +60,7 @@ class NetworkManager(var context: Application) {
 
     companion object {
         var isNetworkConnectivityValid =
-            mutableStateOf(false)//ako nece da registruje inicijalno ugasenu mrezu
+            mutableStateOf(false)
+        val locationBroadcastReceiverRegistered = false
     }
 }
