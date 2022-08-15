@@ -54,7 +54,11 @@ data class Sizes(
     val totems_item_totem_id_weight: Float = 0.3f,
     val totems_item_username_weight: Float = 0.6f,
     val lazy_column_button_weight: Float = 0.1f,
-    val lazy_column_max_width: Float = 1f
+    val lazy_column_max_width: Float = 1f,
+    val lazy_column_title_image_height: Float = 0.3f,
+    val leaderboard_position_weight: Float = 0.1f,
+    val leaderboard_username_weight: Float = 0.5f,
+    val leaderboard_points_weight: Float = 0.3f
 )
 
 val LocalWidth = compositionLocalOf { Sizes() }
