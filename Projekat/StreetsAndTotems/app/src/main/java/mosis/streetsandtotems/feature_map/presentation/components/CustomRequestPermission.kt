@@ -24,7 +24,12 @@ import mosis.streetsandtotems.services.LocationService
 
 @Composable
 fun CustomRequestPermission(
-    permissionsArray: Array<String>,
+    permissionsArray: Array<String> =
+        arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+        )
+
 ) {
     val permissionGrantedState = remember { mutableStateOf(true) }
 
@@ -37,11 +42,12 @@ fun CustomRequestPermission(
                 permissionGrantedState.value = true
 
             }
-//            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-//                Log.d("tag", "coarse")
-//                permissionGrantedState.value = true
-//
-//            }
+            permissions.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false) -> {
+                Log.d("tag", "bck")
+                if (Manifest.permission.ACCESS_BACKGROUND_LOCATION in permissionsArray)
+                    permissionGrantedState.value = true
+
+            }
             else -> {
                 Log.d("tag", "else")
                 permissionGrantedState.value = false

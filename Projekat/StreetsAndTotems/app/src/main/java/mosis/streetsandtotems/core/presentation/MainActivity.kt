@@ -45,11 +45,7 @@ class MainActivity() : ComponentActivity() {
         installSplashScreen().apply {}
         setContent {
             AppTheme {
-                CustomRequestPermission(
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                    ),
-                )
+                CustomRequestPermission()
                 CustomRequestNetwork(NetworkManager.isNetworkConnectivityValid)
                 CustomRequestLocation(LocationService.isLocationEnabled)
                 AppNavigation()
