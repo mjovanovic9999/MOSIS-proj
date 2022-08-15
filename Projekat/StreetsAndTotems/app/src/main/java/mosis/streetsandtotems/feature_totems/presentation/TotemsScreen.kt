@@ -34,7 +34,7 @@ fun TotemsScreen(viewModel: TotemsViewModel) {
                 imageVector = ImageVector.vectorResource(id = R.drawable.tiki),
                 contentDescription = ImageContentDescriptionConstants.TOTEM,
                 modifier = Modifier
-                    .fillMaxHeight(MaterialTheme.sizes.totems_tiki_height)
+                    .fillMaxHeight(MaterialTheme.sizes.lazy_column_title_image_height)
                     .aspectRatio(MaterialTheme.sizes.default_aspect_ratio)
             )
         },
@@ -48,10 +48,7 @@ fun TotemsScreen(viewModel: TotemsViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(state.totems) {
-                    Box(modifier = Modifier.padding(bottom = MaterialTheme.sizes.lazy_column_spacing))
-                    {
-                        TotemListItem(totem = it)
-                    }
+                    TotemListItem(totem = it)
                 }
             }
         })

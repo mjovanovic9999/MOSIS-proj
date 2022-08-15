@@ -41,13 +41,13 @@ fun CustomPage(
                 interactionSource = MutableInteractionSource()
             ) { focusManager.clearFocus() }, horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        titleContent?.invoke()
         if (titleText != null)
             Text(
                 text = titleText,
                 style = MaterialTheme.typography.displaySmall.plus(TextStyle(fontWeight = FontWeight.ExtraBold)),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-        titleContent?.invoke()
         Box(
             modifier = boxModifier
         ) {

@@ -89,6 +89,7 @@ object TitleConstants {
     const val EDIT_PROFILE = "Edit profile"
     const val EDIT_PASSWORD = "Edit password"
     const val BACKPACK = "Backpack"
+    const val LEADERBOARD = "Leaderboard"
 }
 
 object FormFieldConstants {
@@ -148,6 +149,7 @@ object NotificationConstants {
     const val CHANNEL_ID2 = "StreetsAndTotems_channel2"
     const val CHANNEL_NAME2 = "Streets And Totems Notifications2"
 }
+
 object ItemsConstants {
     const val STONE = "Stone"
     const val WOOD = "Wood"
@@ -160,4 +162,9 @@ object ItemsConstants {
 object TotemItemsConstants {
     const val TOTEM_ID = "Totem id:"
     const val PLACED_BY = "Placed by:"
+}
+
+object LeaderboardItemsConstants {
+    const val USERNAME = "Username:"
+    const val POINTS = "Points:"
 }
