@@ -33,7 +33,6 @@ class MainActivity() : ComponentActivity() {
 
 
     private val locationBroadcastReceiver = LocationBroadcastReceiver()
-//    private val notificationBroadcastReceiver = NotificationBroadcastReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,10 +42,7 @@ class MainActivity() : ComponentActivity() {
             IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
         )
 
-//        registerReceiver(
-//            notificationBroadcastReceiver,
-//            IntentFilter("android.location.PROVIDERS_CHANGED")
-//        )
+
 
 
         installSplashScreen().apply {}
@@ -75,19 +71,22 @@ class MainActivity() : ComponentActivity() {
         if (!LocationService.isServiceStarted)//treb si ostane ugasen i onova dugme
         {
             startForegroundService(Intent(this, LocationService::class.java))
-            Log.d("tag", "created")
 
         } else {
+            //notificationProvider.cancelDisableBackgroundServiceNotification()
+
             if (BackgroundServicesEnabled.isEnabled) {
                 notificationProvider.notifyDisable(false)
             }
+
+
         }
 
     }
 
     override fun onPause() {
 
-        if (BackgroundServicesEnabled.isEnabled) {
+        if (BackgroundServicesEnabled.isEnabled && LocationService.isServiceStarted) {
             notificationProvider.notifyDisable(true)
         } else {
             stopService(Intent(this, LocationService::class.java))
@@ -102,9 +101,7 @@ class MainActivity() : ComponentActivity() {
         unregisterReceiver(
             locationBroadcastReceiver,
         )
-//        unregisterReceiver(
-//            notificationBroadcastReceiver,
-//        )
+
         super.onDestroy()
     }
 }

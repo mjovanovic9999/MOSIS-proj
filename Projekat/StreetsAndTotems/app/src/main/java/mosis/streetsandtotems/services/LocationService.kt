@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
+import mosis.streetsandtotems.core.presentation.utils.notification.NotificationBroadcastReceiver
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import javax.inject.Inject
 
@@ -41,6 +42,9 @@ class LocationService : Service() {
     @Inject
     lateinit var networkManager: NetworkManager
 
+    private val locationBroadcastReceiver = LocationBroadcastReceiver()
+
+
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
 
@@ -51,6 +55,12 @@ class LocationService : Service() {
             1,
             notificationProvider.returnDisableBackgroundServiceNotification(false)
         )
+
+//        registerReceiver(
+//            locationBroadcastReceiver,
+//            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+//        )
+
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -67,6 +77,11 @@ class LocationService : Service() {
         notificationProvider.cancelDisableBackgroundServiceNotification()
         isServiceStarted = false
         networkManager.unregister()
+//
+//        unregisterReceiver(
+//            locationBroadcastReceiver,
+//        )
+
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
         Log.d("tag", "ugasennnn")
         serviceJob.cancel()

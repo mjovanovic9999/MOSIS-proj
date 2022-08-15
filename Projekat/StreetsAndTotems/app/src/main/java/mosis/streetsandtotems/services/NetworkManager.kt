@@ -13,7 +13,7 @@ class NetworkManager(var context: Application) {
     val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
 
 
-    ///ne poziva se inicijalno ako je wifi ugasen
+    ///ne poziva se inicijalno   ako je wifi ugasen
 
     private var callback: ConnectivityManager.NetworkCallback = object :
         ConnectivityManager.NetworkCallback() {
@@ -60,6 +60,6 @@ class NetworkManager(var context: Application) {
 
     companion object {
         var isNetworkConnectivityValid =
-            mutableStateOf(true)//ako nece da registruje inicijalno ugasenu mrezu
+            mutableStateOf(false)//ako nece da registruje inicijalno ugasenu mrezu
     }
 }

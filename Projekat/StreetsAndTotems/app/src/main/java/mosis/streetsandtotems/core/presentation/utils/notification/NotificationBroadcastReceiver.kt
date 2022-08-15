@@ -9,6 +9,7 @@ import mosis.streetsandtotems.services.LocationService
 class NotificationBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {
+        NotificationProvider(context).cancelDisableBackgroundServiceNotification()
         //service.showNotification(++Counter.value)
         context.stopService(Intent(context, LocationService::class.java))
 
