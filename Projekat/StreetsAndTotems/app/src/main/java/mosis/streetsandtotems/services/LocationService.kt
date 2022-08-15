@@ -38,6 +38,8 @@ class LocationService : Service() {
 
     lateinit var locationCallback: LocationCallback
 
+    @Inject
+    lateinit var networkManager: NetworkManager
 
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
@@ -62,12 +64,13 @@ class LocationService : Service() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
-
+        notificationProvider.cancelDisableBackgroundServiceNotification()
+        isServiceStarted = false
+        networkManager.unregister()
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
         Log.d("tag", "ugasennnn")
-        isServiceStarted = false
         serviceJob.cancel()
+        super.onDestroy()
 
     }
 
@@ -91,7 +94,7 @@ class LocationService : Service() {
 //mozda ovako il sa location manager
 
 
-        //svuda na close app mora se explicitno pozove close service
+        //da se proveri je l netvork enabled
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
@@ -153,11 +156,6 @@ class LocationService : Service() {
         }
 
 
-    }
-
-    fun stopLocationService() {
-        if (isServiceStarted)
-            this.stopSelf()
     }
 
     companion object {

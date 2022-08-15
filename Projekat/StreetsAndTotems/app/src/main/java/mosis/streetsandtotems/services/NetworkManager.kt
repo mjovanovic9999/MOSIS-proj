@@ -5,49 +5,61 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 
 class NetworkManager(var context: Application) {
 
-    init {
-        val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
+    val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
 
-        connectivityManager.registerDefaultNetworkCallback(object :
-            ConnectivityManager.NetworkCallback() {
 
-            override fun onLost(network: Network) {
-                Log.d(
-                    "tag",
-                    "The application no longer has a default network. The last default network was " + network
-                )
-                isNetworkConnectivityValid.value = false
+    ///ne poziva se inicijalno ako je wifi ugasen
 
-            }
+    private var callback: ConnectivityManager.NetworkCallback = object :
+        ConnectivityManager.NetworkCallback() {
 
-            override fun onCapabilitiesChanged(
-                network: Network,
-                networkCapabilities: NetworkCapabilities
-            ) {
-                Log.d(
-                    "tag",
-                    "caps " + connectivityManager.getNetworkCapabilities(network)
-                        ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED).toString()
-                )
-                isNetworkConnectivityValid.value =
-                    connectivityManager.getNetworkCapabilities(network)
-                        ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
+        override fun onLost(network: Network) {
+            Log.d(
+                "tag",
+                "The application no longer has a default network. The last default network was " + network
+            )
+            isNetworkConnectivityValid.value = false
 
-                Log.d(
-                    "tag",
-                    "caps var" + isNetworkConnectivityValid.toString()
-                )
-            }
-        })
+        }
+
+        override fun onCapabilitiesChanged(
+            network: Network,
+            networkCapabilities: NetworkCapabilities
+        ) {
+            Log.d(
+                "tag",
+                "caps " + connectivityManager.getNetworkCapabilities(network)
+                    ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED).toString()
+            )
+            isNetworkConnectivityValid.value =
+                connectivityManager.getNetworkCapabilities(network)
+                    ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
+
+            Log.d(
+                "tag",
+                "caps var" + isNetworkConnectivityValid.toString()
+
+            )
+            Toast.makeText(context, "NEtworkkkkk", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    fun ok(){}
+    init {
+        connectivityManager.registerDefaultNetworkCallback(callback)
+    }
+
+
+    fun unregister() {
+        connectivityManager.unregisterNetworkCallback(callback)
+    }
 
     companion object {
-        var isNetworkConnectivityValid = mutableStateOf(true)
+        var isNetworkConnectivityValid =
+            mutableStateOf(true)//ako nece da registruje inicijalno ugasenu mrezu
     }
 }

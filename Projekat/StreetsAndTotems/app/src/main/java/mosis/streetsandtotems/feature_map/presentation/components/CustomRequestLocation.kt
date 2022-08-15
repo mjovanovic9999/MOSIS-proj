@@ -18,6 +18,7 @@ import com.google.android.gms.location.Priority
 import mosis.streetsandtotems.core.ButtonConstants.DIALOG_LOCATION_CONFIRM_BUTTON
 import mosis.streetsandtotems.core.ButtonConstants.DIALOG_LOCATION_DISMISS_BUTTON
 import mosis.streetsandtotems.core.MessageConstants
+import mosis.streetsandtotems.services.LocationService
 
 @Composable
 fun CustomRequestLocation(
@@ -56,7 +57,8 @@ fun CustomRequestLocationDialog(
         dismissButton = {
             TextButton(
                 onClick = {
-                    (context as Activity).finishAndRemoveTask()
+                    context.stopService(Intent(context, LocationService::class.java))
+                    (context as Activity).finish()
                 }
             ) {
                 Text(DIALOG_LOCATION_DISMISS_BUTTON)

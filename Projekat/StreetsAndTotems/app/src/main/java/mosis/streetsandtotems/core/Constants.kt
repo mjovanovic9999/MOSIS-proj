@@ -68,11 +68,11 @@ object MessageConstants {
     const val PHONE_NUMBER_REQUIRED = "Phone number is required!"
     const val INVALID_PHONE_NUMBER = "Invalid phone number!"
     const val REPEAT_PASSWORD_REQUIRED = "Repeating password is required!"
-    const val NEW_PASSWORD_REQUIRD = "New password is required!"
+    const val NEW_PASSWORD_REQUIRED = "New password is required!"
     const val CURRENT_PASSWORD_REQUIRED = "Current password is required!"
     const val DIALOG_PERMISSION_TITLE = "Location permission is disabled"
     const val DIALOG_PERMISSION_TEXT =
-        "In order to use Streets And Totems location permission has to be granted!"
+        "In order to use Streets And Totems precise location permission has to be granted!"
     const val DIALOG_LOCATION_TITLE = "Location disabled"
     const val DIALOG_LOCATION_TEXT =
         "In order to use Streets And Totems Location has to be turned on!"
@@ -118,7 +118,7 @@ object RegexConstants {
 
 object DrawerConstants {
     const val SETTINGS = "Settings"
-    const val NOTIFIACTIONS = "Enable notifications"
+    const val NOTIFICATIONS = "Enable notifications"
     const val RUN_IN_BACKGROUND = "Run in background"
     const val SHOW_PHONE_NUMBER = "Show my phone number"
     const val CALL_SETTINGS = "Who is allowed to call me"

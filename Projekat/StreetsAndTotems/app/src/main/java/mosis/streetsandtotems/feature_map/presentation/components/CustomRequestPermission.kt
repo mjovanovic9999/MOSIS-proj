@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import mosis.streetsandtotems.core.ButtonConstants.DIALOG_PERMISSION_CONFIRM_BUTTON
 import mosis.streetsandtotems.core.ButtonConstants.DIALOG_PERMISSION_DISMISS_BUTTON
 import mosis.streetsandtotems.core.MessageConstants
+import mosis.streetsandtotems.services.LocationService
 
 @Composable
 fun CustomRequestPermission(
@@ -104,7 +105,9 @@ fun CustomRequestPermissionsDialog(
         dismissButton = {
             TextButton(
                 onClick = {
+                    context.stopService(Intent(context, LocationService::class.java))
                     (context as Activity).finishAndRemoveTask()
+
                 }
             ) {
                 Text(DIALOG_PERMISSION_DISMISS_BUTTON)

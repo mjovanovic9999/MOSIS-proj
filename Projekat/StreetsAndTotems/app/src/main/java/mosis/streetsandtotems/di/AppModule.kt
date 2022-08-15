@@ -54,10 +54,5 @@ object AppModule {
         return NotificationProvider(app)
     }
 
-    //Network manager
-    @Provides
-    @Singleton
-    fun provideNetworkManager(app: Application): NetworkManager {
-        return NetworkManager(app)
-    }
+
 }

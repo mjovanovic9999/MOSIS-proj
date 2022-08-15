@@ -105,7 +105,7 @@ fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigat
                 .align(Alignment.CenterHorizontally)
         )
         DrawerSwitchItem(
-            text = DrawerConstants.NOTIFIACTIONS,
+            text = DrawerConstants.NOTIFICATIONS,
             switchState = false,
             onCheckedChangeHandler = {})
         DrawerSwitchItem(
