@@ -31,11 +31,6 @@ class NetworkManager(var context: Application) {
             network: Network,
             networkCapabilities: NetworkCapabilities
         ) {
-            Log.d(
-                "tag",
-                "caps " + connectivityManager.getNetworkCapabilities(network)
-                    ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED).toString()
-            )
             isNetworkConnectivityValid.value =
                 connectivityManager.getNetworkCapabilities(network)
                     ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
@@ -45,7 +40,6 @@ class NetworkManager(var context: Application) {
                 "caps var" + isNetworkConnectivityValid.toString()
 
             )
-            Toast.makeText(context, "NEtworkkkkk", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -61,6 +55,5 @@ class NetworkManager(var context: Application) {
     companion object {
         var isNetworkConnectivityValid =
             mutableStateOf(false)
-        val locationBroadcastReceiverRegistered = false
     }
 }

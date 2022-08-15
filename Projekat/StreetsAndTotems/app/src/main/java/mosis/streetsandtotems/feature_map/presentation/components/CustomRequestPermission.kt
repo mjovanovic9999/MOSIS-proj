@@ -17,6 +17,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import mosis.streetsandtotems.core.ButtonConstants.DIALOG_BACKGROUND_PERMISSION_CONFIRM_BUTTON
+import mosis.streetsandtotems.core.ButtonConstants.DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON
 import mosis.streetsandtotems.core.ButtonConstants.DIALOG_PERMISSION_CONFIRM_BUTTON
 import mosis.streetsandtotems.core.ButtonConstants.DIALOG_PERMISSION_DISMISS_BUTTON
 import mosis.streetsandtotems.core.MessageConstants
@@ -24,36 +26,58 @@ import mosis.streetsandtotems.services.LocationService
 
 @Composable
 fun CustomRequestPermission(
-    permissionsArray: Array<String> =
-        arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-        )
-
+    permissionsArray: Array<String>,
+    arePermissionsGranted: MutableState<Boolean>
 ) {
+
+    val requestBackgroundAndroidVerison =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R //novi and
     val permissionGrantedState = remember { mutableStateOf(true) }
+    val permissionBackgroundGrantedState = remember { mutableStateOf(true) }
+
 
     val permissionRequest = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         when {
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                if (!requestBackgroundAndroidVerison) {
+                    arePermissionsGranted.value = true
+                }
                 Log.d("tag", "fine")
                 permissionGrantedState.value = true
-
-            }
-            permissions.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false) -> {
-                Log.d("tag", "bck")
-                if (Manifest.permission.ACCESS_BACKGROUND_LOCATION in permissionsArray)
-                    permissionGrantedState.value = true
 
             }
             else -> {
                 Log.d("tag", "else")
                 permissionGrantedState.value = false
+                arePermissionsGranted.value = false
+
             }
         }
     }
+
+    val permissionBackgroundRequest = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            if (requestBackgroundAndroidVerison) {
+                Log.d("tag", "back Permission provided by user")
+                permissionBackgroundGrantedState.value = true
+                arePermissionsGranted.value = true
+
+            }
+
+        } else {
+            if (requestBackgroundAndroidVerison) {
+
+                Log.d("tag", "back  Permission denied by user")
+                permissionBackgroundGrantedState.value = false
+                arePermissionsGranted.value = false
+            }
+        }
+    }
+
 
     val launchPermissionActivityResult =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult())
@@ -61,9 +85,18 @@ fun CustomRequestPermission(
             permissionRequest.launch(permissionsArray)
         }
 
+    val launchPermissionBackgroundActivityResult =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult())
+        {
+            permissionBackgroundRequest.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
 
     SideEffect {
         permissionRequest.launch(permissionsArray)
+
+        if (requestBackgroundAndroidVerison) {
+            permissionBackgroundRequest.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
     }
 
     if (!permissionGrantedState.value) {
@@ -71,7 +104,14 @@ fun CustomRequestPermission(
             LocalContext.current,
             launchPermissionActivityResult
         )
+    } else if (requestBackgroundAndroidVerison && !permissionBackgroundGrantedState.value) {
+        CustomRequestBackgroundPermissionsDialog(
+            LocalContext.current,
+            //permissionBackgroundRequest,
+            launchPermissionBackgroundActivityResult
+        )
     }
+
 
 }
 
@@ -102,6 +142,8 @@ fun CustomRequestPermissionsDialog(
                         Uri.fromParts("package", context.packageName, null)
                     intent.data = uri
 
+//                    LocationService.arePermissionsGranted=true
+
                     launchPermissionActivityResult.launch(intent)
                 }
             ) {
@@ -117,6 +159,55 @@ fun CustomRequestPermissionsDialog(
                 }
             ) {
                 Text(DIALOG_PERMISSION_DISMISS_BUTTON)
+            }
+        }
+    )
+}
+
+@Composable
+fun CustomRequestBackgroundPermissionsDialog(
+    context: Context,
+    //permissionBackgroundRequest: ManagedActivityResultLauncher<String, Boolean>,
+    launchPermissionBackgroundActivityResult: ManagedActivityResultLauncher<Intent, ActivityResult>
+) {
+    AlertDialog(
+        onDismissRequest = { },
+        title = {
+            Text(
+                MessageConstants.DIALOG_BACKGROUND_PERMISSION_TITLE,
+            )
+        },
+        text = {
+            Text(
+                MessageConstants.DIALOG_BACKGROUND_PERMISSION_TEXT,
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+//                    permissionBackgroundRequest.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                    val intent =
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri: Uri =
+                        Uri.fromParts("package", context.packageName, null)
+                    intent.data = uri
+                    launchPermissionBackgroundActivityResult.launch(intent)
+//                    context.stopService(Intent(context, LocationService::class.java))
+
+                }
+            ) {
+                Text(DIALOG_BACKGROUND_PERMISSION_CONFIRM_BUTTON)
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    context.stopService(Intent(context, LocationService::class.java))
+                    (context as Activity).finishAndRemoveTask()
+//                    requestBackgroundLocationPermission.value = false
+                }
+            ) {
+                Text(DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON)
             }
         }
     )

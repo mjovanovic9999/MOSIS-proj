@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dagger.hilt.android.AndroidEntryPoint
 import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
@@ -31,24 +33,30 @@ class MainActivity() : ComponentActivity() {
     @Inject
     lateinit var notificationProvider: NotificationProvider
 
+    val arePermissionsGranted = mutableStateOf(false)
 
     private val locationBroadcastReceiver = LocationBroadcastReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-
-
-
-
         installSplashScreen().apply {}
         setContent {
             AppTheme {
-                CustomRequestPermission()
-                CustomRequestNetwork(NetworkManager.isNetworkConnectivityValid)
-                CustomRequestLocation(LocationService.isLocationEnabled)
-                AppNavigation()
+
+                if (!arePermissionsGranted.value) {
+                    CustomRequestPermission(
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                        ),arePermissionsGranted
+                    )
+                } else {
+                    CustomRequestNetwork(NetworkManager.isNetworkConnectivityValid)
+                    CustomRequestLocation(LocationService.isLocationEnabled)
+
+                    AppNavigation()
+                }
             }
         }
 
@@ -65,21 +73,20 @@ class MainActivity() : ComponentActivity() {
         Log.d("tag", "onResumeActivity")
 
 
-        if (!LocationService.isServiceStarted)//treb si ostane ugasen i onova dugme
+        if (!LocationService.isServiceStarted /*&& arePermissionsGranted.value*/)//treb si ostane ugasen i onova dugme
         {
             Log.d("tag", "startuje servis")
 
             startForegroundService(Intent(this, LocationService::class.java))
 
         } else {
-            //notificationProvider.cancelDisableBackgroundServiceNotification()
-
             if (BackgroundServicesEnabled.isEnabled) {
                 notificationProvider.notifyDisable(false)
             }
 
 
         }
+
 
     }
 
@@ -99,8 +106,6 @@ class MainActivity() : ComponentActivity() {
     }
 
     override fun onDestroy() {
-
-
         super.onDestroy()
     }
 }

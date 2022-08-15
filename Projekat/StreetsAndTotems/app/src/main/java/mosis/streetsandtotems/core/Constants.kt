@@ -21,6 +21,8 @@ object ButtonConstants {
     const val CANCEL = "Cancel"
     const val DROP = "Drop"
     const val PLACE = "Place"
+    const val DIALOG_BACKGROUND_PERMISSION_CONFIRM_BUTTON = "Grant"
+    const val DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON = "Don't grant"
 }
 
 object FormFieldNamesConstants {
@@ -80,7 +82,9 @@ object MessageConstants {
     const val DIALOG_NETWORK_TEXT =
         "Please check network connectivity in order to use Streets And Totems!"
     const val PASSWORDS_DO_NOT_MATCH = "Passwords don't match!"
-
+    const val DIALOG_BACKGROUND_PERMISSION_TITLE = "Background location permission is disabled"
+    const val DIALOG_BACKGROUND_PERMISSION_TEXT =
+        "In order to use Streets And Totems in background, background location permission has to be granted!"
 }
 
 object TitleConstants {

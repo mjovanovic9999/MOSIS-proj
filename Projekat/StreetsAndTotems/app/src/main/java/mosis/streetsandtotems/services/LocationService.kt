@@ -1,11 +1,13 @@
 package mosis.streetsandtotems.services
 
+import android.Manifest
 import android.app.Application
 import android.app.Service
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.*
@@ -70,7 +72,7 @@ class LocationService : Service() {
         notificationProvider.cancelDisableBackgroundServiceNotification()
         isServiceStarted = false
         networkManager.unregister()
-        
+
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
         Log.d("tag", "ugasennnn")
         serviceJob.cancel()
@@ -141,17 +143,25 @@ class LocationService : Service() {
         task.addOnCompleteListener {
             if (it.isSuccessful) {
 
-                fusedLocationProviderClient.requestLocationUpdates(
-                    locationRequest,
-                    locationCallback,
-                    Looper.getMainLooper()
-                )
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    && (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || checkSelfPermission(
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED)
+                ) {
+                    fusedLocationProviderClient.requestLocationUpdates(
+                        locationRequest,
+                        locationCallback,
+                        Looper.getMainLooper()
+                    )
 
-                val settings = it.result
+                    Log.d("tag", "isLocationEnabled = true")
+                } else {
 
-                isLocationEnabled.value = true
-                Log.d("tag", "isLocationEnabled = true")
 
+                    Log.d("tag", "nece self permission")
+                    this.stopSelf()
+
+                }
             } else {
                 isLocationEnabled.value = false
                 Log.d("tag", "isLocationEnabled = false")
@@ -166,7 +176,5 @@ class LocationService : Service() {
         var mLocation: Location? = null
         var isServiceStarted = false
         var isLocationEnabled = mutableStateOf(true)
-
-
     }
 }
