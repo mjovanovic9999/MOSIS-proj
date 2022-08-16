@@ -9,7 +9,9 @@ import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.scopes.ServiceScoped
 import dagger.hilt.components.SingletonComponent
+import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.feature_auth.data.data_source.FirebaseAuthDataSource
 import mosis.streetsandtotems.feature_auth.domain.repository.AuthRepository
@@ -41,6 +43,7 @@ object AppModule {
     fun provideAuthUseCases(authRepository: AuthRepository) =
         AuthUseCases(emailAndPasswoedSignIn = EmailAndPasswordSignIn(authRepository))
 
+    //Location Provider
     @Provides
     @Singleton
     fun provideFusedLocationProviderClient(app: Application): FusedLocationProviderClient {
@@ -54,10 +57,18 @@ object AppModule {
         return NotificationProvider(app)
     }
 
+    //Location Provider
+    @Provides
+    @Singleton
+    fun provideLocationBroadcastReceiver(): LocationBroadcastReceiver {
+        return LocationBroadcastReceiver()
+    }
+
     //Network manager
     @Provides
     @Singleton
     fun provideNetworkManager(app: Application): NetworkManager {
         return NetworkManager(app)
     }
+
 }

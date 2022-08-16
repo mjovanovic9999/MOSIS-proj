@@ -139,6 +139,8 @@ dependencies {
     //Retrofit
 //    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
 
+    //Crash recovery
+    implementation 'cat.ereza:customactivityoncrash:2.4.0'
 }
 
 kapt {

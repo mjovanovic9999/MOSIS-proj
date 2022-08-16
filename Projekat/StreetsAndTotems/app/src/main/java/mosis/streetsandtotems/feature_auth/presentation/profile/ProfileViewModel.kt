@@ -71,7 +71,7 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
                     initial = "",
                     name = FormFieldNamesConstants.NEW_PASSWORD,
                     validators = listOf(
-                        Validators.Required(MessageConstants.NEW_PASSWORD_REQUIRD),
+                        Validators.Required(MessageConstants.NEW_PASSWORD_REQUIRED),
                         Validators.Min(8, MessageConstants.PASSWORD_LENGTH)
                     ),
                     label = FormFieldConstants.NEW_PASSWORD,

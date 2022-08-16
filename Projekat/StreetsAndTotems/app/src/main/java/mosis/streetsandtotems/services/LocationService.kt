@@ -2,25 +2,18 @@ package mosis.streetsandtotems.services
 
 import android.app.Application
 import android.app.Service
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.location.Location
-import android.location.LocationManager
-import android.os.*
+import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.PendingResult
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.Task
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import javax.inject.Inject
 
@@ -38,6 +31,9 @@ class LocationService : Service() {
 
     lateinit var locationCallback: LocationCallback
 
+    @Inject
+    lateinit var networkManager: NetworkManager
+
 
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
@@ -49,10 +45,11 @@ class LocationService : Service() {
             1,
             notificationProvider.returnDisableBackgroundServiceNotification(false)
         )
+
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        startListeningUserLocation(this)
+        startListeningUserLocation()
         return START_STICKY_COMPATIBILITY
     }
 
@@ -62,17 +59,19 @@ class LocationService : Service() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
+        notificationProvider.cancelDisableBackgroundServiceNotification()
+        isServiceStarted = false
+        networkManager.unregister()
 
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-        Log.d("tag", "ugasennnn")
-        isServiceStarted = false
+        Log.d("tag", "ugasennnn servis")
         serviceJob.cancel()
+        super.onDestroy()
 
     }
 
 
-    private fun startListeningUserLocation(context: Context) {
+    fun startListeningUserLocation() {
 
         val locationRequest = LocationRequest.create()
             .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
@@ -91,7 +90,7 @@ class LocationService : Service() {
 //mozda ovako il sa location manager
 
 
-        //svuda na close app mora se explicitno pozove close service
+        //da se proveri je l netvork enabled
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
@@ -99,6 +98,7 @@ class LocationService : Service() {
                     "tag",
                     "NEW LOCATION: ${result.lastLocation?.latitude}, ${result.lastLocation?.longitude}, ${result.lastLocation?.accuracy}"
                 )
+                isLocationEnabled.value = true
                 mLocation = result.lastLocation
                 mLocation?.let {
                     serviceScope.launch {
@@ -133,38 +133,22 @@ class LocationService : Service() {
 
         task.addOnCompleteListener {
             if (it.isSuccessful) {
-
+                isLocationEnabled.value = true
                 fusedLocationProviderClient.requestLocationUpdates(
                     locationRequest,
                     locationCallback,
                     Looper.getMainLooper()
                 )
-
-                val settings = it.result
-
-                isLocationEnabled.value = true
-                Log.d("tag", "isLocationEnabled = true")
-
             } else {
                 isLocationEnabled.value = false
-                Log.d("tag", "isLocationEnabled = false")
                 this.stopSelf()
             }
         }
-
-
-    }
-
-    fun stopLocationService() {
-        if (isServiceStarted)
-            this.stopSelf()
     }
 
     companion object {
         var mLocation: Location? = null
         var isServiceStarted = false
         var isLocationEnabled = mutableStateOf(true)
-
-
     }
 }

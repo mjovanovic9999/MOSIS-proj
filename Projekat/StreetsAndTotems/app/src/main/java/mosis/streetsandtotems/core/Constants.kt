@@ -21,6 +21,8 @@ object ButtonConstants {
     const val CANCEL = "Cancel"
     const val DROP = "Drop"
     const val PLACE = "Place"
+    const val DIALOG_BACKGROUND_PERMISSION_CONFIRM_BUTTON = "Grant"
+    const val DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON = "Don't grant"
     const val SHOW_ON_MAP = "Show on map"
     const val KICK = "Start kick voting"
     const val TRADE = "Invite to trade"
@@ -71,11 +73,11 @@ object MessageConstants {
     const val PHONE_NUMBER_REQUIRED = "Phone number is required!"
     const val INVALID_PHONE_NUMBER = "Invalid phone number!"
     const val REPEAT_PASSWORD_REQUIRED = "Repeating password is required!"
-    const val NEW_PASSWORD_REQUIRD = "New password is required!"
+    const val NEW_PASSWORD_REQUIRED = "New password is required!"
     const val CURRENT_PASSWORD_REQUIRED = "Current password is required!"
     const val DIALOG_PERMISSION_TITLE = "Location permission is disabled"
     const val DIALOG_PERMISSION_TEXT =
-        "In order to use Streets And Totems location permission has to be granted!"
+        "In order to use Streets And Totems precise and background location permission has to be granted!"
     const val DIALOG_LOCATION_TITLE = "Location disabled"
     const val DIALOG_LOCATION_TEXT =
         "In order to use Streets And Totems Location has to be turned on!"
@@ -83,7 +85,9 @@ object MessageConstants {
     const val DIALOG_NETWORK_TEXT =
         "Please check network connectivity in order to use Streets And Totems!"
     const val PASSWORDS_DO_NOT_MATCH = "Passwords don't match!"
-
+    const val DIALOG_BACKGROUND_PERMISSION_TITLE = "Background location permission is disabled"
+    const val DIALOG_BACKGROUND_PERMISSION_TEXT =
+        "In order to use Streets And Totems in background, background location permission has to be granted!"
 }
 
 object TitleConstants {
@@ -125,7 +129,7 @@ object RegexConstants {
 
 object DrawerConstants {
     const val SETTINGS = "Settings"
-    const val NOTIFIACTIONS = "Enable notifications"
+    const val NOTIFICATIONS = "Enable notifications"
     const val RUN_IN_BACKGROUND = "Run in background"
     const val SHOW_PHONE_NUMBER = "Show my phone number"
     const val CALL_SETTINGS = "Who is allowed to call me"

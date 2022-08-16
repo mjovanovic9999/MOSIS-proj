@@ -68,7 +68,7 @@ class NotificationProvider(private val context: Context) {
             val disableBackgroundServiceIntent = PendingIntent.getBroadcast(
                 context,
                 1,
-                Intent(context, NotificationReceiver::class.java),
+                Intent(context, NotificationBroadcastReceiver::class.java),
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
             )
             notificationBuilder.addAction(

@@ -31,17 +31,17 @@ import mosis.streetsandtotems.ui.theme.sizes
 fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: DestinationsNavigator) {
     CustomPage(
         titleContent = {
-        Image(
-            painter = painterResource(id = R.drawable.logo_text),
-            contentDescription = ImageContentDescriptionConstants.LOGO_TEXT,
-            modifier = Modifier.padding(top = MaterialTheme.sizes.text_logo_top_padding)
-        )
-    },
+            Image(
+                painter = painterResource(id = R.drawable.logo_text),
+                contentDescription = ImageContentDescriptionConstants.LOGO_TEXT,
+                modifier = Modifier.padding(top = MaterialTheme.sizes.text_logo_top_padding)
+            )
+        },
         content = {
             Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.sizes.forgot_password_top_padding)) {
                 Form(formState = viewModel.formState, spacing = MaterialTheme.sizes.none)
                 CustomButton(
-                    clickHandler = { /*TODO*/ },
+                    clickHandler = { },
                     text = ButtonConstants.FORGOT_PASSWORD,
                     buttonType = CustomButtonType.Text,
                     buttonModifier = Modifier.align(Alignment.Start),
