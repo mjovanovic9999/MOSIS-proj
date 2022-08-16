@@ -33,8 +33,6 @@ data class Sizes(
     val drawer_select_height: Dp = 60.dp,
     val drawer_last_divider_top_padding: Dp = 8.dp,
     val profile_screen_spacing: Dp = 20.dp,
-    val title_icon: Dp = 36.dp,
-    val title_spacing: Dp = 5.dp,
     val text_logo_top_padding: Dp = 10.dp,
     val default_aspect_ratio: Float = 1f,
     val backpack_totem_fab_weight: Float = 0.65f,
@@ -58,7 +56,15 @@ data class Sizes(
     val lazy_column_title_image_height: Float = 0.3f,
     val leaderboard_position_weight: Float = 0.1f,
     val leaderboard_username_weight: Float = 0.5f,
-    val leaderboard_points_weight: Float = 0.3f
+    val leaderboard_points_weight: Float = 0.3f,
+    val tiki_title_icon: Dp = 72.dp,
+    val totem_dialog_text_spacing: Dp = 10.dp,
+    val custom_pin_dialog_text_field_height: Dp = 100.dp,
+    val profile_dialog_icon_size: Dp = 28.dp,
+    val profile_dialog_row_height: Dp = 48.dp,
+    val profile_dialog_icon_buttons_weight: Float = 0.25f,
+    val profile_dialog_initials_weight: Float = 0.22f,
+    val profile_dialog_username_and_name_weight: Float = 0.53f
 )
 
 val LocalWidth = compositionLocalOf { Sizes() }

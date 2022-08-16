@@ -13,8 +13,8 @@ import mosis.streetsandtotems.feature_totems.domain.model.Totem
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
-fun TotemListItem(totem: Totem) {
-    CustomLazyColumnItem {
+fun TotemListItem(totem: Totem, onButtonClick: () -> Unit) {
+    CustomLazyColumnItem(onButtonClick = onButtonClick) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.weight(MaterialTheme.sizes.totems_item_totem_id_weight)

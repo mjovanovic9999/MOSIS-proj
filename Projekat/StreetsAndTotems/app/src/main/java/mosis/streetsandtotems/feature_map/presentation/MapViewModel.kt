@@ -1,7 +1,7 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.bumptech.glide.Glide
@@ -17,8 +17,7 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
     private val appContext: Application,
 ) : ViewModel() {
-
-    val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
+    private val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
         try {
             val image = Glide.with(appContext)
                 .downloadOnly()
@@ -33,18 +32,40 @@ class MapViewModel @Inject constructor(
             null
         }
     }
-    val mapState: MapState by mutableStateOf(
-        MapState(
-            19,
-            67108864,
-            67108864,
-            workerCount = 32
-        ) {
-            scale(0.25f)
-            scroll(0.560824, 0.366227)
-        }.apply {
-            addLayer(tileStreamProvider)
-            enableRotation()
-        }
-    )
+
+    private val _mapScreenState =
+        mutableStateOf(MapScreenState(
+            mapState = mutableStateOf(
+                MapState(
+                    levelCount = 19,
+                    fullWidth = 67108864,
+                    fullHeight = 67108864,
+                    workerCount = 16
+                ) {
+                    scale(0.25f)
+                    scroll(0.560824, 0.366227)
+                }.apply {
+                    addLayer(tileStreamProvider)
+                    enableRotation()
+                }
+            ),
+            customPinDialogOpen = false,
+            playerDialogOpen = false))
+    val mapScreenState: State<MapScreenState> = _mapScreenState
+
+    fun showCustomPinDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(customPinDialogOpen = true)
+    }
+
+    fun closeCustomPinDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(customPinDialogOpen = false)
+    }
+
+    fun showPlayerDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = true)
+    }
+
+    fun closePlayerDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
+    }
 }

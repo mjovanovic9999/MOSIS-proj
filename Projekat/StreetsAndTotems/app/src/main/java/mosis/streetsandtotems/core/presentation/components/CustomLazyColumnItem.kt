@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
-fun CustomLazyColumnItem(content: @Composable RowScope.() -> Unit) {
+fun CustomLazyColumnItem(onButtonClick: () -> Unit, content: @Composable RowScope.() -> Unit) {
     Box(modifier = Modifier.padding(bottom = MaterialTheme.sizes.lazy_column_spacing)) {
         Row(
             modifier = Modifier
@@ -27,7 +27,7 @@ fun CustomLazyColumnItem(content: @Composable RowScope.() -> Unit) {
             content()
 
             CustomIconButton(
-                clickHandler = { /*TODO*/ },
+                clickHandler = onButtonClick,
                 icon = Icons.Filled.MoreVert,
                 buttonModifier = Modifier.weight(MaterialTheme.sizes.lazy_column_button_weight),
                 colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.onSecondaryContainer)

@@ -145,12 +145,11 @@ fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigat
         )
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = MaterialTheme.sizes.drawer_leave_buttons_spacing),
-            contentAlignment = Alignment.BottomEnd
+                .fillMaxSize(),
+            contentAlignment = Alignment.BottomEnd,
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.sizes.drawer_leave_buttons_spacing),
+                verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.End
             ) {
                 CustomButton(

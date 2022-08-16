@@ -1,6 +1,7 @@
 package mosis.streetsandtotems.core.presentation.navigation
 
 //import androidx.work.*
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ fun MainScreen(destinationsNavigator: DestinationsNavigator) {
                 DrawerContent(
                     Modifier
                         .align(Alignment.CenterHorizontally)
+                        .fillMaxSize()
                         .padding(MaterialTheme.sizes.drawer_column_padding),
                     destinationsNavigator
                 )

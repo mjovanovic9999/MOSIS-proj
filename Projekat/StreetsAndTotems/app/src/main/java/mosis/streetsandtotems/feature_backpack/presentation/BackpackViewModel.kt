@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import mosis.streetsandtotems.core.presentation.components.IconType
 import javax.inject.Inject
 
 @HiltViewModel
@@ -13,7 +14,7 @@ class BackpackViewModel @Inject constructor() : ViewModel() {
 
     fun openDropItemDialog(
         itemCount: Int,
-        resourceType: ResourceType? = null,
+        resourceType: IconType.ResourceType? = null,
         dropTotem: Boolean = false
     ) {
         _dropItemDialogOpen.value = _dropItemDialogOpen.value.copy(

@@ -152,7 +152,8 @@ fun CustomIconButton(
     enabled: Boolean = true,
     icon: ImageVector? = null,
     iconContentDescription: String? = null,
-    colors: IconButtonColors = IconButtonDefaults.iconButtonColors()
+    colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
+    iconModifier: Modifier = Modifier
 ) {
     IconButton(
         onClick = clickHandler,
@@ -160,6 +161,12 @@ fun CustomIconButton(
         enabled = enabled,
         colors = colors
     ) {
-        icon?.let { Icon(imageVector = it, contentDescription = iconContentDescription) }
+        icon?.let {
+            Icon(
+                imageVector = it,
+                contentDescription = iconContentDescription,
+                modifier = iconModifier
+            )
+        }
     }
 }

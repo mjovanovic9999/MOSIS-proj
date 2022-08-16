@@ -21,6 +21,9 @@ object ButtonConstants {
     const val CANCEL = "Cancel"
     const val DROP = "Drop"
     const val PLACE = "Place"
+    const val SHOW_ON_MAP = "Show on map"
+    const val KICK = "Start kick voting"
+    const val TRADE = "Invite to trade"
 }
 
 object FormFieldNamesConstants {
@@ -90,6 +93,9 @@ object TitleConstants {
     const val EDIT_PASSWORD = "Edit password"
     const val BACKPACK = "Backpack"
     const val LEADERBOARD = "Leaderboard"
+    const val MORE_INFORMATION = "More information"
+    const val CUSTOM_PIN_DIALOG_SQUAD = "Place note pin for your squad"
+    const val CUSTOM_PIN_DIALOG_SOLO = "Place note pin for yourself"
 }
 
 object FormFieldConstants {
@@ -164,7 +170,18 @@ object TotemItemsConstants {
     const val PLACED_BY = "Placed by:"
 }
 
+object TotemDialogConstants {
+    const val PLACING_TIME = "Placing time:"
+    const val LAST_VISIT = "Last visit:"
+    const val DATE_TIME_FORMAT = "dd/MM/yy HH:mm"
+}
+
 object LeaderboardItemsConstants {
     const val USERNAME = "Username:"
     const val POINTS = "Points:"
+}
+
+object CustomPinDialogConstants{
+    const val NOTE_TEXT = "Note text"
+    const val NOTE_TEXT_LENGTH = 100
 }
