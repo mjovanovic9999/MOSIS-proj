@@ -1,7 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
 
-import android.content.Context
-import android.content.Intent
+
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.DrawerState

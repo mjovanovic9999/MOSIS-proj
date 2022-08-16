@@ -1,29 +1,19 @@
 package mosis.streetsandtotems.services
 
-import android.Manifest
 import android.app.Application
 import android.app.Service
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationManager
-import android.os.*
+import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.PendingResult
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.Task
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
-import mosis.streetsandtotems.core.presentation.utils.notification.NotificationBroadcastReceiver
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import javax.inject.Inject
 
@@ -59,7 +49,7 @@ class LocationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        startListeningUserLocation(this)
+        startListeningUserLocation()
         return START_STICKY_COMPATIBILITY
     }
 
@@ -74,14 +64,14 @@ class LocationService : Service() {
         networkManager.unregister()
 
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-        Log.d("tag", "ugasennnn")
+        Log.d("tag", "ugasennnn servis")
         serviceJob.cancel()
         super.onDestroy()
 
     }
 
 
-    private fun startListeningUserLocation(context: Context) {
+    fun startListeningUserLocation() {
 
         val locationRequest = LocationRequest.create()
             .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
@@ -108,6 +98,7 @@ class LocationService : Service() {
                     "tag",
                     "NEW LOCATION: ${result.lastLocation?.latitude}, ${result.lastLocation?.longitude}, ${result.lastLocation?.accuracy}"
                 )
+                isLocationEnabled.value = true
                 mLocation = result.lastLocation
                 mLocation?.let {
                     serviceScope.launch {
@@ -142,34 +133,17 @@ class LocationService : Service() {
 
         task.addOnCompleteListener {
             if (it.isSuccessful) {
-
-                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                    && (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || checkSelfPermission(
-                        Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED)
-                ) {
-                    fusedLocationProviderClient.requestLocationUpdates(
-                        locationRequest,
-                        locationCallback,
-                        Looper.getMainLooper()
-                    )
-
-                    Log.d("tag", "isLocationEnabled = true")
-                } else {
-
-
-                    Log.d("tag", "nece self permission")
-                    this.stopSelf()
-
-                }
+                isLocationEnabled.value = true
+                fusedLocationProviderClient.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper()
+                )
             } else {
                 isLocationEnabled.value = false
-                Log.d("tag", "isLocationEnabled = false")
                 this.stopSelf()
             }
         }
-
-
     }
 
     companion object {

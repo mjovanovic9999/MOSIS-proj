@@ -74,7 +74,7 @@ object MessageConstants {
     const val CURRENT_PASSWORD_REQUIRED = "Current password is required!"
     const val DIALOG_PERMISSION_TITLE = "Location permission is disabled"
     const val DIALOG_PERMISSION_TEXT =
-        "In order to use Streets And Totems precise location permission has to be granted!"
+        "In order to use Streets And Totems precise and background location permission has to be granted!"
     const val DIALOG_LOCATION_TITLE = "Location disabled"
     const val DIALOG_LOCATION_TEXT =
         "In order to use Streets And Totems Location has to be turned on!"

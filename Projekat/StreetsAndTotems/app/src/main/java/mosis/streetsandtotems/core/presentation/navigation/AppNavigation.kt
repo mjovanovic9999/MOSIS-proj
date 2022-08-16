@@ -10,10 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.dependency
 import mosis.streetsandtotems.NavGraphs
-import mosis.streetsandtotems.destinations.LeaderboardsScreenDestination
-import mosis.streetsandtotems.destinations.ProfileScreenDestination
-import mosis.streetsandtotems.destinations.SignInScreenDestination
-import mosis.streetsandtotems.destinations.SignUpScreenDestination
+import mosis.streetsandtotems.destinations.*
 import mosis.streetsandtotems.feature_auth.presentation.profile.ProfileViewModel
 import mosis.streetsandtotems.feature_auth.presentation.signin.SignInViewModel
 import mosis.streetsandtotems.feature_auth.presentation.signup.SignupViewModel
@@ -33,6 +30,7 @@ fun AppNavigation() {
             dependency(SignUpScreenDestination) { hiltViewModel<SignupViewModel>() }
             dependency(ProfileScreenDestination) { hiltViewModel<ProfileViewModel>() }
             dependency(LeaderboardsScreenDestination) { hiltViewModel<LeaderboardsViewModel>() }
+            dependency(MainScreenDestination) { hiltViewModel<MainScreenViewModel>()}
         })
     }
 }
