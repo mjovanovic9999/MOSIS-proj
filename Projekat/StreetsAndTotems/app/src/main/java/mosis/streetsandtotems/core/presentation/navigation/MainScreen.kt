@@ -85,24 +85,13 @@ fun LifecycleCompose(
         effect = {
             val observer = LifecycleEventObserver { _, event ->
                 when (event) {
-
-                    Lifecycle.Event.ON_CREATE -> {
-                        //locationPermissionRequest.launch(permissions)
-                        Log.d("tag", "lifecycle ON CREATE")
-
-                    }
                     Lifecycle.Event.ON_RESUME -> {
 
                         context.registerReceiver(
                             locationBroadcastReceiver,
                             IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
                         )
-
-                        Log.d("tag", "onResumeActivity")
-
-
-                        if (!LocationService.isServiceStarted /*&& arePermissionsGranted.value*/)//treb si ostane ugasen i onova dugme
-                        {
+                        if (!LocationService.isServiceStarted) {
                             Log.d("tag", "startuje servis")
 
                             context.startForegroundService(
