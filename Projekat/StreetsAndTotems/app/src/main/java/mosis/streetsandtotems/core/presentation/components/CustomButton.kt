@@ -119,7 +119,7 @@ private fun ButtonContent(
     iconSize: Dp,
     textStyle: TextStyle,
     textModifier: Modifier,
-    iconContentDescription: String?
+    iconContentDescription: String?,
 ) {
     if (icon != null && iconPosition == IconPosition.Start) {
         Icon(
@@ -152,8 +152,21 @@ fun CustomIconButton(
     enabled: Boolean = true,
     icon: ImageVector? = null,
     iconContentDescription: String? = null,
+    colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
+    iconModifier: Modifier = Modifier
 ) {
-    IconButton(onClick = clickHandler, modifier = buttonModifier, enabled = enabled) {
-        icon?.let { Icon(imageVector = it, contentDescription = iconContentDescription) }
+    IconButton(
+        onClick = clickHandler,
+        modifier = buttonModifier,
+        enabled = enabled,
+        colors = colors
+    ) {
+        icon?.let {
+            Icon(
+                imageVector = it,
+                contentDescription = iconContentDescription,
+                modifier = iconModifier
+            )
+        }
     }
 }

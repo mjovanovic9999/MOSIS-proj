@@ -36,8 +36,6 @@ fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigat
 
     Column(
         modifier = modifier
-            .fillMaxWidth(MaterialTheme.sizes.drawer_column_width)
-            .padding(top = MaterialTheme.sizes.drawer_spacing)
             .clickable(
                 indication = null,
                 interactionSource = MutableInteractionSource()
@@ -107,7 +105,7 @@ fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigat
                 .align(Alignment.CenterHorizontally)
         )
         DrawerSwitchItem(
-            text = DrawerConstants.NOTIFIACTIONS,
+            text = DrawerConstants.NOTIFICATIONS,
             switchState = false,
             onCheckedChangeHandler = {})
         DrawerSwitchItem(
@@ -147,12 +145,11 @@ fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigat
         )
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = MaterialTheme.sizes.drawer_leave_buttons_spacing),
-            contentAlignment = Alignment.BottomEnd
+                .fillMaxSize(),
+            contentAlignment = Alignment.BottomEnd,
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.sizes.drawer_leave_buttons_spacing),
+                verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.End
             ) {
                 CustomButton(

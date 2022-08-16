@@ -11,6 +11,7 @@ import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
 import mosis.streetsandtotems.core.TitleConstants
 import mosis.streetsandtotems.core.presentation.components.CustomPage
+import mosis.streetsandtotems.core.presentation.components.IconType
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_backpack.presentation.components.DropItemDialog
 import mosis.streetsandtotems.feature_backpack.presentation.components.FABWithBadge
@@ -33,8 +34,8 @@ fun BackpackScreen(viewModel: BackpackViewModel) {
                 ItemRow(
                     firstItemImageVector = ImageVector.vectorResource(id = R.drawable.emerald),
                     secondItemImageVector = ImageVector.vectorResource(id = R.drawable.wood),
-                    onFirstItemClick = { viewModel.openDropItemDialog(5, ResourceType.Emerald) },
-                    onSecondItemClick = { viewModel.openDropItemDialog(5, ResourceType.Wood) },
+                    onFirstItemClick = { viewModel.openDropItemDialog(5, IconType.ResourceType.Emerald) },
+                    onSecondItemClick = { viewModel.openDropItemDialog(5, IconType.ResourceType.Wood) },
                     firstItemBadgeText = "5",
                     secondItemBadgeText = "10",
                     firstItemContentDescription = ImageContentDescriptionConstants.EMERALD,
@@ -43,8 +44,8 @@ fun BackpackScreen(viewModel: BackpackViewModel) {
                 ItemRow(
                     firstItemImageVector = ImageVector.vectorResource(id = R.drawable.stone),
                     secondItemImageVector = ImageVector.vectorResource(id = R.drawable.brick),
-                    onFirstItemClick = { viewModel.openDropItemDialog(5, ResourceType.Stone) },
-                    onSecondItemClick = { viewModel.openDropItemDialog(5, ResourceType.Brick) },
+                    onFirstItemClick = { viewModel.openDropItemDialog(5, IconType.ResourceType.Stone) },
+                    onSecondItemClick = { viewModel.openDropItemDialog(5, IconType.ResourceType.Brick) },
                     firstItemBadgeText = "5",
                     secondItemBadgeText = "10",
                     firstItemContentDescription = ImageContentDescriptionConstants.STONE,

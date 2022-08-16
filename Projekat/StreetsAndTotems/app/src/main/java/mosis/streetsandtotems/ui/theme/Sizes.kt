@@ -21,7 +21,7 @@ data class Sizes(
     val image_select_size: Dp = 200.dp,
     val default_shape_corner: Dp = 15.dp,
     val sign_up_button_top_padding: Dp = 5.dp,
-    val drawer_column_width: Float = 0.9f,
+    val drawer_column_padding: Dp = 15.dp,
     val drawer_switch_scale_factor: Float = 0.75f,
     val drawer_spacing: Dp = 10.dp,
     val drawer_image_size: Dp = 100.dp,
@@ -33,8 +33,6 @@ data class Sizes(
     val drawer_select_height: Dp = 60.dp,
     val drawer_last_divider_top_padding: Dp = 8.dp,
     val profile_screen_spacing: Dp = 20.dp,
-    val title_icon: Dp = 36.dp,
-    val title_spacing: Dp = 5.dp,
     val text_logo_top_padding: Dp = 10.dp,
     val default_aspect_ratio: Float = 1f,
     val backpack_totem_fab_weight: Float = 0.65f,
@@ -54,7 +52,19 @@ data class Sizes(
     val totems_item_totem_id_weight: Float = 0.3f,
     val totems_item_username_weight: Float = 0.6f,
     val lazy_column_button_weight: Float = 0.1f,
-    val lazy_column_max_width: Float = 1f
+    val lazy_column_max_width: Float = 1f,
+    val lazy_column_title_image_height: Float = 0.3f,
+    val leaderboard_position_weight: Float = 0.1f,
+    val leaderboard_username_weight: Float = 0.5f,
+    val leaderboard_points_weight: Float = 0.3f,
+    val tiki_title_icon: Dp = 72.dp,
+    val totem_dialog_text_spacing: Dp = 10.dp,
+    val custom_pin_dialog_text_field_height: Dp = 100.dp,
+    val profile_dialog_icon_size: Dp = 28.dp,
+    val profile_dialog_row_height: Dp = 48.dp,
+    val profile_dialog_icon_buttons_weight: Float = 0.25f,
+    val profile_dialog_initials_weight: Float = 0.22f,
+    val profile_dialog_username_and_name_weight: Float = 0.53f
 )
 
 val LocalWidth = compositionLocalOf { Sizes() }

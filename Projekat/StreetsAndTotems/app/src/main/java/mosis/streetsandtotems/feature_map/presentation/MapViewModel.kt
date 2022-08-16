@@ -1,16 +1,11 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
-import mosis.streetsandtotems.feature_map.domain.LocationDTO
-import mosis.streetsandtotems.feature_map.domain.LocationTracker
 import ovh.plrapps.mapcompose.api.addLayer
 import ovh.plrapps.mapcompose.api.enableRotation
 import ovh.plrapps.mapcompose.core.TileStreamProvider
@@ -21,10 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val appContext: Application,
-    private val locationTracker: LocationTracker
 ) : ViewModel() {
-
-    val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
+    private val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
         try {
             val image = Glide.with(appContext)
                 .downloadOnly()
@@ -39,36 +32,40 @@ class MapViewModel @Inject constructor(
             null
         }
     }
-    val mapState: MapState by mutableStateOf(
-        MapState(
-            19,
-            67108864,
-            67108864,
-            workerCount = 16
-        ) {
-            scale(0.25f)
-            scroll(0.560824, 0.366227)
-        }.apply {
-            addLayer(tileStreamProvider)
-            enableRotation()
-        }
-    )
 
+    private val _mapScreenState =
+        mutableStateOf(MapScreenState(
+            mapState = mutableStateOf(
+                MapState(
+                    levelCount = 19,
+                    fullWidth = 67108864,
+                    fullHeight = 67108864,
+                    workerCount = 32
+                ) {
+                    scale(0.25f)
+                    scroll(0.560824, 0.366227)
+                }.apply {
+                    addLayer(tileStreamProvider)
+                    enableRotation()
+                }
+            ),
+            customPinDialogOpen = false,
+            playerDialogOpen = false))
+    val mapScreenState: State<MapScreenState> = _mapScreenState
 
-    var locationState by mutableStateOf(LocationDTO(-1.0, -1.0, -1.0f))
-        private set
-
-    fun LoadLocation(cb: () -> Unit) {
-        viewModelScope.launch {
-            locationTracker.getCurrentLocation()?.let { location ->
-                locationState =
-                    locationState.copy(location.latitude, location.longitude, location.accuracy)
-                cb()
-            } ?: kotlin.run {
-                locationState = locationState.copy(-1.1, -1.1, -1.1f)
-            }
-        }
+    fun showCustomPinDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(customPinDialogOpen = true)
     }
 
+    fun closeCustomPinDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(customPinDialogOpen = false)
+    }
 
+    fun showPlayerDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = true)
+    }
+
+    fun closePlayerDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
+    }
 }
