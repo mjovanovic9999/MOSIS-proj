@@ -25,7 +25,12 @@ object ButtonConstants {
     const val DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON = "Don't grant"
     const val SHOW_ON_MAP = "Show on map"
     const val KICK = "Start kick voting"
+    const val INVITE_TO_SQUAD = "Invite to squad"
     const val TRADE = "Invite to trade"
+    const val YES = "Yes"
+    const val NO = "No"
+    const val ACCEPT = "Accept"
+    const val DECLINE = "Decline"
 }
 
 object FormFieldNamesConstants {
@@ -100,6 +105,7 @@ object TitleConstants {
     const val MORE_INFORMATION = "More information"
     const val CUSTOM_PIN_DIALOG_SQUAD = "Place note pin for your squad"
     const val CUSTOM_PIN_DIALOG_SOLO = "Place note pin for yourself"
+    const val LEAVE_SQUAD = "Are you sure you want to leave your squad?"
 }
 
 object FormFieldConstants {
@@ -188,4 +194,8 @@ object LeaderboardItemsConstants {
 object CustomPinDialogConstants{
     const val NOTE_TEXT = "Note text"
     const val NOTE_TEXT_LENGTH = 100
+}
+
+object ConfirmationDialogTextConstants{
+    const val LEAVE_SQUAD = "If you leave squad you won't be able to rejoin unless someone invites you!"
 }

@@ -17,6 +17,7 @@ import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
 import mosis.streetsandtotems.core.TitleConstants
 import mosis.streetsandtotems.core.presentation.components.CustomPage
+import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.utils.drawVerticalScrollbar
 import mosis.streetsandtotems.feature_leaderboards.presentation.components.LeaderboardsItem
 import mosis.streetsandtotems.ui.theme.sizes
@@ -50,8 +51,15 @@ fun LeaderboardsScreen(viewModel: LeaderboardsViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 itemsIndexed(state.leaderboardUsers) { index, item ->
-                    LeaderboardsItem(index = index + 1, leaderboardUser = item)
+                    LeaderboardsItem(
+                        index = index + 1,
+                        leaderboardUser = item,
+                        onButtonClick = { viewModel.showPlayerDialog() })
                 }
             }
         })
+
+    PlayerDialog(
+        isOpen = state.playerDialogOpen,
+        onDismissRequest = { viewModel.closePlayerDialog() })
 }
