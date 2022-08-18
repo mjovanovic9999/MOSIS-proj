@@ -31,6 +31,7 @@ import mosis.streetsandtotems.feature_map.presentation.util.latLonToOffsets
 import mosis.streetsandtotems.services.LocationService
 import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
+import ovh.plrapps.mapcompose.ui.layout.Fill
 import ovh.plrapps.mapcompose.ui.state.MapState
 import java.io.FileInputStream
 import javax.inject.Inject
@@ -44,6 +45,7 @@ class MapViewModel @Inject constructor(
     val mapScreenState: State<MapScreenState>
 
     private val mapDimensions = calculateMapDimensions()
+    private val circleSize = mutableStateOf(48.dp / 2.5f)
 
     init {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
@@ -51,7 +53,7 @@ class MapViewModel @Inject constructor(
                 val image = Glide.with(appContext)
                     .downloadOnly()
                     //   .load("https://api.maptiler.com/maps/streets/256/${zoomLvl}/${col}/${row}.png?key=HqIvIaAAnQt3ibV6COHi")
-                      .load("https://api.maptiler.com/maps/openstreetmap/${zoomLvl}/${col}/${row}.jpg?key=njA6yIfsMq23cZHLTop1")
+                    .load("https://api.maptiler.com/maps/openstreetmap/${zoomLvl}/${col}/${row}.jpg?key=njA6yIfsMq23cZHLTop1")
                     //.load("https://api.maptiler.com/maps/openstreetmap/256/${zoomLvl}/${col}/${row}.jpg?key=njA6yIfsMq23cZHLTop1")
                     .submit()
                     .get()
@@ -73,12 +75,13 @@ class MapViewModel @Inject constructor(
                     workerCount = workerCount,
                     tileSize = tileSize
                 ) {
-                    scale(initScale)
+                    //           scale(initScale)
                     scroll(initScrollX, initScrollY)
                 }.apply {
                     addLayer(tileStreamProvider)
                     enableRotation()
                     maxScale = 2.5f
+                    minimumScaleMode = Fill
                 }
             ),
             customPinDialogOpen = false,
@@ -95,8 +98,14 @@ class MapViewModel @Inject constructor(
             R.drawable.pin_full_circle,
             Offset(-.5f, -.5f),
         )
+        _mapState.setStateChangeListener {
+            Log.d("tag", circleSize.value.toString())
+            circleSize.value = 48.dp * this.scale / 2.5f
+
+        }
 
         viewModelScope.launch {
+
 
             _mapState.onTap { x, y ->
 
@@ -121,11 +130,11 @@ class MapViewModel @Inject constructor(
                         mapDimensions,
                         mapDimensions
                     )
-//                    _mapState.moveMarker(
-//                        MY_PIN,
-//                        latLon[0],
-//                        latLon[1],
-//                    )
+                    _mapState.moveMarker(
+                        MY_PIN,
+                        latLon[0],
+                        latLon[1],
+                    )
                 }
             }
         }
@@ -173,7 +182,7 @@ class MapViewModel @Inject constructor(
             x,
             y,
             c = {
-                Canvas(modifier = Modifier.size(48.dp), onDraw = {
+                Canvas(modifier = Modifier.size(circleSize.value), onDraw = {
                     drawCircle(color = Color(0x551a88e9))
                     drawCircle(color = Color(0xFF1a88e9), radius = 20f)
                 })
