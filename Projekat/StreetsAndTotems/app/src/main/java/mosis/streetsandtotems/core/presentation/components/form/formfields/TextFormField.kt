@@ -7,12 +7,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -22,13 +20,13 @@ import com.dsc.form_builder.Validators
 import mosis.streetsandtotems.core.presentation.components.CustomTextField
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 
-class TextFormField(
+class TextFormField @OptIn(ExperimentalMaterial3Api::class) constructor(
     initial: String,
     name: String,
     validators: List<Validators> = emptyList(),
     transform: Transform<String>? = null,
     private val textFieldType: CustomTextFieldType = CustomTextFieldType.Basic,
-    private val modifier: Modifier = Modifier,
+    private val modifier: Modifier = Modifier.fillMaxWidth(),
     private val enabled: Boolean = true,
     private val readOnly: Boolean = false,
     private val label: String = "",
@@ -42,8 +40,10 @@ class TextFormField(
     private val keyboardActions: KeyboardActions = KeyboardActions(),
     private val singleLine: Boolean = false,
     private val maxLines: Int = Int.MAX_VALUE,
-    private val visualTransformation: VisualTransformation = VisualTransformation.None
-) : FormField {
+    private val visualTransformation: VisualTransformation = VisualTransformation.None,
+    private val colors: @Composable () -> TextFieldColors = { if (textFieldType == CustomTextFieldType.Basic) TextFieldDefaults.textFieldColors() else TextFieldDefaults.outlinedTextFieldColors() },
+    private val showErrorMessage: Boolean = true,
+) : FormField() {
     override val fieldState: TextFieldState = TextFieldState(
         name = name,
         initial = initial,
@@ -51,31 +51,43 @@ class TextFormField(
         transform = transform
     )
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         Column() {
             CustomTextField(
                 value = fieldState.value,
-                onValueChange = { fieldState.change(it) },
+                onValueChange = {
+                    fieldState.change(it)
+                    onValueChanged.invoke(
+                        it
+                    )
+                },
                 isError = fieldState.hasError,
                 textFieldType = textFieldType,
-                modifier = modifier,
+                modifier = modifier.focusRequester(focusRequester),
                 enabled = enabled,
                 readOnly = readOnly,
                 label = label,
                 placeholder = placeholder,
                 leadingIcon = leadingIcon,
-                trailingIcon = trailingIcon,
-                onTrailingIconClicked = { fieldState.change("") },
+                trailingIcon = if (clearable && fieldState.value != "") trailingIcon else null,
+                onTrailingIconClicked = {
+                    fieldState.change("")
+                    onValueChanged.invoke(
+                        ""
+                    )
+                },
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
                 singleLine = singleLine,
                 maxLines = maxLines,
-                visualTransformation = visualTransformation
+                visualTransformation = visualTransformation,
+                colors = colors()
             )
-            if (fieldState.hasError)
+            if (showErrorMessage)
                 Text(
-                    text = fieldState.errorMessage,
+                    text = if (fieldState.hasError) fieldState.errorMessage else "",
                     color = MaterialTheme.colorScheme.error,
                     textAlign = TextAlign.Left
                 )

@@ -1,28 +1,40 @@
 package mosis.streetsandtotems.core.presentation.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
-fun CustomFAB(resourceId: Int, onClick: () -> Unit={}, modifier: Modifier = Modifier) {
-
-    FloatingActionButton(onClick = onClick, Modifier.padding(10.dp)) {
-        Image(
-            painter = painterResource(resourceId),
-            contentDescription = null,
-            modifier.height(40.dp)
-        )
-
+fun CustomFAB(
+    imageVector: ImageVector,
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    showAsImage: Boolean = false,
+    contentDescription: String? = null,
+    containerColor: Color = FloatingActionButtonDefaults.containerColor,
+    iconModifier: Modifier = Modifier
+) {
+    FloatingActionButton(
+        onClick = onClick,
+        modifier = modifier,
+        containerColor = containerColor
+    ) {
+        if (showAsImage)
+            Image(
+                imageVector = imageVector,
+                contentDescription = contentDescription,
+                modifier = iconModifier
+            )
+        else
+            Icon(
+                imageVector = imageVector,
+                contentDescription = contentDescription,
+                modifier = iconModifier
+            )
     }
 }
