@@ -6,5 +6,5 @@ import ovh.plrapps.mapcompose.ui.state.MapState
 data class MapScreenState(
     val mapState: MutableState<MapState>,
     val customPinDialogOpen: Boolean,
-    val playerDialogOpen: Boolean
+    val playerDialogOpen: Boolean,
 )

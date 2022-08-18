@@ -15,17 +15,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.compose.rememberNavController
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import dagger.hilt.android.lifecycle.HiltViewModel
 import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
 import mosis.streetsandtotems.core.presentation.navigation.components.DrawerContent
 import mosis.streetsandtotems.core.presentation.navigation.components.DrawerScreen
 import mosis.streetsandtotems.core.presentation.utils.notification.BackgroundServicesEnabled
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
+import mosis.streetsandtotems.feature_map.presentation.MapScreen
+import mosis.streetsandtotems.feature_map.presentation.MapViewModel
 import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestLocation
 import mosis.streetsandtotems.services.LocationService
 import mosis.streetsandtotems.ui.theme.sizes
@@ -54,21 +58,22 @@ fun MainScreen(
 
     CustomRequestLocation(LocationService.isLocationEnabled)
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                DrawerContent(
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .fillMaxSize()
-                        .padding(MaterialTheme.sizes.drawer_column_padding),
-                    destinationsNavigator
-                )
-            }
-        },
-        content = { DrawerScreen(navController = navController, drawerState = drawerState) }
-    )
+    MapScreen(drawerState = drawerState, mapViewModel = hiltViewModel())
+//    ModalNavigationDrawer(
+//        drawerState = drawerState,
+//        drawerContent = {
+//            ModalDrawerSheet {
+//                DrawerContent(
+//                    Modifier
+//                        .align(Alignment.CenterHorizontally)
+//                        .fillMaxSize()
+//                        .padding(MaterialTheme.sizes.drawer_column_padding),
+//                    destinationsNavigator
+//                )
+//            }
+//        },
+//        content = { DrawerScreen(navController = navController, drawerState = drawerState) }
+//    )
 }
 
 

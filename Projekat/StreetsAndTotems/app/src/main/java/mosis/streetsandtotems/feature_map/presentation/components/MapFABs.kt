@@ -22,7 +22,9 @@ import mosis.streetsandtotems.ui.theme.sizes
 @Composable
 fun MapFABs(
     drawerState: DrawerState,
-    openCustomPinDialog: () -> Unit) {
+    openCustomPinDialog: () -> Unit,
+    addPin: () -> Unit
+) {
     val scope = rememberCoroutineScope()
     Box(modifier = Modifier.fillMaxSize()) {
         CustomFAB(
@@ -54,6 +56,7 @@ fun MapFABs(
                                 0.4f
                             )
                         }*/
+                    addPin()
                 },
                 modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
             )

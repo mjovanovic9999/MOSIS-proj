@@ -9,7 +9,6 @@ import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.scopes.ServiceScoped
 import dagger.hilt.components.SingletonComponent
 import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider

@@ -19,7 +19,10 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
     val state = mapViewModel.mapScreenState.value
 
     MapComponent(mapState = state.mapState.value)
-    MapFABs(drawerState, openCustomPinDialog = { mapViewModel.showPlayerDialog() })
+    MapFABs(
+        drawerState,
+        openCustomPinDialog = { mapViewModel.showPlayerDialog() },
+        { mapViewModel.locateMe() })
 
     CustomPinDialog(
         isOpen = state.customPinDialogOpen,

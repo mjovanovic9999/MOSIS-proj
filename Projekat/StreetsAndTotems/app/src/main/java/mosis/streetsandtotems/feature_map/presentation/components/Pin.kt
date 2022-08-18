@@ -12,7 +12,7 @@ fun Pin(resourceId: Int, modifier: Modifier = Modifier) {
     Image(
         painter = painterResource(resourceId),
         contentDescription = null,
-        modifier = modifier.height(48.dp)
+        modifier = modifier.height(20.dp),
     )
 
 }

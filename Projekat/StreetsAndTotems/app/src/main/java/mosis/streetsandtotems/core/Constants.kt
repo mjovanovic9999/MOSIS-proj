@@ -1,5 +1,7 @@
 package mosis.streetsandtotems.core
 
+import kotlin.math.PI
+
 object ButtonConstants {
     const val SIGN_IN = "Sign In"
     const val SIGN_IN_GOOGLE = "Sign in with Google"
@@ -54,6 +56,16 @@ object ImageContentDescriptionConstants {
 
 object PinConstants {
     const val MY_PIN = "0"
+}
+
+object MapConstants {
+    const val levelCount = 20
+    const val tileSize = 256
+    const val workerCount = 32
+    const val initScale = 0.25f
+    const val initScrollX = 0.560844
+    const val initScrollY = 0.366227
+    const val degreesToRadiansCoefficient = PI / 180
 }
 
 object VisualTransformationConstants {
@@ -185,7 +197,7 @@ object LeaderboardItemsConstants {
     const val POINTS = "Points:"
 }
 
-object CustomPinDialogConstants{
+object CustomPinDialogConstants {
     const val NOTE_TEXT = "Note text"
     const val NOTE_TEXT_LENGTH = 100
 }
