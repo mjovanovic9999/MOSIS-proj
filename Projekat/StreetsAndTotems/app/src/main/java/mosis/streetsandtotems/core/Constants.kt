@@ -56,16 +56,24 @@ object ImageContentDescriptionConstants {
 
 object PinConstants {
     const val MY_PIN = "0"
+    const val MY_PIN_COLOR_OPACITY = 0x551a88e9
+    const val MY_PIN_COLOR = 0xFF1a88e9
+    const val MY_PIN_RADIUS = 20f
 }
 
 object MapConstants {
-    const val levelCount = 17
-    const val tileSize = 512
-    const val workerCount = 32
-    const val initScale = 0.25f
-    const val initScrollX = 0.560844
-    const val initScrollY = 0.366227
-    const val degreesToRadiansCoefficient = PI / 180
+    const val LEVEL_COUNT = 17
+    const val TITLE_SIZE = 512
+    const val WORKER_COUNT = 32
+    const val INIT_SCROLL_X = 0.560824
+    const val INIT_SCROLL_Y = 0.366227
+    const val DEGREES_TO_RADIANS_COEFFICIENT = PI / 180
+    const val MAX_SCALE = 2.5f
+    const val MY_LOCATION_CIRCLE_SIZE = 60f
+    const val TILE_URL_512 = "https://api.maptiler.com/maps/openstreetmap/"
+    const val TILE_URL_256 = "https://api.maptiler.com/maps/openstreetmap/256/"
+    const val TILE_KEY = "njA6yIfsMq23cZHLTop1"
+
 }
 
 object VisualTransformationConstants {

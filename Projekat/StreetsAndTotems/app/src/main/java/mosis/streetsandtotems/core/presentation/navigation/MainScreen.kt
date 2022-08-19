@@ -58,22 +58,22 @@ fun MainScreen(
 
     CustomRequestLocation(LocationService.isLocationEnabled)
 
-    MapScreen(drawerState = drawerState, mapViewModel = hiltViewModel())
-//    ModalNavigationDrawer(
-//        drawerState = drawerState,
-//        drawerContent = {
-//            ModalDrawerSheet {
-//                DrawerContent(
-//                    Modifier
-//                        .align(Alignment.CenterHorizontally)
-//                        .fillMaxSize()
-//                        .padding(MaterialTheme.sizes.drawer_column_padding),
-//                    destinationsNavigator
-//                )
-//            }
-//        },
-//        content = { DrawerScreen(navController = navController, drawerState = drawerState) }
-//    )
+//    MapScreen(drawerState = drawerState, mapViewModel = hiltViewModel())
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                DrawerContent(
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .fillMaxSize()
+                        .padding(MaterialTheme.sizes.drawer_column_padding),
+                    destinationsNavigator
+                )
+            }
+        },
+        content = { DrawerScreen(navController = navController, drawerState = drawerState) }
+    )
 }
 
 

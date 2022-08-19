@@ -22,7 +22,9 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
     MapFABs(
         drawerState,
         openCustomPinDialog = { mapViewModel.showPlayerDialog() },
-        { mapViewModel.locateMe() })
+        { mapViewModel.followMe() },
+        state.followMe,
+    )
 
     CustomPinDialog(
         isOpen = state.customPinDialogOpen,

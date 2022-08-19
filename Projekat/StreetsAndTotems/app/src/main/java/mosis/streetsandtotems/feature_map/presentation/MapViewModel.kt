@@ -2,6 +2,7 @@ package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.MutableState
@@ -18,16 +19,22 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.R
-import mosis.streetsandtotems.core.MapConstants.initScale
-import mosis.streetsandtotems.core.MapConstants.initScrollX
-import mosis.streetsandtotems.core.MapConstants.initScrollY
-import mosis.streetsandtotems.core.MapConstants.levelCount
-import mosis.streetsandtotems.core.MapConstants.tileSize
-import mosis.streetsandtotems.core.MapConstants.workerCount
+import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_X
+import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_Y
+import mosis.streetsandtotems.core.MapConstants.LEVEL_COUNT
+import mosis.streetsandtotems.core.MapConstants.MAX_SCALE
+import mosis.streetsandtotems.core.MapConstants.MY_LOCATION_CIRCLE_SIZE
+import mosis.streetsandtotems.core.MapConstants.TILE_KEY
+import mosis.streetsandtotems.core.MapConstants.TILE_URL_512
+import mosis.streetsandtotems.core.MapConstants.TITLE_SIZE
+import mosis.streetsandtotems.core.MapConstants.WORKER_COUNT
 import mosis.streetsandtotems.core.PinConstants.MY_PIN
+import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
+import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
+import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
 import mosis.streetsandtotems.feature_map.presentation.components.Pin
 import mosis.streetsandtotems.feature_map.presentation.util.calculateMapDimensions
-import mosis.streetsandtotems.feature_map.presentation.util.latLonToOffsets
+import mosis.streetsandtotems.feature_map.presentation.util.convertLatLngToOffsets
 import mosis.streetsandtotems.services.LocationService
 import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
@@ -35,6 +42,7 @@ import ovh.plrapps.mapcompose.ui.layout.Fill
 import ovh.plrapps.mapcompose.ui.state.MapState
 import java.io.FileInputStream
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
@@ -45,7 +53,7 @@ class MapViewModel @Inject constructor(
     val mapScreenState: State<MapScreenState>
 
     private val mapDimensions = calculateMapDimensions()
-    private val circleSize = mutableStateOf(48.dp / 2.5f)
+    private val circleSize = mutableStateOf(MY_LOCATION_CIRCLE_SIZE.dp / MAX_SCALE)
 
     init {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
@@ -53,8 +61,7 @@ class MapViewModel @Inject constructor(
                 val image = Glide.with(appContext)
                     .downloadOnly()
                     //   .load("https://api.maptiler.com/maps/streets/256/${zoomLvl}/${col}/${row}.png?key=HqIvIaAAnQt3ibV6COHi")
-                    .load("https://api.maptiler.com/maps/openstreetmap/${zoomLvl}/${col}/${row}.jpg?key=njA6yIfsMq23cZHLTop1")
-                    //.load("https://api.maptiler.com/maps/openstreetmap/256/${zoomLvl}/${col}/${row}.jpg?key=njA6yIfsMq23cZHLTop1")
+                    .load("${TILE_URL_512}${zoomLvl}/${col}/${row}.jpg?key=${TILE_KEY}")
                     .submit()
                     .get()
 
@@ -69,75 +76,66 @@ class MapViewModel @Inject constructor(
         _mapScreenState = mutableStateOf(MapScreenState(
             mapState = mutableStateOf(
                 MapState(
-                    levelCount = levelCount,
+                    levelCount = LEVEL_COUNT,
                     fullWidth = mapDimensions,
                     fullHeight = mapDimensions,
-                    workerCount = workerCount,
-                    tileSize = tileSize
+                    workerCount = WORKER_COUNT,
+                    tileSize = TITLE_SIZE
                 ) {
-                    //           scale(initScale)
-                    scroll(initScrollX, initScrollY)
+                    scroll(INIT_SCROLL_X, INIT_SCROLL_Y)
                 }.apply {
                     addLayer(tileStreamProvider)
                     enableRotation()
-                    maxScale = 2.5f
+                    maxScale = MAX_SCALE
                     minimumScaleMode = Fill
                 }
             ),
             customPinDialogOpen = false,
             playerDialogOpen = false,
+            followMe = true,
+            amICentered = false,
         ))
 
         mapScreenState = _mapScreenState
         _mapState = mapScreenState.value.mapState.value
 
-        addPin(
-            MY_PIN,
-            initScrollX,
-            initScrollY,
-            R.drawable.pin_full_circle,
-            Offset(-.5f, -.5f),
-        )
+        initMyLocationPinAndRegisterMove()
+
         _mapState.setStateChangeListener {
-            Log.d("tag", circleSize.value.toString())
-            circleSize.value = 48.dp * this.scale / 2.5f
-
+            //neje optimizovano
+            circleSize.value = MY_LOCATION_CIRCLE_SIZE.dp * this.scale / MAX_SCALE
         }
 
-        viewModelScope.launch {
+        registerAddCustomPin()
 
 
-            _mapState.onTap { x, y ->
+////STA JE REFERRENTIALSNAPSHOTFLOW
+//        //IMA U SERVIS "STA JE OVO"
+//
+//        var pinLocation =
+//            arrayOf((INIT_SCROLL_X * 1000000).roundToInt(), (INIT_SCROLL_Y * 1000000).roundToInt())
+//
+//        _mapState.setStateChangeListener {
+//
+//            val markerInfo = _mapState.getMarkerInfo(MY_PIN)
+//            if (markerInfo != null) {
+//                pinLocation = arrayOf(
+//                    (markerInfo.x * 1000000).roundToInt(),
+//                    (markerInfo.x * 1000000).roundToInt()
+//                )
+//            }
+//            if (mapScreenState.value.followMe && mapScreenState.value.amICentered
+//                && (pinLocation[0] != (this.centroidX * 1000000).roundToInt()
+//                        || pinLocation[1] != (this.centroidY * 1000000).roundToInt())
+//            ) {
+//                _mapScreenState.value = _mapScreenState.value.copy(
+//                    followMe = false, amICentered = false,
+//                )
+//
+//                Toast.makeText(appContext, "CHANGED", Toast.LENGTH_SHORT).show()
+//            }
+//        }
 
-                _mapState.addMarker(
-                    "x",
-                    x,
-                    y,
-                    c = { Pin(resourceId = R.drawable.pin_base_discovery_shot) },
-                    relativeOffset = Offset(-.5f, -.5f)
-                )
-            }
-
-            LocationService.mLocation.collectLatest {
-                Log.d(
-                    "tag",
-                    "NEW LOCATION FLOW: ${it?.latitude}, ${it?.longitude}, ${it?.accuracy}"
-                )
-                if (it != null) {
-                    val latLon = latLonToOffsets(
-                        it.latitude,
-                        it.longitude,
-                        mapDimensions,
-                        mapDimensions
-                    )
-                    _mapState.moveMarker(
-                        MY_PIN,
-                        latLon[0],
-                        latLon[1],
-                    )
-                }
-            }
-        }
     }
 
 
@@ -157,125 +155,108 @@ class MapViewModel @Inject constructor(
         _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
     }
 
-    fun locateMe() {
+    fun centerMeOnMyMarker() {
         val markerInfo = _mapState.getMarkerInfo(MY_PIN)
-        if (markerInfo != null && _mapState.scroll != Offset(
-                markerInfo.x.toFloat(),
-                markerInfo.y.toFloat()
-            )
-        ) {
+        if (markerInfo != null) {
             viewModelScope.launch {
                 _mapState.centerOnMarker(MY_PIN)
             }
         }
     }
 
-    fun addPin(
-        id: String,
-        x: Double,
-        y: Double,
-        resourceId: Int,
-        relativeOffset: Offset = Offset(-.5f, -1f)
-    ) {
+    private fun initMyLocationPinAndRegisterMove() {
         _mapState.addMarker(
+            MY_PIN,
+            INIT_SCROLL_X,
+            INIT_SCROLL_Y,
+            c = {
+                Canvas(modifier = Modifier.size(circleSize.value), onDraw = {
+                    drawCircle(color = Color(MY_PIN_COLOR_OPACITY))
+                    drawCircle(color = Color(MY_PIN_COLOR), radius = MY_PIN_RADIUS)
+                })
+            },
+            clipShape = null,
+            relativeOffset = Offset(-.5f, -.5f)
+        )
+
+        viewModelScope.launch {
+
+            LocationService.mLocation.collectLatest {
+                if (it != null) {
+                    val latLon = convertLatLngToOffsets(
+                        it.latitude,
+                        it.longitude,
+                        mapDimensions,
+                        mapDimensions
+                    )
+
+                    if (mapScreenState.value.followMe) {
+                        if (!mapScreenState.value.amICentered) {
+                            movePinAt(MY_PIN, latLon[0], latLon[1])
+                            centerMeOnMyMarker()
+                            _mapScreenState.value = _mapScreenState.value.copy(amICentered = true)
+                        } else {
+                            val markerInfo = _mapState.getMarkerInfo(MY_PIN)
+                            if (markerInfo != null) {
+                                if ((_mapState.centroidX * 1000000).roundToInt() == (markerInfo.x * 1000000).roundToInt()
+                                    && (_mapState.centroidY * 1000000).roundToInt() == (markerInfo.y * 1000000).roundToInt()
+                                ) {
+                                    movePinAt(MY_PIN, latLon[0], latLon[1])
+                                    centerMeOnMyMarker()
+                                } else {
+//                                    _mapScreenState.value =
+//                                        _mapScreenState.value.copy(
+//                                            amICentered = false,
+//                                            followMe = false
+//                                        )
+                                    movePinAt(MY_PIN, latLon[0], latLon[1])
+                                }
+                            }
+                        }
+
+                    } else {
+                        movePinAt(MY_PIN, latLon[0], latLon[1])
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun registerAddCustomPin() {
+        viewModelScope.launch {
+            _mapState.onLongPress { x, y ->
+                _mapState.addMarker(
+                    x.toString() + y.toString(),
+                    x,
+                    y,
+                    c = {
+                        Pin(R.drawable.pin_base_discovery_shot)
+                    },
+                    clipShape = null,
+                )
+            }
+        }
+    }
+
+    fun followMe() {
+        _mapScreenState.value = _mapScreenState.value.copy(followMe = true)
+
+    }
+
+    private fun NotFollowMe() {
+        _mapScreenState.value = _mapScreenState.value.copy(followMe = false)
+        Log.d("tag", "TAPPP011")
+
+    }
+
+
+    fun movePinAt(id: String, x: Double, y: Double) {
+        _mapState.moveMarker(
             id,
             x,
             y,
-            c = {
-                Canvas(modifier = Modifier.size(circleSize.value), onDraw = {
-                    drawCircle(color = Color(0x551a88e9))
-                    drawCircle(color = Color(0xFF1a88e9), radius = 20f)
-                })
-//                Box(
-//                    Modifier
-//                        .size(48.dp)
-//                        .background(Color(0x551a88e9), shape = CircleShape)
-//                ) {
-////                    Image(
-////                        painter = painterResource(resourceId),
-////                        contentDescription = null,
-////                        modifier = Modifier
-//////                            .height(20.dp)
-//////                            .align(Alignment.Center)
-//////                            .offset(10.dp, 10.dp),
-////                    )
-//                    Image(
-//                        painter = painterResource(R.drawable.pin_full_circle),
-//                        contentDescription = null,
-//                        modifier = Modifier
-//                            .height(16.dp)
-//                            .align(Alignment.Center),
-//                    )
-
-                //    }
-//                Box(
-//                    Modifier
-//                        .size(20.dp)
-//                     //   .background(Color(0x551a88e9), shape = CircleShape)
-//                 //       .border(BorderStroke(30.dp, Color(0x551a88e9)))
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Filled.Circle,
-//                        contentDescription = null,
-//                        tint = Color(0xFF1a88e9),
-//
-//                        modifier = Modifier
-//                            .align(Alignment.Center)
-//                            .size(20.dp)
-//                    )
-//                }
-            },
-            clipShape = null,
-            relativeOffset = relativeOffset
         )
     }
-
-    fun movePin(id: String, x: Double, y: Double) {
-        _mapState.moveMarker(
-            MY_PIN,
-            x,
-            y,
-        )
-    }
-
-
-//    fun addPin() {
-//
-//    //    val long = (mapScreenState.value.myCoordinates.value?.longitude ?: .0)
-//      //  val lat = (mapScreenState.value.myCoordinates.value?.latitude ?: .0)
-//
-//        Log.d("tag x", lat.toString())
-//        Log.d("tag y", long.toString())
-//        val niz = doProjection(lat, long)
-//        Log.d("tag x", niz[0].toString())
-//        Log.d("tag y", niz[1].toString())
-////        _mapState.onTap { x, y ->
-//
-//        _mapState.addMarker(
-//
-//            //    (niz[0] + niz[1]).toString(),
-//
-//            MY_PIN,
-//            niz[0],
-//            niz[1],
-//            c = { Pin(R.drawable.pin_emerald) },
-//            clipShape = null
-//
-//        )
-//        viewModelScope.launch {
-//            _mapState.centerOnMarker(MY_PIN)
-//        }
-////        }
-//    }
-
-//    fun CenterMeOnMap() {
-//
-//        viewModelScope.launch {
-//            _mapState.centerOnMarker(
-//                MY_PIN,
-//                0.4f
-//            )
-//        }
-//    }
 }
 

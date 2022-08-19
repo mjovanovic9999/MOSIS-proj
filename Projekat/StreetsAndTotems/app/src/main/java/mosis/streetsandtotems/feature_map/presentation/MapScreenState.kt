@@ -7,4 +7,6 @@ data class MapScreenState(
     val mapState: MutableState<MapState>,
     val customPinDialogOpen: Boolean,
     val playerDialogOpen: Boolean,
+    val followMe: Boolean,
+    val amICentered: Boolean,
 )

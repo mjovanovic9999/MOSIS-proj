@@ -151,7 +151,7 @@ class LocationService : Service() {
     }
 
     companion object {
-        var mLocation: MutableStateFlow<Location?> = MutableStateFlow(null)
+        val mLocation: MutableStateFlow<Location?> = MutableStateFlow(null)
         var isServiceStarted = false
         var isLocationEnabled = mutableStateOf(true)
 

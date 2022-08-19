@@ -1,18 +1,18 @@
 package mosis.streetsandtotems.feature_map.presentation.util
 
-import mosis.streetsandtotems.core.MapConstants.degreesToRadiansCoefficient
-import mosis.streetsandtotems.core.MapConstants.levelCount
-import mosis.streetsandtotems.core.MapConstants.tileSize
+import mosis.streetsandtotems.core.MapConstants.DEGREES_TO_RADIANS_COEFFICIENT
+import mosis.streetsandtotems.core.MapConstants.LEVEL_COUNT
+import mosis.streetsandtotems.core.MapConstants.TITLE_SIZE
 import kotlin.math.PI
 import kotlin.math.ln
 import kotlin.math.pow
 import kotlin.math.tan
 
 fun calculateMapDimensions(): Int {
-    return 2f.pow(levelCount - 1).toInt() * tileSize
+    return 2f.pow(LEVEL_COUNT - 1).toInt() * TITLE_SIZE
 }
 
-fun latLonToOffsets(
+fun convertLatLngToOffsets(
     latitude: Double,
     longitude: Double,
     mapWidth: Int,
@@ -33,5 +33,5 @@ fun latLonToOffsets(
 }
 
 fun degreesToRadians(degrees: Double): Double {
-    return degrees * degreesToRadiansCoefficient
+    return degrees * DEGREES_TO_RADIANS_COEFFICIENT
 }

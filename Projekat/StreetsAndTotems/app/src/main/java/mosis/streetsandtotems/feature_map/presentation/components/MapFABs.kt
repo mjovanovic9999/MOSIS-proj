@@ -23,7 +23,8 @@ import mosis.streetsandtotems.ui.theme.sizes
 fun MapFABs(
     drawerState: DrawerState,
     openCustomPinDialog: () -> Unit,
-    addPin: () -> Unit
+    locateMe: () -> Unit,
+    followMe: Boolean
 ) {
     val scope = rememberCoroutineScope()
     Box(modifier = Modifier.fillMaxSize()) {
@@ -47,19 +48,16 @@ fun MapFABs(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
         ) {
-            CustomFAB(
-                imageVector = ImageVector.vectorResource(id = R.drawable.locate_me),
-                onClick = {
-                    /*    mapViewModel.viewModelScope.launch {
-                            mapViewModel.state.centerOnMarker(
-                                "prvi",
-                                0.4f
-                            )
-                        }*/
-                    addPin()
-                },
-                modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
-            )
+            if (!followMe) {
+                CustomFAB(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.locate_me),
+                    onClick = {
+
+                        locateMe()
+                    },
+                    modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
+                )
+            }
             CustomFAB(
                 imageVector = ImageVector.vectorResource(id = R.drawable.add_pin),
                 onClick = openCustomPinDialog,
