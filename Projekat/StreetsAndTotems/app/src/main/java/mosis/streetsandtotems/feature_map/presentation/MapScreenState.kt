@@ -8,5 +8,5 @@ data class MapScreenState(
     val customPinDialogOpen: Boolean,
     val playerDialogOpen: Boolean,
     val followMe: Boolean,
-    val amICentered: Boolean,
+    val detectScroll: Boolean,
 )

@@ -33,6 +33,7 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
 import mosis.streetsandtotems.feature_map.presentation.components.Pin
+import mosis.streetsandtotems.feature_map.presentation.util.areOffsetsEqual
 import mosis.streetsandtotems.feature_map.presentation.util.calculateMapDimensions
 import mosis.streetsandtotems.feature_map.presentation.util.convertLatLngToOffsets
 import mosis.streetsandtotems.services.LocationService
@@ -93,7 +94,7 @@ class MapViewModel @Inject constructor(
             customPinDialogOpen = false,
             playerDialogOpen = false,
             followMe = true,
-            amICentered = false,
+            detectScroll = false,
         ))
 
         mapScreenState = _mapScreenState
@@ -101,9 +102,33 @@ class MapViewModel @Inject constructor(
 
         initMyLocationPinAndRegisterMove()
 
+
+        var pinLocation =
+            arrayOf(INIT_SCROLL_X, INIT_SCROLL_Y)
+
         _mapState.setStateChangeListener {
             //neje optimizovano
             circleSize.value = MY_LOCATION_CIRCLE_SIZE.dp * this.scale / MAX_SCALE
+
+
+            val markerInfo = _mapState.getMarkerInfo(MY_PIN)
+            if (markerInfo != null) {
+                pinLocation = arrayOf(
+                    markerInfo.x,
+                    markerInfo.y
+                )
+            }
+            if (
+                mapScreenState.value.followMe
+                && mapScreenState.value.detectScroll
+                &&
+                (!areOffsetsEqual(pinLocation[0], this.centroidX)
+                        || !areOffsetsEqual(pinLocation[1], this.centroidY))
+            ) {
+                _mapScreenState.value = _mapScreenState.value.copy(
+                    followMe = false
+                )
+            }
         }
 
         registerAddCustomPin()
@@ -112,29 +137,6 @@ class MapViewModel @Inject constructor(
 ////STA JE REFERRENTIALSNAPSHOTFLOW
 //        //IMA U SERVIS "STA JE OVO"
 //
-//        var pinLocation =
-//            arrayOf((INIT_SCROLL_X * 1000000).roundToInt(), (INIT_SCROLL_Y * 1000000).roundToInt())
-//
-//        _mapState.setStateChangeListener {
-//
-//            val markerInfo = _mapState.getMarkerInfo(MY_PIN)
-//            if (markerInfo != null) {
-//                pinLocation = arrayOf(
-//                    (markerInfo.x * 1000000).roundToInt(),
-//                    (markerInfo.x * 1000000).roundToInt()
-//                )
-//            }
-//            if (mapScreenState.value.followMe && mapScreenState.value.amICentered
-//                && (pinLocation[0] != (this.centroidX * 1000000).roundToInt()
-//                        || pinLocation[1] != (this.centroidY * 1000000).roundToInt())
-//            ) {
-//                _mapScreenState.value = _mapScreenState.value.copy(
-//                    followMe = false, amICentered = false,
-//                )
-//
-//                Toast.makeText(appContext, "CHANGED", Toast.LENGTH_SHORT).show()
-//            }
-//        }
 
     }
 
@@ -155,14 +157,6 @@ class MapViewModel @Inject constructor(
         _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
     }
 
-    fun centerMeOnMyMarker() {
-        val markerInfo = _mapState.getMarkerInfo(MY_PIN)
-        if (markerInfo != null) {
-            viewModelScope.launch {
-                _mapState.centerOnMarker(MY_PIN)
-            }
-        }
-    }
 
     private fun initMyLocationPinAndRegisterMove() {
         _mapState.addMarker(
@@ -180,7 +174,6 @@ class MapViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-
             LocationService.mLocation.collectLatest {
                 if (it != null) {
                     val latLon = convertLatLngToOffsets(
@@ -190,38 +183,27 @@ class MapViewModel @Inject constructor(
                         mapDimensions
                     )
 
-                    if (mapScreenState.value.followMe) {
-                        if (!mapScreenState.value.amICentered) {
-                            movePinAt(MY_PIN, latLon[0], latLon[1])
-                            centerMeOnMyMarker()
-                            _mapScreenState.value = _mapScreenState.value.copy(amICentered = true)
-                        } else {
-                            val markerInfo = _mapState.getMarkerInfo(MY_PIN)
-                            if (markerInfo != null) {
-                                if ((_mapState.centroidX * 1000000).roundToInt() == (markerInfo.x * 1000000).roundToInt()
-                                    && (_mapState.centroidY * 1000000).roundToInt() == (markerInfo.y * 1000000).roundToInt()
-                                ) {
-                                    movePinAt(MY_PIN, latLon[0], latLon[1])
-                                    centerMeOnMyMarker()
-                                } else {
-//                                    _mapScreenState.value =
-//                                        _mapScreenState.value.copy(
-//                                            amICentered = false,
-//                                            followMe = false
-//                                        )
-                                    movePinAt(MY_PIN, latLon[0], latLon[1])
-                                }
-                            }
-                        }
+                    movePinAt(MY_PIN, latLon[0], latLon[1])
 
-                    } else {
-                        movePinAt(MY_PIN, latLon[0], latLon[1])
+                    if (mapScreenState.value.followMe) {
+                        changeStateDetectScroll(false)
+
+                        centerMeOnMyMarkerSuspend()
+
+                        changeStateDetectScroll(true)
                     }
                 }
+
             }
         }
     }
 
+    private fun changeStateDetectScroll(shouldDetectScroll: Boolean) {
+        _mapScreenState.value =
+            _mapScreenState.value.copy(
+                detectScroll = shouldDetectScroll
+            )
+    }
 
     private fun registerAddCustomPin() {
         viewModelScope.launch {
@@ -240,16 +222,29 @@ class MapViewModel @Inject constructor(
     }
 
     fun followMe() {
-        _mapScreenState.value = _mapScreenState.value.copy(followMe = true)
+        centerMeOnMyMarker()
+        _mapScreenState.value = _mapScreenState.value.copy(followMe = true, detectScroll = false)
 
     }
 
-    private fun NotFollowMe() {
-        _mapScreenState.value = _mapScreenState.value.copy(followMe = false)
-        Log.d("tag", "TAPPP011")
-
+    private suspend fun centerMeOnMyMarkerSuspend() {
+        val markerInfo = _mapState.getMarkerInfo(MY_PIN)
+        if (markerInfo != null) {
+            val x = viewModelScope.launch {
+                _mapState.centerOnMarker(MY_PIN)
+            }
+            x.join()
+        }
     }
 
+    private fun centerMeOnMyMarker() {
+        val markerInfo = _mapState.getMarkerInfo(MY_PIN)
+        if (markerInfo != null) {
+            val x = viewModelScope.launch {
+                _mapState.centerOnMarker(MY_PIN)
+            }
+        }
+    }
 
     fun movePinAt(id: String, x: Double, y: Double) {
         _mapState.moveMarker(
