@@ -1,16 +1,16 @@
-package mosis.streetsandtotems.feature_auth.domain.model
+package mosis.streetsandtotems.feature_auth.presentation.util
 
 import mosis.streetsandtotems.core.FormFieldNamesConstants
 import mosis.streetsandtotems.core.presentation.states.FieldsEmpty
 
 data class SignInFieldsEmpty(
-    var username: Boolean = true,
+    var email: Boolean = true,
     var password: Boolean = true
 ) : FieldsEmpty {
     override fun setFieldEmpty(name: String, empty: Boolean) {
         when (name) {
-            FormFieldNamesConstants.USERNAME -> {
-                username = empty
+            FormFieldNamesConstants.EMAIL -> {
+                email = empty
             }
             FormFieldNamesConstants.PASSWORD -> {
                 password = empty
@@ -19,6 +19,6 @@ data class SignInFieldsEmpty(
     }
 
     override fun anyFieldIsEmpty(): Boolean {
-        return username || password
+        return email || password
     }
 }

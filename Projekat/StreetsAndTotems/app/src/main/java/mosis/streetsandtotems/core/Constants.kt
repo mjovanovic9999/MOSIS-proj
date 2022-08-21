@@ -31,10 +31,11 @@ object ButtonConstants {
     const val NO = "No"
     const val ACCEPT = "Accept"
     const val DECLINE = "Decline"
+    const val DISMISS = "Dismiss"
 }
 
 object FormFieldNamesConstants {
-    const val USERNAME = "username"
+    const val EMAIL = "email"
     const val PASSWORD = "password"
     const val FIRST_NAME = "firstName"
     const val LAST_NAME = "lastName"
@@ -69,8 +70,19 @@ object FormFieldLengthConstants {
     const val PASSWORD = 8
 }
 
+object HandleResponseConstants {
+    const val DEFAULT_ID = 0
+    const val ID_ADDITION_FACTOR = 1
+}
+
 object MessageConstants {
-    const val USERNAME_REQUIRED = "Username is required!"
+    const val SIGN_UP_ERROR = "An error occured while signing up! Please try again!"
+    const val SIGNED_UP = "Sign up successful!"
+    const val SIGNED_OUT = "Sign out successful!"
+    const val INVALID_CREDENTIALS = "Wrong email and/or password!"
+    const val SIGNED_IN = "Sign in successful!"
+    const val INVALID_EMAIL = "Invalid email!"
+    const val EMAIL_REQUIRED = "Email is required!"
     const val PASSWORD_REQUIRED = "Password is required!"
     const val PASSWORD_LENGTH = "Minimum 8 characters needed!"
     const val FIRST_NAME_REQUIRED = "First name is required!"
@@ -109,7 +121,7 @@ object TitleConstants {
 }
 
 object FormFieldConstants {
-    const val USERNAME = "Username"
+    const val EMAIL = "Email"
     const val PASSWORD = "Password"
     const val FIRST_NAME = "First name"
     const val LAST_NAME = "Last name"
@@ -191,11 +203,12 @@ object LeaderboardItemsConstants {
     const val POINTS = "Points:"
 }
 
-object CustomPinDialogConstants{
+object CustomPinDialogConstants {
     const val NOTE_TEXT = "Note text"
     const val NOTE_TEXT_LENGTH = 100
 }
 
-object ConfirmationDialogTextConstants{
-    const val LEAVE_SQUAD = "If you leave squad you won't be able to rejoin unless someone invites you!"
+object ConfirmationDialogTextConstants {
+    const val LEAVE_SQUAD =
+        "If you leave squad you won't be able to rejoin unless someone invites you!"
 }

@@ -22,19 +22,14 @@ class FormState<T : Any>(
     private val _isFormFilled = mutableStateOf(!initialFieldsEmpty.anyFieldIsEmpty())
     val isFormFilled: State<Boolean> = _isFormFilled
 
-
-    fun validate(): Boolean {
-        return formState.validate()
-    }
-
-    fun validateAndFocusFirstInvalidField(): Boolean {
+    private fun validateAndFocusFirstInvalidField(): Boolean {
         val valid = formState.validate()
         if (!valid) fields.first { field -> field.fieldState.hasError }.focusRequester.requestFocus()
         return valid
     }
 
     fun getDataWithValidation(): T? {
-        if (validate())
+        if (validateAndFocusFirstInvalidField())
             return formState.getData(dataType)
         return null
     }

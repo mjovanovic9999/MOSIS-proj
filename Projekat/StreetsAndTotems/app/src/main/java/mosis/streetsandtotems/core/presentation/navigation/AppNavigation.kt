@@ -1,11 +1,7 @@
 package mosis.streetsandtotems.core.presentation.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.State
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.dependency
@@ -18,19 +14,15 @@ import mosis.streetsandtotems.feature_leaderboards.presentation.LeaderboardsView
 
 
 @Composable
-fun AppNavigation() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    )
-    {
-        DestinationsNavHost(navGraph = NavGraphs.root, dependenciesContainerBuilder = {
+fun AppNavigation(isUserAuthenticated: State<Boolean>) {
+    DestinationsNavHost(
+        navGraph = NavGraphs.root,
+        startRoute = if (isUserAuthenticated.value) MainScreenDestination else NavGraphs.root.startRoute,
+        dependenciesContainerBuilder = {
             dependency(SignInScreenDestination) { hiltViewModel<SignInViewModel>() }
             dependency(SignUpScreenDestination) { hiltViewModel<SignupViewModel>() }
             dependency(ProfileScreenDestination) { hiltViewModel<ProfileViewModel>() }
             dependency(LeaderboardsScreenDestination) { hiltViewModel<LeaderboardsViewModel>() }
-            dependency(MainScreenDestination) { hiltViewModel<MainScreenViewModel>()}
+            dependency(MainScreenDestination) { hiltViewModel<MainScreenViewModel>() }
         })
-    }
 }

@@ -33,7 +33,11 @@ import mosis.streetsandtotems.destinations.ProfileScreenDestination
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
-fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigator) {
+fun DrawerContent(
+    modifier: Modifier,
+    destinationsNavigator: DestinationsNavigator,
+    onSignOut: (DestinationsNavigator) -> Unit
+) {
     val focusManager = LocalFocusManager.current
     val isConfirmDialogOpen = remember { mutableStateOf(false) }
 
@@ -170,7 +174,7 @@ fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigat
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 )
                 CustomButton(
-                    clickHandler = { /*TODO*/ },
+                    clickHandler = { onSignOut(destinationsNavigator) },
                     text = DrawerConstants.SIGN_OUT,
                     buttonType = CustomButtonType.Text,
                     icon = Icons.Outlined.Logout,

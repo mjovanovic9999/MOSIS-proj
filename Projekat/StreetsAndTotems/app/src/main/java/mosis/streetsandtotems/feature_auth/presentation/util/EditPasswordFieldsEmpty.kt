@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.feature_auth.domain.model
+package mosis.streetsandtotems.feature_auth.presentation.util
 
 import mosis.streetsandtotems.core.FormFieldNamesConstants
 import mosis.streetsandtotems.core.presentation.states.FieldsEmpty

@@ -1,10 +1,12 @@
 package mosis.streetsandtotems.feature_auth.domain.model
 
-data class SignUpFields(
+import android.net.Uri
+
+data class User(
     val firstName: String,
     val lastName: String,
     val phoneNumber: String,
-    val username: String,
+    val email: String,
     val password: String,
-    val repeatPassword: String
+    val photoUri: Uri?
 )

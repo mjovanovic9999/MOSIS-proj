@@ -9,7 +9,7 @@ import mosis.streetsandtotems.core.TitleConstants
 import mosis.streetsandtotems.core.presentation.components.CustomDialog
 import mosis.streetsandtotems.core.presentation.components.form.Form
 import mosis.streetsandtotems.core.presentation.states.FormState
-import mosis.streetsandtotems.feature_auth.domain.model.EditPasswordFields
+import mosis.streetsandtotems.feature_auth.presentation.util.EditPasswordFields
 
 
 @Composable
