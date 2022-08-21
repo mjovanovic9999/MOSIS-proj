@@ -25,7 +25,10 @@ import mosis.streetsandtotems.ui.theme.sizes
 
 
 @Composable
-fun CustomImageSelectorAndCropper() {
+fun CustomImageSelectorAndCropper(
+    onImageSelected: ((Uri?) -> Unit)? = null,
+    showErrorSnackbar: ((String) -> Unit)? = null
+) {
     var imageUri by remember {
         mutableStateOf<Uri?>(null)
     }
@@ -33,8 +36,9 @@ fun CustomImageSelectorAndCropper() {
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
             imageUri = result.uriContent
+            onImageSelected?.invoke(imageUri)
         } else {
-            val exception = result.error
+            showErrorSnackbar?.invoke(result.error?.message.toString())
         }
     }
 

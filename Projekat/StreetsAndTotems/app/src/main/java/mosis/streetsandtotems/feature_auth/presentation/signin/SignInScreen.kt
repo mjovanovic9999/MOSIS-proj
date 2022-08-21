@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.collectLatest
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.ButtonConstants
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
@@ -21,6 +23,7 @@ import mosis.streetsandtotems.core.presentation.components.form.Form
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.AuthNavGraph
 import mosis.streetsandtotems.destinations.MainScreenDestination
 import mosis.streetsandtotems.destinations.SignUpScreenDestination
+import mosis.streetsandtotems.destinations.TikiScreenDestination
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtons
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtonsType
 import mosis.streetsandtotems.ui.theme.sizes
@@ -29,6 +32,20 @@ import mosis.streetsandtotems.ui.theme.sizes
 @Destination
 @Composable
 fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: DestinationsNavigator) {
+    val state = viewModel.signInState.value
+
+    LaunchedEffect(Unit) {
+        state.signInScreenEvents.collectLatest {
+            if (it != null)
+                when (it) {
+                    SignInScreenEvents.SignInSuccessful -> {
+                        destinationsNavigator.popBackStack()
+                        destinationsNavigator.navigate(MainScreenDestination)
+                    }
+                }
+        }
+    }
+
     CustomPage(
         titleContent = {
             Image(
@@ -39,9 +56,9 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
         },
         content = {
             Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.sizes.forgot_password_top_padding)) {
-                Form(formState = viewModel.formState, spacing = MaterialTheme.sizes.none)
+                Form(formState = state.formState, spacing = MaterialTheme.sizes.none)
                 CustomButton(
-                    clickHandler = { },
+                    clickHandler = { destinationsNavigator.navigate(TikiScreenDestination) },
                     text = ButtonConstants.FORGOT_PASSWORD,
                     buttonType = CustomButtonType.Text,
                     buttonModifier = Modifier.align(Alignment.Start),
@@ -50,7 +67,7 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
             }
             CustomButton(
                 matchParentWidth = true,
-                clickHandler = { destinationsNavigator.navigate(MainScreenDestination) },
+                clickHandler = { viewModel.onEvent(SignInViewModelEvents.SignInWithEmailAndPassword) },
                 text = ButtonConstants.SIGN_IN,
                 buttonType = CustomButtonType.Outlined,
                 buttonModifier = Modifier,

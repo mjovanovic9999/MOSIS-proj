@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.feature_auth.domain.model
+package mosis.streetsandtotems.feature_auth.presentation.util
 
 data class ProfileFields(
     val firstName: String,

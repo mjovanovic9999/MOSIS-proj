@@ -14,8 +14,8 @@ import mosis.streetsandtotems.feature_leaderboards.domain.model.LeaderboardUser
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
-fun LeaderboardsItem(index: Int, leaderboardUser: LeaderboardUser) {
-    CustomLazyColumnItem(onButtonClick = {}) {
+fun LeaderboardsItem(index: Int, leaderboardUser: LeaderboardUser, onButtonClick: () -> Unit) {
+    CustomLazyColumnItem(onButtonClick = onButtonClick) {
         Text(
             text = "$index.",
             modifier = Modifier.weight(MaterialTheme.sizes.leaderboard_position_weight),

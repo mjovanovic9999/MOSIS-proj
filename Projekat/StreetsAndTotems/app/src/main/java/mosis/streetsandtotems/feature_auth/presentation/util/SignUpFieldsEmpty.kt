@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.feature_auth.domain.model
+package mosis.streetsandtotems.feature_auth.presentation.util
 
 import mosis.streetsandtotems.core.FormFieldNamesConstants
 import mosis.streetsandtotems.core.presentation.states.FieldsEmpty
@@ -7,7 +7,7 @@ data class SignUpFieldsEmpty(
     var firstName: Boolean = true,
     var lastName: Boolean = true,
     var phoneNumber: Boolean = true,
-    var username: Boolean = true,
+    var email: Boolean = true,
     var password: Boolean = true,
     var repeatPassword: Boolean = true
 ) : FieldsEmpty {
@@ -22,8 +22,8 @@ data class SignUpFieldsEmpty(
             FormFieldNamesConstants.PHONE_NUMBER -> {
                 phoneNumber = empty
             }
-            FormFieldNamesConstants.USERNAME -> {
-                username = empty
+            FormFieldNamesConstants.EMAIL -> {
+                email = empty
             }
             FormFieldNamesConstants.PASSWORD -> {
                 password = empty
@@ -35,6 +35,6 @@ data class SignUpFieldsEmpty(
     }
 
     override fun anyFieldIsEmpty(): Boolean {
-        return firstName || lastName || phoneNumber || username || password || repeatPassword
+        return firstName || lastName || phoneNumber || email || password || repeatPassword
     }
 }

@@ -22,10 +22,10 @@ import mosis.streetsandtotems.core.domain.validators.validatePhoneNumber
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 import mosis.streetsandtotems.core.presentation.components.form.formfields.TextFormField
 import mosis.streetsandtotems.core.presentation.states.FormState
-import mosis.streetsandtotems.feature_auth.domain.model.EditPasswordFields
-import mosis.streetsandtotems.feature_auth.domain.model.EditPasswordFieldsEmpty
-import mosis.streetsandtotems.feature_auth.domain.model.ProfileFields
-import mosis.streetsandtotems.feature_auth.domain.model.ProfileFieldsEmpty
+import mosis.streetsandtotems.feature_auth.presentation.util.EditPasswordFields
+import mosis.streetsandtotems.feature_auth.presentation.util.EditPasswordFieldsEmpty
+import mosis.streetsandtotems.feature_auth.presentation.util.ProfileFields
+import mosis.streetsandtotems.feature_auth.presentation.util.ProfileFieldsEmpty
 import javax.inject.Inject
 
 @HiltViewModel
@@ -221,10 +221,10 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
                 if (!editMode.value) add(
                     TextFormField(
                         initial = "KorisnickoIme1",
-                        name = FormFieldNamesConstants.USERNAME,
+                        name = FormFieldNamesConstants.EMAIL,
                         textFieldType = CustomTextFieldType.Outlined,
-                        label = FormFieldConstants.USERNAME,
-                        placeholder = FormFieldConstants.USERNAME,
+                        label = FormFieldConstants.EMAIL,
+                        placeholder = FormFieldConstants.EMAIL,
                         singleLine = true,
                         clearable = false,
                         readOnly = true,

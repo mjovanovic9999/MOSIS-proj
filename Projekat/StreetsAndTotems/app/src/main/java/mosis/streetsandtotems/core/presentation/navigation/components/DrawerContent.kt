@@ -15,24 +15,31 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import mosis.streetsandtotems.core.ConfirmationDialogTextConstants
 import mosis.streetsandtotems.core.DrawerConstants
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
-import mosis.streetsandtotems.core.presentation.components.CustomButton
-import mosis.streetsandtotems.core.presentation.components.CustomButtonType
-import mosis.streetsandtotems.core.presentation.components.IconPosition
+import mosis.streetsandtotems.core.TitleConstants
+import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.destinations.LeaderboardsScreenDestination
 import mosis.streetsandtotems.destinations.ProfileScreenDestination
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
-fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigator) {
+fun DrawerContent(
+    modifier: Modifier,
+    destinationsNavigator: DestinationsNavigator,
+    onSignOut: (DestinationsNavigator) -> Unit
+) {
     val focusManager = LocalFocusManager.current
+    val isConfirmDialogOpen = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -153,7 +160,7 @@ fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigat
                 horizontalAlignment = Alignment.End
             ) {
                 CustomButton(
-                    clickHandler = { /*TODO*/ },
+                    clickHandler = { isConfirmDialogOpen.value = true },
                     text = DrawerConstants.LEAVE_SQUAD,
                     buttonType = CustomButtonType.Text,
                     icon = Icons.Outlined.GroupRemove,
@@ -167,7 +174,7 @@ fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigat
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 )
                 CustomButton(
-                    clickHandler = { /*TODO*/ },
+                    clickHandler = { onSignOut(destinationsNavigator) },
                     text = DrawerConstants.SIGN_OUT,
                     buttonType = CustomButtonType.Text,
                     icon = Icons.Outlined.Logout,
@@ -183,4 +190,13 @@ fun DrawerContent(modifier: Modifier, destinationsNavigator: DestinationsNavigat
             }
         }
     }
+
+    CustomConfirmationDialog(
+        type = ConfirmationDialogType.Confirm,
+        isOpen = isConfirmDialogOpen.value,
+        title = TitleConstants.LEAVE_SQUAD,
+        text = ConfirmationDialogTextConstants.LEAVE_SQUAD,
+        onConfirmButtonClick = { /*TODO*/ },
+        onDismissButtonClick = { isConfirmDialogOpen.value = false },
+        onDismissRequest = { isConfirmDialogOpen.value = false })
 }

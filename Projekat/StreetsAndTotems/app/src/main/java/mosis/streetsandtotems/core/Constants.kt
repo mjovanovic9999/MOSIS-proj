@@ -27,11 +27,17 @@ object ButtonConstants {
     const val DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON = "Don't grant"
     const val SHOW_ON_MAP = "Show on map"
     const val KICK = "Start kick voting"
+    const val INVITE_TO_SQUAD = "Invite to squad"
     const val TRADE = "Invite to trade"
+    const val YES = "Yes"
+    const val NO = "No"
+    const val ACCEPT = "Accept"
+    const val DECLINE = "Decline"
+    const val DISMISS = "Dismiss"
 }
 
 object FormFieldNamesConstants {
-    const val USERNAME = "username"
+    const val EMAIL = "email"
     const val PASSWORD = "password"
     const val FIRST_NAME = "firstName"
     const val LAST_NAME = "lastName"
@@ -84,8 +90,19 @@ object FormFieldLengthConstants {
     const val PASSWORD = 8
 }
 
+object HandleResponseConstants {
+    const val DEFAULT_ID = 0
+    const val ID_ADDITION_FACTOR = 1
+}
+
 object MessageConstants {
-    const val USERNAME_REQUIRED = "Username is required!"
+    const val SIGN_UP_ERROR = "An error occured while signing up! Please try again!"
+    const val SIGNED_UP = "Sign up successful!"
+    const val SIGNED_OUT = "Sign out successful!"
+    const val INVALID_CREDENTIALS = "Wrong email and/or password!"
+    const val SIGNED_IN = "Sign in successful!"
+    const val INVALID_EMAIL = "Invalid email!"
+    const val EMAIL_REQUIRED = "Email is required!"
     const val PASSWORD_REQUIRED = "Password is required!"
     const val PASSWORD_LENGTH = "Minimum 8 characters needed!"
     const val FIRST_NAME_REQUIRED = "First name is required!"
@@ -120,10 +137,11 @@ object TitleConstants {
     const val MORE_INFORMATION = "More information"
     const val CUSTOM_PIN_DIALOG_SQUAD = "Place note pin for your squad"
     const val CUSTOM_PIN_DIALOG_SOLO = "Place note pin for yourself"
+    const val LEAVE_SQUAD = "Are you sure you want to leave your squad?"
 }
 
 object FormFieldConstants {
-    const val USERNAME = "Username"
+    const val EMAIL = "Email"
     const val PASSWORD = "Password"
     const val FIRST_NAME = "First name"
     const val LAST_NAME = "Last name"
@@ -208,4 +226,9 @@ object LeaderboardItemsConstants {
 object CustomPinDialogConstants {
     const val NOTE_TEXT = "Note text"
     const val NOTE_TEXT_LENGTH = 100
+}
+
+object ConfirmationDialogTextConstants {
+    const val LEAVE_SQUAD =
+        "If you leave squad you won't be able to rejoin unless someone invites you!"
 }

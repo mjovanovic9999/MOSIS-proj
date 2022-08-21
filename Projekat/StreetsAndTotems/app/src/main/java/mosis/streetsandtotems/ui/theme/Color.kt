@@ -63,3 +63,4 @@ val error = Color(0xFFba1b1b)
 
 val google_sign_in = Color(0xFFFF4444)
 val facebook_sign_in = Color(0xFF4462FF)
+val overlay = Color(0xAA000000)

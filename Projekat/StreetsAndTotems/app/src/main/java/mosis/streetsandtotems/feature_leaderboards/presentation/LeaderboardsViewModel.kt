@@ -35,9 +35,18 @@ class LeaderboardsViewModel @Inject constructor() : ViewModel() {
                     LeaderboardUser("KorisnickoIme1", 12345),
                     LeaderboardUser("KorisnickoIme1", 12345),
                     LeaderboardUser("KorisnickoIme1", 12345),
-                )
+                ),
+                playerDialogOpen = false
+            ),
+
             )
-        )
     val leaderboardState: State<LeaderboardsState> = _leaderboardState
 
+    fun showPlayerDialog() {
+        _leaderboardState.value = _leaderboardState.value.copy(playerDialogOpen = true)
+    }
+
+    fun closePlayerDialog() {
+        _leaderboardState.value = _leaderboardState.value.copy(playerDialogOpen = false)
+    }
 }

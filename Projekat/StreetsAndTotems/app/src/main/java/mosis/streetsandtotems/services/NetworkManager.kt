@@ -5,8 +5,9 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import androidx.compose.runtime.mutableStateOf
+import javax.inject.Inject
 
-class NetworkManager(var context: Application) {
+class NetworkManager @Inject constructor(var context: Application) {
 
     val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
 

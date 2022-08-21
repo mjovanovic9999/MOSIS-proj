@@ -15,9 +15,10 @@ import mosis.streetsandtotems.core.NotificationConstants.CHANNEL_ID
 import mosis.streetsandtotems.core.NotificationConstants.DISABLE_BACKGROUND_SERVICE_ID
 import mosis.streetsandtotems.core.NotificationConstants.DISABLE_BACKGROUND_SERVICE_TEXT
 import mosis.streetsandtotems.core.NotificationConstants.DISABLE_BACKGROUND_SERVICE_TITLE
+import javax.inject.Inject
 
 
-class NotificationProvider(private val context: Context) {
+class NotificationProvider @Inject constructor(private val context: Context) {
 
     private var notificationManager: NotificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

@@ -8,7 +8,7 @@ import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGrap
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinDialog
 import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
 import mosis.streetsandtotems.feature_map.presentation.components.MapFABs
-import mosis.streetsandtotems.feature_map.presentation.components.PlayerDialog
+import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 
 
 @OptIn(ExperimentalMaterial3Api::class)

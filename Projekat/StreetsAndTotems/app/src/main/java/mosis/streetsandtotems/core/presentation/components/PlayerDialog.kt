@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.feature_map.presentation.components
+package mosis.streetsandtotems.core.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,13 +15,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import mosis.streetsandtotems.core.ButtonConstants
-import mosis.streetsandtotems.core.presentation.components.CustomButtonType
-import mosis.streetsandtotems.core.presentation.components.CustomDialog
-import mosis.streetsandtotems.core.presentation.components.CustomIconButton
 import mosis.streetsandtotems.ui.theme.sizes
 
+
 @Composable
-fun PlayerDialog(isOpen: Boolean, onDismissRequest: () -> Unit) {
+fun PlayerDialog(
+    isOpen: Boolean,
+    onDismissRequest: () -> Unit,
+    isSquadMember: Boolean = false,
+    tradeEnabled: Boolean = false
+) {
     CustomDialog(
         isOpen = isOpen,
         onDismissRequest = onDismissRequest,
@@ -101,9 +104,10 @@ fun PlayerDialog(isOpen: Boolean, onDismissRequest: () -> Unit) {
                     )
             )
         },
-        confirmButtonText = ButtonConstants.KICK,
+        confirmButtonText = if (isSquadMember) ButtonConstants.KICK else ButtonConstants.INVITE_TO_SQUAD,
         confirmButtonMatchParentWidth = true,
         dismissButtonText = ButtonConstants.TRADE,
+        dismissButtonVisible = tradeEnabled,
         dismissButtomMatchParentWidth = true,
         buttonType = CustomButtonType.Outlined
     )
