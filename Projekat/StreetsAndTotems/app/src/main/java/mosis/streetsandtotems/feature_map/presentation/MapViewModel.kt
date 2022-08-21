@@ -106,10 +106,13 @@ class MapViewModel @Inject constructor(
         var pinLocation =
             arrayOf(INIT_SCROLL_X, INIT_SCROLL_Y)
 
-        _mapState.setStateChangeListener {
-            //neje optimizovano
-            circleSize.value = MY_LOCATION_CIRCLE_SIZE.dp * this.scale / MAX_SCALE
+        var scale = _mapState.scale
 
+        _mapState.setStateChangeListener {
+            if (scale != this.scale) {
+                scale = this.scale
+                circleSize.value = MY_LOCATION_CIRCLE_SIZE.dp * this.scale / MAX_SCALE
+            }
 
             val markerInfo = _mapState.getMarkerInfo(MY_PIN)
             if (markerInfo != null) {
