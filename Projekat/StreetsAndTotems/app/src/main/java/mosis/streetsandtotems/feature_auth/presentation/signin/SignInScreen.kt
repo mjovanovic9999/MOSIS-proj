@@ -72,7 +72,7 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
                 buttonType = CustomButtonType.Outlined,
                 buttonModifier = Modifier,
                 textStyle = MaterialTheme.typography.titleMedium,
-                enabled = true//viewModel.formState.isFormFilled.value
+                enabled = state.formState.isFormFilled.value
             )
 
             AuthButtons(type = AuthButtonsType.SignIn)

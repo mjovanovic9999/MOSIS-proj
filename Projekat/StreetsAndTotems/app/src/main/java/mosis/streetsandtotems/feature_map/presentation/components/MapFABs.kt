@@ -48,13 +48,18 @@ fun MapFABs(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
         ) {
+            CustomFilterDialog(isOpen = true) {
+
+            }
             if (!followMe) {
                 CustomFAB(
                     imageVector = ImageVector.vectorResource(id = R.drawable.locate_me),
-                    onClick = {
-
-                        locateMe()
-                    },
+                    onClick = { locateMe() },
+                    modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
+                )
+            } else {
+                CustomFAB(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.located_me),
                     modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
                 )
             }

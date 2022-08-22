@@ -61,10 +61,25 @@ object ImageContentDescriptionConstants {
 }
 
 object PinConstants {
-    const val MY_PIN = "0"
     const val MY_PIN_COLOR_OPACITY = 0x551a88e9
     const val MY_PIN_COLOR = 0xFF1a88e9
     const val MY_PIN_RADIUS = 20f
+    const val MY_PIN = "MY_PIN"
+    const val MARKET="MARKET"
+    const val MY_BASE="MY_BASE"
+    const val MUTUAL_BASE="MUTUAL_BASE"
+    const val BASE_DISCOVERY="BASE_DISCOVERY"
+
+//    const val RESOURCES_EMERALDS="RESOURCE_EMERALDS"
+//    const val RESOURCES_BRICKS="RESOURCE_BRICKS"
+//    const val RESOURCES_WOODS="RESOURCE_WOODS"
+//    const val RESOURCES_STONES="RESOURCE_STONES"
+
+    const val RESOURCES="RESOURCES"
+
+    const val FRIENDS="FRIENDS"
+
+    const val TIKIS="TIKIS"
 }
 
 object MapConstants {

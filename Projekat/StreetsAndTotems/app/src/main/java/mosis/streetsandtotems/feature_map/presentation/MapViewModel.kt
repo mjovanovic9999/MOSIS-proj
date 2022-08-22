@@ -2,7 +2,6 @@ package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.MutableState
@@ -41,10 +40,11 @@ import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
 import ovh.plrapps.mapcompose.ui.layout.Fill
 import ovh.plrapps.mapcompose.ui.state.MapState
+import ovh.plrapps.mapcompose.ui.state.markers.model.RenderingStrategy
 import java.io.FileInputStream
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
+@OptIn(ExperimentalClusteringApi::class)
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val appContext: Application,
@@ -93,12 +93,15 @@ class MapViewModel @Inject constructor(
             ),
             customPinDialogOpen = false,
             playerDialogOpen = false,
+            filterDialogOpen = !false,
             followMe = true,
             detectScroll = false,
         ))
 
         mapScreenState = _mapScreenState
         _mapState = mapScreenState.value.mapState.value
+
+        _mapState.addLazyLoader("0")
 
         initMyLocationPinAndRegisterMove()
 
@@ -134,12 +137,16 @@ class MapViewModel @Inject constructor(
             }
         }
 
-        registerAddCustomPin()
+        registerAddCustomPin(R.drawable.pin_base_discovery_shot, true)
 
 
 ////STA JE REFERRENTIALSNAPSHOTFLOW
 //        //IMA U SERVIS "STA JE OVO"
 //
+
+        //koji tipovi markera imamo
+//        friends  resources   tikies
+//mypin enemies
 
     }
 
@@ -158,6 +165,14 @@ class MapViewModel @Inject constructor(
 
     fun closePlayerDialog() {
         _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
+    }
+
+    fun showFilterDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(filterDialogOpen = true)
+    }
+
+    fun closeFilterDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(filterDialogOpen = false)
     }
 
 
@@ -191,7 +206,7 @@ class MapViewModel @Inject constructor(
                     if (mapScreenState.value.followMe) {
                         changeStateDetectScroll(false)
 
-                        centerMeOnMyMarkerSuspend()
+                        centerMeOnMyPinSuspend()
 
                         changeStateDetectScroll(true)
                     }
@@ -208,29 +223,21 @@ class MapViewModel @Inject constructor(
             )
     }
 
-    private fun registerAddCustomPin() {
+    private fun registerAddCustomPin(resourceId: Int, isResourceCentered: Boolean) {
         viewModelScope.launch {
             _mapState.onLongPress { x, y ->
-                _mapState.addMarker(
-                    x.toString() + y.toString(),
-                    x,
-                    y,
-                    c = {
-                        Pin(R.drawable.pin_base_discovery_shot)
-                    },
-                    clipShape = null,
-                )
+                addPinAt(x.toString() + y.toString(), resourceId, x, y, isResourceCentered)
+//                _mapState.addCallout("0", x, y, c = { Pin(resourceId = resourceId) })
             }
         }
     }
 
     fun followMe() {
-        centerMeOnMyMarker()
+        centerMeOnMyPin()
         _mapScreenState.value = _mapScreenState.value.copy(followMe = true, detectScroll = false)
-
     }
 
-    private suspend fun centerMeOnMyMarkerSuspend() {
+    private suspend fun centerMeOnMyPinSuspend() {
         val markerInfo = _mapState.getMarkerInfo(MY_PIN)
         if (markerInfo != null) {
             val x = viewModelScope.launch {
@@ -240,7 +247,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun centerMeOnMyMarker() {
+    private fun centerMeOnMyPin() {
         val markerInfo = _mapState.getMarkerInfo(MY_PIN)
         if (markerInfo != null) {
             val x = viewModelScope.launch {
@@ -249,12 +256,37 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun movePinAt(id: String, x: Double, y: Double) {
+    @OptIn(ExperimentalClusteringApi::class)
+    fun addPinAt(
+        pinId: String,
+        resourceId: Int,
+        x: Double,
+        y: Double,
+        isResourceCentered: Boolean
+    ) {
+        _mapState.addMarker(
+            pinId,
+            x,
+            y,
+            c = {
+                Pin(resourceId)
+            },
+            clipShape = null,
+            relativeOffset = if (isResourceCentered) Offset(-.5f, -.5f) else Offset(-.5f, -1f),
+            renderingStrategy = RenderingStrategy.LazyLoading("0")
+        )
+    }
+
+    fun movePinAt(pinId: String, x: Double, y: Double) {
         _mapState.moveMarker(
-            id,
+            pinId,
             x,
             y,
         )
+    }
+
+    fun removePin(pinId: String) {
+        _mapState.removeMarker(pinId)
     }
 }
 
