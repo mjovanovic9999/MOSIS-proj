@@ -1,7 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.MutableState
@@ -31,6 +30,10 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
+import mosis.streetsandtotems.feature_map.domain.model.PinDTO
+import mosis.streetsandtotems.feature_map.domain.util.PinTypes
+import mosis.streetsandtotems.feature_map.domain.util.detectPinType
+import mosis.streetsandtotems.feature_map.domain.util.returnPinTypeResourceId
 import mosis.streetsandtotems.feature_map.presentation.components.Pin
 import mosis.streetsandtotems.feature_map.presentation.util.areOffsetsEqual
 import mosis.streetsandtotems.feature_map.presentation.util.calculateMapDimensions
@@ -55,6 +58,14 @@ class MapViewModel @Inject constructor(
 
     private val mapDimensions = calculateMapDimensions()
     private val circleSize = mutableStateOf(MY_LOCATION_CIRCLE_SIZE.dp / MAX_SCALE)
+
+    val array = arrayOf<PinDTO>(
+        PinDTO("RESOURCESWOOD", (INIT_SCROLL_X * 1.0001), INIT_SCROLL_Y),
+        PinDTO("RESOURCESSTONE", (INIT_SCROLL_X), INIT_SCROLL_Y * 1.0001),
+        PinDTO("FRIENDS", (INIT_SCROLL_X * 1.0001), INIT_SCROLL_Y * 1.0001),
+        PinDTO("TIKIS", (INIT_SCROLL_X * 1.00005), INIT_SCROLL_Y * 1.00005),
+    )
+
 
     init {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
@@ -93,9 +104,12 @@ class MapViewModel @Inject constructor(
             ),
             customPinDialogOpen = false,
             playerDialogOpen = false,
-            filterDialogOpen = !false,
             followMe = true,
             detectScroll = false,
+            filterDialogOpen = false,
+            filterShowTikis = false,
+            filterShowFriends = false,
+            filterShowResources = false,
         ))
 
         mapScreenState = _mapScreenState
@@ -137,44 +151,20 @@ class MapViewModel @Inject constructor(
             }
         }
 
-        registerAddCustomPin(R.drawable.pin_base_discovery_shot, true)
+        registerAddCustomPin(R.drawable.pin_house_discovery_shot, true)
+
+
+
+        array.forEach { addPinAt(it.id, returnPinTypeResourceId(it), it.x, it.y, true) }
 
 
 ////STA JE REFERRENTIALSNAPSHOTFLOW
 //        //IMA U SERVIS "STA JE OVO"
 //
 
-        //koji tipovi markera imamo
-//        friends  resources   tikies
-//mypin enemies
+//sta ceda kaze nekakav state za sve sve pinove il stringid array prikazane i neprikazane
 
     }
-
-
-    fun showCustomPinDialog() {
-        _mapScreenState.value = _mapScreenState.value.copy(customPinDialogOpen = true)
-    }
-
-    fun closeCustomPinDialog() {
-        _mapScreenState.value = _mapScreenState.value.copy(customPinDialogOpen = false)
-    }
-
-    fun showPlayerDialog() {
-        _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = true)
-    }
-
-    fun closePlayerDialog() {
-        _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
-    }
-
-    fun showFilterDialog() {
-        _mapScreenState.value = _mapScreenState.value.copy(filterDialogOpen = true)
-    }
-
-    fun closeFilterDialog() {
-        _mapScreenState.value = _mapScreenState.value.copy(filterDialogOpen = false)
-    }
-
 
     private fun initMyLocationPinAndRegisterMove() {
         _mapState.addMarker(
@@ -277,6 +267,18 @@ class MapViewModel @Inject constructor(
         )
     }
 
+    @OptIn(ExperimentalClusteringApi::class)
+    fun addPinAtLatLng(
+        pinId: String,
+        resourceId: Int,
+        lat: Double,
+        lng: Double,
+        isResourceCentered: Boolean
+    ) {
+        val coords = convertLatLngToOffsets(lat, lng, mapDimensions, mapDimensions)
+        addPinAt(pinId, resourceId, coords[0], coords[1], isResourceCentered)
+    }
+
     fun movePinAt(pinId: String, x: Double, y: Double) {
         _mapState.moveMarker(
             pinId,
@@ -288,5 +290,67 @@ class MapViewModel @Inject constructor(
     fun removePin(pinId: String) {
         _mapState.removeMarker(pinId)
     }
+
+
+    fun showCustomPinDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(customPinDialogOpen = true)
+    }
+
+    fun closeCustomPinDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(customPinDialogOpen = false)
+    }
+
+    fun showPlayerDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = true)
+    }
+
+    fun closePlayerDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
+    }
+
+    fun showFilterDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(filterDialogOpen = true)
+    }
+
+    fun closeFilterDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(filterDialogOpen = false)
+    }
+
+    fun changeFilterTikis() {
+        _mapScreenState.value =
+            _mapScreenState.value.copy(filterShowTikis = !mapScreenState.value.filterShowTikis)
+    }
+
+    fun changeFilterFriends() {
+        _mapScreenState.value =
+            _mapScreenState.value.copy(filterShowFriends = !mapScreenState.value.filterShowFriends)
+    }
+
+    fun changeFilterResources() {
+        _mapScreenState.value =
+            _mapScreenState.value.copy(filterShowResources = !mapScreenState.value.filterShowResources)
+    }
+
+    fun applyFilers() {
+        array.forEach {
+            when (detectPinType(it)) {
+                is PinTypes.ITypeResource ->
+                    if (mapScreenState.value.filterShowResources) removePin(it.id)
+                PinTypes.TypeTiki -> if (mapScreenState.value.filterShowTikis) removePin(it.id)
+                PinTypes.TypeFriend -> if (mapScreenState.value.filterShowFriends) removePin(it.id)
+                else -> {}
+            }
+        }
+    }
+
+    fun dismissFilters() {
+        _mapScreenState.value = _mapScreenState.value.copy(
+            filterShowTikis = false,
+            filterShowFriends = false,
+            filterShowResources = false,
+        )
+    }
+
+
 }
 

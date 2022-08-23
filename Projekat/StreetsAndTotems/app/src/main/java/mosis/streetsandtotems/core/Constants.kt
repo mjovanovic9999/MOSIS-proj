@@ -65,21 +65,20 @@ object PinConstants {
     const val MY_PIN_COLOR = 0xFF1a88e9
     const val MY_PIN_RADIUS = 20f
     const val MY_PIN = "MY_PIN"
-    const val MARKET="MARKET"
-    const val MY_BASE="MY_BASE"
-    const val MUTUAL_BASE="MUTUAL_BASE"
-    const val BASE_DISCOVERY="BASE_DISCOVERY"
 
-//    const val RESOURCES_EMERALDS="RESOURCE_EMERALDS"
-//    const val RESOURCES_BRICKS="RESOURCE_BRICKS"
-//    const val RESOURCES_WOODS="RESOURCE_WOODS"
-//    const val RESOURCES_STONES="RESOURCE_STONES"
+    const val MARKET = "MARKET"
+    const val HOME = "HOME"
+    const val HOME_DISCOVERY = "HOME_DISCOVERY"
+    const val RESOURCES_EMERALDS = "RESOURCES_EMERALDS"
+    const val RESOURCES_BRICKS = "RESOURCES_BRICKS"
+    const val RESOURCES_WOODS = "RESOURCES_WOODS"
+    const val RESOURCES_STONES = "RESOURCES_STONES"
+    const val FRIENDS = "FRIENDS"
+    const val TIKIS = "TIKIS"
+    const val CUSTOM = "CUSTOM"
+    const val OTHER_PLAYER = "OTHER_PLAYER"
+    const val OTHER_HOME = "OTHER_HOME"
 
-    const val RESOURCES="RESOURCES"
-
-    const val FRIENDS="FRIENDS"
-
-    const val TIKIS="TIKIS"
 }
 
 object MapConstants {

@@ -1,5 +1,7 @@
 package mosis.streetsandtotems.feature_map.presentation.util
 
+import android.location.Location
+import android.util.Log
 import mosis.streetsandtotems.core.MapConstants.COMPARISON_PRECISION
 import mosis.streetsandtotems.core.MapConstants.DEGREES_TO_RADIANS_COEFFICIENT
 import mosis.streetsandtotems.core.MapConstants.LEVEL_COUNT
@@ -37,3 +39,14 @@ fun degreesToRadians(degrees: Double): Double {
 
 fun areOffsetsEqual(x1: Double, x2: Double): Boolean =
     (x1 * COMPARISON_PRECISION).roundToInt() == (x2 * COMPARISON_PRECISION).roundToInt()
+
+fun distanceBetweenLatLng(
+    startLat: Double,
+    startLng: Double,
+    endLat: Double,
+    endLng: Double
+): Float {
+    val result = floatArrayOf(0f)
+    Location.distanceBetween(startLat, startLng, endLat, endLng, result)
+    return result[0]
+}

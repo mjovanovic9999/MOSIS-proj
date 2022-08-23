@@ -24,8 +24,10 @@ fun MapFABs(
     drawerState: DrawerState,
     openCustomPinDialog: () -> Unit,
     locateMe: () -> Unit,
-    followMe: Boolean
-) {
+    followMe: Boolean,
+    showFilterDialog: () -> Unit,
+
+    ) {
     val scope = rememberCoroutineScope()
     Box(modifier = Modifier.fillMaxSize()) {
         CustomFAB(
@@ -38,7 +40,7 @@ fun MapFABs(
         CustomFAB(
             imageVector = ImageVector.vectorResource(id = R.drawable.layers),
             onClick = {
-
+                showFilterDialog()
             },
             modifier = Modifier
                 .padding(MaterialTheme.sizes.fab_padding)
@@ -48,9 +50,6 @@ fun MapFABs(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
         ) {
-            CustomFilterDialog(isOpen = true) {
-
-            }
             if (!followMe) {
                 CustomFAB(
                     imageVector = ImageVector.vectorResource(id = R.drawable.locate_me),

@@ -7,7 +7,10 @@ data class MapScreenState(
     val mapState: MutableState<MapState>,
     val customPinDialogOpen: Boolean,
     val playerDialogOpen: Boolean,
-    val filterDialogOpen:Boolean,
+    val filterDialogOpen: Boolean,
     val followMe: Boolean,
     val detectScroll: Boolean,
+    val filterShowTikis: Boolean,
+    val filterShowFriends: Boolean,
+    val filterShowResources: Boolean
 )

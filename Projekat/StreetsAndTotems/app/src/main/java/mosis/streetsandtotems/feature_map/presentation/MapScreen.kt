@@ -9,6 +9,7 @@ import mosis.streetsandtotems.feature_map.presentation.components.CustomPinDialo
 import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
 import mosis.streetsandtotems.feature_map.presentation.components.MapFABs
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
+import mosis.streetsandtotems.feature_map.presentation.components.CustomFilterDialog
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,8 +23,9 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
     MapFABs(
         drawerState,
         openCustomPinDialog = { mapViewModel.showPlayerDialog() },
-        { mapViewModel.followMe() },
-        state.followMe,
+        locateMe = { mapViewModel.followMe() },
+        followMe = state.followMe,
+        showFilterDialog = { mapViewModel.showFilterDialog() },
     )
 
     CustomPinDialog(
@@ -34,4 +36,24 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
     PlayerDialog(
         isOpen = state.playerDialogOpen,
         onDismissRequest = { mapViewModel.closePlayerDialog() })
+
+    CustomFilterDialog(
+        isOpen = state.filterDialogOpen,
+        onDismissRequest = {
+            mapViewModel.closeFilterDialog()
+            mapViewModel.dismissFilters()
+        },
+        filterShowTikis = state.filterShowTikis,
+        changeFilterTikis = { mapViewModel.changeFilterTikis() },
+        filterShowFriends = state.filterShowFriends,
+        changeFilterFriends = { mapViewModel.changeFilterFriends() },
+        filterShowResources = state.filterShowResources,
+        changeFilterResources = { mapViewModel.changeFilterResources() },
+        applyFilters = {
+            mapViewModel.closeFilterDialog()
+
+            mapViewModel.applyFilers()
+        },
+    )
+
 }
