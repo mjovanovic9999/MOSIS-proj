@@ -2,6 +2,7 @@ package mosis.streetsandtotems.feature_map.domain.util
 
 sealed interface PinTypes {
     interface ITypeResource : PinTypes
+    object TypeResource : ITypeResource
     object TypeResourceWood : ITypeResource
     object TypeResourceBrick : ITypeResource
     object TypeResourceStone : ITypeResource

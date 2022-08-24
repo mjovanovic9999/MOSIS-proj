@@ -3,13 +3,14 @@ package mosis.streetsandtotems.feature_map.presentation
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import com.ramcosta.composedestinations.annotation.Destination
+import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
+import mosis.streetsandtotems.feature_map.presentation.components.CustomFilterDialog
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinDialog
 import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
 import mosis.streetsandtotems.feature_map.presentation.components.MapFABs
-import mosis.streetsandtotems.core.presentation.components.PlayerDialog
-import mosis.streetsandtotems.feature_map.presentation.components.CustomFilterDialog
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,21 +40,24 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
 
     CustomFilterDialog(
         isOpen = state.filterDialogOpen,
+        onConfirmButtonClick = { mapViewModel.closeFilterDialog() },
         onDismissRequest = {
             mapViewModel.closeFilterDialog()
-            mapViewModel.dismissFilters()
+            mapViewModel.resetFilters()
         },
-        filterShowTikis = state.filterShowTikis,
-        changeFilterTikis = { mapViewModel.changeFilterTikis() },
-        filterShowFriends = state.filterShowFriends,
-        changeFilterFriends = { mapViewModel.changeFilterFriends() },
-        filterShowResources = state.filterShowResources,
-        changeFilterResources = { mapViewModel.changeFilterResources() },
-        applyFilters = {
-            mapViewModel.closeFilterDialog()
-
-            mapViewModel.applyFilers()
-        },
+        filterState = mapViewModel.filtersFlow.collectAsState(),
+        updateFilter = { mapViewModel.updateFilter(it) },
+//        filterShowTikis = state.filters,
+//        changeFilterTikis = { mapViewModel.changeFilterTikis() },
+//        filterShowFriends = state.filterShowFriends,
+//        changeFilterFriends = { mapViewModel.changeFilterFriends() },
+//        filterShowResources = state.filterShowResources,
+//        changeFilterResources = { mapViewModel.changeFilterResources() },
+//        applyFilters = {
+//            mapViewModel.closeFilterDialog()
+//
+//            mapViewModel.applyFilers()
+//        },
     )
 
 }

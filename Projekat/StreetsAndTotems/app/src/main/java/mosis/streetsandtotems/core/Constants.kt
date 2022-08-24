@@ -69,15 +69,17 @@ object PinConstants {
     const val MARKET = "MARKET"
     const val HOME = "HOME"
     const val HOME_DISCOVERY = "HOME_DISCOVERY"
-    const val RESOURCES_EMERALDS = "RESOURCES_EMERALDS"
-    const val RESOURCES_BRICKS = "RESOURCES_BRICKS"
-    const val RESOURCES_WOODS = "RESOURCES_WOODS"
-    const val RESOURCES_STONES = "RESOURCES_STONES"
+    const val RESOURCES = "RESOURCES"
+    const val RESOURCES_EMERALDS = RESOURCES + "_EMERALDS"
+    const val RESOURCES_BRICKS = RESOURCES + "_BRICKS"
+    const val RESOURCES_WOODS = RESOURCES + "_WOODS"
+    const val RESOURCES_STONES = RESOURCES + "_STONES"
     const val FRIENDS = "FRIENDS"
     const val TIKIS = "TIKIS"
     const val CUSTOM = "CUSTOM"
     const val OTHER_PLAYER = "OTHER_PLAYER"
     const val OTHER_HOME = "OTHER_HOME"
+
 
 }
 
@@ -85,9 +87,12 @@ object MapConstants {
     const val LEVEL_COUNT = 17
     const val TITLE_SIZE = 512
     const val WORKER_COUNT = 32
-    const val INIT_SCROLL_X = 0.560824
-    const val INIT_SCROLL_Y = 0.366227
+    const val INIT_SCROLL_X = 0.560821
+    const val INIT_SCROLL_Y = 0.366226
+    const val INIT_SCROLL_LAT = 43.321198
+    const val INIT_SCROLL_LNG = 21.895673
     const val DEGREES_TO_RADIANS_COEFFICIENT = PI / 180
+    const val RADIANS_TO_DEGREES_COEFFICIENT = 180 / PI
     const val MAX_SCALE = 2.5f
     const val MY_LOCATION_CIRCLE_SIZE = 60f
     const val TILE_URL_512 = "https://api.maptiler.com/maps/openstreetmap/"

@@ -5,6 +5,7 @@ import android.util.Log
 import mosis.streetsandtotems.core.MapConstants.COMPARISON_PRECISION
 import mosis.streetsandtotems.core.MapConstants.DEGREES_TO_RADIANS_COEFFICIENT
 import mosis.streetsandtotems.core.MapConstants.LEVEL_COUNT
+import mosis.streetsandtotems.core.MapConstants.RADIANS_TO_DEGREES_COEFFICIENT
 import mosis.streetsandtotems.core.MapConstants.TITLE_SIZE
 import ovh.plrapps.mapcompose.api.centroidX
 import kotlin.math.*
@@ -33,9 +34,9 @@ fun convertLatLngToOffsets(
     return doubleArrayOf(x / mapWidth, y / mapHeight)
 }
 
-fun degreesToRadians(degrees: Double): Double {
-    return degrees * DEGREES_TO_RADIANS_COEFFICIENT
-}
+fun degreesToRadians(degrees: Double): Double = degrees * DEGREES_TO_RADIANS_COEFFICIENT
+
+fun radiansToDegrees(radians: Double): Double = radians * RADIANS_TO_DEGREES_COEFFICIENT
 
 fun areOffsetsEqual(x1: Double, x2: Double): Boolean =
     (x1 * COMPARISON_PRECISION).roundToInt() == (x2 * COMPARISON_PRECISION).roundToInt()

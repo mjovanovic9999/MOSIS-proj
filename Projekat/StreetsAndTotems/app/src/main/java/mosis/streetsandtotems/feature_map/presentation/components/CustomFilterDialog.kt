@@ -1,41 +1,27 @@
 package mosis.streetsandtotems.feature_map.presentation.components
 
-import android.app.Activity
-import android.content.Intent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Done
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import mosis.streetsandtotems.R
-import mosis.streetsandtotems.core.ButtonConstants
-import mosis.streetsandtotems.core.MessageConstants
-import mosis.streetsandtotems.core.presentation.components.CustomButton
+import mosis.streetsandtotems.core.PinConstants.FRIENDS
+import mosis.streetsandtotems.core.PinConstants.RESOURCES
+import mosis.streetsandtotems.core.PinConstants.TIKIS
 import mosis.streetsandtotems.core.presentation.components.CustomDialog
 import mosis.streetsandtotems.feature_map.domain.util.PinTypes
-import mosis.streetsandtotems.services.LocationService
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomFilterDialog(
     isOpen: Boolean,
     onDismissRequest: () -> Unit,
-    filterShowTikis: Boolean,
-    changeFilterTikis: () -> Unit,
-    filterShowFriends: Boolean,
-    changeFilterFriends: () -> Unit,
-    filterShowResources: Boolean,
-    changeFilterResources: () -> Unit,
-    applyFilters: () -> Unit,
+    onConfirmButtonClick: () -> Unit,
+    filterState: State<Set<PinTypes>>,
+    updateFilter: (PinTypes) -> Unit,
 ) {
-    val commentState = remember { mutableStateListOf<PinTypes>() }
-    val isSelected = remember {
-        mutableStateOf(false)
-    }
-
     CustomDialog(
         modifier = Modifier.fillMaxWidth(),
         isOpen = isOpen,
@@ -46,42 +32,20 @@ fun CustomFilterDialog(
             Column {
                 Text(text = "Category")
                 Row {
-                    FilterChip(
-                        selected = filterShowTikis,
-                        onClick = { changeFilterTikis() },
-                        label = { Text(text = "Tikis") },
-                        leadingIcon = {
-                            if (filterShowTikis)
-                                Icon(
-                                    Icons.Rounded.Done,
-                                    contentDescription = null
-                                )
-                        },
-//                        trailingIcon = { Pin(resourceId = R.drawable.tiki) },
+                    CustomFilterChip(
+                        filterState.value.contains(PinTypes.TypeTiki),
+                        { updateFilter(PinTypes.TypeTiki) },
+                        TIKIS
                     )
-                    FilterChip(
-                        selected = filterShowFriends,
-                        onClick = { changeFilterFriends() },
-                        label = { Text(text = "Friends") },
-                        leadingIcon = {
-                            if (filterShowFriends)
-                                Icon(
-                                    Icons.Rounded.Done,
-                                    contentDescription = null
-                                )
-                        },
+                    CustomFilterChip(
+                        filterState.value.contains(PinTypes.TypeFriend),
+                        { updateFilter(PinTypes.TypeFriend) },
+                        FRIENDS
                     )
-                    FilterChip(
-                        selected = filterShowResources,
-                        onClick = { changeFilterResources() },
-                        label = { Text(text = "Resources") },
-                        leadingIcon = {
-                            if (filterShowResources)
-                                Icon(
-                                    Icons.Rounded.Done,
-                                    contentDescription = null
-                                )
-                        },
+                    CustomFilterChip(
+                        filterState.value.contains(PinTypes.TypeResource),
+                        { updateFilter(PinTypes.TypeResource) },
+                        RESOURCES
                     )
                 }
                 Divider()
@@ -89,7 +53,9 @@ fun CustomFilterDialog(
         },
         confirmButtonEnabled = true,
         confirmButtonText = "Apply filter",
-        onConfirmButtonClick = { applyFilters() },
+        onConfirmButtonClick = {
+            onConfirmButtonClick()
+        },
         dismissButtonEnabled = true,
         dismissButtonText = "Dismiss",
         onDismissButtonClick = { onDismissRequest() },

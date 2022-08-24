@@ -1,6 +1,7 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.MutableState
@@ -14,9 +15,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_X
 import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_Y
 import mosis.streetsandtotems.core.MapConstants.LEVEL_COUNT
@@ -26,6 +28,7 @@ import mosis.streetsandtotems.core.MapConstants.TILE_KEY
 import mosis.streetsandtotems.core.MapConstants.TILE_URL_512
 import mosis.streetsandtotems.core.MapConstants.TITLE_SIZE
 import mosis.streetsandtotems.core.MapConstants.WORKER_COUNT
+import mosis.streetsandtotems.core.PinConstants.CUSTOM
 import mosis.streetsandtotems.core.PinConstants.MY_PIN
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
@@ -33,8 +36,7 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
 import mosis.streetsandtotems.feature_map.domain.model.PinDTO
 import mosis.streetsandtotems.feature_map.domain.util.PinTypes
 import mosis.streetsandtotems.feature_map.domain.util.detectPinType
-import mosis.streetsandtotems.feature_map.domain.util.returnPinTypeResourceId
-import mosis.streetsandtotems.feature_map.presentation.components.Pin
+import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.util.areOffsetsEqual
 import mosis.streetsandtotems.feature_map.presentation.util.calculateMapDimensions
 import mosis.streetsandtotems.feature_map.presentation.util.convertLatLngToOffsets
@@ -59,13 +61,7 @@ class MapViewModel @Inject constructor(
     private val mapDimensions = calculateMapDimensions()
     private val circleSize = mutableStateOf(MY_LOCATION_CIRCLE_SIZE.dp / MAX_SCALE)
 
-    val array = arrayOf<PinDTO>(
-        PinDTO("RESOURCESWOOD", (INIT_SCROLL_X * 1.0001), INIT_SCROLL_Y),
-        PinDTO("RESOURCESSTONE", (INIT_SCROLL_X), INIT_SCROLL_Y * 1.0001),
-        PinDTO("FRIENDS", (INIT_SCROLL_X * 1.0001), INIT_SCROLL_Y * 1.0001),
-        PinDTO("TIKIS", (INIT_SCROLL_X * 1.00005), INIT_SCROLL_Y * 1.00005),
-    )
-
+    val filtersFlow = MutableStateFlow<Set<PinTypes>>(setOf<PinTypes>())
 
     init {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
@@ -84,7 +80,6 @@ class MapViewModel @Inject constructor(
                 null
             }
         }
-
         _mapScreenState = mutableStateOf(MapScreenState(
             mapState = mutableStateOf(
                 MapState(
@@ -104,12 +99,16 @@ class MapViewModel @Inject constructor(
             ),
             customPinDialogOpen = false,
             playerDialogOpen = false,
+            filterDialogOpen = false,
             followMe = true,
             detectScroll = false,
-            filterDialogOpen = false,
-            filterShowTikis = false,
-            filterShowFriends = false,
-            filterShowResources = false,
+            filters = setOf<PinTypes>(),
+            pinsArray = arrayOf(
+                PinDTO("RESOURCESWOOD", (INIT_SCROLL_X * 1.0001), INIT_SCROLL_Y),
+                PinDTO("RESOURCESSTONE", (INIT_SCROLL_X), INIT_SCROLL_Y * 1.0001),
+                PinDTO("FRIENDS", (INIT_SCROLL_X * 1.0001), INIT_SCROLL_Y * 1.0001),
+                PinDTO("TIKIS", (INIT_SCROLL_X * 1.00005), INIT_SCROLL_Y * 1.00005),
+            )
         ))
 
         mapScreenState = _mapScreenState
@@ -120,6 +119,23 @@ class MapViewModel @Inject constructor(
         initMyLocationPinAndRegisterMove()
 
 
+
+        _mapScreenState.value.pinsArray.forEach { addPinAtLatLng(it.id, it.lat, it.lng) }
+
+        registerFilterPins()
+
+        registerAddCustomPin()
+
+
+////STA JE REFERRENTIALSNAPSHOTFLOW
+//        //IMA U SERVIS "STA JE OVO"
+//
+//da se proba s flow
+
+
+    }
+
+    private fun registerOnMapStateChangeListener() {
         var pinLocation =
             arrayOf(INIT_SCROLL_X, INIT_SCROLL_Y)
 
@@ -150,20 +166,24 @@ class MapViewModel @Inject constructor(
                 )
             }
         }
+    }
 
-        registerAddCustomPin(R.drawable.pin_house_discovery_shot, true)
+    private fun registerFilterPins() {///////ovde neka kombinacija flows vrv
+        viewModelScope.launch {
+            filtersFlow.collect {
+                Log.d("tag", "COLLECTED")
+//                it.forEach {
+//                    if (it == PinTypes.TypeTiki) {
+//                        filterShowTikis.value = true
+//                        return@collect
+//                    }
+//                }
+//                filterShowTikis.value = false
 
-
-
-        array.forEach { addPinAt(it.id, returnPinTypeResourceId(it), it.x, it.y, true) }
-
-
-////STA JE REFERRENTIALSNAPSHOTFLOW
-//        //IMA U SERVIS "STA JE OVO"
-//
-
-//sta ceda kaze nekakav state za sve sve pinove il stringid array prikazane i neprikazane
-
+                //rerender pin map
+            }
+            //pinsFlowCollect
+        }
     }
 
     private fun initMyLocationPinAndRegisterMove() {
@@ -213,10 +233,10 @@ class MapViewModel @Inject constructor(
             )
     }
 
-    private fun registerAddCustomPin(resourceId: Int, isResourceCentered: Boolean) {
+    private fun registerAddCustomPin() {
         viewModelScope.launch {
             _mapState.onLongPress { x, y ->
-                addPinAt(x.toString() + y.toString(), resourceId, x, y, isResourceCentered)
+                addPinAt(CUSTOM + x.toString() + y.toString(), x, y)
 //                _mapState.addCallout("0", x, y, c = { Pin(resourceId = resourceId) })
             }
         }
@@ -249,20 +269,21 @@ class MapViewModel @Inject constructor(
     @OptIn(ExperimentalClusteringApi::class)
     fun addPinAt(
         pinId: String,
-        resourceId: Int,
         x: Double,
         y: Double,
-        isResourceCentered: Boolean
     ) {
         _mapState.addMarker(
             pinId,
             x,
             y,
             c = {
-                Pin(resourceId)
+                CustomPin(pinId)
             },
             clipShape = null,
-            relativeOffset = if (isResourceCentered) Offset(-.5f, -.5f) else Offset(-.5f, -1f),
+            relativeOffset = if (detectPinType(pinId) == PinTypes.TypeHomeDiscoveryShot)
+                Offset(-.5f, -.5f)
+            else
+                Offset(-.5f, -1f),
             renderingStrategy = RenderingStrategy.LazyLoading("0")
         )
     }
@@ -270,13 +291,11 @@ class MapViewModel @Inject constructor(
     @OptIn(ExperimentalClusteringApi::class)
     fun addPinAtLatLng(
         pinId: String,
-        resourceId: Int,
         lat: Double,
         lng: Double,
-        isResourceCentered: Boolean
     ) {
         val coords = convertLatLngToOffsets(lat, lng, mapDimensions, mapDimensions)
-        addPinAt(pinId, resourceId, coords[0], coords[1], isResourceCentered)
+        addPinAt(pinId, coords[0], coords[1])
     }
 
     fun movePinAt(pinId: String, x: Double, y: Double) {
@@ -316,40 +335,37 @@ class MapViewModel @Inject constructor(
         _mapScreenState.value = _mapScreenState.value.copy(filterDialogOpen = false)
     }
 
-    fun changeFilterTikis() {
-        _mapScreenState.value =
-            _mapScreenState.value.copy(filterShowTikis = !mapScreenState.value.filterShowTikis)
-    }
-
-    fun changeFilterFriends() {
-        _mapScreenState.value =
-            _mapScreenState.value.copy(filterShowFriends = !mapScreenState.value.filterShowFriends)
-    }
-
-    fun changeFilterResources() {
-        _mapScreenState.value =
-            _mapScreenState.value.copy(filterShowResources = !mapScreenState.value.filterShowResources)
-    }
-
-    fun applyFilers() {
-        array.forEach {
-            when (detectPinType(it)) {
-                is PinTypes.ITypeResource ->
-                    if (mapScreenState.value.filterShowResources) removePin(it.id)
-                PinTypes.TypeTiki -> if (mapScreenState.value.filterShowTikis) removePin(it.id)
-                PinTypes.TypeFriend -> if (mapScreenState.value.filterShowFriends) removePin(it.id)
-                else -> {}
-            }
+    fun updateFilter(pinType: PinTypes) {
+        filtersFlow.update {
+            if (it.contains(pinType)) it.minus(pinType)
+            else it.plus(pinType)
         }
     }
 
-    fun dismissFilters() {
-        _mapScreenState.value = _mapScreenState.value.copy(
-            filterShowTikis = false,
-            filterShowFriends = false,
-            filterShowResources = false,
-        )
+
+    fun resetFilters() {
+        filtersFlow.update { setOf() }
     }
+
+//    fun applyFilers() {
+//        mapScreenState.value.pinsArray.forEach {
+//            when (detectPinType(it.id)) {
+//                is PinTypes.ITypeResource ->
+//                    if (mapScreenState.value.filterShowResources) removePin(it.id)
+//                PinTypes.TypeTiki -> if (mapScreenState.value.filters) removePin(it.id)
+//                PinTypes.TypeFriend -> if (mapScreenState.value.filterShowFriends) removePin(it.id)
+//                else -> {}
+//            }
+//        }
+//    }
+//
+//    fun dismissFilters() {
+//        _mapScreenState.value = _mapScreenState.value.copy(
+//            filterShowTikis = false,
+//            filterShowFriends = false,
+//            filterShowResources = false,
+//        )
+//    }
 
 
 }
