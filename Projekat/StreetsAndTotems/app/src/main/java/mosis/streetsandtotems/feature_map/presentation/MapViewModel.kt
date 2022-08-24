@@ -17,8 +17,11 @@ import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_LAT
+import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_LNG
 import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_X
 import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_Y
 import mosis.streetsandtotems.core.MapConstants.LEVEL_COUNT
@@ -33,6 +36,8 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
+import mosis.streetsandtotems.core.PinConstants.RESOURCES_BRICKS
+import mosis.streetsandtotems.core.PinConstants.RESOURCES_STONES
 import mosis.streetsandtotems.feature_map.domain.model.PinDTO
 import mosis.streetsandtotems.feature_map.domain.util.PinTypes
 import mosis.streetsandtotems.feature_map.domain.util.detectPinType
@@ -60,8 +65,6 @@ class MapViewModel @Inject constructor(
 
     private val mapDimensions = calculateMapDimensions()
     private val circleSize = mutableStateOf(MY_LOCATION_CIRCLE_SIZE.dp / MAX_SCALE)
-
-    val filtersFlow = MutableStateFlow<Set<PinTypes>>(setOf<PinTypes>())
 
     init {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
@@ -102,13 +105,16 @@ class MapViewModel @Inject constructor(
             filterDialogOpen = false,
             followMe = true,
             detectScroll = false,
-            filters = setOf<PinTypes>(),
-            pinsArray = arrayOf(
-                PinDTO("RESOURCESWOOD", (INIT_SCROLL_X * 1.0001), INIT_SCROLL_Y),
-                PinDTO("RESOURCESSTONE", (INIT_SCROLL_X), INIT_SCROLL_Y * 1.0001),
-                PinDTO("FRIENDS", (INIT_SCROLL_X * 1.0001), INIT_SCROLL_Y * 1.0001),
-                PinDTO("TIKIS", (INIT_SCROLL_X * 1.00005), INIT_SCROLL_Y * 1.00005),
+            filtersFlow = MutableStateFlow<Set<PinTypes>>(setOf<PinTypes>()),
+            pinsFlow = MutableStateFlow(
+                setOf(
+                    PinDTO(RESOURCES_BRICKS, (INIT_SCROLL_LAT * 1.0001), INIT_SCROLL_LNG),
+                    PinDTO(RESOURCES_STONES, (INIT_SCROLL_LAT), INIT_SCROLL_LNG * 1.0001),
+                    PinDTO("FRIENDS", (INIT_SCROLL_LAT * 1.0001), INIT_SCROLL_LNG * 1.0001),
+                    PinDTO("TIKIS", (INIT_SCROLL_LAT * 1.00005), INIT_SCROLL_LNG * 1.00005),
+                )
             )
+
         ))
 
         mapScreenState = _mapScreenState
@@ -118,19 +124,9 @@ class MapViewModel @Inject constructor(
 
         initMyLocationPinAndRegisterMove()
 
-
-
-        _mapScreenState.value.pinsArray.forEach { addPinAtLatLng(it.id, it.lat, it.lng) }
-
         registerFilterPins()
 
         registerAddCustomPin()
-
-
-////STA JE REFERRENTIALSNAPSHOTFLOW
-//        //IMA U SERVIS "STA JE OVO"
-//
-//da se proba s flow
 
 
     }
@@ -168,10 +164,27 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun registerFilterPins() {///////ovde neka kombinacija flows vrv
+    private fun registerFilterPins() {
         viewModelScope.launch {
-            filtersFlow.collect {
-                Log.d("tag", "COLLECTED")
+            mapScreenState.value.pinsFlow.combineTransform(mapScreenState.value.filtersFlow) { p, f ->
+                for (pinDTO in p) {
+                    if (f.contains(detectPinType(pinDTO.id)) ||
+                        (f.contains(PinTypes.TypeResource) &&
+                                (detectPinType(pinDTO.id) is PinTypes.ITypeResource))
+                    ) {
+                        removePin(pinDTO.id)
+                    } else {
+                        emit(pinDTO)
+                    }
+                }
+            }.collect {
+                addPinDTO(it)
+            }
+        }
+    }
+//        mapScreenState.value.filtersFlow
+
+//            mapScreenState.value.filtersFlow.collect {
 //                it.forEach {
 //                    if (it == PinTypes.TypeTiki) {
 //                        filterShowTikis.value = true
@@ -180,11 +193,10 @@ class MapViewModel @Inject constructor(
 //                }
 //                filterShowTikis.value = false
 
-                //rerender pin map
-            }
-            //pinsFlowCollect
-        }
-    }
+//rerender pin map
+//            }
+//pinsFlowCollect
+
 
     private fun initMyLocationPinAndRegisterMove() {
         _mapState.addMarker(
@@ -236,7 +248,7 @@ class MapViewModel @Inject constructor(
     private fun registerAddCustomPin() {
         viewModelScope.launch {
             _mapState.onLongPress { x, y ->
-                addPinAt(CUSTOM + x.toString() + y.toString(), x, y)
+                addPinAtOffset(CUSTOM + x.toString() + y.toString(), x, y)
 //                _mapState.addCallout("0", x, y, c = { Pin(resourceId = resourceId) })
             }
         }
@@ -267,7 +279,7 @@ class MapViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalClusteringApi::class)
-    fun addPinAt(
+    fun addPinAtOffset(
         pinId: String,
         x: Double,
         y: Double,
@@ -288,14 +300,17 @@ class MapViewModel @Inject constructor(
         )
     }
 
-    @OptIn(ExperimentalClusteringApi::class)
+    fun addPinDTO(pin: PinDTO) {
+        addPinAtLatLng(pin.id, pin.lat, pin.lng)
+    }
+
     fun addPinAtLatLng(
         pinId: String,
         lat: Double,
         lng: Double,
     ) {
-        val coords = convertLatLngToOffsets(lat, lng, mapDimensions, mapDimensions)
-        addPinAt(pinId, coords[0], coords[1])
+        val cords = convertLatLngToOffsets(lat, lng, mapDimensions, mapDimensions)
+        addPinAtOffset(pinId, cords[0], cords[1])
     }
 
     fun movePinAt(pinId: String, x: Double, y: Double) {
@@ -336,7 +351,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun updateFilter(pinType: PinTypes) {
-        filtersFlow.update {
+        mapScreenState.value.filtersFlow.update {
             if (it.contains(pinType)) it.minus(pinType)
             else it.plus(pinType)
         }
@@ -344,7 +359,7 @@ class MapViewModel @Inject constructor(
 
 
     fun resetFilters() {
-        filtersFlow.update { setOf() }
+        mapScreenState.value.filtersFlow.update { setOf() }
     }
 
 //    fun applyFilers() {

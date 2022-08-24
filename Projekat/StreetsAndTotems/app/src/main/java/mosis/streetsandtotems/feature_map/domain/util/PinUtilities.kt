@@ -26,9 +26,7 @@ fun detectPinType(pinId: String): PinTypes {
     else if (pinId.startsWith(OTHER_HOME, true)) return PinTypes.TypeOtherHome
     else if (pinId.startsWith(OTHER_PLAYER, true)) return PinTypes.TypeOtherPlayer
     else if (pinId.startsWith(CUSTOM, true)) return PinTypes.TypeCustom
-    return PinTypes.TypeHomeDiscoveryShot
-
-
+    return PinTypes.TypeResource
 }
 
 

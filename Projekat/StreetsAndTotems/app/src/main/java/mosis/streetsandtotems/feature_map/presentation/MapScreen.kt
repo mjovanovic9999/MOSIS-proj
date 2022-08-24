@@ -45,19 +45,8 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
             mapViewModel.closeFilterDialog()
             mapViewModel.resetFilters()
         },
-        filterState = mapViewModel.filtersFlow.collectAsState(),
+        filterState = mapViewModel.mapScreenState.value.filtersFlow.collectAsState(),
         updateFilter = { mapViewModel.updateFilter(it) },
-//        filterShowTikis = state.filters,
-//        changeFilterTikis = { mapViewModel.changeFilterTikis() },
-//        filterShowFriends = state.filterShowFriends,
-//        changeFilterFriends = { mapViewModel.changeFilterFriends() },
-//        filterShowResources = state.filterShowResources,
-//        changeFilterResources = { mapViewModel.changeFilterResources() },
-//        applyFilters = {
-//            mapViewModel.closeFilterDialog()
-//
-//            mapViewModel.applyFilers()
-//        },
     )
 
 }
