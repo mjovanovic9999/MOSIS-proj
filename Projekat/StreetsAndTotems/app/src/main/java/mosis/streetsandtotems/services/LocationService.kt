@@ -7,12 +7,14 @@ import android.location.Location
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.location.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import javax.inject.Inject
@@ -77,7 +79,7 @@ class LocationService : Service() {
             .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
             .setWaitForAccurateLocation(true)
             .setInterval(4000)
-        //.setSmallestDisplacement(2f)
+        // .setSmallestDisplacement(2f)
 
         Log.d("tag", "skloniti komenatr za smallest displacement")
 
@@ -87,22 +89,25 @@ class LocationService : Service() {
                 .addLocationRequest(locationRequest)
                 .setAlwaysShow(true) //sta je bre ovoo???????? //https://stackoverflow.com/questions/29861580/locationservices-settingsapi-reset-settings-change-unavailable-flag
                 .build()
-//mozda ovako il sa location manager
-
-
-        //da se proveri je l netvork enabled
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
-                Log.d(
-                    "tag",
-                    "NEW LOCATION: ${result.lastLocation?.latitude}, ${result.lastLocation?.longitude}, ${result.lastLocation?.accuracy}"
-                )
+
                 isLocationEnabled.value = true
-                mLocation = result.lastLocation
-                mLocation?.let {
-                    serviceScope.launch {
-                        //            Log.d("tag", it.accuracy.toString())
+
+                Toast.makeText(
+                    context,
+                    result.lastLocation?.accuracy.toString(),
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                serviceScope.launch {
+                    mLocation.emit(result.lastLocation)
+                    Log.d(
+                        "tag",
+                        "NEW LOCATION: ${result.lastLocation?.latitude}, ${result.lastLocation?.longitude}, ${result.lastLocation?.accuracy}"
+                    )
+                    //            Log.d("tag", it.accuracy.toString())
 //                            val apiClient = ApiClient.getInstance(this@LocationService)
 //                                .create(ApiClient::class.java)
 //                            val response = apiClient.updateLocation()
@@ -121,7 +126,6 @@ class LocationService : Service() {
 //                                }
 //                            })
 
-                    }
 
                 }
             }
@@ -147,8 +151,9 @@ class LocationService : Service() {
     }
 
     companion object {
-        var mLocation: Location? = null
+        val mLocation: MutableStateFlow<Location?> = MutableStateFlow(null)
         var isServiceStarted = false
         var isLocationEnabled = mutableStateOf(true)
+
     }
 }
