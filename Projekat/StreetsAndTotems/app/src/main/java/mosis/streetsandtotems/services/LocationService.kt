@@ -17,6 +17,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
+import mosis.streetsandtotems.feature_map.domain.repository.MapRepository
 import javax.inject.Inject
 
 
@@ -36,6 +37,8 @@ class LocationService : Service() {
     @Inject
     lateinit var networkManager: NetworkManager
 
+    @Inject
+    lateinit var mapRepository: MapRepository
 
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
@@ -103,6 +106,14 @@ class LocationService : Service() {
 
                 serviceScope.launch {
                     mLocation.emit(result.lastLocation)
+                    result.lastLocation?.let {
+                        mapRepository.updateMyLocation(
+                            mosis.streetsandtotems.feature_map.domain.model.Location(
+                                it.latitude,
+                                it.longitude
+                            )
+                        )
+                    }
                     Log.d(
                         "tag",
                         "NEW LOCATION: ${result.lastLocation?.latitude}, ${result.lastLocation?.longitude}, ${result.lastLocation?.accuracy}"
