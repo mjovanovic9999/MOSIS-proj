@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.core.presentation.navigation.util
+package mosis.streetsandtotems.feature_main.presentation.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector

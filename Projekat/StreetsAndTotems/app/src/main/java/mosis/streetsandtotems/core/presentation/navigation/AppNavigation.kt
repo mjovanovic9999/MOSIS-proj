@@ -11,6 +11,7 @@ import mosis.streetsandtotems.feature_auth.presentation.profile.ProfileViewModel
 import mosis.streetsandtotems.feature_auth.presentation.signin.SignInViewModel
 import mosis.streetsandtotems.feature_auth.presentation.signup.SignupViewModel
 import mosis.streetsandtotems.feature_leaderboards.presentation.LeaderboardsViewModel
+import mosis.streetsandtotems.feature_main.presentation.MainScreenViewModel
 
 
 @Composable

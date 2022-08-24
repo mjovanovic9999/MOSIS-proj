@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.core.presentation.navigation.components
+package mosis.streetsandtotems.feature_main.presentation.components
 
 import android.content.Intent
 import android.content.IntentFilter

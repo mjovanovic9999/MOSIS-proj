@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.core.presentation.navigation
+package mosis.streetsandtotems.feature_main.presentation
 
 //import androidx.work.*
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,10 +15,13 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collectLatest
-import mosis.streetsandtotems.core.presentation.navigation.components.DrawerContent
-import mosis.streetsandtotems.core.presentation.navigation.components.DrawerScreen
-import mosis.streetsandtotems.core.presentation.navigation.components.LifecycleCompose
+import mosis.streetsandtotems.feature_main.presentation.components.DrawerContent
+import mosis.streetsandtotems.feature_main.presentation.components.DrawerScreen
+import mosis.streetsandtotems.feature_main.presentation.components.LifecycleCompose
 import mosis.streetsandtotems.destinations.SignInScreenDestination
+import mosis.streetsandtotems.feature_main.presentation.MainScreenEvents
+import mosis.streetsandtotems.feature_main.presentation.MainScreenViewModel
+import mosis.streetsandtotems.feature_main.presentation.MainScreenViewModelEvents
 import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestLocation
 import mosis.streetsandtotems.services.LocationService
 import mosis.streetsandtotems.ui.theme.sizes

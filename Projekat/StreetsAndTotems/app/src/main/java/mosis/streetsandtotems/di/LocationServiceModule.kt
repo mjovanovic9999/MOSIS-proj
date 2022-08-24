@@ -13,12 +13,10 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(ServiceComponent::class)
-object ServiceModule {
+object LocationServiceModule {
     @Provides
     @ServiceScoped
     fun provideFusedLocationProviderClient(app: Application): FusedLocationProviderClient {
         return LocationServices.getFusedLocationProviderClient(app)
     }
-
-
 }

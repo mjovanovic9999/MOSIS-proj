@@ -13,9 +13,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
-
-
+object AppSingletonModule {
     @Provides
     @Singleton
     fun provideNotificationService(app: Application): NotificationProvider {

@@ -16,12 +16,6 @@ import mosis.streetsandtotems.feature_auth.domain.use_case.*
 @Module
 @InstallIn(ViewModelComponent::class)
 object AuthModule {
-
-    @Provides
-    @ViewModelScoped
-    fun provideFirebaseAuth(): FirebaseAuth = Firebase.auth
-
-
     @Provides
     @ViewModelScoped
     fun provideFirebaseDataSource(firebaseAuth: FirebaseAuth): FirebaseAuthDataSource =

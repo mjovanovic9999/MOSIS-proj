@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.core.presentation.navigation.components
+package mosis.streetsandtotems.feature_main.presentation.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

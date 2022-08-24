@@ -9,7 +9,8 @@ import javax.inject.Inject
 
 class NetworkManager @Inject constructor(var context: Application) {
 
-    val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
+    val connectivityManager: ConnectivityManager =
+        context.getSystemService(ConnectivityManager::class.java)
 
     private var callback: ConnectivityManager.NetworkCallback = object :
         ConnectivityManager.NetworkCallback() {
