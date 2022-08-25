@@ -11,7 +11,7 @@ import mosis.streetsandtotems.core.PinConstants.RESOURCES_BRICKS
 import mosis.streetsandtotems.core.PinConstants.RESOURCES_EMERALDS
 import mosis.streetsandtotems.core.PinConstants.RESOURCES_STONES
 import mosis.streetsandtotems.core.PinConstants.RESOURCES_WOODS
-import mosis.streetsandtotems.core.PinConstants.TIKIS
+import mosis.streetsandtotems.core.PinConstants.TOTEMS
 
 fun detectPinType(pinId: String): PinTypes {
 
@@ -19,7 +19,7 @@ fun detectPinType(pinId: String): PinTypes {
     else if (pinId.startsWith(RESOURCES_BRICKS, true)) return PinTypes.TypeResourceBrick
     else if (pinId.startsWith(RESOURCES_STONES, true)) return PinTypes.TypeResourceStone
     else if (pinId.startsWith(RESOURCES_EMERALDS, true)) return PinTypes.TypeResourceEmerald
-    else if (pinId.startsWith(TIKIS, true)) return PinTypes.TypeTiki
+    else if (pinId.startsWith(TOTEMS, true)) return PinTypes.TypeTiki
     else if (pinId.startsWith(FRIENDS, true)) return PinTypes.TypeFriend
     else if (pinId.startsWith(MARKET, true)) return PinTypes.TypeMarket
     else if (pinId.startsWith(HOME, true)) return PinTypes.TypeHome
