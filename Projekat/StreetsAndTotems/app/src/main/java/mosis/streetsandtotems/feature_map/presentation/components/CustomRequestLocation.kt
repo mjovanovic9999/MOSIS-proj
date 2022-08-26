@@ -3,6 +3,7 @@ package mosis.streetsandtotems.feature_map.presentation.components
 import android.app.Activity
 import android.content.Intent
 import android.provider.Settings
+import android.util.Log
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -20,6 +21,17 @@ fun CustomRequestLocation(
 ) {
     if (!isLocationEnabled.value) {
         CustomRequestLocationDialog()
+    } else if (!LocationService.isServiceStarted) {
+        Log.d("tag", "startuje servis na kurblu")
+
+        val context = LocalContext.current
+
+        context.startForegroundService(
+            Intent(
+                context,
+                LocationService::class.java
+            )
+        )
     }
 }
 

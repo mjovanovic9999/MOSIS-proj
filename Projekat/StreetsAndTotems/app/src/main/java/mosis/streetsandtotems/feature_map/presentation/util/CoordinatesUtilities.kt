@@ -1,13 +1,11 @@
 package mosis.streetsandtotems.feature_map.presentation.util
 
 import android.location.Location
-import android.util.Log
 import mosis.streetsandtotems.core.MapConstants.COMPARISON_PRECISION
 import mosis.streetsandtotems.core.MapConstants.DEGREES_TO_RADIANS_COEFFICIENT
 import mosis.streetsandtotems.core.MapConstants.LEVEL_COUNT
 import mosis.streetsandtotems.core.MapConstants.RADIANS_TO_DEGREES_COEFFICIENT
 import mosis.streetsandtotems.core.MapConstants.TITLE_SIZE
-import ovh.plrapps.mapcompose.api.centroidX
 import kotlin.math.*
 
 fun calculateMapDimensions(): Int {
@@ -18,7 +16,7 @@ fun convertLatLngToOffsets(
     latitude: Double,
     longitude: Double,
     mapWidth: Int,
-    mapHeight: Int
+    mapHeight: Int,
 ): DoubleArray {
     val FE = 180 // false easting
     val radius = mapWidth / (2 * PI)
@@ -32,6 +30,34 @@ fun convertLatLngToOffsets(
     val y = mapHeight / 2 - yFromEquator
 
     return doubleArrayOf(x / mapWidth, y / mapHeight)
+}
+
+fun convertOffsetsToLatLng(
+    x: Double,
+    y: Double,
+    mapWidth: Int,
+    mapHeight: Int,
+): DoubleArray {
+    val FE = 180 // false easting
+    val radius = mapWidth / (2 * PI)
+
+    val x_temp = x * mapWidth
+
+    val lonRad = x_temp / radius
+
+    val longitude = radiansToDegrees(lonRad) - FE
+
+
+    val y_temp = y * mapHeight
+
+    val yFromEquator = mapHeight / 2 - y_temp
+
+    val latRad = 2 * (atan(exp(yFromEquator / radius)) - PI / 4)
+
+    val latitude = radiansToDegrees(latRad)
+
+
+    return doubleArrayOf(latitude, longitude)
 }
 
 fun degreesToRadians(degrees: Double): Double = degrees * DEGREES_TO_RADIANS_COEFFICIENT

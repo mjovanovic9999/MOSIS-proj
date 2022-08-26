@@ -44,6 +44,8 @@ class LocationService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
 
     override fun onCreate() {
+        Log.d("tag", "brmm brmm")
+
         super.onCreate()
         isServiceStarted = true
         startForeground(
@@ -90,7 +92,7 @@ class LocationService : Service() {
         val locationSettingsRequest =
             LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest)
-                .setAlwaysShow(true) //sta je bre ovoo???????? //https://stackoverflow.com/questions/29861580/locationservices-settingsapi-reset-settings-change-unavailable-flag
+                .setAlwaysShow(true)
                 .build()
 
         locationCallback = object : LocationCallback() {
