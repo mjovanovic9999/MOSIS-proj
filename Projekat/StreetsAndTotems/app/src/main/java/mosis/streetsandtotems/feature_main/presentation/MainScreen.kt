@@ -60,9 +60,8 @@ fun MainScreen(
         viewModel.notificationProvider
     )
 
-    //CustomRequestLocation(LocationService.isLocationEnabled)
+    CustomRequestLocation(LocationService.isLocationEnabled)
 
-//    MapScreen(drawerState = drawerState, mapViewModel = hiltViewModel())
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {

@@ -70,6 +70,7 @@ object PinConstants {
     const val MY_PIN_COLOR_OPACITY = 0x551a88e9
     const val MY_PIN_COLOR = 0xFF1a88e9
     const val MY_PIN_RADIUS = 20f
+    const val LAZY_LOADER_ID = "0"
     const val MY_PIN = "MY_PIN"
 
     const val MARKET = "MARKET"
@@ -81,7 +82,7 @@ object PinConstants {
     const val RESOURCES_WOODS = RESOURCES + "_WOODS"
     const val RESOURCES_STONES = RESOURCES + "_STONES"
     const val FRIENDS = "FRIENDS"
-    const val TIKIS = "TIKIS"
+    const val TOTEMS = "TOTEMS"
     const val CUSTOM = "CUSTOM"
     const val OTHER_PLAYER = "OTHER_PLAYER"
     const val OTHER_HOME = "OTHER_HOME"

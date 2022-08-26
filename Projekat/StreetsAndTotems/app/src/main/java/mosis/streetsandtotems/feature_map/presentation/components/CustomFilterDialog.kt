@@ -10,7 +10,7 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import mosis.streetsandtotems.core.PinConstants.FRIENDS
 import mosis.streetsandtotems.core.PinConstants.RESOURCES
-import mosis.streetsandtotems.core.PinConstants.TIKIS
+import mosis.streetsandtotems.core.PinConstants.TOTEMS
 import mosis.streetsandtotems.core.presentation.components.CustomDialog
 import mosis.streetsandtotems.feature_map.domain.util.PinTypes
 
@@ -35,7 +35,7 @@ fun CustomFilterDialog(
                     CustomFilterChip(
                         filterState.value.contains(PinTypes.TypeTiki),
                         { updateFilter(PinTypes.TypeTiki) },
-                        TIKIS
+                        TOTEMS
                     )
                     CustomFilterChip(
                         filterState.value.contains(PinTypes.TypeFriend),
