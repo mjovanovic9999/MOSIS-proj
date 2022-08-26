@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.core.presentation.navigation
+package mosis.streetsandtotems.feature_main.presentation
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.State

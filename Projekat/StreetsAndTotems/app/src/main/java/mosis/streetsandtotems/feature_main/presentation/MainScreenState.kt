@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.core.presentation.navigation
+package mosis.streetsandtotems.feature_main.presentation
 
 import kotlinx.coroutines.flow.StateFlow
 
