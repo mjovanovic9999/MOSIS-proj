@@ -59,7 +59,7 @@ fun CustomPinDialog(isOpen: Boolean, onDismissRequest: () -> Unit) {
                     buttonType = CustomButtonType.Outlined,
                     text = ButtonConstants.CANCEL,
                     textStyle = MaterialTheme.typography.titleMedium,
-                    )
+                )
             },
             confirmButton = {
                 CustomButton(
@@ -68,6 +68,6 @@ fun CustomPinDialog(isOpen: Boolean, onDismissRequest: () -> Unit) {
                     text = ButtonConstants.PLACE,
                     enabled = commentState.value != "",
                     textStyle = MaterialTheme.typography.titleMedium,
-                    )
+                )
             })
 }

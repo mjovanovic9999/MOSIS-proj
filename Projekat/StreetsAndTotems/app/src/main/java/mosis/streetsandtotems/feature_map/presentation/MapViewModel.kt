@@ -1,57 +1,330 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
+import android.util.Log
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
-import ovh.plrapps.mapcompose.api.addLayer
-import ovh.plrapps.mapcompose.api.enableRotation
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_LAT
+import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_LNG
+import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_X
+import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_Y
+import mosis.streetsandtotems.core.MapConstants.LEVEL_COUNT
+import mosis.streetsandtotems.core.MapConstants.MAX_SCALE
+import mosis.streetsandtotems.core.MapConstants.MY_LOCATION_CIRCLE_SIZE
+import mosis.streetsandtotems.core.MapConstants.TILE_KEY
+import mosis.streetsandtotems.core.MapConstants.TILE_URL_512
+import mosis.streetsandtotems.core.MapConstants.TITLE_SIZE
+import mosis.streetsandtotems.core.MapConstants.WORKER_COUNT
+import mosis.streetsandtotems.core.PinConstants.CUSTOM
+import mosis.streetsandtotems.core.PinConstants.MY_PIN
+import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
+import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
+import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
+import mosis.streetsandtotems.core.PinConstants.RESOURCES_BRICKS
+import mosis.streetsandtotems.core.PinConstants.RESOURCES_STONES
+import mosis.streetsandtotems.feature_map.domain.model.PinDTO
+import mosis.streetsandtotems.feature_map.domain.util.PinTypes
+import mosis.streetsandtotems.feature_map.domain.util.detectPinType
+import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
+import mosis.streetsandtotems.feature_map.presentation.util.areOffsetsEqual
+import mosis.streetsandtotems.feature_map.presentation.util.calculateMapDimensions
+import mosis.streetsandtotems.feature_map.presentation.util.convertLatLngToOffsets
+import mosis.streetsandtotems.services.LocationService
+import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
+import ovh.plrapps.mapcompose.ui.layout.Fill
 import ovh.plrapps.mapcompose.ui.state.MapState
+import ovh.plrapps.mapcompose.ui.state.markers.model.RenderingStrategy
 import java.io.FileInputStream
 import javax.inject.Inject
 
+@OptIn(ExperimentalClusteringApi::class)
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val appContext: Application,
 ) : ViewModel() {
-    private val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
-        try {
-            val image = Glide.with(appContext)
-                .downloadOnly()
-                .load("https://api.maptiler.com/maps/streets/256/${zoomLvl}/${col}/${row}.png?key=HqIvIaAAnQt3ibV6COHi")
-                .submit()
-                .get()
+    private val _mapScreenState: MutableState<MapScreenState>
+    private val _mapState: MapState
+    val mapScreenState: State<MapScreenState>
+
+    private val mapDimensions = calculateMapDimensions()
+    private val circleSize = mutableStateOf(MY_LOCATION_CIRCLE_SIZE.dp / MAX_SCALE)
+
+    init {
+        val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
+            try {
+                val image = Glide.with(appContext)
+                    .downloadOnly()
+                    //   .load("https://api.maptiler.com/maps/streets/256/${zoomLvl}/${col}/${row}.png?key=HqIvIaAAnQt3ibV6COHi")
+                    .load("${TILE_URL_512}${zoomLvl}/${col}/${row}.jpg?key=${TILE_KEY}")
+                    .submit()
+                    .get()
 
 
-            FileInputStream(image)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
+                FileInputStream(image)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
         }
-    }
-
-    private val _mapScreenState =
-        mutableStateOf(MapScreenState(
+        _mapScreenState = mutableStateOf(MapScreenState(
             mapState = mutableStateOf(
                 MapState(
-                    levelCount = 19,
-                    fullWidth = 67108864,
-                    fullHeight = 67108864,
-                    workerCount = 32
+                    levelCount = LEVEL_COUNT,
+                    fullWidth = mapDimensions,
+                    fullHeight = mapDimensions,
+                    workerCount = WORKER_COUNT,
+                    tileSize = TITLE_SIZE
                 ) {
-                    scale(0.25f)
-                    scroll(0.560824, 0.366227)
+                    scroll(INIT_SCROLL_X, INIT_SCROLL_Y)
                 }.apply {
                     addLayer(tileStreamProvider)
                     enableRotation()
+                    maxScale = MAX_SCALE
+                    minimumScaleMode = Fill
                 }
             ),
             customPinDialogOpen = false,
-            playerDialogOpen = false))
-    val mapScreenState: State<MapScreenState> = _mapScreenState
+            playerDialogOpen = false,
+            filterDialogOpen = false,
+            followMe = true,
+            detectScroll = false,
+            filtersFlow = MutableStateFlow<Set<PinTypes>>(setOf<PinTypes>()),
+            pinsFlow = MutableStateFlow(
+                setOf(
+                    PinDTO(RESOURCES_BRICKS, (INIT_SCROLL_LAT * 1.0001), INIT_SCROLL_LNG),
+                    PinDTO(RESOURCES_STONES, (INIT_SCROLL_LAT), INIT_SCROLL_LNG * 1.0001),
+                    PinDTO("FRIENDS", (INIT_SCROLL_LAT * 1.0001), INIT_SCROLL_LNG * 1.0001),
+                    PinDTO("TIKIS", (INIT_SCROLL_LAT * 1.00005), INIT_SCROLL_LNG * 1.00005),
+                )
+            )
+
+        ))
+
+        mapScreenState = _mapScreenState
+        _mapState = mapScreenState.value.mapState.value
+
+        _mapState.addLazyLoader("0")
+
+        initMyLocationPinAndRegisterMove()
+
+        registerFilterPins()
+
+        registerAddCustomPin()
+
+
+    }
+
+    private fun registerOnMapStateChangeListener() {
+        var pinLocation =
+            arrayOf(INIT_SCROLL_X, INIT_SCROLL_Y)
+
+        var scale = _mapState.scale
+
+        _mapState.setStateChangeListener {
+            if (scale != this.scale) {
+                scale = this.scale
+                circleSize.value = MY_LOCATION_CIRCLE_SIZE.dp * this.scale / MAX_SCALE
+            }
+
+            val markerInfo = _mapState.getMarkerInfo(MY_PIN)
+            if (markerInfo != null) {
+                pinLocation = arrayOf(
+                    markerInfo.x,
+                    markerInfo.y
+                )
+            }
+            if (
+                mapScreenState.value.followMe
+                && mapScreenState.value.detectScroll
+                &&
+                (!areOffsetsEqual(pinLocation[0], this.centroidX)
+                        || !areOffsetsEqual(pinLocation[1], this.centroidY))
+            ) {
+                _mapScreenState.value = _mapScreenState.value.copy(
+                    followMe = false
+                )
+            }
+        }
+    }
+
+    private fun registerFilterPins() {
+        viewModelScope.launch {
+            mapScreenState.value.pinsFlow.combineTransform(mapScreenState.value.filtersFlow) { p, f ->
+                for (pinDTO in p) {
+                    if (f.contains(detectPinType(pinDTO.id)) ||
+                        (f.contains(PinTypes.TypeResource) &&
+                                (detectPinType(pinDTO.id) is PinTypes.ITypeResource))
+                    ) {
+                        removePin(pinDTO.id)
+                    } else {
+                        emit(pinDTO)
+                    }
+                }
+            }.collect {
+                addPinDTO(it)
+            }
+        }
+    }
+//        mapScreenState.value.filtersFlow
+
+//            mapScreenState.value.filtersFlow.collect {
+//                it.forEach {
+//                    if (it == PinTypes.TypeTiki) {
+//                        filterShowTikis.value = true
+//                        return@collect
+//                    }
+//                }
+//                filterShowTikis.value = false
+
+//rerender pin map
+//            }
+//pinsFlowCollect
+
+
+    private fun initMyLocationPinAndRegisterMove() {
+        _mapState.addMarker(
+            MY_PIN,
+            INIT_SCROLL_X,
+            INIT_SCROLL_Y,
+            c = {
+                Canvas(modifier = Modifier.size(circleSize.value), onDraw = {
+                    drawCircle(color = Color(MY_PIN_COLOR_OPACITY))
+                    drawCircle(color = Color(MY_PIN_COLOR), radius = MY_PIN_RADIUS)
+                })
+            },
+            clipShape = null,
+            relativeOffset = Offset(-.5f, -.5f)
+        )
+
+        viewModelScope.launch {
+            LocationService.mLocation.collectLatest {
+                if (it != null) {
+                    val latLon = convertLatLngToOffsets(
+                        it.latitude,
+                        it.longitude,
+                        mapDimensions,
+                        mapDimensions
+                    )
+
+                    movePinAt(MY_PIN, latLon[0], latLon[1])
+
+                    if (mapScreenState.value.followMe) {
+                        changeStateDetectScroll(false)
+
+                        centerMeOnMyPinSuspend()
+
+                        changeStateDetectScroll(true)
+                    }
+                }
+
+            }
+        }
+    }
+
+    private fun changeStateDetectScroll(shouldDetectScroll: Boolean) {
+        _mapScreenState.value =
+            _mapScreenState.value.copy(
+                detectScroll = shouldDetectScroll
+            )
+    }
+
+    private fun registerAddCustomPin() {
+        viewModelScope.launch {
+            _mapState.onLongPress { x, y ->
+                addPinAtOffset(CUSTOM + x.toString() + y.toString(), x, y)
+//                _mapState.addCallout("0", x, y, c = { Pin(resourceId = resourceId) })
+            }
+        }
+    }
+
+    fun followMe() {
+        centerMeOnMyPin()
+        _mapScreenState.value = _mapScreenState.value.copy(followMe = true, detectScroll = false)
+    }
+
+    private suspend fun centerMeOnMyPinSuspend() {
+        val markerInfo = _mapState.getMarkerInfo(MY_PIN)
+        if (markerInfo != null) {
+            val x = viewModelScope.launch {
+                _mapState.centerOnMarker(MY_PIN)
+            }
+            x.join()
+        }
+    }
+
+    private fun centerMeOnMyPin() {
+        val markerInfo = _mapState.getMarkerInfo(MY_PIN)
+        if (markerInfo != null) {
+            val x = viewModelScope.launch {
+                _mapState.centerOnMarker(MY_PIN)
+            }
+        }
+    }
+
+    @OptIn(ExperimentalClusteringApi::class)
+    fun addPinAtOffset(
+        pinId: String,
+        x: Double,
+        y: Double,
+    ) {
+        _mapState.addMarker(
+            pinId,
+            x,
+            y,
+            c = {
+                CustomPin(pinId)
+            },
+            clipShape = null,
+            relativeOffset = if (detectPinType(pinId) == PinTypes.TypeHomeDiscoveryShot)
+                Offset(-.5f, -.5f)
+            else
+                Offset(-.5f, -1f),
+            renderingStrategy = RenderingStrategy.LazyLoading("0")
+        )
+    }
+
+    fun addPinDTO(pin: PinDTO) {
+        addPinAtLatLng(pin.id, pin.lat, pin.lng)
+    }
+
+    fun addPinAtLatLng(
+        pinId: String,
+        lat: Double,
+        lng: Double,
+    ) {
+        val cords = convertLatLngToOffsets(lat, lng, mapDimensions, mapDimensions)
+        addPinAtOffset(pinId, cords[0], cords[1])
+    }
+
+    fun movePinAt(pinId: String, x: Double, y: Double) {
+        _mapState.moveMarker(
+            pinId,
+            x,
+            y,
+        )
+    }
+
+    fun removePin(pinId: String) {
+        _mapState.removeMarker(pinId)
+    }
+
 
     fun showCustomPinDialog() {
         _mapScreenState.value = _mapScreenState.value.copy(customPinDialogOpen = true)
@@ -68,4 +341,47 @@ class MapViewModel @Inject constructor(
     fun closePlayerDialog() {
         _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
     }
+
+    fun showFilterDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(filterDialogOpen = true)
+    }
+
+    fun closeFilterDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(filterDialogOpen = false)
+    }
+
+    fun updateFilter(pinType: PinTypes) {
+        mapScreenState.value.filtersFlow.update {
+            if (it.contains(pinType)) it.minus(pinType)
+            else it.plus(pinType)
+        }
+    }
+
+
+    fun resetFilters() {
+        mapScreenState.value.filtersFlow.update { setOf() }
+    }
+
+//    fun applyFilers() {
+//        mapScreenState.value.pinsArray.forEach {
+//            when (detectPinType(it.id)) {
+//                is PinTypes.ITypeResource ->
+//                    if (mapScreenState.value.filterShowResources) removePin(it.id)
+//                PinTypes.TypeTiki -> if (mapScreenState.value.filters) removePin(it.id)
+//                PinTypes.TypeFriend -> if (mapScreenState.value.filterShowFriends) removePin(it.id)
+//                else -> {}
+//            }
+//        }
+//    }
+//
+//    fun dismissFilters() {
+//        _mapScreenState.value = _mapScreenState.value.copy(
+//            filterShowTikis = false,
+//            filterShowFriends = false,
+//            filterShowResources = false,
+//        )
+//    }
+
+
 }
+

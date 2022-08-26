@@ -22,7 +22,12 @@ import mosis.streetsandtotems.ui.theme.sizes
 @Composable
 fun MapFABs(
     drawerState: DrawerState,
-    openCustomPinDialog: () -> Unit) {
+    openCustomPinDialog: () -> Unit,
+    locateMe: () -> Unit,
+    followMe: Boolean,
+    showFilterDialog: () -> Unit,
+
+    ) {
     val scope = rememberCoroutineScope()
     Box(modifier = Modifier.fillMaxSize()) {
         CustomFAB(
@@ -35,7 +40,7 @@ fun MapFABs(
         CustomFAB(
             imageVector = ImageVector.vectorResource(id = R.drawable.layers),
             onClick = {
-
+                showFilterDialog()
             },
             modifier = Modifier
                 .padding(MaterialTheme.sizes.fab_padding)
@@ -45,18 +50,18 @@ fun MapFABs(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
         ) {
-            CustomFAB(
-                imageVector = ImageVector.vectorResource(id = R.drawable.locate_me),
-                onClick = {
-                    /*    mapViewModel.viewModelScope.launch {
-                            mapViewModel.state.centerOnMarker(
-                                "prvi",
-                                0.4f
-                            )
-                        }*/
-                },
-                modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
-            )
+            if (!followMe) {
+                CustomFAB(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.locate_me),
+                    onClick = { locateMe() },
+                    modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
+                )
+            } else {
+                CustomFAB(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.located_me),
+                    modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
+                )
+            }
             CustomFAB(
                 imageVector = ImageVector.vectorResource(id = R.drawable.add_pin),
                 onClick = openCustomPinDialog,

@@ -1,5 +1,13 @@
 package mosis.streetsandtotems.core
 
+import kotlin.math.PI
+
+object FirestoreConstants{
+    const val USER_IN_GAME_DATA_COLLECTION = "user_in_game_data"
+
+    const val LOCATION_DOCUMENT_FIELD = "location"
+}
+
 object ButtonConstants {
     const val SIGN_IN = "Sign In"
     const val SIGN_IN_GOOGLE = "Sign in with Google"
@@ -59,7 +67,44 @@ object ImageContentDescriptionConstants {
 }
 
 object PinConstants {
-    const val MY_PIN = "0"
+    const val MY_PIN_COLOR_OPACITY = 0x551a88e9
+    const val MY_PIN_COLOR = 0xFF1a88e9
+    const val MY_PIN_RADIUS = 20f
+    const val MY_PIN = "MY_PIN"
+
+    const val MARKET = "MARKET"
+    const val HOME = "HOME"
+    const val HOME_DISCOVERY = "HOME_DISCOVERY"
+    const val RESOURCES = "RESOURCES"
+    const val RESOURCES_EMERALDS = RESOURCES + "_EMERALDS"
+    const val RESOURCES_BRICKS = RESOURCES + "_BRICKS"
+    const val RESOURCES_WOODS = RESOURCES + "_WOODS"
+    const val RESOURCES_STONES = RESOURCES + "_STONES"
+    const val FRIENDS = "FRIENDS"
+    const val TIKIS = "TIKIS"
+    const val CUSTOM = "CUSTOM"
+    const val OTHER_PLAYER = "OTHER_PLAYER"
+    const val OTHER_HOME = "OTHER_HOME"
+
+
+}
+
+object MapConstants {
+    const val LEVEL_COUNT = 17
+    const val TITLE_SIZE = 512
+    const val WORKER_COUNT = 32
+    const val INIT_SCROLL_X = 0.560821
+    const val INIT_SCROLL_Y = 0.366226
+    const val INIT_SCROLL_LAT = 43.321198
+    const val INIT_SCROLL_LNG = 21.895673
+    const val DEGREES_TO_RADIANS_COEFFICIENT = PI / 180
+    const val RADIANS_TO_DEGREES_COEFFICIENT = 180 / PI
+    const val MAX_SCALE = 2.5f
+    const val MY_LOCATION_CIRCLE_SIZE = 60f
+    const val TILE_URL_512 = "https://api.maptiler.com/maps/openstreetmap/"
+    const val TILE_URL_256 = "https://api.maptiler.com/maps/openstreetmap/256/"
+    const val TILE_KEY = "njA6yIfsMq23cZHLTop1"
+    const val COMPARISON_PRECISION = 1000000
 }
 
 object VisualTransformationConstants {

@@ -20,7 +20,6 @@ import mosis.streetsandtotems.core.presentation.components.CustomDialog
 import mosis.streetsandtotems.feature_totems.presentation.TotemsState
 import mosis.streetsandtotems.ui.theme.sizes
 import java.time.format.DateTimeFormatter
-
 @Composable
 fun TotemDialog(state: TotemsState, onDismissRequest: () -> Unit) {
     CustomDialog(
