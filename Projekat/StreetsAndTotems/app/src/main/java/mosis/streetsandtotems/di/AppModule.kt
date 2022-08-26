@@ -9,6 +9,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
+import mosis.streetsandtotems.feature_settings_persistence.PreferencesDataStore
 import javax.inject.Singleton
 
 @Module
@@ -20,5 +21,11 @@ object AppModule {
     @Singleton
     fun provideNotificationService(app: Application): NotificationProvider {
         return NotificationProvider(app)
+    }
+
+    @Provides
+    @Singleton
+    fun providePreferencesDataStore(app: Application): PreferencesDataStore {
+        return PreferencesDataStore(app)
     }
 }
