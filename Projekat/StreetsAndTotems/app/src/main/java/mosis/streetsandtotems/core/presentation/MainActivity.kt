@@ -20,7 +20,7 @@ import mosis.streetsandtotems.core.presentation.components.CustomSnackbar
 import mosis.streetsandtotems.core.presentation.navigation.AppNavigation
 import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestNetwork
 import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestPermission
-import mosis.streetsandtotems.feature_settings_persistence.viewmodel.SettingsPersistenceViewModel
+import mosis.streetsandtotems.feature_settings_persistence.PreferencesDataStore
 import mosis.streetsandtotems.services.NetworkManager
 import mosis.streetsandtotems.ui.theme.AppTheme
 import javax.inject.Inject
