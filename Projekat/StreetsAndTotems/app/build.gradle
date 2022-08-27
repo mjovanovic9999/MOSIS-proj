@@ -95,6 +95,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-database-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx:24.2.2'
 
+    //GeoFirestore
+    implementation 'com.github.imperiumlabs:GeoFirestore-Android:v1.5.0'
+
     //Google Accompanist
     implementation "com.google.accompanist:accompanist-systemuicontroller:$google_accompanist_verison"
     implementation "com.google.accompanist:accompanist-permissions:$google_accompanist_verison"

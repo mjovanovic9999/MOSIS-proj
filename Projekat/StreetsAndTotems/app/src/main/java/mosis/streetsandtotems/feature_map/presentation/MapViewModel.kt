@@ -223,7 +223,7 @@ class MapViewModel @Inject constructor(
             )
 
         viewModelScope.launch {
-            LocationService.mLocation.collectLatest {
+            LocationService.locationFlow.collectLatest {
                 if (it != null) {
                     val latLon = convertLatLngToOffsets(
                         it.latitude,

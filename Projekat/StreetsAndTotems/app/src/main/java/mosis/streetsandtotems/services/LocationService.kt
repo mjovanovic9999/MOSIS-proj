@@ -10,14 +10,20 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.location.*
+import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
-import mosis.streetsandtotems.feature_map.domain.repository.MapRepository
+import mosis.streetsandtotems.feature_map.domain.model.PinAction
+import mosis.streetsandtotems.feature_map.domain.model.PinActionType
+import mosis.streetsandtotems.feature_map.domain.model.Resource
+import mosis.streetsandtotems.feature_map.domain.model.UserInGameData
+import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
 import javax.inject.Inject
 
 
@@ -38,7 +44,7 @@ class LocationService : Service() {
     lateinit var networkManager: NetworkManager
 
     @Inject
-    lateinit var mapRepository: MapRepository
+    lateinit var mapServiceRepository: MapServiceRepository
 
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
@@ -53,6 +59,9 @@ class LocationService : Service() {
             notificationProvider.returnDisableBackgroundServiceNotification(false)
         )
 
+        initUserPinsFlow()
+        initResourcesFlow()
+        
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -73,12 +82,85 @@ class LocationService : Service() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
         Log.d("tag", "ugasennnn servis")
         serviceJob.cancel()
+        mapServiceRepository.removeAllCallbacks()
         super.onDestroy()
 
     }
 
+    private fun initUserPinsFlow() {
+        serviceScope.launch {
+            mapServiceRepository.getUserInGameData().collect {
+                emitPinAction(it, userPinsFlow, PinActionType.Added)
+            }
+        }
+        mapServiceRepository.registerCallbacksOnUserInGameDataUpdate(
+            userAddedCallback = {
+                emitPinActionWithServiceScope(it, userPinsFlow, PinActionType.Added)
+            },
+            userModifiedCallback = {
+                emitPinActionWithServiceScope(it, userPinsFlow, PinActionType.Modified)
 
-    fun startListeningUserLocation() {
+            },
+            userRemovedCallback = {
+                emitPinActionWithServiceScope(it, userPinsFlow, PinActionType.Removed)
+            }
+        )
+    }
+
+    private fun initResourcesFlow() {
+        serviceScope.launch {
+            mapServiceRepository.getResources().collect {
+                emitPinAction(it, resourcesPinsFlow, PinActionType.Added)
+            }
+        }
+
+        mapServiceRepository.registerCallbackOnResourcesUpdate(
+            resourceAddedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    resourcesPinsFlow,
+                    PinActionType.Added
+                )
+            },
+            resourceModifiedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    resourcesPinsFlow,
+                    PinActionType.Modified
+                )
+            },
+            resourceRemovedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    resourcesPinsFlow,
+                    PinActionType.Removed
+                )
+            }
+        )
+    }
+
+    private suspend fun <T> emitPinAction(
+        pinData: T?,
+        pinFlow: MutableStateFlow<PinAction<T>?>,
+        actionType: PinActionType
+    ) {
+        Log.d("emit", pinData.toString())
+        pinData?.let {
+            pinFlow.emit(PinAction(pinData, actionType))
+        }
+    }
+
+    private fun <T> emitPinActionWithServiceScope(
+        pinData: T?,
+        pinFlow: MutableStateFlow<PinAction<T>?>,
+        actionType: PinActionType
+    ) {
+        serviceScope.launch {
+            emitPinAction(pinData = pinData, pinFlow = pinFlow, actionType = actionType)
+        }
+    }
+
+    private fun startListeningUserLocation() {
 
         val locationRequest = LocationRequest.create()
             .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
@@ -107,10 +189,10 @@ class LocationService : Service() {
                 ).show()
 
                 serviceScope.launch {
-                    mLocation.emit(result.lastLocation)
+                    locationFlow.emit(result.lastLocation)
                     result.lastLocation?.let {
-                        mapRepository.updateMyLocation(
-                            mosis.streetsandtotems.feature_map.domain.model.Location(
+                        mapServiceRepository.updateMyLocation(
+                            GeoPoint(
                                 it.latitude,
                                 it.longitude
                             )
@@ -164,9 +246,12 @@ class LocationService : Service() {
     }
 
     companion object {
-        val mLocation: MutableStateFlow<Location?> = MutableStateFlow(null)
+        val locationFlow: MutableStateFlow<Location?> = MutableStateFlow(value = null)
+        val userPinsFlow: MutableStateFlow<PinAction<UserInGameData>?> =
+            MutableStateFlow(value = null)
+        val resourcesPinsFlow: MutableStateFlow<PinAction<Resource>?> =
+            MutableStateFlow(value = null)
         var isServiceStarted = false
-        var isLocationEnabled = mutableStateOf(true)
-
+        var isLocationEnabled = mutableStateOf(value = true)
     }
 }
