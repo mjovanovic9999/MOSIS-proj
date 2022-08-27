@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
+import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -45,6 +46,7 @@ import mosis.streetsandtotems.feature_map.domain.model.PinDTO
 import mosis.streetsandtotems.feature_map.domain.util.PinTypes
 import mosis.streetsandtotems.feature_map.domain.util.detectPinType
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
+import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
 import mosis.streetsandtotems.feature_map.presentation.util.areOffsetsEqual
 import mosis.streetsandtotems.feature_map.presentation.util.calculateMapDimensions
 import mosis.streetsandtotems.feature_map.presentation.util.convertLatLngToOffsets
@@ -132,7 +134,16 @@ class MapViewModel @Inject constructor(
 
         registerAddCustomPin()
 
-
+        _mapState.addMarker(
+            "AAAAAAAAAA",
+            INIT_SCROLL_X * 0.99999,
+            INIT_SCROLL_Y * 0.99999,
+            c = {
+                CustomPinImage(imageUri = "https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F13%2F2015%2F04%2F05%2Ffeatured.jpg")
+            },
+            clipShape = null,
+            renderingStrategy = RenderingStrategy.LazyLoading(LAZY_LOADER_ID)
+        )
     }
 
     private fun registerOnMapStateChangeListener() {

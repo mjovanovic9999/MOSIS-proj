@@ -222,7 +222,10 @@ object NotificationConstants {
 
 
     const val CHANNEL_ID2 = "StreetsAndTotems_channel2"
-    const val CHANNEL_NAME2 = "Streets And Totems Notifications2"
+    const val CHANNEL_NAME2 = "Streets And Totems Nearby Notifications"
+    const val NOTIFY_NEARBY_PASS_ID = 2
+    const val NOTIFY_NEARBY_PASS_TITLE = "Something is near you!"
+    const val NOTIFY_NEARBY_PASS_TEXT = "Open application to find out more!"
 }
 
 object ItemsConstants {

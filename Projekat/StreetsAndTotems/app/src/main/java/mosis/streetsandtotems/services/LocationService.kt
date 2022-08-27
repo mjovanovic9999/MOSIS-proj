@@ -51,9 +51,8 @@ class LocationService : Service() {
 
     override fun onCreate() {
         Log.d("tag", "brmm brmm")
-
-        super.onCreate()
         isServiceStarted = true
+        super.onCreate()
         startForeground(
             1,
             notificationProvider.returnDisableBackgroundServiceNotification(false)
@@ -61,7 +60,7 @@ class LocationService : Service() {
 
         initUserPinsFlow()
         initResourcesFlow()
-        
+
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -192,6 +191,7 @@ class LocationService : Service() {
                     locationFlow.emit(result.lastLocation)
                     result.lastLocation?.let {
                         mapServiceRepository.updateMyLocation(
+
                             GeoPoint(
                                 it.latitude,
                                 it.longitude

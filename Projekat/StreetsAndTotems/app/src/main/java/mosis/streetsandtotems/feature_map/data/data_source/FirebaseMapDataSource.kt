@@ -21,6 +21,17 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     fun updateUserLocation(user: FirebaseUser, newLocation: GeoPoint) {
         userGeoFirestore.setLocation(user.uid, newLocation)
+//=======
+//import com.google.firebase.firestore.FirebaseFirestore
+//import com.google.firebase.firestore.GeoPoint
+//import mosis.streetsandtotems.core.FirestoreConstants
+//
+//class FirebaseMapDataSource(private val db: FirebaseFirestore) {
+//    fun updateUserLocation(user: FirebaseUser, newLocation: GeoPoint): Task<Void> {
+//        return db.collection(FirestoreConstants.USER_IN_GAME_DATA_COLLECTION)
+//            .document(user.uid)
+//            .update(FirestoreConstants.LOCATION_DOCUMENT_FIELD, newLocation)
+//>>>>>>> feature_map
     }
 
     suspend fun getUserInGameData(currentUser: FirebaseUser): Flow<UserInGameData?> {
