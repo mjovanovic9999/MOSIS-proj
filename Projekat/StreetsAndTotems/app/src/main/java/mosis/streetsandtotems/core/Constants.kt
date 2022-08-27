@@ -259,3 +259,13 @@ object ConfirmationDialogTextConstants {
     const val LEAVE_SQUAD =
         "If you leave squad you won't be able to rejoin unless someone invites you!"
 }
+
+object UserSettingsConstants {
+    const val DATA_STORE_NAME = "USER_SETTINGS"
+
+    const val RUN_IN_BACKGROUND_PREFERENCES = "RUN_IN_BACKGROUND"
+    const val SHOW_NOTIFICATIONS_PREFERENCES = "SHOW_NOTIFICATIONS"
+    const val SHOW_MY_PHONE_NUMBER_PREFERENCES = "SHOW_MY_PHONE_NUMBER"
+    const val CALL_PRIVACY_LEVEL_PREFERENCES = "CALL_PRIVACY_LEVEL"
+    const val SMS_PRIVACY_LEVEL_PREFERENCES = "SMS_PRIVACY_LEVEL"
+}

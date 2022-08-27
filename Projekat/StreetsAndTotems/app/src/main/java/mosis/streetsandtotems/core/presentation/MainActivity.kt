@@ -4,7 +4,6 @@ import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +20,7 @@ import mosis.streetsandtotems.core.presentation.components.CustomSnackbar
 import mosis.streetsandtotems.core.presentation.navigation.AppNavigation
 import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestNetwork
 import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestPermission
-import mosis.streetsandtotems.feature_settings_persistence.viewmodel.SettingsPersistenceViewModel
+import mosis.streetsandtotems.feature_settings_persistence.PreferencesDataStore
 import mosis.streetsandtotems.services.NetworkManager
 import mosis.streetsandtotems.ui.theme.AppTheme
 import javax.inject.Inject
@@ -44,11 +43,9 @@ class MainActivity() : ComponentActivity() {
     @Inject
     lateinit var isUserAuthenticated: State<Boolean>
 
+    @Inject
+    lateinit var store: PreferencesDataStore
 
-    /////////
-    private val activityViewModel: SettingsPersistenceViewModel by viewModels()
-
-    ////////
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,9 +74,7 @@ class MainActivity() : ComponentActivity() {
             }
         }
     }
-
 }
-
 
 
 

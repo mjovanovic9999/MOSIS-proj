@@ -12,6 +12,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
+import mosis.streetsandtotems.feature_settings_persistence.PreferencesDataStore
 import javax.inject.Singleton
 
 @Module
@@ -23,6 +24,11 @@ object AppSingletonModule {
         return NotificationProvider(app)
     }
 
+    @Provides
+    @Singleton
+    fun providePreferencesDataStore(app: Application): PreferencesDataStore {
+        return PreferencesDataStore(app)
+    }
     @Provides
     @Singleton
     fun provideFirebaseAuth(): FirebaseAuth = Firebase.auth
