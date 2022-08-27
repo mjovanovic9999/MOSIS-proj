@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
+import mosis.streetsandtotems.core.presentation.components.CustomButton
 import mosis.streetsandtotems.core.presentation.utils.notification.BackgroundServicesEnabled
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.services.LocationService
@@ -21,6 +22,9 @@ fun LifecycleCompose(
     notificationProvider: NotificationProvider
 ) {
 
+    CustomButton(clickHandler = {
+        notificationProvider.notifyNearbyPass()
+    }, text = "ADD notif")
 
     val context = LocalContext.current
 

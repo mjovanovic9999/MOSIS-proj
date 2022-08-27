@@ -51,6 +51,8 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
         updateFilter = { mapViewModel.updateFilter(it) },
     )
     Row {//testtest
-        CustomButton(clickHandler = { mapViewModel.tempAddDDPIN() }, text = "ADD")
+        CustomButton(clickHandler = {
+            mapViewModel.tempAddDDPIN()
+        }, text = "ADD")
     }
 }
