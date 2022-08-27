@@ -16,7 +16,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.feature_map.domain.model.PinAction
@@ -165,7 +164,7 @@ class LocationService : Service() {
             .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
             .setWaitForAccurateLocation(true)
             .setInterval(4000)
-        // .setSmallestDisplacement(2f)
+            .setSmallestDisplacement(2f)
 
         Log.d("tag", "skloniti komenatr za smallest displacement")
 

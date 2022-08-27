@@ -1,18 +1,19 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
+import android.net.Uri
 import android.util.Log
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
+import com.google.firebase.firestore.ktx.getField
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FirestoreConstants
+import mosis.streetsandtotems.feature_map.domain.model.ProfileData
 import mosis.streetsandtotems.feature_map.domain.model.Resource
 import mosis.streetsandtotems.feature_map.domain.model.UserInGameData
 import org.imperiumlabs.geofirestore.GeoFirestore
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.GeoPoint
 
 class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     private val userGeoFirestore =
@@ -28,7 +29,17 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     suspend fun getUserInGameData(currentUser: FirebaseUser): Flow<UserInGameData?> {
         return db.collection(FirestoreConstants.USER_IN_GAME_DATA_COLLECTION)
             .whereNotEqualTo(FirestoreConstants.ID_FIELD, currentUser.uid).get()
-            .await().documents.map { it.toObject<UserInGameData>()?.copy(id = it.id) }
+            .await().documents.map {
+                val profileDataSnapshot =
+                    it.getField<DocumentReference>("profile_data")?.get()?.await()
+                val profileData = profileDataSnapshot?.toObject<ProfileData>()
+                    ?.copy(image = Uri.parse(profileDataSnapshot.getField<String>("image_uri")))
+                Log.d("tag", profileData.toString())
+                it.toObject<UserInGameData>()?.copy(
+                    id = it.id,
+                    display_data = profileData
+                )
+            }
             .asFlow()
     }
 
@@ -78,7 +89,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         snapshots: QuerySnapshot?,
         userAddedCallback: (user: T?) -> Unit,
         userModifiedCallback: (user: T?) -> Unit,
-        userRemovedCallback: (user: T?) -> Unit
+        userRemovedCallback: (user: T?) -> Unit,
+        customConversion: (document: QueryDocumentSnapshot) -> T? = { it.toObject<T>() }
     ) {
         if (e != null) {
             Log.w("tag", "listen:error", e)
@@ -87,9 +99,9 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
         for (dc in snapshots!!.documentChanges) {
             when (dc.type) {
-                DocumentChange.Type.ADDED -> userAddedCallback(dc.document.toObject<T>())
-                DocumentChange.Type.MODIFIED -> userModifiedCallback(dc.document.toObject<T>())
-                DocumentChange.Type.REMOVED -> userRemovedCallback(dc.document.toObject<T>())
+                DocumentChange.Type.ADDED -> userAddedCallback(customConversion(dc.document))
+                DocumentChange.Type.MODIFIED -> userModifiedCallback(customConversion(dc.document))
+                DocumentChange.Type.REMOVED -> userRemovedCallback(customConversion(dc.document))
             }
         }
     }

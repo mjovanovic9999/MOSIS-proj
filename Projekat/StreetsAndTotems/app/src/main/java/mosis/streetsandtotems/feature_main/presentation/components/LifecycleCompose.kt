@@ -67,9 +67,6 @@ fun LifecycleCompose(
                             locationBroadcastReceiver,
                         )
                     }
-                    Lifecycle.Event.ON_STOP -> {//to delete
-                        notificationProvider.notifyNearbyPass()
-                    }
                     else -> {}
                 }
             }

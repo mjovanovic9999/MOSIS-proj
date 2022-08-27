@@ -7,5 +7,5 @@ data class UserInGameData(
     val l: GeoPoint? = null,
     val calls_allowed: Boolean? = null,
     val messaging_allowed: Boolean? = null,
-    val squad_id: String? = null
+    val display_data: ProfileData? = null
 )
