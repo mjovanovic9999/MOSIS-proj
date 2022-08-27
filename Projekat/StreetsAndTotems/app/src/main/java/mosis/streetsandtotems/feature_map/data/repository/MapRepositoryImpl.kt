@@ -13,11 +13,7 @@ class MapRepositoryImpl(
 ) : MapRepository {
     override suspend fun updateMyLocation(newLocation: GeoPoint) {
         auth.currentUser?.let {
-            try {
-                firebaseMapDataSource.updateUserLocation(it, newLocation).await()
-            } catch (e: Exception) {
-                Log.d("firestoreError", e.message.toString())
-            }
+            firebaseMapDataSource.updateUserLocation(it, newLocation)
         }
     }
 

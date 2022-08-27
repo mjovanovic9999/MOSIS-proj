@@ -22,9 +22,6 @@ fun LifecycleCompose(
     notificationProvider: NotificationProvider
 ) {
 
-    CustomButton(clickHandler = {
-        notificationProvider.notifyNearbyPass()
-    }, text = "ADD notif")
 
     val context = LocalContext.current
 
@@ -69,6 +66,9 @@ fun LifecycleCompose(
                         context.unregisterReceiver(
                             locationBroadcastReceiver,
                         )
+                    }
+                    Lifecycle.Event.ON_STOP -> {//to delete
+                        notificationProvider.notifyNearbyPass()
                     }
                     else -> {}
                 }
