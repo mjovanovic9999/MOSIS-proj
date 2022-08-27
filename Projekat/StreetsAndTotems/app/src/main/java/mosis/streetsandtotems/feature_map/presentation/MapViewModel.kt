@@ -1,6 +1,7 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
@@ -42,7 +43,6 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
 import mosis.streetsandtotems.core.PinConstants.RESOURCES_BRICKS
 import mosis.streetsandtotems.core.PinConstants.RESOURCES_EMERALDS
-import mosis.streetsandtotems.core.PinConstants.RESOURCES_STONES
 import mosis.streetsandtotems.core.PinConstants.TOTEMS
 import mosis.streetsandtotems.feature_map.domain.model.PinActionType
 import mosis.streetsandtotems.feature_map.domain.model.PinDTO
@@ -51,7 +51,10 @@ import mosis.streetsandtotems.feature_map.domain.util.PinTypes
 import mosis.streetsandtotems.feature_map.domain.util.detectPinType
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
-import mosis.streetsandtotems.feature_map.presentation.util.*
+import mosis.streetsandtotems.feature_map.presentation.util.areOffsetsEqual
+import mosis.streetsandtotems.feature_map.presentation.util.calculateMapDimensions
+import mosis.streetsandtotems.feature_map.presentation.util.convertGeoPointNullToOffsets
+import mosis.streetsandtotems.feature_map.presentation.util.convertLatLngToOffsets
 import mosis.streetsandtotems.services.LocationService
 import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
@@ -162,12 +165,12 @@ class MapViewModel @Inject constructor(
 
     fun addUserPin(userData: UserInGameData) {
         if (userData.id != null) {
-            _mapScreenState.value.userDataHashMap.put(userData.id, userData)
+            _mapScreenState.value.userDataHashMap[userData.id] = userData
             addPin(
                 userData.id, userData.l
             ) {
                 CustomPinImage(
-                    "https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F13%2F2015%2F04%2F05%2Ffeatured.jpg",
+                    imageUri = userData.display_data?.image ?: Uri.EMPTY,
                     true//userData.squad_id != null && "MYSQUADID" != null && userData.squad_id == "MYSQUADID"
                 )
             }

@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.feature_map.domain.model
 
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.GeoPoint
 
 data class UserInGameData(
@@ -8,5 +7,5 @@ data class UserInGameData(
     val l: GeoPoint? = null,
     val calls_allowed: Boolean? = null,
     val messaging_allowed: Boolean? = null,
-    val profile_data: DocumentReference? = null
+    val display_data: ProfileData? = null
 )
