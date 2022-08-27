@@ -13,7 +13,7 @@ import mosis.streetsandtotems.core.PinConstants.RESOURCES_STONES
 import mosis.streetsandtotems.core.PinConstants.RESOURCES_WOODS
 import mosis.streetsandtotems.core.PinConstants.TOTEMS
 
-fun detectPinType(pinId: String): PinTypes {
+fun detectPinType(pinId: String): PinTypes { //delete
 
     if (pinId.startsWith(RESOURCES_WOODS, true)) return PinTypes.TypeResourceWood
     else if (pinId.startsWith(RESOURCES_BRICKS, true)) return PinTypes.TypeResourceBrick
@@ -30,7 +30,7 @@ fun detectPinType(pinId: String): PinTypes {
 }
 
 
-fun returnPinTypeResourceId(pinId: String): Int = when (detectPinType(pinId)) {
+fun returnPinTypeResourceId(pinId: String): Int = when (detectPinType(pinId)) {//delete
     PinTypes.TypeResourceWood -> R.drawable.pin_wood
     PinTypes.TypeResourceBrick -> R.drawable.pin_brick
     PinTypes.TypeResourceStone -> R.drawable.pin_stone

@@ -1,6 +1,7 @@
 package mosis.streetsandtotems.feature_map.presentation.util
 
 import android.location.Location
+import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.core.MapConstants.COMPARISON_PRECISION
 import mosis.streetsandtotems.core.MapConstants.DEGREES_TO_RADIANS_COEFFICIENT
 import mosis.streetsandtotems.core.MapConstants.LEVEL_COUNT
@@ -32,12 +33,41 @@ fun convertLatLngToOffsets(
     return doubleArrayOf(x / mapWidth, y / mapHeight)
 }
 
-fun convertOffsetsToLatLng(
+fun convertGeoPointToOffsets(
+    geoPoint: GeoPoint,
+    mapWidth: Int,
+    mapHeight: Int,
+): DoubleArray {
+    val FE = 180 // false easting
+    val radius = mapWidth / (2 * PI)
+
+    val latRad = degreesToRadians(geoPoint.latitude)
+    val lonRad = degreesToRadians(geoPoint.longitude + FE)
+
+    val x = lonRad * radius
+
+    val yFromEquator = radius * ln(tan(PI / 4 + latRad / 2))
+    val y = mapHeight / 2 - yFromEquator
+
+    return doubleArrayOf(x / mapWidth, y / mapHeight)
+}
+
+fun convertGeoPointNullToOffsets(
+    geoPoint: GeoPoint?,
+    mapWidth: Int,
+    mapHeight: Int,
+): DoubleArray {
+    if (geoPoint != null)
+        return convertGeoPointToOffsets(geoPoint, mapWidth, mapWidth)
+    return doubleArrayOf(0.0, 0.0)
+}
+
+fun convertOffsetsToGeoPoint(
     x: Double,
     y: Double,
     mapWidth: Int,
     mapHeight: Int,
-): DoubleArray {
+): GeoPoint {
     val FE = 180 // false easting
     val radius = mapWidth / (2 * PI)
 
@@ -57,7 +87,7 @@ fun convertOffsetsToLatLng(
     val latitude = radiansToDegrees(latRad)
 
 
-    return doubleArrayOf(latitude, longitude)
+    return GeoPoint(latitude, longitude)
 }
 
 fun degreesToRadians(degrees: Double): Double = degrees * DEGREES_TO_RADIANS_COEFFICIENT

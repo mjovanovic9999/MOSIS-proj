@@ -11,6 +11,8 @@ import mosis.streetsandtotems.core.FirestoreConstants
 import mosis.streetsandtotems.feature_map.domain.model.Resource
 import mosis.streetsandtotems.feature_map.domain.model.UserInGameData
 import org.imperiumlabs.geofirestore.GeoFirestore
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 
 class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     private val userGeoFirestore =

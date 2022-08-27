@@ -23,6 +23,7 @@ fun CustomRequestLocation(
         CustomRequestLocationDialog()
     } else if (!LocationService.isServiceStarted) {
         Log.d("tag", "startuje servis na kurblu")
+        LocationService.isServiceStarted = true //da ograici double paljenje servisa!
 
         val context = LocalContext.current
 
