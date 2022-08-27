@@ -2,6 +2,10 @@ package mosis.streetsandtotems.core
 
 import kotlin.math.PI
 
+object DatabaseConstants{
+    const val DATABASE_NAME = "local_db"
+}
+
 object FirestoreConstants {
     const val USER_IN_GAME_DATA_COLLECTION = "user_in_game_data"
     const val RESOURCES_COLLECTION = "resources"

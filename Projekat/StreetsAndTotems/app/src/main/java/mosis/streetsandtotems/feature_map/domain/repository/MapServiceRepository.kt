@@ -23,5 +23,8 @@ interface MapServiceRepository {
         resourceRemovedCallback: (resource: Resource?) -> Unit
     )
 
+    //fun registerCallbackOnUserDataUpdate()
+
+    //fun getCustomPins(): Flow<>
     fun removeAllCallbacks()
 }
