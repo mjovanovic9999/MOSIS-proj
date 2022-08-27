@@ -16,8 +16,7 @@ import mosis.streetsandtotems.feature_map.domain.util.returnPinTypeResourceId
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
-fun CustomPinImage(imageUri: String) {
-    val resourceId = R.drawable.pin_other_player
+fun CustomPinImage(imageUri: String, isMyFriend: Boolean) {
     Box {
         GlideImage(
             imageModel = imageUri,
@@ -27,10 +26,9 @@ fun CustomPinImage(imageUri: String) {
                 .offset(3.dp, 3.dp)
         )
         Image(
-            painter = painterResource(resourceId),
+            painter = painterResource(if (isMyFriend) R.drawable.pin_friend else R.drawable.pin_other_player),
             contentDescription = null,
             modifier = Modifier.height(48.dp),
-
             )
     }
 }
