@@ -11,8 +11,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.scopes.ServiceScoped
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
-import mosis.streetsandtotems.feature_map.data.repository.MapRepositoryImpl
-import mosis.streetsandtotems.feature_map.domain.repository.MapRepository
+import mosis.streetsandtotems.feature_map.data.repository.MapServiceRepositoryImpl
+import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
 
 @Module
 @InstallIn(ServiceComponent::class)
@@ -33,5 +33,5 @@ object LocationServiceModule {
     fun provideMapRepository(
         firebaseMapDataSource: FirebaseMapDataSource,
         auth: FirebaseAuth
-    ): MapRepository = MapRepositoryImpl(firebaseMapDataSource, auth)
+    ): MapServiceRepository = MapServiceRepositoryImpl(firebaseMapDataSource, auth)
 }

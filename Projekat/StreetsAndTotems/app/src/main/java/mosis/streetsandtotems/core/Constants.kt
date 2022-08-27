@@ -2,10 +2,11 @@ package mosis.streetsandtotems.core
 
 import kotlin.math.PI
 
-object FirestoreConstants{
+object FirestoreConstants {
     const val USER_IN_GAME_DATA_COLLECTION = "user_in_game_data"
+    const val RESOURCES_COLLECTION = "resources"
 
-    const val LOCATION_DOCUMENT_FIELD = "location"
+    const val ID_FIELD = "__name__"
 }
 
 object ButtonConstants {

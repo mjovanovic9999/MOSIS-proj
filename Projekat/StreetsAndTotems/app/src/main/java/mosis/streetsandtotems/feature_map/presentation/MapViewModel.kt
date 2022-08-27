@@ -48,7 +48,6 @@ import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.util.areOffsetsEqual
 import mosis.streetsandtotems.feature_map.presentation.util.calculateMapDimensions
 import mosis.streetsandtotems.feature_map.presentation.util.convertLatLngToOffsets
-import mosis.streetsandtotems.feature_settings_persistence.viewmodel.SettingsPersistenceViewModel
 import mosis.streetsandtotems.services.LocationService
 import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
@@ -224,7 +223,7 @@ class MapViewModel @Inject constructor(
             )
 
         viewModelScope.launch {
-            LocationService.mLocation.collectLatest {
+            LocationService.locationFlow.collectLatest {
                 if (it != null) {
                     val latLon = convertLatLngToOffsets(
                         it.latitude,
