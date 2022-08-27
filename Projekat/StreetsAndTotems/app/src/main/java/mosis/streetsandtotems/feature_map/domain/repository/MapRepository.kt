@@ -1,6 +1,7 @@
 package mosis.streetsandtotems.feature_map.domain.repository
 
-import mosis.streetsandtotems.feature_map.domain.model.Location
+import com.google.firebase.firestore.GeoPoint
+
 
 interface MapRepository {
     /*
@@ -9,5 +10,5 @@ interface MapRepository {
 
     */
 
-    suspend fun updateMyLocation(newLocation: Location)
+    suspend fun updateMyLocation(newLocation: GeoPoint)
 }

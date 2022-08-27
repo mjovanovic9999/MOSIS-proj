@@ -10,6 +10,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.location.*
+import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -110,7 +111,7 @@ class LocationService : Service() {
                     mLocation.emit(result.lastLocation)
                     result.lastLocation?.let {
                         mapRepository.updateMyLocation(
-                            mosis.streetsandtotems.feature_map.domain.model.Location(
+                            GeoPoint(
                                 it.latitude,
                                 it.longitude
                             )
