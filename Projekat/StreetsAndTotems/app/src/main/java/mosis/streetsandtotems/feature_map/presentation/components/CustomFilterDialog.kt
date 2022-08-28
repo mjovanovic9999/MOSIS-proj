@@ -12,15 +12,18 @@ import mosis.streetsandtotems.core.PinConstants.FRIENDS
 import mosis.streetsandtotems.core.PinConstants.RESOURCES
 import mosis.streetsandtotems.core.PinConstants.TOTEMS
 import mosis.streetsandtotems.core.presentation.components.CustomDialog
-import mosis.streetsandtotems.feature_map.domain.util.PinTypes
 
 @Composable
 fun CustomFilterDialog(
     isOpen: Boolean,
     onDismissRequest: () -> Unit,
     onConfirmButtonClick: () -> Unit,
-    filterState: State<Set<PinTypes>>,
-    updateFilter: (PinTypes) -> Unit,
+    updateFilterResources: () -> Unit,
+    updateFilterPlayers: () -> Unit,
+    updateFilterTotems: () -> Unit,
+    filterResourceState: State<Boolean>,
+    filterFriendsState: State<Boolean>,
+    filterTotemsState: State<Boolean>,
 ) {
     CustomDialog(
         modifier = Modifier.fillMaxWidth(),
@@ -33,29 +36,27 @@ fun CustomFilterDialog(
                 Text(text = "Category")
                 Row {
                     CustomFilterChip(
-                        filterState.value.contains(PinTypes.TypeTiki),
-                        { updateFilter(PinTypes.TypeTiki) },
-                        TOTEMS
+                        filterResourceState.value,
+                        { updateFilterResources() },
+                        RESOURCES
                     )
                     CustomFilterChip(
-                        filterState.value.contains(PinTypes.TypeFriend),
-                        { updateFilter(PinTypes.TypeFriend) },
+                        filterFriendsState.value,
+                        { updateFilterPlayers() },
                         FRIENDS
                     )
                     CustomFilterChip(
-                        filterState.value.contains(PinTypes.TypeResource),
-                        { updateFilter(PinTypes.TypeResource) },
-                        RESOURCES
+                        filterTotemsState.value,
+                        { updateFilterTotems() },
+                        TOTEMS
                     )
                 }
                 Divider()
             }
         },
         confirmButtonEnabled = true,
-        confirmButtonText = "Apply filter",
-        onConfirmButtonClick = {
-            onConfirmButtonClick()
-        },
+        confirmButtonText = "Apply",
+        onConfirmButtonClick = { onConfirmButtonClick() },
         dismissButtonEnabled = true,
         dismissButtonText = "Dismiss",
         onDismissButtonClick = { onDismissRequest() },

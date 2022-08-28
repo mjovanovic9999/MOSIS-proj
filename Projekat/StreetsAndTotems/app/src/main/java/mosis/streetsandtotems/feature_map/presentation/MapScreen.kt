@@ -1,11 +1,9 @@
 package mosis.streetsandtotems.feature_map.presentation
 
-import android.util.Log
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import com.ramcosta.composedestinations.annotation.Destination
 import mosis.streetsandtotems.core.presentation.components.CustomButton
@@ -49,8 +47,12 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
             mapViewModel.closeFilterDialog()
             mapViewModel.resetFilters()
         },
-        filterState = mapViewModel.mapScreenState.value.filtersFlow.collectAsState(),
-        updateFilter = { mapViewModel.updateFilter(it) },
+        updateFilterResources = { mapViewModel.updateFilterResources() },
+        updateFilterPlayers = { mapViewModel.updateFilterFriends() },
+        updateFilterTotems = { mapViewModel.updateFilterTotems() },
+        filterResourceState = mapViewModel.mapScreenState.value.filterResources.collectAsState(),
+        filterFriendsState = mapViewModel.mapScreenState.value.filterPlayers.collectAsState(),
+        filterTotemsState = mapViewModel.mapScreenState.value.filterTotems.collectAsState(),
     )
     Row {//testtest
         CustomButton(clickHandler = {

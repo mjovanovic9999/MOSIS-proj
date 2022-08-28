@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import mosis.streetsandtotems.core.MapConstants.MAP_PRECISION_METERS
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.feature_map.domain.model.PinAction
 import mosis.streetsandtotems.feature_map.domain.model.PinActionType
@@ -88,19 +89,19 @@ class LocationService : Service() {
     private fun initUserPinsFlow() {
         serviceScope.launch {
             mapServiceRepository.getUserInGameData().collect {
-                emitPinAction(it, userPinsFlow, PinActionType.Added)
+                emitPinAction(it, playersPinFlow, PinActionType.Added)
             }
         }
         mapServiceRepository.registerCallbacksOnUserInGameDataUpdate(
             userAddedCallback = {
-                emitPinActionWithServiceScope(it, userPinsFlow, PinActionType.Added)
+                emitPinActionWithServiceScope(it, playersPinFlow, PinActionType.Added)
             },
             userModifiedCallback = {
-                emitPinActionWithServiceScope(it, userPinsFlow, PinActionType.Modified)
+                emitPinActionWithServiceScope(it, playersPinFlow, PinActionType.Modified)
 
             },
             userRemovedCallback = {
-                emitPinActionWithServiceScope(it, userPinsFlow, PinActionType.Removed)
+                emitPinActionWithServiceScope(it, playersPinFlow, PinActionType.Removed)
             }
         )
     }
@@ -164,7 +165,7 @@ class LocationService : Service() {
             .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
             .setWaitForAccurateLocation(true)
             .setInterval(4000)
-            .setSmallestDisplacement(2f)
+            .setSmallestDisplacement(MAP_PRECISION_METERS)
 
         Log.d("tag", "skloniti komenatr za smallest displacement")
 
@@ -246,7 +247,7 @@ class LocationService : Service() {
 
     companion object {
         val locationFlow: MutableStateFlow<Location?> = MutableStateFlow(value = null)
-        val userPinsFlow: MutableStateFlow<PinAction<UserInGameData>?> =
+        val playersPinFlow: MutableStateFlow<PinAction<UserInGameData>?> =
             MutableStateFlow(value = null)
         val resourcesPinsFlow: MutableStateFlow<PinAction<Resource>?> =
             MutableStateFlow(value = null)

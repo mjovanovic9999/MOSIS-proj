@@ -2,7 +2,7 @@ package mosis.streetsandtotems.core
 
 import kotlin.math.PI
 
-object DatabaseConstants{
+object DatabaseConstants {
     const val DATABASE_NAME = "local_db"
 }
 
@@ -110,7 +110,7 @@ object MapConstants {
     const val TILE_URL_512 = "https://api.maptiler.com/maps/openstreetmap/"
     const val TILE_URL_256 = "https://api.maptiler.com/maps/openstreetmap/256/"
     const val TILE_KEY = "njA6yIfsMq23cZHLTop1"
-    const val COMPARISON_PRECISION = 1000000
+    const val MAP_PRECISION_METERS = 2f
 }
 
 object VisualTransformationConstants {

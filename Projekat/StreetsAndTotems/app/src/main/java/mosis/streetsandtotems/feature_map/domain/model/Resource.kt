@@ -10,6 +10,7 @@ enum class ResourceType {
 }
 
 data class Resource(
+    val id: String? = null,
     val type: ResourceType? = null,
     val l: GeoPoint? = null,
     val remaining: Int? = null
