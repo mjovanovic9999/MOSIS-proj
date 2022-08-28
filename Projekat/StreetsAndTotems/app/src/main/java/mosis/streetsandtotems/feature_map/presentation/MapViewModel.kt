@@ -5,7 +5,10 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -278,24 +281,24 @@ class MapViewModel @Inject constructor(
 
     private fun registerFilterPins() {
         viewModelScope.launch {
-            mapScreenState.value.filterResources.collect { shouldShow ->
+            mapScreenState.value.filterResources.collect { shouldFilter ->
                 mapScreenState.value.resourcesHashMap.values.forEach { resource ->
-                    if (shouldShow) {
-                        addResourcePin(resource)
-                    } else {
+                    if (shouldFilter) {
                         resource.id?.let { removePin(it) }
+                    } else {
+                        addResourcePin(resource)
                     }
                 }
 
             }
         }
         viewModelScope.launch {
-            mapScreenState.value.filterPlayers.collect { shouldShow ->
+            mapScreenState.value.filterPlayers.collect { shouldFilter ->
                 mapScreenState.value.playersHashMap.values.forEach { player ->
-                    if (shouldShow) {
-                        addPlayerPin(player)
-                    } else {
+                    if (shouldFilter) {
                         player.id?.let { removePin(it) }
+                    } else {
+                        addPlayerPin(player)
                     }
                 }
 
@@ -303,9 +306,9 @@ class MapViewModel @Inject constructor(
         }
         //treba ovo!!!
 /*        viewModelScope.launch {
-            mapScreenState.value.filterTotems.collect { shouldShow ->
+            mapScreenState.value.filterTotems.collect { shouldFilter ->
                 mapScreenState.value.totemHashMap.values.forEach { totem ->
-                    if (shouldShow) {
+                    if (!shouldShow) {
                         addTotemPin(totem)
                     } else {
                         totem.id?.let { removePin(it) }
@@ -321,6 +324,7 @@ class MapViewModel @Inject constructor(
     private fun initMyLocationPinAndRegisterMove() {
         _mapState.addLazyLoader(LAZY_LOADER_ID)
         _mapState.addMarker(
+//nije clickable!!!!!!!!!
             MY_PIN,
             INIT_SCROLL_X,
             INIT_SCROLL_Y,
@@ -333,8 +337,7 @@ class MapViewModel @Inject constructor(
             clipShape = null,
             relativeOffset = Offset(-.5f, -.5f),
             renderingStrategy = RenderingStrategy.LazyLoading("0"),
-
-            )
+        )
 
         viewModelScope.launch {
             LocationService.locationFlow.collectLatest {
@@ -345,6 +348,7 @@ class MapViewModel @Inject constructor(
                         changeStateDetectScroll(false)
 
                         centerMeOnMyPinSuspend()
+
 
                         changeStateDetectScroll(true)
                     }
@@ -381,6 +385,7 @@ class MapViewModel @Inject constructor(
         val markerInfo = _mapState.getMarkerInfo(MY_PIN)
         if (markerInfo != null) {
             val x = viewModelScope.launch {
+                _mapState.scale = MAX_SCALE
                 _mapState.centerOnMarker(MY_PIN)
             }
             x.join()
@@ -415,7 +420,8 @@ class MapViewModel @Inject constructor(
                 CustomPin(pinId)
             },
             clipShape = null,
-            renderingStrategy = RenderingStrategy.LazyLoading(LAZY_LOADER_ID)
+            renderingStrategy = RenderingStrategy.LazyLoading(LAZY_LOADER_ID),
+            clickable = true,
         )
     }
 
@@ -475,11 +481,5 @@ class MapViewModel @Inject constructor(
         mapScreenState.value.filterPlayers.value = false
         mapScreenState.value.filterTotems.value = false
     }
-
-
-    fun tempAddDDPIN() {
-
-    }
-
 }
 

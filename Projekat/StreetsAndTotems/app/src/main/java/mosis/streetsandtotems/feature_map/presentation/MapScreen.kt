@@ -54,9 +54,4 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
         filterFriendsState = mapViewModel.mapScreenState.value.filterPlayers.collectAsState(),
         filterTotemsState = mapViewModel.mapScreenState.value.filterTotems.collectAsState(),
     )
-    Row {//testtest
-        CustomButton(clickHandler = {
-            mapViewModel.tempAddDDPIN()
-        }, text = "ADD")
-    }
 }

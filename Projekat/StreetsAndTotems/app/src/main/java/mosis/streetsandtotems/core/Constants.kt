@@ -111,6 +111,7 @@ object MapConstants {
     const val TILE_URL_256 = "https://api.maptiler.com/maps/openstreetmap/256/"
     const val TILE_KEY = "njA6yIfsMq23cZHLTop1"
     const val MAP_PRECISION_METERS = 2f
+    const val MAXIMUM_IGNORE_ACCURACY_METERS = 100f
 }
 
 object VisualTransformationConstants {
@@ -207,7 +208,7 @@ object DrawerConstants {
     const val PROFILE = "Visit profile"
     const val LEAVE_SQUAD = "Leave squad"
     const val SIGN_OUT = "Sign out"
-    val DROPDOWN_SELECT_LIST = listOf("Everyone", "Only squad members", "No one")
+    val DROPDOWN_SELECT_LIST = listOf("No one", "Only squad members", "Everyone")
 }
 
 object WorkerKeys {

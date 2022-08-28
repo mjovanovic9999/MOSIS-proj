@@ -43,7 +43,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             .asFlow()
     }
 
-    fun regsterCallbacksOnUserInGameDataUpdate(
+    fun registerCallbacksOnUserInGameDataUpdate(
         currentUser: FirebaseUser,
         userAddedCallback: (user: UserInGameData?) -> Unit,
         userModifiedCallback: (user: UserInGameData?) -> Unit,
@@ -64,7 +64,9 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     suspend fun getResources(): Flow<Resource?> {
         return db.collection(FirestoreConstants.RESOURCES_COLLECTION).get()
-            .await().documents.map { it.toObject<Resource>() }.asFlow()
+            .await().documents.map {
+                it.toObject<Resource>()?.copy(id = it.id)
+            }.asFlow()
     }
 
     fun registerCallbacksOnResourcesUpdate(

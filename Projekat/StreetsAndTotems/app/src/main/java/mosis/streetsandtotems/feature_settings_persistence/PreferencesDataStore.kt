@@ -33,8 +33,8 @@ class PreferencesDataStore(val context: Context) {
             mutablePreferences[RUN_IN_BACKGROUND] = userSettings.runInBackground
             mutablePreferences[SHOW_NOTIFICATIONS] = userSettings.showNotifications
             mutablePreferences[SHOW_MY_PHONE_NUMBER] = userSettings.showMyPhoneNumber
-            mutablePreferences[CALL_PRIVACY_LEVEL] = userSettings.CallPrivacyLevel.ordinal
-            mutablePreferences[SMS_PRIVACY_LEVEL] = userSettings.SMSPrivacyLevel.ordinal
+            mutablePreferences[CALL_PRIVACY_LEVEL] = userSettings.callPrivacyLevel.ordinal
+            mutablePreferences[SMS_PRIVACY_LEVEL] = userSettings.smsPrivacyLevel.ordinal
         }
     }
 
@@ -43,8 +43,8 @@ class PreferencesDataStore(val context: Context) {
             runInBackground = preferences[RUN_IN_BACKGROUND] ?: true,
             showNotifications = preferences[SHOW_NOTIFICATIONS] ?: true,
             showMyPhoneNumber = preferences[SHOW_MY_PHONE_NUMBER] ?: false,
-            CallPrivacyLevel = PrivacySettings.values()[preferences[CALL_PRIVACY_LEVEL] ?: 0],
-            SMSPrivacyLevel = PrivacySettings.values()[preferences[SMS_PRIVACY_LEVEL] ?: 0]
+            callPrivacyLevel = PrivacySettings.values()[preferences[CALL_PRIVACY_LEVEL] ?: 0],
+            smsPrivacyLevel = PrivacySettings.values()[preferences[SMS_PRIVACY_LEVEL] ?: 0]
         )
     }
 

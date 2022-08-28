@@ -29,7 +29,7 @@ class MapServiceRepositoryImpl(
     ) {
         auth.currentUser?.let {
             listenerRegistrations.add(
-                firebaseMapDataSource.regsterCallbacksOnUserInGameDataUpdate(
+                firebaseMapDataSource.registerCallbacksOnUserInGameDataUpdate(
                     it,
                     userAddedCallback = userAddedCallback,
                     userModifiedCallback = userModifiedCallback,

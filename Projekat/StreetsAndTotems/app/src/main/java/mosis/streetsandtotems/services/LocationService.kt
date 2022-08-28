@@ -18,6 +18,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.MapConstants.MAP_PRECISION_METERS
+import mosis.streetsandtotems.core.MapConstants.MAXIMUM_IGNORE_ACCURACY_METERS
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.feature_map.domain.model.PinAction
 import mosis.streetsandtotems.feature_map.domain.model.PinActionType
@@ -167,8 +168,6 @@ class LocationService : Service() {
             .setInterval(4000)
             .setSmallestDisplacement(MAP_PRECISION_METERS)
 
-        Log.d("tag", "skloniti komenatr za smallest displacement")
-
 
         val locationSettingsRequest =
             LocationSettingsRequest.Builder()
@@ -188,15 +187,16 @@ class LocationService : Service() {
                 ).show()
 
                 serviceScope.launch {
-                    locationFlow.emit(result.lastLocation)
                     result.lastLocation?.let {
-                        mapServiceRepository.updateMyLocation(
-
-                            GeoPoint(
-                                it.latitude,
-                                it.longitude
+                        if (it.accuracy <= MAXIMUM_IGNORE_ACCURACY_METERS) {
+                            locationFlow.emit(it)
+                            mapServiceRepository.updateMyLocation(
+                                GeoPoint(
+                                    it.latitude,
+                                    it.longitude
+                                )
                             )
-                        )
+                        }
                     }
                     Log.d(
                         "tag",

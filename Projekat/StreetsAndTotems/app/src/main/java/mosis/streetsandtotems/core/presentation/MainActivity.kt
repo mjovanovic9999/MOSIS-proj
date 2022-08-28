@@ -43,10 +43,6 @@ class MainActivity() : ComponentActivity() {
     @Inject
     lateinit var isUserAuthenticated: State<Boolean>
 
-    @Inject
-    lateinit var store: PreferencesDataStore
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

@@ -4,16 +4,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.location.LocationManager
 import android.util.Log
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
-import mosis.streetsandtotems.core.presentation.components.CustomButton
-import mosis.streetsandtotems.core.presentation.utils.notification.BackgroundServicesEnabled
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
+import mosis.streetsandtotems.feature_settings_persistence.PreferencesDataStore
 import mosis.streetsandtotems.services.LocationService
 
 @Composable
@@ -21,9 +21,16 @@ fun LifecycleCompose(
     locationBroadcastReceiver: LocationBroadcastReceiver,
     notificationProvider: NotificationProvider
 ) {
-
-
     val context = LocalContext.current
+    val backgroundServiceEnabled = remember { mutableStateOf(true) }
+
+    val scope = rememberCoroutineScope()
+    scope.launch {
+
+        PreferencesDataStore(context).userSettingsFlow.map { it.runInBackground }.collect {
+            backgroundServiceEnabled.value = it
+        }
+    }
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(
@@ -48,7 +55,7 @@ fun LifecycleCompose(
                             )
 
                         } else {
-                            if (BackgroundServicesEnabled.isEnabled) {
+                            if (backgroundServiceEnabled.value) {
                                 notificationProvider.notifyDisable(false)
                             }
 
@@ -57,7 +64,7 @@ fun LifecycleCompose(
 
                     }
                     Lifecycle.Event.ON_PAUSE -> {
-                        if (BackgroundServicesEnabled.isEnabled && LocationService.isServiceStarted) {
+                        if (backgroundServiceEnabled.value && LocationService.isServiceStarted) {
                             notificationProvider.notifyDisable(true)
                         } else {
                             context.stopService(Intent(context, LocationService::class.java))
