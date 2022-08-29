@@ -81,7 +81,12 @@ class NotificationProvider @Inject constructor(private val context: Context) {
     fun notifyNearbyPass() {
         val intent = Intent(context, MainActivity::class.java)
 
-        val startApp = PendingIntent.getActivity(context, 0, intent, 0)
+        val startApp = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        )
 
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setOngoing(false)
@@ -93,7 +98,7 @@ class NotificationProvider @Inject constructor(private val context: Context) {
 //            .setVibrate(longArrayOf(0, 500, 300/*, 500, 750*/))
 //            .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
 //            .setDefaults(NotificationCompat.DEFAULT_SOUND)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setDefaults(DEFAULT_SOUND or DEFAULT_VIBRATE)
 
 //        (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 //            (context.getSystemService(Service.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
