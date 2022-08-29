@@ -74,7 +74,9 @@ fun LifecycleCompose(
                             locationBroadcastReceiver,
                         )
                     }
-                    else -> {}
+                    else -> {
+                        notificationProvider.notifyNearbyPass()
+                    }
                 }
             }
             lifecycleOwner.lifecycle.addObserver(observer)
