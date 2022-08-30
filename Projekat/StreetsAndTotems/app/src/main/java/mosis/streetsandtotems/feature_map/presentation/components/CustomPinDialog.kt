@@ -21,7 +21,6 @@ import mosis.streetsandtotems.core.presentation.components.CustomTextField
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 import mosis.streetsandtotems.ui.theme.sizes
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomPinDialog(isOpen: Boolean, onDismissRequest: () -> Unit) {
     val commentState = remember { mutableStateOf("") }

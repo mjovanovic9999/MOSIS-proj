@@ -112,6 +112,7 @@ object MapConstants {
     const val TILE_KEY = "njA6yIfsMq23cZHLTop1"
     const val MAP_PRECISION_METERS = 2f
     const val MAXIMUM_IGNORE_ACCURACY_METERS = 100f
+    const val MAXIMUM_TRADE_DISTANCE_IN_METERS = 20f
 }
 
 object VisualTransformationConstants {
@@ -231,6 +232,8 @@ object NotificationConstants {
     const val NOTIFY_NEARBY_PASS_ID = 2
     const val NOTIFY_NEARBY_PASS_TITLE = "Something is near you!"
     const val NOTIFY_NEARBY_PASS_TEXT = "Open application to find out more!"
+
+    val VIBRATION_PATTERN_TIMINGS = longArrayOf(0, 300, 50, 200)
 }
 
 object ItemsConstants {

@@ -1,5 +1,8 @@
 package mosis.streetsandtotems.core.presentation.components
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -13,18 +16,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.core.content.ContextCompat.startActivity
 import mosis.streetsandtotems.core.ButtonConstants
 import mosis.streetsandtotems.ui.theme.sizes
 
 
 @Composable
 fun PlayerDialog(
-    isOpen: Boolean,
+    isOpen: Boolean,//na true da se fetchuje broj username ime prezime
     onDismissRequest: () -> Unit,
     isSquadMember: Boolean = false,
-    tradeEnabled: Boolean = false
+    tradeEnabled: Boolean = false,
+    isCallAllowed: Boolean? = false,
+    isMessagingAllowed: Boolean? = false,
 ) {
+    val context = LocalContext.current
     CustomDialog(
         isOpen = isOpen,
         onDismissRequest = onDismissRequest,
@@ -72,10 +80,9 @@ fun PlayerDialog(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-
-
                     CustomIconButton(
-                        clickHandler = { /*TODO*/ },
+                        enabled = isCallAllowed == false,
+                        clickHandler = { callNumber(context, "0123456789") },//fetch number
                         icon = Icons.Outlined.Call,
                         buttonModifier = Modifier
                             .size(MaterialTheme.sizes.profile_dialog_row_height),
@@ -83,7 +90,8 @@ fun PlayerDialog(
                         iconModifier = Modifier.size(MaterialTheme.sizes.profile_dialog_icon_size)
                     )
                     CustomIconButton(
-                        clickHandler = { /*TODO*/ },
+                        enabled = isMessagingAllowed == false,
+                        clickHandler = { sendSms(context, "0123456789") },////fetch number
                         icon = Icons.Outlined.Message,
                         buttonModifier = Modifier
                             .size(MaterialTheme.sizes.profile_dialog_row_height),
@@ -111,4 +119,16 @@ fun PlayerDialog(
         dismissButtomMatchParentWidth = true,
         buttonType = CustomButtonType.Outlined
     )
+}
+
+fun callNumber(context: Context, number: String) {
+    val intent = Intent(Intent.ACTION_DIAL)
+    intent.data = Uri.parse("tel:$number")
+    startActivity(context, intent, null)
+}
+
+fun sendSms(context: Context, number: String) {
+    val uri = Uri.parse("smsto:$number")
+    val intent = Intent(Intent.ACTION_SENDTO, uri)
+    startActivity(context, intent, null)
 }

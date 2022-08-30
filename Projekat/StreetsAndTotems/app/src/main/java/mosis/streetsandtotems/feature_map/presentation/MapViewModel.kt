@@ -109,6 +109,7 @@ class MapViewModel @Inject constructor(
             resourcesHashMap = mutableMapOf(),
             playersHashMap = mutableMapOf(),
             totemsHashMap = mutableMapOf(),
+            selectedPlayer = mutableStateOf(null)
         ))
 
         mapScreenState = _mapScreenState
@@ -125,6 +126,7 @@ class MapViewModel @Inject constructor(
 
         registerAllPinsFlow()
 
+        registerOnPinClick()
     }
 
     fun registerAllPinsFlow() {
@@ -324,7 +326,6 @@ class MapViewModel @Inject constructor(
     private fun initMyLocationPinAndRegisterMove() {
         _mapState.addLazyLoader(LAZY_LOADER_ID)
         _mapState.addMarker(
-//nije clickable!!!!!!!!!
             MY_PIN,
             INIT_SCROLL_X,
             INIT_SCROLL_Y,
@@ -337,6 +338,7 @@ class MapViewModel @Inject constructor(
             clipShape = null,
             relativeOffset = Offset(-.5f, -.5f),
             renderingStrategy = RenderingStrategy.LazyLoading("0"),
+            clickable = false,
         )
 
         viewModelScope.launch {
@@ -439,6 +441,15 @@ class MapViewModel @Inject constructor(
         _mapState.removeMarker(pinId)
     }
 
+    fun registerOnPinClick() {
+        _mapState.onMarkerClick { id, x, y ->
+            Log.d("tag", "clicked na $id x je $x y je $y")
+            if (mapScreenState.value.playersHashMap.containsKey(id)) {
+                _mapScreenState.value.selectedPlayer.value = mapScreenState.value.playersHashMap[id]
+                showPlayerDialog()
+            }
+        }
+    }
 
     fun showCustomPinDialog() {
         _mapScreenState.value = _mapScreenState.value.copy(customPinDialogOpen = true)
