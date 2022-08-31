@@ -1,21 +1,16 @@
 package mosis.streetsandtotems.feature_map.presentation
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import com.google.firebase.firestore.GeoPoint
 import com.ramcosta.composedestinations.annotation.Destination
-import mosis.streetsandtotems.core.MapConstants.MAXIMUM_TRADE_DISTANCE_IN_METERS
-import mosis.streetsandtotems.core.presentation.components.CustomButton
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_map.presentation.components.CustomFilterDialog
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinDialog
 import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
 import mosis.streetsandtotems.feature_map.presentation.components.MapFABs
-import mosis.streetsandtotems.feature_map.presentation.util.distanceBetweenGeoPoints
 import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
 import mosis.streetsandtotems.services.LocationService
 
@@ -44,14 +39,18 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
     PlayerDialog(
         isOpen = state.playerDialogOpen,
         onDismissRequest = { mapViewModel.closePlayerDialog() },
-        isSquadMember = state.selectedPlayer.value?.id == "MYID",
+        isSquadMember = state.selectedPlayer.value.id == "MYID",////////////////////////////
         tradeEnabled = isTradePossible(
             LocationService.locationFlow.value,
-            state.selectedPlayer.value?.l
+            state.selectedPlayer.value.l
         ),
-        isCallAllowed = state.selectedPlayer.value?.calls_allowed,
-        isMessagingAllowed = state.selectedPlayer.value?.messaging_allowed,
-        )
+        callsAllowed = state.selectedPlayer.value.calls_allowed,
+        messagingAllowed = state.selectedPlayer.value.messaging_allowed,
+        phoneNumber = state.selectedPlayer.value.display_data?.phone_number,
+        firstName = state.selectedPlayer.value.display_data?.first_name,
+        lastName = state.selectedPlayer.value.display_data?.last_name,
+        userName = state.selectedPlayer.value.display_data?.user_name,
+    )
 
     CustomFilterDialog(
         isOpen = state.filterDialogOpen,

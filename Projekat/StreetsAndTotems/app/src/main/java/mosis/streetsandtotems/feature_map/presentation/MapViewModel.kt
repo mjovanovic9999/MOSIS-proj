@@ -109,7 +109,8 @@ class MapViewModel @Inject constructor(
             resourcesHashMap = mutableMapOf(),
             playersHashMap = mutableMapOf(),
             totemsHashMap = mutableMapOf(),
-            selectedPlayer = mutableStateOf(null)
+            customPinsHashMap=mutableMapOf(),
+            selectedPlayer = mutableStateOf(UserInGameData())
         ))
 
         mapScreenState = _mapScreenState
@@ -351,7 +352,6 @@ class MapViewModel @Inject constructor(
 
                         centerMeOnMyPinSuspend()
 
-
                         changeStateDetectScroll(true)
                     }
                 }
@@ -372,6 +372,9 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             _mapState.onLongPress { x, y ->
                 addPinAtOffset(CUSTOM + x.toString() + y.toString(), x, y)
+
+                val geoPoint = convertOffsetsToGeoPoint(x, y, mapDimensions, mapDimensions)
+
             }
         }
     }
@@ -444,9 +447,14 @@ class MapViewModel @Inject constructor(
     fun registerOnPinClick() {
         _mapState.onMarkerClick { id, x, y ->
             Log.d("tag", "clicked na $id x je $x y je $y")
-            if (mapScreenState.value.playersHashMap.containsKey(id)) {
-                _mapScreenState.value.selectedPlayer.value = mapScreenState.value.playersHashMap[id]
+            if (mapScreenState.value.resourcesHashMap.containsKey(id)) {
+
+            } else if (mapScreenState.value.playersHashMap.containsKey(id)) {
+                _mapScreenState.value.selectedPlayer.value =
+                    mapScreenState.value.playersHashMap[id]!!
                 showPlayerDialog()
+            } else if (mapScreenState.value.totemsHashMap.containsKey(id)) {
+
             }
         }
     }
@@ -465,6 +473,7 @@ class MapViewModel @Inject constructor(
 
     fun closePlayerDialog() {
         _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
+//        _mapScreenState.value.selectedPlayer.value = UserInGameData()//treba li ovo?????
     }
 
     fun showFilterDialog() {

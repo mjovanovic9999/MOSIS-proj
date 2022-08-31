@@ -19,5 +19,6 @@ data class MapScreenState(
     val resourcesHashMap: MutableMap<String, Resource>,
     val playersHashMap: MutableMap<String, UserInGameData>,
     val totemsHashMap: MutableMap<String, Any>,
-    val selectedPlayer: MutableState<UserInGameData?>,
+    val customPinsHashMap: MutableMap<String, Any>,
+    val selectedPlayer: MutableState<UserInGameData>,
 )

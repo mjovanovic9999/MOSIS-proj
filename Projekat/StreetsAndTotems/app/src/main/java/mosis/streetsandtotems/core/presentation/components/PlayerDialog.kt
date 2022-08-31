@@ -25,12 +25,16 @@ import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
 fun PlayerDialog(
-    isOpen: Boolean,//na true da se fetchuje broj username ime prezime
+    isOpen: Boolean,
     onDismissRequest: () -> Unit,
     isSquadMember: Boolean = false,
     tradeEnabled: Boolean = false,
-    isCallAllowed: Boolean? = false,
-    isMessagingAllowed: Boolean? = false,
+    callsAllowed: Boolean? = false,
+    messagingAllowed: Boolean? = false,
+    phoneNumber: String? = null,
+    firstName: String? = null,
+    lastName: String? = null,
+    userName: String? = null,
 ) {
     val context = LocalContext.current
     CustomDialog(
@@ -52,7 +56,7 @@ fun PlayerDialog(
                             .align(Alignment.CenterStart),
                     ) {
                         Text(
-                            text = "JS",
+                            text = "(${firstName?.first()} ${lastName?.first()}",
                             modifier = Modifier.align(Alignment.Center),
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -65,12 +69,12 @@ fun PlayerDialog(
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "AAAAAAAAAA",
+                        text = userName ?: "",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Text(
-                        text = "Aleksandar Sokolovic",
+                        text = "$firstName $lastName",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.labelLarge
                     )
@@ -81,8 +85,8 @@ fun PlayerDialog(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     CustomIconButton(
-                        enabled = isCallAllowed == false,
-                        clickHandler = { callNumber(context, "0123456789") },//fetch number
+                        enabled = callsAllowed == true,
+                        clickHandler = { callNumber(context, phoneNumber) },
                         icon = Icons.Outlined.Call,
                         buttonModifier = Modifier
                             .size(MaterialTheme.sizes.profile_dialog_row_height),
@@ -90,8 +94,8 @@ fun PlayerDialog(
                         iconModifier = Modifier.size(MaterialTheme.sizes.profile_dialog_icon_size)
                     )
                     CustomIconButton(
-                        enabled = isMessagingAllowed == false,
-                        clickHandler = { sendSms(context, "0123456789") },////fetch number
+                        enabled = messagingAllowed == true,
+                        clickHandler = { sendSms(context, phoneNumber) },
                         icon = Icons.Outlined.Message,
                         buttonModifier = Modifier
                             .size(MaterialTheme.sizes.profile_dialog_row_height),
@@ -116,19 +120,23 @@ fun PlayerDialog(
         confirmButtonMatchParentWidth = true,
         dismissButtonText = ButtonConstants.TRADE,
         dismissButtonVisible = tradeEnabled,
-        dismissButtomMatchParentWidth = true,
+        dismissButtonMatchParentWidth = true,
         buttonType = CustomButtonType.Outlined
     )
 }
 
-fun callNumber(context: Context, number: String) {
-    val intent = Intent(Intent.ACTION_DIAL)
-    intent.data = Uri.parse("tel:$number")
-    startActivity(context, intent, null)
+fun callNumber(context: Context, number: String?) {
+    if (number != null) {
+        val intent = Intent(Intent.ACTION_DIAL)
+        intent.data = Uri.parse("tel:$number")
+        startActivity(context, intent, null)
+    }
 }
 
-fun sendSms(context: Context, number: String) {
-    val uri = Uri.parse("smsto:$number")
-    val intent = Intent(Intent.ACTION_SENDTO, uri)
-    startActivity(context, intent, null)
+fun sendSms(context: Context, number: String?) {
+    if (number != null) {
+        val uri = Uri.parse("smsto:$number")
+        val intent = Intent(Intent.ACTION_SENDTO, uri)
+        startActivity(context, intent, null)
+    }
 }
