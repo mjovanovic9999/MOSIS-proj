@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FirestoreConstants
 import mosis.streetsandtotems.feature_map.domain.model.ProfileData
-import mosis.streetsandtotems.feature_map.domain.model.Resource
+import mosis.streetsandtotems.feature_map.domain.model.ResourceData
+import mosis.streetsandtotems.feature_map.domain.model.TotemData
 import mosis.streetsandtotems.feature_map.domain.model.UserInGameData
 import org.imperiumlabs.geofirestore.GeoFirestore
 
@@ -57,22 +58,24 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                     snapshots,
                     userAddedCallback,
                     userModifiedCallback,
-                    userRemovedCallback
+                    userRemovedCallback,
+                    customConversion = { it.toObject<UserInGameData>().copy(id = it.id) }
                 )
             }
     }
 
-    suspend fun getResources(): Flow<Resource?> {
+
+    suspend fun getResources(): Flow<ResourceData?> {
         return db.collection(FirestoreConstants.RESOURCES_COLLECTION).get()
             .await().documents.map {
-                it.toObject<Resource>()?.copy(id = it.id)
+                it.toObject<ResourceData>()?.copy(id = it.id)
             }.asFlow()
     }
 
     fun registerCallbacksOnResourcesUpdate(
-        resourceAddedCallback: (resource: Resource?) -> Unit,
-        resourceModifiedCallback: (resource: Resource?) -> Unit,
-        resourceRemovedCallback: (resource: Resource?) -> Unit
+        resourceAddedCallback: (resource: ResourceData?) -> Unit,
+        resourceModifiedCallback: (resource: ResourceData?) -> Unit,
+        resourceRemovedCallback: (resource: ResourceData?) -> Unit
     ): ListenerRegistration {
         return db.collection(FirestoreConstants.RESOURCES_COLLECTION)
             .addSnapshotListener { snapshots, e ->
@@ -81,7 +84,34 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                     snapshots,
                     resourceAddedCallback,
                     resourceModifiedCallback,
-                    resourceRemovedCallback
+                    resourceRemovedCallback,
+                    customConversion = { it.toObject<ResourceData>().copy(id = it.id) }
+                )
+            }
+    }
+
+
+    suspend fun getTotems(): Flow<TotemData?> {
+        return db.collection(FirestoreConstants.TOTEMS_COLLECTION).get()
+            .await().documents.map {
+                it.toObject<TotemData>()?.copy(id = it.id)
+            }.asFlow()
+    }
+
+    fun registerCallbacksOnTotemsUpdate(
+        totemAddedCallback: (totem: TotemData?) -> Unit,
+        totemModifiedCallback: (totem: TotemData?) -> Unit,
+        totemRemovedCallback: (totem: TotemData?) -> Unit
+    ): ListenerRegistration {
+        return db.collection(FirestoreConstants.TOTEMS_COLLECTION)
+            .addSnapshotListener { snapshots, e ->
+                collectionSnapshotListenerCallback(
+                    e,
+                    snapshots,
+                    totemAddedCallback,
+                    totemModifiedCallback,
+                    totemRemovedCallback,
+                    customConversion = { it.toObject<TotemData>().copy(id = it.id) }
                 )
             }
     }

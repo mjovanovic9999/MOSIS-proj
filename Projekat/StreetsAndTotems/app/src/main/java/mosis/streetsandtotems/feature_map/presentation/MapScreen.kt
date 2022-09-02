@@ -32,8 +32,12 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
     )
 
     CustomPinDialog(
-        isOpen = state.customPinDialogOpen,
-        onDismissRequest = { mapViewModel.closeCustomPinDialog() }
+        isOpen = state.pinDialog.dialogOpen,
+        onDismissRequest = { mapViewModel.closeCustomPinDialog() },
+        dialogText = state.pinDialog.text,
+        isNewPin = state.pinDialog.id == null,
+        isSquadMember = true,////////////////////////////squad_id!=null
+        placedBy = state.pinDialog.placedBy,
     )
 
     PlayerDialog(

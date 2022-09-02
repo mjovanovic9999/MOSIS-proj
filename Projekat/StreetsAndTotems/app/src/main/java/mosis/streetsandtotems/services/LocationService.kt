@@ -12,18 +12,13 @@ import androidx.compose.runtime.mutableStateOf
 import com.google.android.gms.location.*
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.MapConstants.MAP_PRECISION_METERS
 import mosis.streetsandtotems.core.MapConstants.MAXIMUM_IGNORE_ACCURACY_METERS
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
-import mosis.streetsandtotems.feature_map.domain.model.PinAction
-import mosis.streetsandtotems.feature_map.domain.model.PinActionType
-import mosis.streetsandtotems.feature_map.domain.model.Resource
-import mosis.streetsandtotems.feature_map.domain.model.UserInGameData
+import mosis.streetsandtotems.feature_map.domain.model.*
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
 import javax.inject.Inject
 
@@ -61,6 +56,7 @@ class LocationService : Service() {
 
         initUserPinsFlow()
         initResourcesFlow()
+        initTotemsFlow()
 
     }
 
@@ -88,11 +84,6 @@ class LocationService : Service() {
     }
 
     private fun initUserPinsFlow() {
-        serviceScope.launch {
-            mapServiceRepository.getUserInGameData().collect {
-                emitPinAction(it, playersPinFlow, PinActionType.Added)
-            }
-        }
         mapServiceRepository.registerCallbacksOnUserInGameDataUpdate(
             userAddedCallback = {
                 emitPinActionWithServiceScope(it, playersPinFlow, PinActionType.Added)
@@ -108,12 +99,6 @@ class LocationService : Service() {
     }
 
     private fun initResourcesFlow() {
-        serviceScope.launch {
-            mapServiceRepository.getResources().collect {
-                emitPinAction(it, resourcesPinsFlow, PinActionType.Added)
-            }
-        }
-
         mapServiceRepository.registerCallbackOnResourcesUpdate(
             resourceAddedCallback = {
                 emitPinActionWithServiceScope(
@@ -139,12 +124,37 @@ class LocationService : Service() {
         )
     }
 
+    private fun initTotemsFlow() {
+        mapServiceRepository.registerCallbackOnTotemsUpdate(
+            totemAddedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    totemsPinsFlow,
+                    PinActionType.Added
+                )
+            },
+            totemModifiedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    totemsPinsFlow,
+                    PinActionType.Modified
+                )
+            },
+            totemRemovedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    totemsPinsFlow,
+                    PinActionType.Removed
+                )
+            }
+        )
+    }
+
     private suspend fun <T> emitPinAction(
         pinData: T?,
-        pinFlow: MutableStateFlow<PinAction<T>?>,
+        pinFlow: MutableSharedFlow<PinAction<T>?>,
         actionType: PinActionType
     ) {
-        Log.d("emit", pinData.toString())
         pinData?.let {
             pinFlow.emit(PinAction(pinData, actionType))
         }
@@ -152,7 +162,7 @@ class LocationService : Service() {
 
     private fun <T> emitPinActionWithServiceScope(
         pinData: T?,
-        pinFlow: MutableStateFlow<PinAction<T>?>,
+        pinFlow: MutableSharedFlow<PinAction<T>?>,
         actionType: PinActionType
     ) {
         serviceScope.launch {
@@ -247,9 +257,15 @@ class LocationService : Service() {
 
     companion object {
         val locationFlow: MutableStateFlow<Location?> = MutableStateFlow(value = null)
-        val playersPinFlow: MutableStateFlow<PinAction<UserInGameData>?> =
+        val playersPinFlow: MutableSharedFlow<PinAction<UserInGameData>?> =
+            MutableSharedFlow()
+        val resourcesPinsFlow: MutableSharedFlow<PinAction<ResourceData>?> =
+            MutableSharedFlow()
+        val totemsPinsFlow: MutableSharedFlow<PinAction<TotemData>?> =
+            MutableSharedFlow()
+        val customPinsFlow: MutableStateFlow<PinAction<CustomPinData>?> =//neje uvrzano
             MutableStateFlow(value = null)
-        val resourcesPinsFlow: MutableStateFlow<PinAction<Resource>?> =
+        val homePinsFlow: MutableStateFlow<PinAction<HomeData>?> =//neje uvrzano
             MutableStateFlow(value = null)
         var isServiceStarted = false
         var isLocationEnabled = mutableStateOf(value = true)

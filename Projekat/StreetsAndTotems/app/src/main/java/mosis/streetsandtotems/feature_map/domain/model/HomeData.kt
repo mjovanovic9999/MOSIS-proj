@@ -2,10 +2,12 @@ package mosis.streetsandtotems.feature_map.domain.model
 
 import com.google.firebase.firestore.GeoPoint
 
-data class UserInGameData(
+data class HomeData(
     override val id: String? = null,
     override val l: GeoPoint? = null,
-    val calls_allowed: Boolean? = null,
-    val messaging_allowed: Boolean? = null,
-    val display_data: ProfileData? = null
+    val emerald: Int? = null,
+    val stone: Int? = null,
+    val brick: Int? = null,
+    val wood: Int? = null,
+    val totem: Int? = null,
 ) : IData

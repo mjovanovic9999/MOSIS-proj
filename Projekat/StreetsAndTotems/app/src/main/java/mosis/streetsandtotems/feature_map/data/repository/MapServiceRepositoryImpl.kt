@@ -6,7 +6,8 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
-import mosis.streetsandtotems.feature_map.domain.model.Resource
+import mosis.streetsandtotems.feature_map.domain.model.ResourceData
+import mosis.streetsandtotems.feature_map.domain.model.TotemData
 import mosis.streetsandtotems.feature_map.domain.model.UserInGameData
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
 
@@ -20,6 +21,13 @@ class MapServiceRepositoryImpl(
         auth.currentUser?.let {
             firebaseMapDataSource.updateUserLocation(it, newLocation)
         }
+    }
+
+    override suspend fun getUserInGameData(): Flow<UserInGameData?> {
+        auth.currentUser?.let {
+            return firebaseMapDataSource.getUserInGameData(it)
+        }
+        return emptyFlow()
     }
 
     override fun registerCallbacksOnUserInGameDataUpdate(
@@ -40,14 +48,7 @@ class MapServiceRepositoryImpl(
     }
 
 
-    override suspend fun getUserInGameData(): Flow<UserInGameData?> {
-        auth.currentUser?.let {
-            return firebaseMapDataSource.getUserInGameData(it)
-        }
-        return emptyFlow()
-    }
-
-    override suspend fun getResources(): Flow<Resource?> {
+    override suspend fun getResources(): Flow<ResourceData?> {
         auth.currentUser?.let {
             return firebaseMapDataSource.getResources()
         }
@@ -55,9 +56,9 @@ class MapServiceRepositoryImpl(
     }
 
     override fun registerCallbackOnResourcesUpdate(
-        resourceAddedCallback: (resource: Resource?) -> Unit,
-        resourceModifiedCallback: (resource: Resource?) -> Unit,
-        resourceRemovedCallback: (resource: Resource?) -> Unit
+        resourceAddedCallback: (resource: ResourceData?) -> Unit,
+        resourceModifiedCallback: (resource: ResourceData?) -> Unit,
+        resourceRemovedCallback: (resource: ResourceData?) -> Unit
     ) {
         auth.currentUser?.let {
             listenerRegistrations.add(
@@ -69,6 +70,31 @@ class MapServiceRepositoryImpl(
             )
         }
     }
+
+
+    override suspend fun getTotems(): Flow<TotemData?> {
+        auth.currentUser?.let {
+            return firebaseMapDataSource.getTotems()
+        }
+        return emptyFlow()
+    }
+
+    override fun registerCallbackOnTotemsUpdate(
+        totemAddedCallback: (totem: TotemData?) -> Unit,
+        totemModifiedCallback: (totem: TotemData?) -> Unit,
+        totemRemovedCallback: (totem: TotemData?) -> Unit
+    ) {
+        auth.currentUser?.let {
+            listenerRegistrations.add(
+                firebaseMapDataSource.registerCallbacksOnTotemsUpdate(
+                    totemAddedCallback,
+                    totemModifiedCallback,
+                    totemRemovedCallback
+                )
+            )
+        }
+    }
+
 
     override fun removeAllCallbacks() {
         listenerRegistrations.forEach {
