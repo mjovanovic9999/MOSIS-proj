@@ -9,6 +9,10 @@ object DatabaseConstants {
 object FirestoreConstants {
     const val USER_IN_GAME_DATA_COLLECTION = "user_in_game_data"
     const val RESOURCES_COLLECTION = "resources"
+    const val TOTEMS_COLLECTION = "totems"
+    const val CUSTOM_PINS_COLLECTION = "custom_pins"
+    const val HOMES_COLLECTION = "homes"
+
 
     const val ID_FIELD = "__name__"
 }
@@ -78,6 +82,8 @@ object ButtonConstants {
     const val CANCEL = "Cancel"
     const val DROP = "Drop"
     const val PLACE = "Place"
+    const val EDIT = "Edit"
+    const val REMOVE = "Remove"
     const val DIALOG_BACKGROUND_PERMISSION_CONFIRM_BUTTON = "Grant"
     const val DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON = "Don't grant"
     const val SHOW_ON_MAP = "Show on map"
@@ -156,6 +162,7 @@ object MapConstants {
     const val TILE_KEY = "njA6yIfsMq23cZHLTop1"
     const val MAP_PRECISION_METERS = 2f
     const val MAXIMUM_IGNORE_ACCURACY_METERS = 100f
+    const val MAXIMUM_TRADE_DISTANCE_IN_METERS = 20f
 }
 
 object VisualTransformationConstants {
@@ -214,8 +221,10 @@ object TitleConstants {
     const val BACKPACK = "Backpack"
     const val LEADERBOARD = "Leaderboard"
     const val MORE_INFORMATION = "More information"
-    const val CUSTOM_PIN_DIALOG_SQUAD = "Place note pin for your squad"
-    const val CUSTOM_PIN_DIALOG_SOLO = "Place note pin for yourself"
+    const val CUSTOM_NEW_PIN_DIALOG_SQUAD = "Place note pin for your squad"
+    const val CUSTOM_NEW_PIN_DIALOG_SOLO = "Place note pin for yourself"
+    const val CUSTOM_PIN_DIALOG_SQUAD_PLACED_BY = "Squad's pin placed by: "
+    const val CUSTOM_PIN_DIALOG_SOLO_PLACED_BY = "My pin"
     const val LEAVE_SQUAD = "Are you sure you want to leave your squad?"
 }
 
@@ -278,6 +287,8 @@ object NotificationConstants {
     const val NOTIFY_NEARBY_PASS_ID = 2
     const val NOTIFY_NEARBY_PASS_TITLE = "Something is near you!"
     const val NOTIFY_NEARBY_PASS_TEXT = "Open application to find out more!"
+
+    val VIBRATION_PATTERN_TIMINGS = longArrayOf(0, 300, 50, 200)
 }
 
 object ItemsConstants {
@@ -306,8 +317,8 @@ object LeaderboardItemsConstants {
 }
 
 object CustomPinDialogConstants {
-    const val NOTE_TEXT = "Note text"
-    const val NOTE_TEXT_LENGTH = 100
+    const val PIN_TEXT = "Pin text"
+    const val PIN_TEXT_LENGTH = 100
 }
 
 object ConfirmationDialogTextConstants {

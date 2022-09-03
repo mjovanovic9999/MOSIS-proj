@@ -75,7 +75,7 @@ fun LifecycleCompose(
                         )
                     }
                     else -> {
-                        notificationProvider.notifyNearbyPass()
+//                        notificationProvider.notifyNearbyPass()
                     }
                 }
             }
