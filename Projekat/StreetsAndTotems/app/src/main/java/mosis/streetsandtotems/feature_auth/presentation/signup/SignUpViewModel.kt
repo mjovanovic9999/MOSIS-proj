@@ -26,7 +26,6 @@ import mosis.streetsandtotems.core.presentation.states.FormState
 import mosis.streetsandtotems.feature_auth.domain.use_case.AuthUseCases
 import mosis.streetsandtotems.feature_auth.presentation.util.SignUpFields
 import mosis.streetsandtotems.feature_auth.presentation.util.SignUpFieldsEmpty
-import mosis.streetsandtotems.feature_auth.presentation.util.handleSignInWithEmailAndPassword
 import javax.inject.Inject
 
 @HiltViewModel
@@ -184,7 +183,7 @@ class SignupViewModel @Inject constructor(
                     ),
                     snackbarFlow = snackbarFlow,
                     showLoaderFlow = showLoaderFlow,
-                    errorMessage = MessageConstants.SIGN_UP_ERROR,
+                    defaultErrorMessage = MessageConstants.SIGN_UP_ERROR,
                     successMessage = MessageConstants.SIGNED_UP,
                     onSuccess = {
                         viewModelScope.launch {

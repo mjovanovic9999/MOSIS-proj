@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Streets And Totems</string>
-    <item format="float" name="nis_latitude" type="dimen" >43.321181</item>
-    <item name="nis_longitude" type="dimen" format="float">21.895675</item>
-    <item format="float" name="map_zoom" type="dimen" >16.5</item>
-
+    <item name="nis_latitude" format="float" type="dimen">43.321181</item>
+    <item name="nis_longitude" format="float" type="dimen">21.895675</item>
+    <item name="map_zoom" format="float" type="dimen">16.5</item>
+    <string name="web_client_id">362520785619-rq3i6di9rrn74ho2p29vpdi27nkuhobp.apps.googleusercontent.com</string>
 </resources>

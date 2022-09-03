@@ -4,6 +4,7 @@ import androidx.compose.material3.SnackbarDuration
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import mosis.streetsandtotems.core.HandleResponseConstants
+import mosis.streetsandtotems.core.MessageConstants
 import mosis.streetsandtotems.core.domain.model.Response
 import mosis.streetsandtotems.core.domain.model.SnackbarSettings
 import mosis.streetsandtotems.core.presentation.components.SnackbarType
@@ -15,8 +16,8 @@ suspend fun <T : Any> handleResponse(
     onLoading: (() -> Unit)? = null,
     onSuccess: ((T?) -> Unit)? = null,
     onError: ((String?, T?) -> Unit)? = null,
-    errorMessage: String = "",
-    successMessage: String = ""
+    defaultErrorMessage: String = MessageConstants.DEFAULT_ERROR_MESSAGE,
+    successMessage: String = MessageConstants.DEFAULT_SUCCESS_MESSAGE
 ) {
     responseFlow.collect {
         when (it) {
@@ -28,7 +29,7 @@ suspend fun <T : Any> handleResponse(
                 showLoaderFlow?.emit(false)
                 snackbarFlow?.emit(
                     SnackbarSettings(
-                        message = errorMessage,
+                        message = it.message ?: defaultErrorMessage,
                         duration = SnackbarDuration.Short,
                         snackbarType = SnackbarType.Error,
                         snackbarId = snackbarFlow.value?.snackbarId?.plus(other = HandleResponseConstants.ID_ADDITION_FACTOR)

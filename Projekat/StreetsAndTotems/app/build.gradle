@@ -91,9 +91,12 @@ dependencies {
 
     //Firebase
     implementation platform('com.google.firebase:firebase-bom:30.3.2')
-    implementation 'com.google.firebase:firebase-auth-ktx:21.0.7'
-    implementation 'com.google.firebase:firebase-database-ktx:20.0.5'
-    implementation 'com.google.firebase:firebase-firestore-ktx:24.2.2'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.0.8'
+    implementation 'com.google.firebase:firebase-database-ktx:20.0.6'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.3.0'
+
+    //Google Sign In
+    implementation 'com.google.android.gms:play-services-auth:20.2.0'
 
     //GeoFirestore
     implementation 'com.github.imperiumlabs:GeoFirestore-Android:v1.5.0'
