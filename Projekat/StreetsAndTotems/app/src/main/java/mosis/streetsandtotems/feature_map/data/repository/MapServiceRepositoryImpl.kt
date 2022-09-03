@@ -3,33 +3,32 @@ package mosis.streetsandtotems.feature_map.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ListenerRegistration
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
-import mosis.streetsandtotems.feature_map.domain.model.Resource
-import mosis.streetsandtotems.feature_map.domain.model.UserInGameData
+import mosis.streetsandtotems.feature_map.data.data_source.FirebaseServiceDataSource
+import mosis.streetsandtotems.feature_map.domain.model.*
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
 
 class MapServiceRepositoryImpl(
-    private val firebaseMapDataSource: FirebaseMapDataSource,
+    private val firebaseServiceDataSource: FirebaseServiceDataSource,
     private val auth: FirebaseAuth
 ) : MapServiceRepository {
     private var listenerRegistrations: MutableList<ListenerRegistration> = mutableListOf()
 
     override suspend fun updateMyLocation(newLocation: GeoPoint) {
         auth.currentUser?.let {
-            firebaseMapDataSource.updateUserLocation(it, newLocation)
+            firebaseServiceDataSource.updateUserLocation(it, newLocation)
         }
     }
+
+
 
     override fun registerCallbacksOnUserInGameDataUpdate(
         userAddedCallback: (user: UserInGameData?) -> Unit,
         userModifiedCallback: (user: UserInGameData?) -> Unit,
-        userRemovedCallback: (user: UserInGameData?) -> Unit
+        userRemovedCallback: (user: UserInGameData?) -> Unit,
     ) {
         auth.currentUser?.let {
             listenerRegistrations.add(
-                firebaseMapDataSource.regsterCallbacksOnUserInGameDataUpdate(
+                firebaseServiceDataSource.registerCallbacksOnUserInGameDataUpdate(
                     it,
                     userAddedCallback = userAddedCallback,
                     userModifiedCallback = userModifiedCallback,
@@ -40,28 +39,14 @@ class MapServiceRepositoryImpl(
     }
 
 
-    override suspend fun getUserInGameData(): Flow<UserInGameData?> {
-        auth.currentUser?.let {
-            return firebaseMapDataSource.getUserInGameData(it)
-        }
-        return emptyFlow()
-    }
-
-    override suspend fun getResources(): Flow<Resource?> {
-        auth.currentUser?.let {
-            return firebaseMapDataSource.getResources()
-        }
-        return emptyFlow()
-    }
-
     override fun registerCallbackOnResourcesUpdate(
-        resourceAddedCallback: (resource: Resource?) -> Unit,
-        resourceModifiedCallback: (resource: Resource?) -> Unit,
-        resourceRemovedCallback: (resource: Resource?) -> Unit
+        resourceAddedCallback: (resource: ResourceData?) -> Unit,
+        resourceModifiedCallback: (resource: ResourceData?) -> Unit,
+        resourceRemovedCallback: (resource: ResourceData?) -> Unit,
     ) {
         auth.currentUser?.let {
             listenerRegistrations.add(
-                firebaseMapDataSource.registerCallbacksOnResourcesUpdate(
+                firebaseServiceDataSource.registerCallbacksOnResourcesUpdate(
                     resourceAddedCallback,
                     resourceModifiedCallback,
                     resourceRemovedCallback
@@ -69,6 +54,58 @@ class MapServiceRepositoryImpl(
             )
         }
     }
+
+
+    override fun registerCallbackOnTotemsUpdate(
+        totemAddedCallback: (totem: TotemData?) -> Unit,
+        totemModifiedCallback: (totem: TotemData?) -> Unit,
+        totemRemovedCallback: (totem: TotemData?) -> Unit,
+    ) {
+        auth.currentUser?.let {
+            listenerRegistrations.add(
+                firebaseServiceDataSource.registerCallbacksOnTotemsUpdate(
+                    totemAddedCallback,
+                    totemModifiedCallback,
+                    totemRemovedCallback
+                )
+            )
+        }
+    }
+
+
+    override fun registerCallbackOnCustomPinsUpdate(
+        customPinAddedCallback: (customPin: CustomPinData?) -> Unit,
+        customPinModifiedCallback: (customPin: CustomPinData?) -> Unit,
+        customPinRemovedCallback: (customPin: CustomPinData?) -> Unit,
+    ) {
+        auth.currentUser?.let {
+            listenerRegistrations.add(
+                firebaseServiceDataSource.registerCallbacksOnCustomPinsUpdate(
+                    customPinAddedCallback,
+                    customPinModifiedCallback,
+                    customPinRemovedCallback
+                )
+            )
+        }
+    }
+
+
+    override fun registerCallbackOnHomesUpdate(
+        homeAddedCallback: (user: HomeData?) -> Unit,
+        homeModifiedCallback: (user: HomeData?) -> Unit,
+        homeRemovedCallback: (user: HomeData?) -> Unit,
+    ) {
+        auth.currentUser?.let {
+            listenerRegistrations.add(
+                firebaseServiceDataSource.registerCallbacksOnHomesUpdate(
+                    homeAddedCallback = homeAddedCallback,
+                    homeModifiedCallback = homeModifiedCallback,
+                    homeRemovedCallback = homeRemovedCallback,
+                )
+            )
+        }
+    }
+
 
     override fun removeAllCallbacks() {
         listenerRegistrations.forEach {

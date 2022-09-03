@@ -15,7 +15,7 @@ import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
-fun DrawerIconSelection(label: String) {
+fun DrawerIconSelection(label: String, selectedIndex: Int, onIndexChange: (Int) -> Unit) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
@@ -31,8 +31,9 @@ fun DrawerIconSelection(label: String) {
                 modifier = Modifier.fillMaxWidth(),
                 type = CustomTextFieldType.Outlined,
                 readOnly = true,
-                defaultSelectedIndex = 0,
-                height = MaterialTheme.sizes.drawer_select_height
+                defaultSelectedIndex = selectedIndex,
+                height = MaterialTheme.sizes.drawer_select_height,
+                onIndexChange = onIndexChange,
             )
         }
     }

@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import kotlinx.coroutines.flow.collectLatest
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.ButtonConstants
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
@@ -26,6 +25,7 @@ import mosis.streetsandtotems.destinations.SignUpScreenDestination
 import mosis.streetsandtotems.destinations.TikiScreenDestination
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtons
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtonsType
+import mosis.streetsandtotems.feature_auth.presentation.components.OneTapGoogle
 import mosis.streetsandtotems.ui.theme.sizes
 
 @AuthNavGraph(start = true)
@@ -35,16 +35,19 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
     val state = viewModel.signInState.value
 
     LaunchedEffect(Unit) {
-        state.signInScreenEvents.collectLatest {
+        state.signInScreenEvents.collect {
             if (it != null)
                 when (it) {
                     SignInScreenEvents.SignInSuccessful -> {
                         destinationsNavigator.popBackStack()
                         destinationsNavigator.navigate(MainScreenDestination)
                     }
+                    SignInScreenEvents.WrongEmail -> viewModel.signInState.value.formState.fields[0].focusRequester.requestFocus()
+                    SignInScreenEvents.WrongPassword -> viewModel.signInState.value.formState.fields[1].focusRequester.requestFocus()
                 }
         }
     }
+
 
     CustomPage(
         titleContent = {
@@ -75,7 +78,10 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
                 enabled = state.formState.isFormFilled.value
             )
 
-            AuthButtons(type = AuthButtonsType.SignIn)
+            AuthButtons(
+                type = AuthButtonsType.SignIn,
+                onSignInWithGoogleClick = { viewModel.onEvent(SignInViewModelEvents.OneTapSignInWithGoogle) },
+                onSignInWithFacebookClick = { })
 
             CustomButton(
                 clickHandler = { destinationsNavigator.navigate(SignUpScreenDestination) },
@@ -85,5 +91,9 @@ fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: Destinations
                 textStyle = MaterialTheme.typography.labelLarge
             )
         })
+
+    OneTapGoogle(
+        signInResult = state.onTapSignInResponse.value,
+        onAccountSelected = { viewModel.onEvent(SignInViewModelEvents.SignInWithGoogle(it)) })
 }
 

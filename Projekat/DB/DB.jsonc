@@ -3,6 +3,7 @@
 {
     "id": "auth_id",
     "data": {
+        "user_name": "",
         "first_name": "",
         "last_name": "",
         "phone_number": "",
@@ -20,7 +21,7 @@
         "user_online": "",
         "squad_id": "",
         "calls_allowed": "",
-        "messaging_ allowed": ""
+        "messaging_allowed": ""
     }
 }
 
@@ -63,7 +64,8 @@
 {
     "id": "",
     "data":{
-        "placed_by": "auth_id || squad_id",
+        "placed_by": "auth_id",
+        "visible_to": "auth_id || squad_id",
         "text": "",
         "latitude": "",
         "longitude": ""
@@ -101,7 +103,7 @@
     "id": "auth_id || squad_id",
     "data": {
         "latitude": "",
-        "longtude": "",
+        "longitude": "",
         "inventory": {
             "wood": "",
             "brick": "",
@@ -109,7 +111,7 @@
             "emerald": "",
             "totem": ""
         },
-     //   "protection_level": "unprotected || low || medium || high"
+     ///////////////////////////////////////////   "protection_level": "unprotected || low || medium || high"
     }
 }
 

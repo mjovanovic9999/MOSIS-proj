@@ -36,8 +36,19 @@ import mosis.streetsandtotems.ui.theme.sizes
 fun DrawerContent(
     modifier: Modifier,
     destinationsNavigator: DestinationsNavigator,
-    onSignOut: (DestinationsNavigator) -> Unit
-) {
+    onSignOut: (DestinationsNavigator) -> Unit,
+    runInBackground: Boolean,
+    onRunInBackgroundChange: () -> Unit,
+    showNotifications: Boolean,
+    onShowNotificationsChange: () -> Unit,
+    showMyPhoneNumber: Boolean,
+    onShowMyPhoneNumberChange: () -> Unit,
+    callPrivacyLevel: Int,
+    onCallPrivacyLevelIndexChange: (Int) -> Unit,
+    smsPrivacyLevel: Int,
+    onSmsPrivacyLevelChange: (Int) -> Unit,
+
+    ) {
     val focusManager = LocalFocusManager.current
     val isConfirmDialogOpen = remember { mutableStateOf(false) }
 
@@ -113,23 +124,31 @@ fun DrawerContent(
         )
         DrawerSwitchItem(
             text = DrawerConstants.NOTIFICATIONS,
-            switchState = false,
-            onCheckedChangeHandler = {})
+            switchState = showNotifications,
+            onCheckedChangeHandler = { onShowNotificationsChange() })
         DrawerSwitchItem(
             text = DrawerConstants.RUN_IN_BACKGROUND,
-            switchState = true,
-            onCheckedChangeHandler = {})
+            switchState = runInBackground,
+            onCheckedChangeHandler = { onRunInBackgroundChange() })
         DrawerSwitchItem(
             text = DrawerConstants.SHOW_PHONE_NUMBER,
-            switchState = false,
-            onCheckedChangeHandler = {})
+            switchState = showMyPhoneNumber,
+            onCheckedChangeHandler = { onShowMyPhoneNumberChange() })
         Divider(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
         )
-        DrawerIconSelection(label = DrawerConstants.CALL_SETTINGS)
-        DrawerIconSelection(label = DrawerConstants.SMS_SETTINGS)
+        DrawerIconSelection(
+            label = DrawerConstants.CALL_SETTINGS,
+            callPrivacyLevel,
+            onIndexChange = onCallPrivacyLevelIndexChange
+        )
+        DrawerIconSelection(
+            label = DrawerConstants.SMS_SETTINGS,
+            smsPrivacyLevel,
+            onIndexChange = onSmsPrivacyLevelChange
+        )
         Divider(
             modifier = Modifier
                 .fillMaxWidth()

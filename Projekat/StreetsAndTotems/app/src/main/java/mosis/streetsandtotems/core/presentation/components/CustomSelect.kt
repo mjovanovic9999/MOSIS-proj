@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.core.presentation.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -21,12 +22,13 @@ fun CustomSelect(
     readOnly: Boolean = false,
     modifier: Modifier = Modifier,
     defaultSelectedIndex: Int? = null,
-    height: Dp? = null
+    height: Dp? = null,
+    onIndexChange: (Int) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val expanded = remember { mutableStateOf(false) }
     val selectedText =
-        remember { mutableStateOf(if ((defaultSelectedIndex != null) && (selectList.size > defaultSelectedIndex) && (defaultSelectedIndex >= 0)) selectList[defaultSelectedIndex] else "") }
+        mutableStateOf(if ((defaultSelectedIndex != null) && (selectList.size > defaultSelectedIndex) && (defaultSelectedIndex >= 0)) selectList[defaultSelectedIndex] else "")
 
     ExposedDropdownMenuBox(
         expanded = expanded.value,
@@ -47,18 +49,18 @@ fun CustomSelect(
         val filteringOptions =
             selectList.filter { it.contains(selectedText.value, ignoreCase = true) }
         if (filteringOptions.isNotEmpty()) {
-
             ExposedDropdownMenu(
                 expanded = expanded.value,
                 onDismissRequest = { expanded.value = false },
             ) {
-                selectList.forEach {
+                selectList.forEachIndexed { index, it ->
                     DropdownMenuItem(
                         text = { Text(text = it) },
                         onClick = {
                             selectedText.value = it
                             expanded.value = false
                             focusManager.clearFocus()
+                            onIndexChange(index)
                         })
                 }
             }

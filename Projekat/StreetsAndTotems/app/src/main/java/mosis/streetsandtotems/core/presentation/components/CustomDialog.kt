@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Composable
 fun CustomDialog(
     modifier: Modifier = Modifier,
@@ -25,7 +27,7 @@ fun CustomDialog(
     onConfirmButtonClick: () -> Unit = {},
     onDismissButtonClick: () -> Unit = {},
     confirmButtonMatchParentWidth: Boolean = false,
-    dismissButtomMatchParentWidth: Boolean = false,
+    dismissButtonMatchParentWidth: Boolean = false,
     confirmButtonVisible: Boolean = true,
     dismissButtonVisible: Boolean = true,
     clickable: Boolean = false
@@ -63,7 +65,7 @@ fun CustomDialog(
                         text = dismissButtonText ?: "",
                         buttonType = buttonType,
                         textStyle = MaterialTheme.typography.titleMedium,
-                        matchParentWidth = dismissButtomMatchParentWidth,
+                        matchParentWidth = dismissButtonMatchParentWidth,
                         contentPadding = ButtonDefaults.ContentPadding,
                         enabled = dismissButtonEnabled
                     )

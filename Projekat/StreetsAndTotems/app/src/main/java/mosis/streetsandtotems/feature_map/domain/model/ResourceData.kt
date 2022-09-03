@@ -9,8 +9,10 @@ enum class ResourceType {
     Emerald
 }
 
-data class Resource(
+data class ResourceData(
+    override val id: String? = null,
+    override val l: GeoPoint? = null,
     val type: ResourceType? = null,
-    val l: GeoPoint? = null,
     val remaining: Int? = null
-)
+) : IData
+

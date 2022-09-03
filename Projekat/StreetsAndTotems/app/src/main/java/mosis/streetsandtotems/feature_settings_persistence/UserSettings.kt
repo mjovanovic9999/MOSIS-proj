@@ -4,8 +4,8 @@ data class UserSettings(
     val runInBackground: Boolean,
     val showNotifications: Boolean,
     val showMyPhoneNumber: Boolean,
-    val CallPrivacyLevel: PrivacySettings,
-    val SMSPrivacyLevel: PrivacySettings,
+    val callPrivacyLevel: PrivacySettings,
+    val smsPrivacyLevel: PrivacySettings,
 )
 
 enum class PrivacySettings {

@@ -21,35 +21,39 @@ enum class AuthButtonsType {
 }
 
 @Composable
-fun AuthButtons(type: AuthButtonsType) {
+fun AuthButtons(
+    type: AuthButtonsType,
+    onSignInWithGoogleClick: () -> Unit = {},
+    onSignInWithFacebookClick: () -> Unit = {}
+) {
     Column() {
-                CustomButton(
-                    matchParentWidth = true,
-                    clickHandler = { /*TODO*/ },
-                    buttonType = CustomButtonType.Filled,
-                    text = if(type == AuthButtonsType.SignUp) ButtonConstants.SIGN_UP_GOOGLE else ButtonConstants.SIGN_IN_GOOGLE,
-                    icon = ImageVector.vectorResource(
-                        id = R.drawable.google
-                    ),
-                    iconSize = MaterialTheme.sizes.icon,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = google_sign_in
-                    ),
-                    textStyle = MaterialTheme.typography.titleMedium
-                )
-                CustomButton(
-                    matchParentWidth = true,
-                    clickHandler = { /*TODO*/ },
-                    buttonType = CustomButtonType.Filled,
-                    text = if(type == AuthButtonsType.SignUp) ButtonConstants.SIGN_UP_FACEBOOK else ButtonConstants.SIGN_IN_FACEBOOK,
-                    icon = ImageVector.vectorResource(id = R.drawable.facebook),
-                    iconSize = MaterialTheme.sizes.icon,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = facebook_sign_in
-                    ),
-                    textStyle = MaterialTheme.typography.titleMedium
-                )
+        CustomButton(
+            matchParentWidth = true,
+            clickHandler = onSignInWithGoogleClick,
+            buttonType = CustomButtonType.Filled,
+            text = if (type == AuthButtonsType.SignUp) ButtonConstants.SIGN_UP_GOOGLE else ButtonConstants.SIGN_IN_GOOGLE,
+            icon = ImageVector.vectorResource(
+                id = R.drawable.google
+            ),
+            iconSize = MaterialTheme.sizes.icon,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = google_sign_in
+            ),
+            textStyle = MaterialTheme.typography.titleMedium
+        )
+        CustomButton(
+            matchParentWidth = true,
+            clickHandler = onSignInWithFacebookClick,
+            buttonType = CustomButtonType.Filled,
+            text = if (type == AuthButtonsType.SignUp) ButtonConstants.SIGN_UP_FACEBOOK else ButtonConstants.SIGN_IN_FACEBOOK,
+            icon = ImageVector.vectorResource(id = R.drawable.facebook),
+            iconSize = MaterialTheme.sizes.icon,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = facebook_sign_in
+            ),
+            textStyle = MaterialTheme.typography.titleMedium
+        )
     }
 }

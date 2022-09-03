@@ -2,9 +2,10 @@ package mosis.streetsandtotems.feature_map.presentation.util
 
 import android.location.Location
 import com.google.firebase.firestore.GeoPoint
-import mosis.streetsandtotems.core.MapConstants.COMPARISON_PRECISION
 import mosis.streetsandtotems.core.MapConstants.DEGREES_TO_RADIANS_COEFFICIENT
 import mosis.streetsandtotems.core.MapConstants.LEVEL_COUNT
+import mosis.streetsandtotems.core.MapConstants.MAP_PRECISION_METERS
+import mosis.streetsandtotems.core.MapConstants.MAXIMUM_TRADE_DISTANCE_IN_METERS
 import mosis.streetsandtotems.core.MapConstants.RADIANS_TO_DEGREES_COEFFICIENT
 import mosis.streetsandtotems.core.MapConstants.TITLE_SIZE
 import kotlin.math.*
@@ -58,7 +59,7 @@ fun convertGeoPointNullToOffsets(
     mapHeight: Int,
 ): DoubleArray {
     if (geoPoint != null)
-        return convertGeoPointToOffsets(geoPoint, mapWidth, mapWidth)
+        return convertGeoPointToOffsets(geoPoint, mapWidth, mapHeight)
     return doubleArrayOf(0.0, 0.0)
 }
 
@@ -71,16 +72,16 @@ fun convertOffsetsToGeoPoint(
     val FE = 180 // false easting
     val radius = mapWidth / (2 * PI)
 
-    val x_temp = x * mapWidth
+    val xTemp = x * mapWidth
 
-    val lonRad = x_temp / radius
+    val lonRad = xTemp / radius
 
     val longitude = radiansToDegrees(lonRad) - FE
 
 
-    val y_temp = y * mapHeight
+    val yTemp = y * mapHeight
 
-    val yFromEquator = mapHeight / 2 - y_temp
+    val yFromEquator = mapHeight / 2 - yTemp
 
     val latRad = 2 * (atan(exp(yFromEquator / radius)) - PI / 4)
 
@@ -94,16 +95,20 @@ fun degreesToRadians(degrees: Double): Double = degrees * DEGREES_TO_RADIANS_COE
 
 fun radiansToDegrees(radians: Double): Double = radians * RADIANS_TO_DEGREES_COEFFICIENT
 
-fun areOffsetsEqual(x1: Double, x2: Double): Boolean =
-    (x1 * COMPARISON_PRECISION).roundToInt() == (x2 * COMPARISON_PRECISION).roundToInt()
+fun areGeoPointsEqual(x1: GeoPoint, x2: GeoPoint): Boolean =
+    distanceBetweenGeoPoints(x1, x2) <= MAP_PRECISION_METERS
 
-fun distanceBetweenLatLng(
-    startLat: Double,
-    startLng: Double,
-    endLat: Double,
-    endLng: Double
+fun distanceBetweenGeoPoints(
+    x1: GeoPoint, x2: GeoPoint
 ): Float {
     val result = floatArrayOf(0f)
-    Location.distanceBetween(startLat, startLng, endLat, endLng, result)
+    Location.distanceBetween(x1.latitude, x1.longitude, x2.latitude, x2.longitude, result)
     return result[0]
 }
+
+fun isTradePossible(myLocation: Location?, otherPlayerLocation: GeoPoint?): Boolean =
+    if (myLocation != null && otherPlayerLocation != null)
+        distanceBetweenGeoPoints(
+            GeoPoint(myLocation.latitude, myLocation.longitude), otherPlayerLocation
+        ) <= MAXIMUM_TRADE_DISTANCE_IN_METERS
+    else false

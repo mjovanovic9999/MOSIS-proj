@@ -1,5 +1,7 @@
 package mosis.streetsandtotems.feature_auth.presentation.signin
 
+import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.State
@@ -12,18 +14,21 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dsc.form_builder.Validators
+import com.google.android.gms.auth.api.identity.BeginSignInResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.*
+import mosis.streetsandtotems.core.domain.model.Response
 import mosis.streetsandtotems.core.domain.model.SnackbarSettings
+import mosis.streetsandtotems.core.domain.util.handleResponse
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 import mosis.streetsandtotems.core.presentation.components.form.formfields.TextFormField
 import mosis.streetsandtotems.core.presentation.states.FormState
 import mosis.streetsandtotems.feature_auth.domain.use_case.AuthUseCases
 import mosis.streetsandtotems.feature_auth.presentation.util.SignInFields
 import mosis.streetsandtotems.feature_auth.presentation.util.SignInFieldsEmpty
-import mosis.streetsandtotems.feature_auth.presentation.util.handleSignInWithEmailAndPassword
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,7 +37,8 @@ class SignInViewModel @Inject constructor(
     private val snackbarFlow: MutableStateFlow<SnackbarSettings?>,
     private val showLoaderFlow: MutableStateFlow<Boolean>,
 ) : ViewModel() {
-    private val _signInScreenEvents = MutableStateFlow<SignInScreenEvents?>(value = null)
+    private val _oneTapSignInResult = mutableStateOf<BeginSignInResult?>(null)
+    private val _signInScreenEvents = MutableSharedFlow<SignInScreenEvents?>()
 
     private val _signInState = mutableStateOf(
         SignInState(
@@ -86,7 +92,8 @@ class SignInViewModel @Inject constructor(
                 SignInFields::class,
                 SignInFieldsEmpty()
             ),
-            _signInScreenEvents
+            _signInScreenEvents,
+            _oneTapSignInResult
         )
     )
     val signInState: State<SignInState> = _signInState
@@ -94,16 +101,67 @@ class SignInViewModel @Inject constructor(
     fun onEvent(event: SignInViewModelEvents) {
         when (event) {
             SignInViewModelEvents.SignInWithEmailAndPassword -> signInWithEmailAndPasswordHandler()
+            SignInViewModelEvents.OneTapSignInWithGoogle -> oneTapSignInWithGoogleHandler()
+            is SignInViewModelEvents.SignInWithGoogle -> signInWithGoogleHandler(event.intent)
         }
     }
 
+    private fun signInWithGoogleHandler(intent: Intent?) {
+        intent?.let {
+            viewModelScope.launch {
+                authUseCases.signInWithGoogle(it).collect {
+                    when (it) {
+                        Response.Loading -> showLoaderFlow.emit(true)
+                        is Response.Error -> {
+                            showLoaderFlow.emit(false)
+                            Log.d("tag", "ERRORRRRR")
+                        }
+                        is Response.Success -> {
+                            showLoaderFlow.emit(false)
+                            Log.d("tag", "SUCC")
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun oneTapSignInWithGoogleHandler() {
+        viewModelScope.launch {
+            authUseCases.oneTapSignInWithGoogle().collect { response ->
+                when (response) {
+                    Response.Loading -> showLoaderFlow.emit(true)
+                    is Response.Error -> {
+                        showLoaderFlow.emit(false)
+                    }
+                    is Response.Success -> {
+                        showLoaderFlow.emit(false)
+                        _oneTapSignInResult.value = response.data
+                    }
+                }
+            }
+        }
+    }
 
     private fun signInWithEmailAndPasswordHandler() {
         val data = signInState.value.formState.getDataWithValidation()
         if (data != null) {
             viewModelScope.launch {
-                handleSignInWithEmailAndPassword(
-                    email = data.email, password = data.password,
+                handleResponse(
+                    responseFlow = authUseCases.emailAndPasswordSignIn(data.email, data.password),
+                    onError = { _, errorData ->
+                        if (errorData != null) {
+                            viewModelScope.launch {
+                                if (errorData.wrongEmail) _signInScreenEvents.emit(
+                                    SignInScreenEvents.WrongEmail
+                                )
+                                else if (errorData.wrongPassword) _signInScreenEvents.emit(
+                                    SignInScreenEvents.WrongPassword
+                                )
+                            }
+                        }
+                    },
                     onSuccess = {
                         viewModelScope.launch {
                             _signInScreenEvents.emit(
@@ -111,9 +169,9 @@ class SignInViewModel @Inject constructor(
                             )
                         }
                     },
-                    authUseCases = authUseCases,
                     snackbarFlow = snackbarFlow,
-                    showLoaderFlow = showLoaderFlow
+                    showLoaderFlow = showLoaderFlow,
+                    successMessage = MessageConstants.SIGNED_IN
                 )
             }
         }
