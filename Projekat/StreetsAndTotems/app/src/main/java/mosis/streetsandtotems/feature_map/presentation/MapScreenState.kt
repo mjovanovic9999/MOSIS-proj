@@ -8,7 +8,7 @@ import ovh.plrapps.mapcompose.ui.state.MapState
 
 data class MapScreenState(
     val mapState: MutableState<MapState>,
-    val pinDialog: SelectedCustomPinDialog,
+    val customPinDialog: SelectedCustomPinDialog,
     val playerDialogOpen: Boolean,
     val filterDialogOpen: Boolean,
     val followMe: Boolean,
@@ -20,7 +20,7 @@ data class MapScreenState(
     val resourcesHashMap: MutableMap<String, ResourceData>,
     val playersHashMap: MutableMap<String, UserInGameData>,
     val totemsHashMap: MutableMap<String, TotemData>,////////
-    val customPinsHashMap: MutableMap<String, CustomPinData>,////////
+    val customPinsHashMap: MutableMap<String, CustomPinData>,
 
     val home: MutableState<HomeData>,///
 

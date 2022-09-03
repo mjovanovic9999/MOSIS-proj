@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.GeoPoint
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,6 +41,7 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
 import mosis.streetsandtotems.feature_map.domain.model.*
+import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
 import mosis.streetsandtotems.feature_map.presentation.util.*
@@ -63,6 +65,56 @@ class MapViewModel @Inject constructor(
 
     private val mapDimensions = calculateMapDimensions()
     private val circleSize = mutableStateOf(MY_LOCATION_CIRCLE_SIZE.dp / MAX_SCALE)
+
+
+    fun addCustomPinFB() {
+        viewModelScope.launch {
+            LocationService.mapServiceRepositoryCompanion?.addCustomPin(
+                l = mapScreenState.value.customPinDialog.l,
+                visible_to = "AAAAAAAAAAAAA",//squad id||auth id
+                placed_by = "BBBBBBBBBBB",//moj auth id
+                text = mapScreenState.value.customPinDialog.text.value,
+            )
+        }
+    }
+
+    fun updateCustomPinFB() {
+        viewModelScope.launch {
+            mapScreenState.value.customPinDialog.id?.let {
+                LocationService.mapServiceRepositoryCompanion?.updateCustomPin(
+                    id = it,
+                    visible_to = "AAAAAAAAAAAAA",//,
+                    placed_by = "BBBBBBBBBBB",//moj auth id
+                    text = mapScreenState.value.customPinDialog.text.value,
+
+                    )
+            }
+        }
+    }
+
+    fun deleteCustomPin() {
+        viewModelScope.launch {
+            mapScreenState.value.customPinDialog.id?.let {
+                LocationService.mapServiceRepositoryCompanion?.deleteCustomPin(it)
+            }
+        }
+    }
+
+    fun addHome() {
+        viewModelScope.launch {
+            LocationService.mapServiceRepositoryCompanion?.addHome(
+                "MOJID",
+                GeoPoint(43.313198, 21.906673)
+            )
+        }
+    }
+
+
+    fun deleteHome() {
+        viewModelScope.launch {
+            LocationService.mapServiceRepositoryCompanion?.deleteHome("MOJID")
+        }
+    }
 
     init {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
@@ -98,7 +150,7 @@ class MapViewModel @Inject constructor(
                     minimumScaleMode = Fill
                 }
             ),
-            pinDialog = SelectedCustomPinDialog(
+            customPinDialog = SelectedCustomPinDialog(
                 dialogOpen = false,
                 id = null,
                 l = GeoPoint(0.0, 0.0),
@@ -154,7 +206,7 @@ class MapViewModel @Inject constructor(
     private fun <T : IData> registerPinsFlow(flow: MutableSharedFlow<PinAction<T>?>) {
         viewModelScope.launch {
             flow.collect {
-                Log.d("tag", "register " + it?.pinData?.id)
+                Log.d("tag", "register " + it?.pinData)
                 when (it?.action) {
                     PinActionType.Added -> addPinHash(it.pinData)
                     PinActionType.Modified -> modifyPinHash(it.pinData)
@@ -255,10 +307,8 @@ class MapViewModel @Inject constructor(
     }
 
     private fun movePinConditionally(id: String, newGeoPoint: GeoPoint?, oldGeoPoint: GeoPoint?) {
-        if (oldGeoPoint != null && newGeoPoint != null && !areGeoPointsEqual(
-                newGeoPoint,
-                oldGeoPoint
-            )
+        if (oldGeoPoint != null && newGeoPoint != null
+            && !areGeoPointsEqual(newGeoPoint, oldGeoPoint)
         ) {
             movePinAtLatLng(id, newGeoPoint.latitude, newGeoPoint.longitude)
         }
@@ -488,7 +538,12 @@ class MapViewModel @Inject constructor(
 
             } else if (mapScreenState.value.customPinsHashMap.containsKey(id)) {
                 val customPin = mapScreenState.value.customPinsHashMap[id]!!
-                showCustomPinDialog(customPin.l, customPin.id, customPin.placed_by)
+                showCustomPinDialog(
+                    l = customPin.l,
+                    id = customPin.id,
+                    placedBy = customPin.placed_by,
+                    customPin.text
+                )
             }
         }
     }
@@ -512,20 +567,26 @@ class MapViewModel @Inject constructor(
 //        )
 //    }
 
-    private fun showCustomPinDialog(l: GeoPoint?, id: String? = null, placedBy: String? = null) {
+    private fun showCustomPinDialog(
+        l: GeoPoint?,
+        id: String? = null,
+        placedBy: String? = null,
+        text: String? = null
+    ) {
         _mapScreenState.value = _mapScreenState.value.copy(
-            pinDialog = _mapScreenState.value.pinDialog.copy(
+            customPinDialog = _mapScreenState.value.customPinDialog.copy(
                 id = id,
                 dialogOpen = true,
                 l = l!!,
                 placedBy = placedBy,
+                text = mutableStateOf(text ?: ""),
             )
         )
     }
 
     fun closeCustomPinDialog() {
         _mapScreenState.value = _mapScreenState.value.copy(
-            pinDialog = SelectedCustomPinDialog(
+            customPinDialog = SelectedCustomPinDialog(
                 dialogOpen = false,
                 l = GeoPoint(0.0, 0.0),
                 id = null,

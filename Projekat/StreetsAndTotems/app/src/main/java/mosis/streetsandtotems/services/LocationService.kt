@@ -42,6 +42,7 @@ class LocationService : Service() {
     @Inject
     lateinit var mapServiceRepository: MapServiceRepository
 
+
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.IO + serviceJob)
 
@@ -57,10 +58,13 @@ class LocationService : Service() {
         initUserPinsFlow()
         initResourcesFlow()
         initTotemsFlow()
-
+        initCustomPinsFlow()
+        initHomesFlow()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        mapServiceRepositoryCompanion = mapServiceRepository
+
         startListeningUserLocation()
         return START_STICKY_COMPATIBILITY
     }
@@ -150,6 +154,56 @@ class LocationService : Service() {
         )
     }
 
+    private fun initCustomPinsFlow() {
+        mapServiceRepository.registerCallbackOnCustomPinsUpdate(
+            customPinAddedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    customPinsFlow,
+                    PinActionType.Added
+                )
+            }, customPinModifiedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    customPinsFlow,
+                    PinActionType.Modified
+                )
+            }, customPinRemovedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    customPinsFlow,
+                    PinActionType.Removed
+                )
+            }
+        )
+    }
+
+    private fun initHomesFlow() {
+        mapServiceRepository.registerCallbackOnHomesUpdate(
+            homeAddedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    homePinsFlow,
+                    PinActionType.Added
+                )
+            },
+            homeModifiedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    homePinsFlow,
+                    PinActionType.Modified
+                )
+            },
+            homeRemovedCallback = {
+                emitPinActionWithServiceScope(
+                    it,
+                    homePinsFlow,
+                    PinActionType.Removed
+                )
+            }
+        )
+    }
+
     private suspend fun <T> emitPinAction(
         pinData: T?,
         pinFlow: MutableSharedFlow<PinAction<T>?>,
@@ -212,26 +266,6 @@ class LocationService : Service() {
                         "tag",
                         "NEW LOCATION: ${result.lastLocation?.latitude}, ${result.lastLocation?.longitude}, ${result.lastLocation?.accuracy}"
                     )
-                    //            Log.d("tag", it.accuracy.toString())
-//                            val apiClient = ApiClient.getInstance(this@LocationService)
-//                                .create(ApiClient::class.java)
-//                            val response = apiClient.updateLocation()
-//                            response.enqueue(object : Callback<LocationResponse> {
-//                                override fun onResponse(
-//                                    call: Call<LocationResponse>,
-//                                    response: Response<LocationResponse>
-//                                ) {
-//                                    Log.d(TAG, "onLocationChanged: Latitude ${it.latitude} , Longitude ${it.longitude}")
-//                                    Log.d(TAG, "run: Running = Location Update Successful")
-//                                }
-//
-//                                override fun onFailure(call: Call<LocationResponse>, t: Throwable) {
-//                                    Log.d(TAG, "run: Running = Location Update Failed")
-//
-//                                }
-//                            })
-
-
                 }
             }
         }
@@ -257,17 +291,21 @@ class LocationService : Service() {
 
     companion object {
         val locationFlow: MutableStateFlow<Location?> = MutableStateFlow(value = null)
+
         val playersPinFlow: MutableSharedFlow<PinAction<UserInGameData>?> =
             MutableSharedFlow()
         val resourcesPinsFlow: MutableSharedFlow<PinAction<ResourceData>?> =
             MutableSharedFlow()
         val totemsPinsFlow: MutableSharedFlow<PinAction<TotemData>?> =
             MutableSharedFlow()
-        val customPinsFlow: MutableStateFlow<PinAction<CustomPinData>?> =//neje uvrzano
-            MutableStateFlow(value = null)
-        val homePinsFlow: MutableStateFlow<PinAction<HomeData>?> =//neje uvrzano
-            MutableStateFlow(value = null)
+        val customPinsFlow: MutableSharedFlow<PinAction<CustomPinData>?> =
+            MutableSharedFlow()
+        val homePinsFlow: MutableSharedFlow<PinAction<HomeData>?> =
+            MutableSharedFlow()
+
         var isServiceStarted = false
         var isLocationEnabled = mutableStateOf(value = true)
+
+        var mapServiceRepositoryCompanion: MapServiceRepository? = null
     }
 }

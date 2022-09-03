@@ -1,7 +1,10 @@
 package mosis.streetsandtotems.feature_map.presentation
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import com.ramcosta.composedestinations.annotation.Destination
@@ -32,12 +35,15 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
     )
 
     CustomPinDialog(
-        isOpen = state.pinDialog.dialogOpen,
+        isOpen = state.customPinDialog.dialogOpen,
         onDismissRequest = { mapViewModel.closeCustomPinDialog() },
-        dialogText = state.pinDialog.text,
-        isNewPin = state.pinDialog.id == null,
+        dialogText = state.customPinDialog.text,
+        isNewPin = state.customPinDialog.id == null,
         isSquadMember = true,////////////////////////////squad_id!=null
-        placedBy = state.pinDialog.placedBy,
+        placedBy = state.customPinDialog.placedBy,
+        addCustomPinFB = { mapViewModel.addCustomPinFB() },
+        updateCustomPin = { mapViewModel.updateCustomPinFB() },
+        deleteCustomPin = { mapViewModel.deleteCustomPin() }
     )
 
     PlayerDialog(
@@ -70,4 +76,16 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
         filterFriendsState = mapViewModel.mapScreenState.value.filterPlayers.collectAsState(),
         filterTotemsState = mapViewModel.mapScreenState.value.filterTotems.collectAsState(),
     )
+    Row() {
+
+        Button(onClick = { mapViewModel.addHome() }) {
+            Text(text = "DODAJ KUCU")
+
+        }
+        Button(onClick = { mapViewModel.deleteHome()
+        }) {
+            Text(text = "del KUCU")
+
+        }
+    }
 }

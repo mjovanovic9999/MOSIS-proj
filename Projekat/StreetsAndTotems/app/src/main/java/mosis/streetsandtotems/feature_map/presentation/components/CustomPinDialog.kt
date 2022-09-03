@@ -8,7 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -17,7 +16,6 @@ import mosis.streetsandtotems.core.ButtonConstants.EDIT
 import mosis.streetsandtotems.core.ButtonConstants.PLACE
 import mosis.streetsandtotems.core.ButtonConstants.REMOVE
 import mosis.streetsandtotems.core.CustomPinDialogConstants
-import mosis.streetsandtotems.core.TitleConstants
 import mosis.streetsandtotems.core.TitleConstants.CUSTOM_NEW_PIN_DIALOG_SOLO
 import mosis.streetsandtotems.core.TitleConstants.CUSTOM_NEW_PIN_DIALOG_SQUAD
 import mosis.streetsandtotems.core.TitleConstants.CUSTOM_PIN_DIALOG_SOLO_PLACED_BY
@@ -36,8 +34,11 @@ fun CustomPinDialog(
     isNewPin: Boolean,//promena na dugmici
     isSquadMember: Boolean,
     placedBy: String?,
+    addCustomPinFB: () -> Unit,
+    updateCustomPin: () -> Unit,
+    deleteCustomPin: () -> Unit,
 ) {
-    val initText = remember { mutableStateOf(dialogText.value) }
+    val initText = mutableStateOf(dialogText.value)
     if (isOpen)
         AlertDialog(
             onDismissRequest = {
@@ -60,10 +61,10 @@ fun CustomPinDialog(
             },
             text = {
                 CustomTextField(
-                    value = dialogText.value,
+                    value = initText.value,
                     onValueChange = {
                         if (it.length <= CustomPinDialogConstants.PIN_TEXT_LENGTH)
-                            dialogText.value = it
+                            initText.value = it
                     },
                     textFieldType = CustomTextFieldType.Outlined,
                     label = CustomPinDialogConstants.PIN_TEXT,
@@ -76,7 +77,7 @@ fun CustomPinDialog(
                 CustomButton(
                     clickHandler = {
                         if (!isNewPin) {
-
+                            deleteCustomPin()
                         }//na server delete
                         onDismissRequest()
                     },
@@ -88,16 +89,19 @@ fun CustomPinDialog(
             confirmButton = {
                 CustomButton(
                     clickHandler = {
+                        dialogText.value = initText.value
                         if (isNewPin) {
+                            addCustomPinFB()
 
                         }//na server add
                         else {
+                            updateCustomPin()
                         }//na server edit
                         onDismissRequest()
                     },
                     buttonType = CustomButtonType.Outlined,
                     text = if (isNewPin) PLACE else EDIT,
-                    enabled = if (isNewPin) dialogText.value != "" else dialogText.value != initText.value,
+                    enabled = initText.value != "" && if (!isNewPin) dialogText.value != initText.value else true,
                     textStyle = MaterialTheme.typography.titleMedium,
                 )
             })

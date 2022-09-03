@@ -10,6 +10,8 @@ object FirestoreConstants {
     const val USER_IN_GAME_DATA_COLLECTION = "user_in_game_data"
     const val RESOURCES_COLLECTION = "resources"
     const val TOTEMS_COLLECTION = "totems"
+    const val CUSTOM_PINS_COLLECTION = "custom_pins"
+    const val HOMES_COLLECTION = "homes"
 
 
     const val ID_FIELD = "__name__"
