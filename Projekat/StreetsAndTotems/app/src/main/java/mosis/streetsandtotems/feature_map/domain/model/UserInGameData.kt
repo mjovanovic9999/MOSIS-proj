@@ -7,5 +7,5 @@ data class UserInGameData(
     override val l: GeoPoint? = null,
     val calls_allowed: Boolean? = null,
     val messaging_allowed: Boolean? = null,
-    val display_data: ProfileData? = null
+    val user_profile_data: UserProfileData? = null,
 ) : IData

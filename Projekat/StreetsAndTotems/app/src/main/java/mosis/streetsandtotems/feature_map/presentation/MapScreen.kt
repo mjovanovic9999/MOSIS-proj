@@ -1,10 +1,7 @@
 package mosis.streetsandtotems.feature_map.presentation
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import com.ramcosta.composedestinations.annotation.Destination
@@ -49,17 +46,17 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
     PlayerDialog(
         isOpen = state.playerDialogOpen,
         onDismissRequest = { mapViewModel.closePlayerDialog() },
-        isSquadMember = state.selectedPlayer.value.id == "MYID",////////////////////////////
+        isSquadMember = state.selectedPlayer.value.user_profile_data?.squad_id == "MYSQUADID",////////////////////////////
         tradeEnabled = isTradePossible(
             LocationService.locationFlow.value,
             state.selectedPlayer.value.l
         ),
         callsAllowed = state.selectedPlayer.value.calls_allowed,
         messagingAllowed = state.selectedPlayer.value.messaging_allowed,
-        phoneNumber = state.selectedPlayer.value.display_data?.phone_number,
-        firstName = state.selectedPlayer.value.display_data?.first_name,
-        lastName = state.selectedPlayer.value.display_data?.last_name,
-        userName = state.selectedPlayer.value.display_data?.user_name,
+        phoneNumber = state.selectedPlayer.value.user_profile_data?.phone_number,
+        firstName = state.selectedPlayer.value.user_profile_data?.first_name,
+        lastName = state.selectedPlayer.value.user_profile_data?.last_name,
+        userName = state.selectedPlayer.value.user_profile_data?.user_name,
     )
 
     CustomFilterDialog(
@@ -76,16 +73,4 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
         filterFriendsState = mapViewModel.mapScreenState.value.filterPlayers.collectAsState(),
         filterTotemsState = mapViewModel.mapScreenState.value.filterTotems.collectAsState(),
     )
-    Row() {
-
-        Button(onClick = { mapViewModel.addHome() }) {
-            Text(text = "DODAJ KUCU")
-
-        }
-        Button(onClick = { mapViewModel.deleteHome()
-        }) {
-            Text(text = "del KUCU")
-
-        }
-    }
 }

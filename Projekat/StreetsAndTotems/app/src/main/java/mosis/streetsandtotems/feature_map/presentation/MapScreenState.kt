@@ -9,7 +9,6 @@ import ovh.plrapps.mapcompose.ui.state.MapState
 data class MapScreenState(
     val mapState: MutableState<MapState>,
     val customPinDialog: SelectedCustomPinDialog,
-    val playerDialogOpen: Boolean,
     val filterDialogOpen: Boolean,
     val followMe: Boolean,
     val detectScroll: Boolean,
@@ -25,6 +24,7 @@ data class MapScreenState(
     val home: MutableState<HomeData>,///
 
     val selectedPlayer: MutableState<UserInGameData>,
+    val playerDialogOpen: Boolean,
 )
 
 

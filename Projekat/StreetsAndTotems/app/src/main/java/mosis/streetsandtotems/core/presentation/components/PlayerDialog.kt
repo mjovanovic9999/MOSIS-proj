@@ -22,7 +22,6 @@ import androidx.core.content.ContextCompat.startActivity
 import mosis.streetsandtotems.core.ButtonConstants
 import mosis.streetsandtotems.ui.theme.sizes
 
-
 @Composable
 fun PlayerDialog(
     isOpen: Boolean,
@@ -74,7 +73,7 @@ fun PlayerDialog(
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Text(
-                        text = "$firstName $lastName",
+                        text = (firstName ?: " ") + (lastName ?: " "),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.labelLarge
                     )

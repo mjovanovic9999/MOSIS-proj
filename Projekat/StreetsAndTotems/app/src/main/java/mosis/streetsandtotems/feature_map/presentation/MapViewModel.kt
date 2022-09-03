@@ -17,7 +17,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.GeoPoint
-import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,9 +39,7 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
-import mosis.streetsandtotems.feature_map.data.repository.MapViewModelRepositoryImpl
 import mosis.streetsandtotems.feature_map.domain.model.*
-import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
@@ -69,55 +66,6 @@ class MapViewModel @Inject constructor(
     private val mapDimensions = calculateMapDimensions()
     private val circleSize = mutableStateOf(MY_LOCATION_CIRCLE_SIZE.dp / MAX_SCALE)
 
-
-    fun addCustomPinFB() {
-        viewModelScope.launch {
-            mapViewModelRepository.addCustomPin(
-                l = mapScreenState.value.customPinDialog.l,
-                visible_to = "AAAAAAAAAAAAA",//squad id||auth id
-                placed_by = "BBBBBBBBBBB",//moj auth id
-                text = mapScreenState.value.customPinDialog.text.value,
-            )
-        }
-    }
-
-    fun updateCustomPinFB() {
-        viewModelScope.launch {
-            mapScreenState.value.customPinDialog.id?.let {
-                mapViewModelRepository.updateCustomPin(
-                    id = it,
-                    visible_to = "AAAAAAAAAAAAA",//,
-                    placed_by = "BBBBBBBBBBB",//moj auth id
-                    text = mapScreenState.value.customPinDialog.text.value,
-
-                    )
-            }
-        }
-    }
-
-    fun deleteCustomPin() {
-        viewModelScope.launch {
-            mapScreenState.value.customPinDialog.id?.let {
-                mapViewModelRepository.deleteCustomPin(it)
-            }
-        }
-    }
-
-    fun addHome() {
-        viewModelScope.launch {
-            mapViewModelRepository.addHome(
-                "MOJID",
-                GeoPoint(43.313198, 21.906673)
-            )
-        }
-    }
-
-
-    fun deleteHome() {
-        viewModelScope.launch {
-            mapViewModelRepository.deleteHome("MOJID")
-        }
-    }
 
     init {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
@@ -255,7 +203,7 @@ class MapViewModel @Inject constructor(
                     composable =
                         {
                             CustomPinImage(
-                                imageUri = dataType.display_data?.image ?: Uri.EMPTY,
+                                imageUri = dataType.user_profile_data?.image ?: Uri.EMPTY,
                                 true//userData.squad_id != null && "MYSQUADID" != null && userData.squad_id == "MYSQUADID"
                             )
                         }
@@ -503,9 +451,7 @@ class MapViewModel @Inject constructor(
             pinId,
             x,
             y,
-            c = {
-                CustomPin(resourceId)
-            },
+            c = { CustomPin(resourceId) },
             clipShape = null,
             renderingStrategy = RenderingStrategy.LazyLoading(LAZY_LOADER_ID),
             clickable = true,
@@ -534,6 +480,7 @@ class MapViewModel @Inject constructor(
             } else if (mapScreenState.value.playersHashMap.containsKey(id)) {
                 _mapScreenState.value.selectedPlayer.value =
                     mapScreenState.value.playersHashMap[id]!!
+                Log.d("tag", _mapScreenState.value.selectedPlayer.value.toString())
                 showPlayerDialog()
 
             } else if (mapScreenState.value.totemsHashMap.containsKey(id)) {
@@ -634,4 +581,58 @@ class MapViewModel @Inject constructor(
         mapScreenState.value.filterTotems.value = false
     }
 
+    //region firebase functions
+
+    fun addCustomPinFB() {
+        viewModelScope.launch {
+            mapViewModelRepository.addCustomPin(
+                l = mapScreenState.value.customPinDialog.l,
+                visible_to = "AAAAAAAAAAAAA",//squad id||auth id
+                placed_by = "BBBBBBBBBBB",//moj auth id
+                text = mapScreenState.value.customPinDialog.text.value,
+            )
+        }
+    }
+
+    fun updateCustomPinFB() {
+        viewModelScope.launch {
+            mapScreenState.value.customPinDialog.id?.let {
+                mapViewModelRepository.updateCustomPin(
+                    id = it,
+                    visible_to = "AAAAAAAAAAAAA",//,
+                    placed_by = "BBBBBBBBBBB",//moj auth id
+                    text = mapScreenState.value.customPinDialog.text.value,
+
+                    )
+            }
+        }
+    }
+
+    fun deleteCustomPin() {
+        viewModelScope.launch {
+            mapScreenState.value.customPinDialog.id?.let {
+                mapViewModelRepository.deleteCustomPin(it)
+            }
+        }
+    }
+
+
+    fun addHome() {
+        viewModelScope.launch {
+            mapViewModelRepository.addHome(
+                "MOJID",
+                GeoPoint(43.313198, 21.906673)
+            )
+        }
+    }
+
+    fun updateHome() {}
+
+    fun deleteHome() {
+        viewModelScope.launch {
+            mapViewModelRepository.deleteHome("MOJID")
+        }
+    }
+
+    //endregion
 }
