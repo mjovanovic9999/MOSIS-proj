@@ -63,8 +63,6 @@ class LocationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        mapServiceRepositoryCompanion = mapServiceRepository
-
         startListeningUserLocation()
         return START_STICKY_COMPATIBILITY
     }
@@ -293,19 +291,19 @@ class LocationService : Service() {
         val locationFlow: MutableStateFlow<Location?> = MutableStateFlow(value = null)
 
         val playersPinFlow: MutableSharedFlow<PinAction<UserInGameData>?> =
-            MutableSharedFlow()
+            MutableSharedFlow(replay = 1)
         val resourcesPinsFlow: MutableSharedFlow<PinAction<ResourceData>?> =
-            MutableSharedFlow()
+            MutableSharedFlow(replay = 1)
         val totemsPinsFlow: MutableSharedFlow<PinAction<TotemData>?> =
-            MutableSharedFlow()
+            MutableSharedFlow(replay = 1)
         val customPinsFlow: MutableSharedFlow<PinAction<CustomPinData>?> =
-            MutableSharedFlow()
+            MutableSharedFlow(replay = 1)
         val homePinsFlow: MutableSharedFlow<PinAction<HomeData>?> =
-            MutableSharedFlow()
+            MutableSharedFlow(replay = 1)
 
         var isServiceStarted = false
         var isLocationEnabled = mutableStateOf(value = true)
 
-        var mapServiceRepositoryCompanion: MapServiceRepository? = null
+
     }
 }

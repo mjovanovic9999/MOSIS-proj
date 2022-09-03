@@ -40,8 +40,10 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
+import mosis.streetsandtotems.feature_map.data.repository.MapViewModelRepositoryImpl
 import mosis.streetsandtotems.feature_map.domain.model.*
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
+import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
 import mosis.streetsandtotems.feature_map.presentation.util.*
@@ -58,6 +60,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val appContext: Application,
+    private val mapViewModelRepository: MapViewModelRepository
 ) : ViewModel() {
     private val _mapScreenState: MutableState<MapScreenState>
     private val _mapState: MapState
@@ -69,7 +72,7 @@ class MapViewModel @Inject constructor(
 
     fun addCustomPinFB() {
         viewModelScope.launch {
-            LocationService.mapServiceRepositoryCompanion?.addCustomPin(
+            mapViewModelRepository.addCustomPin(
                 l = mapScreenState.value.customPinDialog.l,
                 visible_to = "AAAAAAAAAAAAA",//squad id||auth id
                 placed_by = "BBBBBBBBBBB",//moj auth id
@@ -81,7 +84,7 @@ class MapViewModel @Inject constructor(
     fun updateCustomPinFB() {
         viewModelScope.launch {
             mapScreenState.value.customPinDialog.id?.let {
-                LocationService.mapServiceRepositoryCompanion?.updateCustomPin(
+                mapViewModelRepository.updateCustomPin(
                     id = it,
                     visible_to = "AAAAAAAAAAAAA",//,
                     placed_by = "BBBBBBBBBBB",//moj auth id
@@ -95,14 +98,14 @@ class MapViewModel @Inject constructor(
     fun deleteCustomPin() {
         viewModelScope.launch {
             mapScreenState.value.customPinDialog.id?.let {
-                LocationService.mapServiceRepositoryCompanion?.deleteCustomPin(it)
+                mapViewModelRepository.deleteCustomPin(it)
             }
         }
     }
 
     fun addHome() {
         viewModelScope.launch {
-            LocationService.mapServiceRepositoryCompanion?.addHome(
+            mapViewModelRepository.addHome(
                 "MOJID",
                 GeoPoint(43.313198, 21.906673)
             )
@@ -112,7 +115,7 @@ class MapViewModel @Inject constructor(
 
     fun deleteHome() {
         viewModelScope.launch {
-            LocationService.mapServiceRepositoryCompanion?.deleteHome("MOJID")
+            mapViewModelRepository.deleteHome("MOJID")
         }
     }
 
