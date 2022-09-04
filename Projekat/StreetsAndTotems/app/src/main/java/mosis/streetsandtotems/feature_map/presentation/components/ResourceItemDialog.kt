@@ -41,14 +41,6 @@ fun ResourceItemDialog(
         resourceType
     )
 
-
-
-    if (isOpen) {
-        Log.d("tag", "START")
-        Log.d("tag", emptySpaces.toString())
-        Log.d("tag", currentResourceCount.toString())
-        Log.d("tag", "END")
-    }
     CustomDialog(
         isOpen = isOpen,
         modifier = Modifier

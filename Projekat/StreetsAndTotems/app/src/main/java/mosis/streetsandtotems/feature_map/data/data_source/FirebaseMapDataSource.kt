@@ -1,20 +1,12 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
-import android.util.Log
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.GeoPoint
-import com.google.firebase.firestore.ktx.getField
-import kotlinx.coroutines.tasks.await
-import mosis.streetsandtotems.core.FirestoreConstants
-import mosis.streetsandtotems.feature_map.domain.model.ResourceData
-import mosis.streetsandtotems.feature_map.domain.model.ResourceType
-import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FirestoreConstants
 import mosis.streetsandtotems.core.domain.model.UserData
+import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 
 class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     fun addCustomPin(
@@ -88,7 +80,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     suspend fun getPlayerInventory(userId: String): UserInventoryData? {
-        return db.collection(FirestoreConstants.USER_INVENTORY).document(userId).get().await()
+        return db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION).document(userId).get()
+            .await()
             .toObject(UserInventoryData::class.java)
 
 
@@ -98,7 +91,10 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         myId: String,
         newUserInventoryData: UserInventoryData
     ) {
-        db.collection(FirestoreConstants.USER_INVENTORY).document(myId).set(newUserInventoryData)
+        db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION).document(myId)
+            .set(newUserInventoryData)
+    }
+
     fun updateUserOnlineStatus(isOnline: Boolean, userId: String): Task<Void> {
         return db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION).document(userId)
             .update(FirestoreConstants.IS_ONLINE_FIELD, isOnline)
