@@ -20,11 +20,10 @@ class MapServiceRepositoryImpl(
     }
 
 
-
     override fun registerCallbacksOnUserInGameDataUpdate(
-        userAddedCallback: (user: UserInGameData?) -> Unit,
-        userModifiedCallback: (user: UserInGameData?) -> Unit,
-        userRemovedCallback: (user: UserInGameData?) -> Unit,
+        userAddedCallback: (user: UserInGameData) -> Unit,
+        userModifiedCallback: (user: UserInGameData) -> Unit,
+        userRemovedCallback: (user: UserInGameData) -> Unit,
     ) {
         auth.currentUser?.let {
             listenerRegistrations.add(
@@ -40,9 +39,9 @@ class MapServiceRepositoryImpl(
 
 
     override fun registerCallbackOnResourcesUpdate(
-        resourceAddedCallback: (resource: ResourceData?) -> Unit,
-        resourceModifiedCallback: (resource: ResourceData?) -> Unit,
-        resourceRemovedCallback: (resource: ResourceData?) -> Unit,
+        resourceAddedCallback: (resource: ResourceData) -> Unit,
+        resourceModifiedCallback: (resource: ResourceData) -> Unit,
+        resourceRemovedCallback: (resource: ResourceData) -> Unit,
     ) {
         auth.currentUser?.let {
             listenerRegistrations.add(
@@ -57,9 +56,9 @@ class MapServiceRepositoryImpl(
 
 
     override fun registerCallbackOnTotemsUpdate(
-        totemAddedCallback: (totem: TotemData?) -> Unit,
-        totemModifiedCallback: (totem: TotemData?) -> Unit,
-        totemRemovedCallback: (totem: TotemData?) -> Unit,
+        totemAddedCallback: (totem: TotemData) -> Unit,
+        totemModifiedCallback: (totem: TotemData) -> Unit,
+        totemRemovedCallback: (totem: TotemData) -> Unit,
     ) {
         auth.currentUser?.let {
             listenerRegistrations.add(
@@ -74,9 +73,9 @@ class MapServiceRepositoryImpl(
 
 
     override fun registerCallbackOnCustomPinsUpdate(
-        customPinAddedCallback: (customPin: CustomPinData?) -> Unit,
-        customPinModifiedCallback: (customPin: CustomPinData?) -> Unit,
-        customPinRemovedCallback: (customPin: CustomPinData?) -> Unit,
+        customPinAddedCallback: (customPin: CustomPinData) -> Unit,
+        customPinModifiedCallback: (customPin: CustomPinData) -> Unit,
+        customPinRemovedCallback: (customPin: CustomPinData) -> Unit,
     ) {
         auth.currentUser?.let {
             listenerRegistrations.add(
@@ -91,9 +90,9 @@ class MapServiceRepositoryImpl(
 
 
     override fun registerCallbackOnHomesUpdate(
-        homeAddedCallback: (user: HomeData?) -> Unit,
-        homeModifiedCallback: (user: HomeData?) -> Unit,
-        homeRemovedCallback: (user: HomeData?) -> Unit,
+        homeAddedCallback: (user: HomeData) -> Unit,
+        homeModifiedCallback: (user: HomeData) -> Unit,
+        homeRemovedCallback: (user: HomeData) -> Unit,
     ) {
         auth.currentUser?.let {
             listenerRegistrations.add(

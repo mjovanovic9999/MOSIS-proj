@@ -17,11 +17,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.GeoPoint
-import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_LAT
@@ -40,14 +37,13 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
-import mosis.streetsandtotems.feature_map.data.repository.MapViewModelRepositoryImpl
+import mosis.streetsandtotems.di.util.SharedFlowWrapper
 import mosis.streetsandtotems.feature_map.domain.model.*
-import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
 import mosis.streetsandtotems.feature_map.presentation.util.*
-import mosis.streetsandtotems.services.LocationService
+import mosis.streetsandtotems.services.LocationServiceEvents
 import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
 import ovh.plrapps.mapcompose.ui.layout.Fill
@@ -60,66 +56,65 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val appContext: Application,
-    private val mapViewModelRepository: MapViewModelRepository
+    private val mapViewModelRepository: MapViewModelRepository,
+    private val locationServiceEvents: SharedFlowWrapper<LocationServiceEvents>
 ) : ViewModel() {
     private val _mapScreenState: MutableState<MapScreenState>
     private val _mapState: MapState
+    private val filterPlayers = MutableStateFlow(false)
+    private val filterTotems = MutableStateFlow(false)
+    private val filterResources = MutableStateFlow(false)
+    private val resourcesHashMap = mutableMapOf<String, ResourceData>()
+    private val playersHashMap = mutableMapOf<String, UserInGameData>()
+    private val totemsHashMap = mutableMapOf<String, TotemData>()
+    private val customPinsHashMap = mutableMapOf<String, CustomPinData>()
+
     val mapScreenState: State<MapScreenState>
 
     private val mapDimensions = calculateMapDimensions()
     private val circleSize = mutableStateOf(MY_LOCATION_CIRCLE_SIZE.dp / MAX_SCALE)
 
-
-    fun addCustomPinFB() {
-        viewModelScope.launch {
-            mapViewModelRepository.addCustomPin(
-                l = mapScreenState.value.customPinDialog.l,
-                visible_to = "AAAAAAAAAAAAA",//squad id||auth id
-                placed_by = "BBBBBBBBBBB",//moj auth id
-                text = mapScreenState.value.customPinDialog.text.value,
-            )
-        }
-    }
-
-    fun updateCustomPinFB() {
-        viewModelScope.launch {
-            mapScreenState.value.customPinDialog.id?.let {
-                mapViewModelRepository.updateCustomPin(
-                    id = it,
-                    visible_to = "AAAAAAAAAAAAA",//,
-                    placed_by = "BBBBBBBBBBB",//moj auth id
-                    text = mapScreenState.value.customPinDialog.text.value,
-
-                    )
-            }
-        }
-    }
-
-    fun deleteCustomPin() {
-        viewModelScope.launch {
-            mapScreenState.value.customPinDialog.id?.let {
-                mapViewModelRepository.deleteCustomPin(it)
-            }
-        }
-    }
-
-    fun addHome() {
-        viewModelScope.launch {
-            mapViewModelRepository.addHome(
-                "MOJID",
-                GeoPoint(43.313198, 21.906673)
-            )
-        }
-    }
-
-
-    fun deleteHome() {
-        viewModelScope.launch {
-            mapViewModelRepository.deleteHome("MOJID")
-        }
-    }
-
     init {
+        _mapScreenState = getInitMapState()
+
+        mapScreenState = _mapScreenState
+        _mapState = mapScreenState.value.mapState.value
+
+
+        initMyLocationPinAndRegisterMove()
+
+        registerOnMapStateChangeListener()
+
+        registerFilterPins()
+
+        registerAddCustomPin()
+
+        registerOnPinClick()
+
+        registerOnLocationService()
+    }
+
+    fun onEvent(event: MapViewModelEvents) {
+        when (event) {
+            MapViewModelEvents.AddCustomPin -> addCustomPinFBHandler()
+            MapViewModelEvents.CloseCustomPinDialog -> closeCustomPinDialogHandler()
+            MapViewModelEvents.CloseFilterDialog -> closeFilterDialogHandler()
+            MapViewModelEvents.FollowMe -> followMeHandler()
+            MapViewModelEvents.RemoveCustomPin -> removeCustomPinHandler()
+            MapViewModelEvents.ShowFilterDialog -> showFilterDialogHandler()
+            MapViewModelEvents.ShowPlayerDialog -> showPlayerDialogHandler()
+            MapViewModelEvents.UpdateCustomPin -> updateCustomPinFBHandler()
+            MapViewModelEvents.ClosePlayerDialog -> closePlayerDialogHandler()
+            MapViewModelEvents.ResetFilters -> resetFiltersHandler()
+            MapViewModelEvents.UpdateFilterFriends -> updateFilterFriendsHandler()
+            MapViewModelEvents.UpdateFilterResource -> updateFilterResourcesHandler()
+            MapViewModelEvents.UpdateFilterTotems -> updateFilterTotemsHandler()
+            MapViewModelEvents.AddHome -> addHomeHandler()
+            MapViewModelEvents.RemoveHome -> removeHomeHandler()
+        }
+    }
+
+    private fun getInitMapState(): MutableState<MapScreenState> {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
             try {
                 val image = Glide.with(appContext)
@@ -136,7 +131,8 @@ class MapViewModel @Inject constructor(
                 null
             }
         }
-        _mapScreenState = mutableStateOf(MapScreenState(
+
+        return mutableStateOf(MapScreenState(
             mapState = mutableStateOf(
                 MapState(
                     levelCount = LEVEL_COUNT,
@@ -164,59 +160,54 @@ class MapViewModel @Inject constructor(
             filterDialogOpen = false,
             followMe = true,
             detectScroll = true,
-            filterPlayers = MutableStateFlow(false),
-            filterTotems = MutableStateFlow(false),
-            filterResources = MutableStateFlow(false),
-            resourcesHashMap = mutableMapOf(),
-            playersHashMap = mutableMapOf(),
-            totemsHashMap = mutableMapOf(),
-            customPinsHashMap = mutableMapOf(),
-            selectedPlayer = mutableStateOf(UserInGameData()),
-            home = mutableStateOf(HomeData())
+            filterPlayers = filterPlayers.value,
+            filterTotems = filterTotems.value,
+            filterResources = filterResources.value,
+            resourcesHashMap = resourcesHashMap,
+            playersHashMap = playersHashMap,
+            totemsHashMap = totemsHashMap,
+            customPinsHashMap = customPinsHashMap,
+            selectedPlayer = UserInGameData(),
+            home = HomeData(),
+            playerLocation = GeoPoint(
+                INIT_SCROLL_LAT,
+                INIT_SCROLL_LNG
+            )
         ))
-
-        mapScreenState = _mapScreenState
-        _mapState = mapScreenState.value.mapState.value
-
-
-        initMyLocationPinAndRegisterMove()
-
-        registerOnMapStateChangeListener()
-
-        registerFilterPins()
-
-        registerAddCustomPin()
-
-        registerAllPinsFlow()
-
-        registerOnPinClick()
     }
 
-//    fun onEvent(event: MapViewModelEvents){
-//        when(event){
-//
-//        }
-//    }
-
-    private fun registerAllPinsFlow() {
-        registerPinsFlow(LocationService.playersPinFlow)
-        registerPinsFlow(LocationService.totemsPinsFlow)
-        registerPinsFlow(LocationService.resourcesPinsFlow)
-        registerPinsFlow(LocationService.customPinsFlow)
-        registerPinsFlow(LocationService.homePinsFlow)
-    }
-
-    private fun <T : IData> registerPinsFlow(flow: MutableSharedFlow<PinAction<T>?>) {
+    private fun registerOnLocationService() {
         viewModelScope.launch {
-            flow.collect {
-                Log.d("tag", "register " + it?.pinData)
-                when (it?.action) {
-                    PinActionType.Added -> addPinHash(it.pinData)
-                    PinActionType.Modified -> modifyPinHash(it.pinData)
-                    PinActionType.Removed -> removePinHash(it.pinData)
-                    null -> Log.d("tag", "null resource")
-                }
+            locationServiceEvents.flow.collect {
+                onLocationServiceEvent(it)
             }
+        }
+    }
+
+    private suspend fun onLocationServiceEvent(event: LocationServiceEvents) {
+        when (event) {
+            is LocationServiceEvents.PlayerLocationChanged -> {
+                movePinAtLatLng(MY_PIN, event.newLocation.latitude, event.newLocation.longitude)
+
+                if (mapScreenState.value.followMe) {
+                    changeStateDetectScroll(false)
+
+                    centerMeOnMyPin()
+
+                    changeStateDetectScroll(true)
+                }
+
+            }
+            is LocationServiceEvents.PinDataChanged<*> -> handlePinAction(event.pinAction)
+        }
+    }
+
+
+    private fun <T : IData> handlePinAction(pinAction: PinAction<T>) {
+        when (pinAction.action) {
+            PinActionType.Added -> addPinHash(pinAction.pinData)
+            PinActionType.Modified -> modifyPinHash(pinAction.pinData)
+            PinActionType.Removed -> removePinHash(pinAction.pinData)
         }
     }
 
@@ -225,15 +216,15 @@ class MapViewModel @Inject constructor(
             var composable: @Composable() (() -> Unit)? = null
             when (dataType) {
                 is HomeData -> {
-                    _mapScreenState.value.home.value = dataType
+                    _mapScreenState.value = _mapScreenState.value.copy(home = dataType)
                     composable = { CustomPin(resourceId = R.drawable.pin_home) }
                 }
                 is CustomPinData -> {
-                    _mapScreenState.value.customPinsHashMap[it] = dataType
+                    customPinsHashMap[it] = dataType
                     composable = { CustomPin(resourceId = R.drawable.pin_custom) }
                 }
                 is ResourceData -> {
-                    _mapScreenState.value.resourcesHashMap[it] = dataType
+                    resourcesHashMap[it] = dataType
                     composable = {
                         CustomPin(
                             when (dataType.type) {
@@ -247,11 +238,11 @@ class MapViewModel @Inject constructor(
                     }
                 }
                 is TotemData -> {
-                    _mapScreenState.value.totemsHashMap[it] = dataType
+                    totemsHashMap[it] = dataType
                     composable = { CustomPin(resourceId = R.drawable.pin_tiki) }
                 }
                 is UserInGameData -> {
-                    _mapScreenState.value.playersHashMap[it] = dataType
+                    playersHashMap[it] = dataType
                     composable =
                         {
                             CustomPinImage(
@@ -285,22 +276,22 @@ class MapViewModel @Inject constructor(
             var oldData: IData? = null
             when (dataType) {
                 is HomeData -> {
-                    oldData = _mapScreenState.value.home.value
-                    _mapScreenState.value.home.value = dataType
+                    oldData = _mapScreenState.value.home
+                    _mapScreenState.value = _mapScreenState.value.copy(home = dataType)
                 }
                 is CustomPinData -> {
-                    oldData = _mapScreenState.value.customPinsHashMap.put(it, dataType)
+                    oldData = customPinsHashMap.put(it, dataType)
 
                 }
                 is ResourceData -> {
-                    oldData = _mapScreenState.value.resourcesHashMap.put(it, dataType)
+                    oldData = resourcesHashMap.put(it, dataType)
                 }
                 is TotemData -> {
-                    oldData = _mapScreenState.value.totemsHashMap.put(it, dataType)
+                    oldData = totemsHashMap.put(it, dataType)
 
                 }
                 is UserInGameData -> {
-                    oldData = _mapScreenState.value.playersHashMap.put(it, dataType)
+                    oldData = playersHashMap.put(it, dataType)
                 }
             }
             if (oldData != null) {
@@ -322,19 +313,19 @@ class MapViewModel @Inject constructor(
         dataType.id?.let {
             when (dataType) {
                 is HomeData -> {
-                    mapScreenState.value.home.value = HomeData()
+                    _mapScreenState.value = mapScreenState.value.copy(home = HomeData())
                 }
                 is CustomPinData -> {
-                    mapScreenState.value.customPinsHashMap.remove(it)
+                    customPinsHashMap.remove(it)
                 }
                 is ResourceData -> {
-                    mapScreenState.value.resourcesHashMap.remove(it)
+                    resourcesHashMap.remove(it)
                 }
                 is TotemData -> {
-                    mapScreenState.value.totemsHashMap.remove(it)
+                    totemsHashMap.remove(it)
                 }
                 is UserInGameData -> {
-                    mapScreenState.value.playersHashMap.remove(it)
+                    playersHashMap.remove(it)
                 }
             }
             removePin(it)
@@ -383,7 +374,7 @@ class MapViewModel @Inject constructor(
 
     private fun registerFilterPins() {
         viewModelScope.launch {
-            mapScreenState.value.filterResources.collect { shouldFilter ->
+            filterResources.collect { shouldFilter ->
                 mapScreenState.value.resourcesHashMap.values.forEach { resource ->
                     if (shouldFilter) {
                         resource.id?.let { removePin(it) }
@@ -395,7 +386,7 @@ class MapViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            mapScreenState.value.filterPlayers.collect { shouldFilter ->
+            filterPlayers.collect { shouldFilter ->
                 mapScreenState.value.playersHashMap.values.forEach { player ->
                     if (shouldFilter) {
                         player.id?.let { removePin(it) }
@@ -407,7 +398,7 @@ class MapViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            mapScreenState.value.filterTotems.collect { shouldFilter ->
+            filterTotems.collect { shouldFilter ->
                 mapScreenState.value.totemsHashMap.values.forEach { totem ->
                     if (shouldFilter) {
                         totem.id?.let { removePin(it) }
@@ -436,23 +427,6 @@ class MapViewModel @Inject constructor(
             renderingStrategy = RenderingStrategy.LazyLoading("0"),
             clickable = false,
         )
-
-        viewModelScope.launch {
-            LocationService.locationFlow.collectLatest {
-                if (it != null) {
-                    movePinAtLatLng(MY_PIN, it.latitude, it.longitude)
-
-                    if (mapScreenState.value.followMe) {
-                        changeStateDetectScroll(false)
-
-                        centerMeOnMyPin()
-
-                        changeStateDetectScroll(true)
-                    }
-                }
-
-            }
-        }
     }
 
 
@@ -464,7 +438,7 @@ class MapViewModel @Inject constructor(
     }
 
 
-    fun followMe() {
+    private fun followMeHandler() {
         viewModelScope.launch {
             centerMeOnMyPin()
             _mapScreenState.value = _mapScreenState.value.copy(followMe = true, detectScroll = true)
@@ -483,7 +457,7 @@ class MapViewModel @Inject constructor(
     }
 
 
-    fun centerOnPin(pinId: String) {
+    private fun centerOnPin(pinId: String) {
         val markerInfo = _mapState.getMarkerInfo(pinId)
         if (markerInfo != null) {
             viewModelScope.launch {
@@ -493,7 +467,7 @@ class MapViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalClusteringApi::class)
-    fun addPinAtOffset(
+    private fun addPinAtOffset(
         pinId: String,
         x: Double,
         y: Double,
@@ -513,7 +487,7 @@ class MapViewModel @Inject constructor(
     }
 
 
-    fun movePinAtLatLng(pinId: String, lat: Double, lng: Double) {
+    private fun movePinAtLatLng(pinId: String, lat: Double, lng: Double) {
         val cords = convertLatLngToOffsets(lat, lng, mapDimensions, mapDimensions)
         _mapState.moveMarker(
             pinId,
@@ -522,26 +496,28 @@ class MapViewModel @Inject constructor(
         )
     }
 
-    fun removePin(pinId: String) {
+    private fun removePin(pinId: String) {
         _mapState.removeMarker(pinId)
     }
 
-    fun registerOnPinClick() {
+    private fun registerOnPinClick() {
         _mapState.onMarkerClick { id, x, y ->
             Log.d("tag", "clicked na pin $id x je $x y je $y")
             if (mapScreenState.value.resourcesHashMap.containsKey(id)) {
 
             } else if (mapScreenState.value.playersHashMap.containsKey(id)) {
-                _mapScreenState.value.selectedPlayer.value =
+                _mapScreenState.value = _mapScreenState.value.copy(
+                    selectedPlayer =
                     mapScreenState.value.playersHashMap[id]!!
-                showPlayerDialog()
+                )
+                showPlayerDialogHandler()
 
             } else if (mapScreenState.value.totemsHashMap.containsKey(id)) {
 
 
             } else if (mapScreenState.value.customPinsHashMap.containsKey(id)) {
                 val customPin = mapScreenState.value.customPinsHashMap[id]!!
-                showCustomPinDialog(
+                showCustomPinDialogHandler(
                     l = customPin.l,
                     id = customPin.id,
                     placedBy = customPin.placed_by,
@@ -554,7 +530,14 @@ class MapViewModel @Inject constructor(
     private fun registerAddCustomPin() {//kako set to handluje?????????? u bazu
         viewModelScope.launch {
             _mapState.onLongPress { x, y ->
-                showCustomPinDialog(convertOffsetsToGeoPoint(x, y, mapDimensions, mapDimensions))
+                showCustomPinDialogHandler(
+                    convertOffsetsToGeoPoint(
+                        x,
+                        y,
+                        mapDimensions,
+                        mapDimensions
+                    )
+                )
             }
         }
     }
@@ -570,7 +553,7 @@ class MapViewModel @Inject constructor(
 //        )
 //    }
 
-    private fun showCustomPinDialog(
+    private fun showCustomPinDialogHandler(
         l: GeoPoint?,
         id: String? = null,
         placedBy: String? = null,
@@ -587,7 +570,7 @@ class MapViewModel @Inject constructor(
         )
     }
 
-    fun closeCustomPinDialog() {
+    private fun closeCustomPinDialogHandler() {
         _mapScreenState.value = _mapScreenState.value.copy(
             customPinDialog = SelectedCustomPinDialog(
                 dialogOpen = false,
@@ -599,39 +582,96 @@ class MapViewModel @Inject constructor(
         )
     }
 
-    fun showPlayerDialog() {
+    private fun showPlayerDialogHandler() {
         _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = true)
     }
 
-    fun closePlayerDialog() {
+    private fun closePlayerDialogHandler() {
         _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
 //        _mapScreenState.value.selectedPlayer.value = UserInGameData()//treba li ovo?????
     }
 
-    fun showFilterDialog() {
+    private fun showFilterDialogHandler() {
         _mapScreenState.value = _mapScreenState.value.copy(filterDialogOpen = true)
     }
 
-    fun closeFilterDialog() {
+    private fun closeFilterDialogHandler() {
         _mapScreenState.value = _mapScreenState.value.copy(filterDialogOpen = false)
     }
 
-    fun updateFilterResources() {
-        mapScreenState.value.filterResources.value = !mapScreenState.value.filterResources.value
+    private fun updateFilterResourcesHandler() {
+        viewModelScope.launch {
+            filterResources.emit(!filterResources.value)
+        }
     }
 
-    fun updateFilterFriends() {
-        mapScreenState.value.filterPlayers.value = !mapScreenState.value.filterPlayers.value
+    private fun updateFilterFriendsHandler() {
+        viewModelScope.launch {
+            filterPlayers.emit(!filterPlayers.value)
+        }
     }
 
-    fun updateFilterTotems() {
-        mapScreenState.value.filterTotems.value = !mapScreenState.value.filterTotems.value
+    private fun updateFilterTotemsHandler() {
+        viewModelScope.launch {
+            filterTotems.emit(!filterTotems.value)
+        }
     }
 
-    fun resetFilters() {
-        mapScreenState.value.filterResources.value = false
-        mapScreenState.value.filterPlayers.value = false
-        mapScreenState.value.filterTotems.value = false
+    private fun resetFiltersHandler() {
+        viewModelScope.launch {
+            filterResources.emit(false)
+            filterTotems.emit(false)
+            filterPlayers.emit(false)
+        }
     }
 
+
+    private fun addCustomPinFBHandler() {
+        viewModelScope.launch {
+            mapViewModelRepository.addCustomPin(
+                l = mapScreenState.value.customPinDialog.l,
+                visible_to = "AAAAAAAAAAAAA",//squad id||auth id
+                placed_by = "BBBBBBBBBBB",//moj auth id
+                text = mapScreenState.value.customPinDialog.text.value,
+            )
+        }
+    }
+
+    private fun updateCustomPinFBHandler() {
+        viewModelScope.launch {
+            mapScreenState.value.customPinDialog.id?.let {
+                mapViewModelRepository.updateCustomPin(
+                    id = it,
+                    visible_to = "AAAAAAAAAAAAA",//,
+                    placed_by = "BBBBBBBBBBB",//moj auth id
+                    text = mapScreenState.value.customPinDialog.text.value,
+
+                    )
+            }
+        }
+    }
+
+    private fun removeCustomPinHandler() {
+        viewModelScope.launch {
+            mapScreenState.value.customPinDialog.id?.let {
+                mapViewModelRepository.deleteCustomPin(it)
+            }
+        }
+    }
+
+    private fun addHomeHandler() {
+        viewModelScope.launch {
+            mapViewModelRepository.addHome(
+                "MOJID",
+                GeoPoint(43.313198, 21.906673)
+            )
+        }
+    }
+
+
+    private fun removeHomeHandler() {
+        viewModelScope.launch {
+            mapViewModelRepository.deleteHome("MOJID")
+        }
+    }
 }
