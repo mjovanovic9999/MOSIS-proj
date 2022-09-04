@@ -7,7 +7,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -30,7 +29,7 @@ fun CustomRequestPermission(
     arePermissionsGranted: MutableState<Boolean>
 ) {
 
-    val requestBackgroundAndroidVerison =
+    val requestBackgroundAndroidVersion =
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.R //novi and
     val permissionGrantedState = remember { mutableStateOf(true) }
     val permissionBackgroundGrantedState = remember { mutableStateOf(true) }
@@ -41,15 +40,13 @@ fun CustomRequestPermission(
     ) { permissions ->
         when {
             permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                if (!requestBackgroundAndroidVerison) {
+                if (!requestBackgroundAndroidVersion) {
                     arePermissionsGranted.value = true
                 }
-                Log.d("tag", "fine")
                 permissionGrantedState.value = true
 
             }
             else -> {
-                Log.d("tag", "else")
                 permissionGrantedState.value = false
                 arePermissionsGranted.value = false
 
@@ -61,17 +58,14 @@ fun CustomRequestPermission(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            if (requestBackgroundAndroidVerison) {
-                Log.d("tag", "back Permission provided by user")
+            if (requestBackgroundAndroidVersion) {
                 permissionBackgroundGrantedState.value = true
                 arePermissionsGranted.value = true
 
             }
 
         } else {
-            if (requestBackgroundAndroidVerison) {
-
-                Log.d("tag", "back  Permission denied by user")
+            if (requestBackgroundAndroidVersion) {
                 permissionBackgroundGrantedState.value = false
                 arePermissionsGranted.value = false
             }
@@ -94,7 +88,7 @@ fun CustomRequestPermission(
     SideEffect {
         permissionRequest.launch(permissionsArray)
 
-        if (requestBackgroundAndroidVerison) {
+        if (requestBackgroundAndroidVersion) {
             permissionBackgroundRequest.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         }
     }
@@ -104,10 +98,9 @@ fun CustomRequestPermission(
             LocalContext.current,
             launchPermissionActivityResult
         )
-    } else if (requestBackgroundAndroidVerison && !permissionBackgroundGrantedState.value) {
+    } else if (requestBackgroundAndroidVersion && !permissionBackgroundGrantedState.value) {
         CustomRequestBackgroundPermissionsDialog(
             LocalContext.current,
-            //permissionBackgroundRequest,
             launchPermissionBackgroundActivityResult
         )
     }
@@ -141,9 +134,6 @@ fun CustomRequestPermissionsDialog(
                     val uri: Uri =
                         Uri.fromParts("package", context.packageName, null)
                     intent.data = uri
-
-//                    LocationService.arePermissionsGranted=true
-
                     launchPermissionActivityResult.launch(intent)
                 }
             ) {
@@ -167,7 +157,6 @@ fun CustomRequestPermissionsDialog(
 @Composable
 fun CustomRequestBackgroundPermissionsDialog(
     context: Context,
-    //permissionBackgroundRequest: ManagedActivityResultLauncher<String, Boolean>,
     launchPermissionBackgroundActivityResult: ManagedActivityResultLauncher<Intent, ActivityResult>
 ) {
     AlertDialog(
@@ -185,14 +174,12 @@ fun CustomRequestBackgroundPermissionsDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-//                    permissionBackgroundRequest.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
                     val intent =
                         Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                     val uri: Uri =
                         Uri.fromParts("package", context.packageName, null)
                     intent.data = uri
                     launchPermissionBackgroundActivityResult.launch(intent)
-//                    context.stopService(Intent(context, LocationService::class.java))
 
                 }
             ) {
@@ -204,7 +191,6 @@ fun CustomRequestBackgroundPermissionsDialog(
                 onClick = {
                     context.stopService(Intent(context, LocationService::class.java))
                     (context as Activity).finishAndRemoveTask()
-//                    requestBackgroundLocationPermission.value = false
                 }
             ) {
                 Text(DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON)

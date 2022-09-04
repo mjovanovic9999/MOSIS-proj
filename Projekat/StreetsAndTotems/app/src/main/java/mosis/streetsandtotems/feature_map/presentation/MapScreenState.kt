@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
 
+import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.runtime.MutableState
 import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.feature_map.domain.model.*
@@ -8,7 +9,6 @@ import ovh.plrapps.mapcompose.ui.state.MapState
 data class MapScreenState(
     val mapState: MutableState<MapState>,
     val customPinDialog: SelectedCustomPinDialog,
-    val playerDialogOpen: Boolean,
     val filterDialogOpen: Boolean,
     val followMe: Boolean,
     val detectScroll: Boolean,
@@ -24,8 +24,14 @@ data class MapScreenState(
     val home: HomeData,
 
     val playerLocation: GeoPoint,
+    val playerInventory: UserInventoryData,
 
-    val selectedPlayer: ProfileData
+    val playerDialogOpen: Boolean,
+    val selectedPlayer: ProfileData,
+
+
+    val resourceDialogOpen: Boolean,
+    val selectedResource: ResourceData,
 )
 
 

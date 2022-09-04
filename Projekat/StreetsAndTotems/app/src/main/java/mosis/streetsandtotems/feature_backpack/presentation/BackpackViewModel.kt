@@ -15,13 +15,13 @@ class BackpackViewModel @Inject constructor() : ViewModel() {
     fun openDropItemDialog(
         itemCount: Int,
         resourceType: IconType.ResourceType? = null,
-        dropTotem: Boolean = false
+        dropTotem: Boolean = false,
     ) {
         _dropItemDialogOpen.value = _dropItemDialogOpen.value.copy(
             open = true,
             itemType = resourceType,
             itemCount = itemCount,
-            dropTotem = dropTotem
+            dropTotem = dropTotem,
         )
     }
 
@@ -30,7 +30,7 @@ class BackpackViewModel @Inject constructor() : ViewModel() {
             open = false,
             itemType = null,
             itemCount = null,
-            dropTotem = false
+            dropTotem = false,
         )
     }
 

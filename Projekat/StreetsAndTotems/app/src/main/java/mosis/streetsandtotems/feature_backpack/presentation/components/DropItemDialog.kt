@@ -21,7 +21,11 @@ import mosis.streetsandtotems.ui.theme.sizes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropItemDialog(state: DropItemDialogState, onDismissRequest: () -> Unit) {
+fun DropItemDialog(
+    state: DropItemDialogState, onDismissRequest: () -> Unit,
+    onDrop: () -> Unit,
+    onPlaceTotem: (() -> Unit)? = null,
+) {
     val dropAmount = remember { mutableStateOf(FormFieldConstants.DEFAULT_AMOUNT) }
 
     CustomDialog(
@@ -33,7 +37,8 @@ fun DropItemDialog(state: DropItemDialogState, onDismissRequest: () -> Unit) {
             CustomDialogTitle(
                 isTotem = state.dropTotem,
                 resourceType = state.itemType,
-                countMessage = state.itemCount?.toString() + ItemsConstants.ITEMS_LEFT
+                countMessage = state.itemCount?.toString() + ItemsConstants.ITEMS_LEFT,
+                needTotemAdditionalText = false,
             )
         },
         text = {
@@ -43,7 +48,7 @@ fun DropItemDialog(state: DropItemDialogState, onDismissRequest: () -> Unit) {
                 verticalAlignment = Alignment.Bottom
             ) {
                 CustomButton(
-                    clickHandler = { /*TODO*/ },
+                    clickHandler = onDrop,
                     text = ButtonConstants.DROP,
                     buttonType = CustomButtonType.Outlined,
                     textStyle = MaterialTheme.typography.titleMedium,
@@ -72,7 +77,8 @@ fun DropItemDialog(state: DropItemDialogState, onDismissRequest: () -> Unit) {
         confirmButtonText = ButtonConstants.PLACE,
         confirmButtonVisible = state.dropTotem,
         dismissButtonVisible = false,
-        clickable = true
+        clickable = true,
+        onConfirmButtonClick = onPlaceTotem ?: {}
     )
 }
 

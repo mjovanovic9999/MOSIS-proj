@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.core
 
+import mosis.streetsandtotems.core.presentation.components.IconType
 import kotlin.math.PI
 
 
@@ -93,6 +94,11 @@ object ButtonConstants {
     const val PLACE = "Place"
     const val EDIT = "Edit"
     const val REMOVE = "Remove"
+    const val INVEST = "Invest"
+    const val BUY = "Buy"
+    const val TAKE = "Take"
+    const val PUT = "PUT"
+    const val APPLY = "Apply"
     const val DIALOG_BACKGROUND_PERMISSION_CONFIRM_BUTTON = "Grant"
     const val DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON = "Don't grant"
     const val SHOW_ON_MAP = "Show on map"
@@ -343,4 +349,18 @@ object PreferencesDataStoreConstants {
 
     const val USER_ID_PREFERENCES = "USER_DATA"
     const val SQUAD_ID_PREFERENCES = "SQUAD_ID"
+}
+
+object PointsConversion {
+    const val EMERALD = 40
+    const val STONE = 30
+    const val BRICK = 20
+    const val WOOD = 10
+
+    const val LOW = 50
+    const val MEDIUM = 100
+    const val HIGH = 200
+
+
+   
 }

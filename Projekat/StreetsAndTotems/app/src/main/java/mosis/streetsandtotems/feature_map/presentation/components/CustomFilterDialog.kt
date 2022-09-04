@@ -1,12 +1,17 @@
 package mosis.streetsandtotems.feature_map.presentation.components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+import mosis.streetsandtotems.core.ButtonConstants
 import mosis.streetsandtotems.core.PinConstants.FRIENDS
 import mosis.streetsandtotems.core.PinConstants.RESOURCES
 import mosis.streetsandtotems.core.PinConstants.TOTEMS
@@ -22,42 +27,52 @@ fun CustomFilterDialog(
     updateFilterTotems: () -> Unit,
     filterResourceState: Boolean,
     filterFriendsState: Boolean,
-    filterTotemsState: Boolean
+    filterTotemsState: Boolean,
 ) {
     CustomDialog(
         modifier = Modifier.fillMaxWidth(),
         isOpen = isOpen,
         title = {
-            Text("Filter map pins")
+            Text("Visible pins")
         },
         text = {
-            Column {
-                Text(text = "Category")
-                Row {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+            ) {
+                item {
                     CustomFilterChip(
-                        filterResourceState,
+                        !filterResourceState,
                         { updateFilterResources() },
                         RESOURCES
                     )
+                }
+                item {
                     CustomFilterChip(
-                        filterFriendsState,
+                        !filterFriendsState,
                         { updateFilterPlayers() },
                         FRIENDS
                     )
+                }
+                item {
                     CustomFilterChip(
-                        filterTotemsState,
+                        !filterTotemsState,
                         { updateFilterTotems() },
                         TOTEMS
                     )
                 }
-                Divider()
             }
+//            FlowRow(mainAxisAlignment = FlowMainAxisAlignment.SpaceEvenly) {
+//
+//
+//
+//            }
+
         },
         confirmButtonEnabled = true,
-        confirmButtonText = "Apply",
+        confirmButtonText = ButtonConstants.APPLY,
         onConfirmButtonClick = { onConfirmButtonClick() },
         dismissButtonEnabled = true,
-        dismissButtonText = "Dismiss",
+        dismissButtonText = ButtonConstants.DISMISS,
         onDismissButtonClick = { onDismissRequest() },
     )
 

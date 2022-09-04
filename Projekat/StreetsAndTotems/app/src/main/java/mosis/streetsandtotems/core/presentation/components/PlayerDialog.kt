@@ -16,12 +16,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.content.ContextCompat.startActivity
+import com.skydoves.landscapist.glide.GlideImage
 import mosis.streetsandtotems.core.ButtonConstants
 import mosis.streetsandtotems.ui.theme.sizes
-
 
 @Composable
 fun PlayerDialog(
@@ -35,6 +36,7 @@ fun PlayerDialog(
     firstName: String? = null,
     lastName: String? = null,
     userName: String? = null,
+    image: Uri? = null,
 ) {
     val context = LocalContext.current
     CustomDialog(
@@ -56,7 +58,7 @@ fun PlayerDialog(
                             .align(Alignment.CenterStart),
                     ) {
                         Text(
-                            text = (firstName ?: " ").first() + " " + (lastName ?: " ").first(),
+                            text = (firstName ?: " ").first() + "" + (lastName ?: " ").first(),
                             modifier = Modifier.align(Alignment.Center),
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -74,7 +76,7 @@ fun PlayerDialog(
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Text(
-                        text = "$firstName $lastName",
+                        text = (firstName ?: " ") + (lastName ?: " "),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.labelLarge
                     )
@@ -114,14 +116,19 @@ fun PlayerDialog(
                         MaterialTheme.colorScheme.secondaryContainer,
                         RoundedCornerShape(MaterialTheme.sizes.default_shape_corner)
                     )
-            )
+            ) {
+                GlideImage(
+                    imageModel = image,
+                    modifier = Modifier.clip(RoundedCornerShape(MaterialTheme.sizes.default_shape_corner))
+                )
+            }
         },
         confirmButtonText = if (isSquadMember) ButtonConstants.KICK else ButtonConstants.INVITE_TO_SQUAD,
         confirmButtonMatchParentWidth = true,
         dismissButtonText = ButtonConstants.TRADE,
         dismissButtonVisible = tradeEnabled,
         dismissButtonMatchParentWidth = true,
-        buttonType = CustomButtonType.Outlined
+        buttonType = CustomButtonType.Outlined,
     )
 }
 
