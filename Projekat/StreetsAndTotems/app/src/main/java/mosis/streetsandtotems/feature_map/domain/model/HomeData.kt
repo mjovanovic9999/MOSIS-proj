@@ -6,4 +6,4 @@ data class HomeData(
     override val id: String? = null,
     override val l: GeoPoint? = null,
     val inventory: InventoryData? = null,
-) : IData
+) : Data

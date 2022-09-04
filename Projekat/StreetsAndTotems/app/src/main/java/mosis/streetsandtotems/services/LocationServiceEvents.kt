@@ -5,9 +5,9 @@ import mosis.streetsandtotems.feature_map.domain.model.*
 
 sealed class LocationServiceEvents {
     data class PlayerLocationChanged(val newLocation: GeoPoint) : LocationServiceEvents()
-    sealed class PinDataChanged<T : IData>(val pinAction: PinAction<T>) : LocationServiceEvents()
-    class UserInGameDataChanged(pinAction: PinAction<UserInGameData>) :
-        PinDataChanged<UserInGameData>(pinAction)
+    sealed class PinDataChanged<T : Data>(val pinAction: PinAction<T>) : LocationServiceEvents()
+    class ProfileDataChanged(pinAction: PinAction<ProfileData>) :
+        PinDataChanged<ProfileData>(pinAction)
 
     data class ResourcesChanged(val resourcePinAction: PinAction<ResourceData>) :
         PinDataChanged<ResourceData>(resourcePinAction)

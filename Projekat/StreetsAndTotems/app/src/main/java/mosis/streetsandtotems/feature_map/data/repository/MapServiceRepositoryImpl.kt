@@ -20,14 +20,14 @@ class MapServiceRepositoryImpl(
     }
 
 
-    override fun registerCallbacksOnUserInGameDataUpdate(
-        userAddedCallback: (user: UserInGameData) -> Unit,
-        userModifiedCallback: (user: UserInGameData) -> Unit,
-        userRemovedCallback: (user: UserInGameData) -> Unit,
+    override fun registerCallbacksOnProfileDataUpdate(
+        userAddedCallback: (user: ProfileData) -> Unit,
+        userModifiedCallback: (user: ProfileData) -> Unit,
+        userRemovedCallback: (user: ProfileData) -> Unit,
     ) {
         auth.currentUser?.let {
             listenerRegistrations.add(
-                firebaseServiceDataSource.registerCallbacksOnUserInGameDataUpdate(
+                firebaseServiceDataSource.registerCallbacksOnProfileDataUpdate(
                     it,
                     userAddedCallback = userAddedCallback,
                     userModifiedCallback = userModifiedCallback,

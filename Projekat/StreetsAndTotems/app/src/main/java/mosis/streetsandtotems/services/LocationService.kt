@@ -150,10 +150,10 @@ class LocationService : Service() {
     }
 
     private fun initUserPinsFlow() {
-        mapServiceRepository.registerCallbacksOnUserInGameDataUpdate(
+        mapServiceRepository.registerCallbacksOnProfileDataUpdate(
             userAddedCallback = {
                 emitLocationServiceEvent(
-                    LocationServiceEvents.UserInGameDataChanged(
+                    LocationServiceEvents.ProfileDataChanged(
                         PinAction(
                             it,
                             PinActionType.Added
@@ -163,7 +163,7 @@ class LocationService : Service() {
             },
             userModifiedCallback = {
                 emitLocationServiceEvent(
-                    LocationServiceEvents.UserInGameDataChanged(
+                    LocationServiceEvents.ProfileDataChanged(
                         PinAction(
                             it,
                             PinActionType.Modified
@@ -173,7 +173,7 @@ class LocationService : Service() {
             },
             userRemovedCallback = {
                 emitLocationServiceEvent(
-                    LocationServiceEvents.UserInGameDataChanged(
+                    LocationServiceEvents.ProfileDataChanged(
                         PinAction(
                             it,
                             PinActionType.Added

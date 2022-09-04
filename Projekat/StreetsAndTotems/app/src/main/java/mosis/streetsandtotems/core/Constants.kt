@@ -7,7 +7,7 @@ object DatabaseConstants {
 }
 
 object FirestoreConstants {
-    const val USER_IN_GAME_DATA_COLLECTION = "user_in_game_data"
+    const val PROFILE_DATA_COLLECTION = "profile_data"
     const val RESOURCES_COLLECTION = "resources"
     const val TOTEMS_COLLECTION = "totems"
     const val CUSTOM_PINS_COLLECTION = "custom_pins"
@@ -15,6 +15,7 @@ object FirestoreConstants {
 
 
     const val ID_FIELD = "__name__"
+    const val IMAGE_URI_FIELD = "image_uri"
 }
 
 object FirebaseErrorCodesConstants {

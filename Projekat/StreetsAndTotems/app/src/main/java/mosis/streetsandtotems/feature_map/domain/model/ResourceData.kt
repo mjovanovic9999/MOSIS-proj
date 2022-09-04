@@ -14,5 +14,5 @@ data class ResourceData(
     override val l: GeoPoint? = null,
     val type: ResourceType? = null,
     val remaining: Int? = null
-) : IData
+) : Data
 
