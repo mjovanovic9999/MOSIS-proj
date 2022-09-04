@@ -13,6 +13,7 @@ import mosis.streetsandtotems.core.TitleConstants
 import mosis.streetsandtotems.core.presentation.components.CustomPage
 import mosis.streetsandtotems.core.presentation.components.IconType
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
+import mosis.streetsandtotems.core.presentation.components.CustomItemDialog
 import mosis.streetsandtotems.feature_backpack.presentation.components.DropItemDialog
 import mosis.streetsandtotems.feature_backpack.presentation.components.FABWithBadge
 import mosis.streetsandtotems.feature_backpack.presentation.components.ItemRow
@@ -34,8 +35,18 @@ fun BackpackScreen(viewModel: BackpackViewModel) {
                 ItemRow(
                     firstItemImageVector = ImageVector.vectorResource(id = R.drawable.emerald),
                     secondItemImageVector = ImageVector.vectorResource(id = R.drawable.wood),
-                    onFirstItemClick = { viewModel.openDropItemDialog(5, IconType.ResourceType.Emerald) },
-                    onSecondItemClick = { viewModel.openDropItemDialog(5, IconType.ResourceType.Wood) },
+                    onFirstItemClick = {
+                        viewModel.openDropItemDialog(
+                            5,
+                            IconType.ResourceType.Emerald
+                        )
+                    },
+                    onSecondItemClick = {
+                        viewModel.openDropItemDialog(
+                            5,
+                            IconType.ResourceType.Wood
+                        )
+                    },
                     firstItemBadgeText = "5",
                     secondItemBadgeText = "10",
                     firstItemContentDescription = ImageContentDescriptionConstants.EMERALD,
@@ -44,8 +55,18 @@ fun BackpackScreen(viewModel: BackpackViewModel) {
                 ItemRow(
                     firstItemImageVector = ImageVector.vectorResource(id = R.drawable.stone),
                     secondItemImageVector = ImageVector.vectorResource(id = R.drawable.brick),
-                    onFirstItemClick = { viewModel.openDropItemDialog(5, IconType.ResourceType.Stone) },
-                    onSecondItemClick = { viewModel.openDropItemDialog(5, IconType.ResourceType.Brick) },
+                    onFirstItemClick = {
+                        viewModel.openDropItemDialog(
+                            5,
+                            IconType.ResourceType.Stone
+                        )
+                    },
+                    onSecondItemClick = {
+                        viewModel.openDropItemDialog(
+                            5,
+                            IconType.ResourceType.Brick
+                        )
+                    },
                     firstItemBadgeText = "5",
                     secondItemBadgeText = "10",
                     firstItemContentDescription = ImageContentDescriptionConstants.STONE,
@@ -67,5 +88,8 @@ fun BackpackScreen(viewModel: BackpackViewModel) {
 
     DropItemDialog(
         state = viewModel.dropItemDialogOpen.value,
-        onDismissRequest = { viewModel.closeDropItemDialog() })
+        onDismissRequest = { viewModel.closeDropItemDialog() },
+        onDrop = {},
+    )
+
 }

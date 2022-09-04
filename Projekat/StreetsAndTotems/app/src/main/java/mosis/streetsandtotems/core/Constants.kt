@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.core
 
+import mosis.streetsandtotems.core.presentation.components.IconType
 import kotlin.math.PI
 
 object DatabaseConstants {
@@ -335,4 +336,15 @@ object UserSettingsConstants {
     const val SHOW_MY_PHONE_NUMBER_PREFERENCES = "SHOW_MY_PHONE_NUMBER"
     const val CALL_PRIVACY_LEVEL_PREFERENCES = "CALL_PRIVACY_LEVEL"
     const val SMS_PRIVACY_LEVEL_PREFERENCES = "SMS_PRIVACY_LEVEL"
+}
+
+object PointsConversion {
+    const val EMERALD = 40
+    const val STONE = 30
+    const val BRICK = 20
+    const val WOOD = 10
+
+    const val LOW = 50
+    const val MEDIUM = 100
+    const val HIGH = 200
 }

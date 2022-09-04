@@ -1,8 +1,7 @@
-package mosis.streetsandtotems.feature_backpack.presentation.components
+package mosis.streetsandtotems.core.presentation.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -12,33 +11,44 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import com.dsc.form_builder.isNumeric
 import mosis.streetsandtotems.core.ButtonConstants
 import mosis.streetsandtotems.core.FormFieldConstants
 import mosis.streetsandtotems.core.ItemsConstants
-import mosis.streetsandtotems.core.presentation.components.*
-import mosis.streetsandtotems.feature_backpack.presentation.DropItemDialogState
+import mosis.streetsandtotems.feature_map.domain.model.MarketItem
 import mosis.streetsandtotems.ui.theme.sizes
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropItemDialog(
-    state: DropItemDialogState, onDismissRequest: () -> Unit,
-    onDrop: () -> Unit,
-    onPlaceTotem: (() -> Unit)? = null,
+fun CustomItemDialog(
+    isOpen: Boolean,
+    resourceType: IconType.ResourceType,
+    itemCount: Int,
+    dropTotem: Boolean = false,
+    onDismissRequest: () -> Unit,
+    onButtonClick: () -> Unit,
+    isMarket: Boolean,
+    marketExchangeItem: MarketItem? = null,
+    isTotem: Boolean,
+    isHome: Boolean,
+    backpackItemCount: Int? = null
 ) {
+
     val dropAmount = remember { mutableStateOf(FormFieldConstants.DEFAULT_AMOUNT) }
 
     CustomDialog(
-        isOpen = state.open,
+        isOpen = isOpen,
         modifier = Modifier
             .fillMaxWidth(MaterialTheme.sizes.drop_item_dialog_width),
         onDismissRequest = onDismissRequest,
         title = {
             CustomDialogTitle(
-                isTotem = state.dropTotem,
-                resourceType = state.itemType,
-                countMessage = state.itemCount?.toString() + ItemsConstants.ITEMS_LEFT,
-                needAdditionalText = false,
+                isTotem = dropTotem,
+                resourceType = resourceType,
+                countMessage = if (isTotem) itemCount.toString() + ItemsConstants.ITEMS_LEFT
+                else if (isMarket) "For $itemCount ${marketExchangeItem?.currency_type}s"
+                else if (isHome) "Backpack: $backpackItemCount"
+                else "",
+                needAdditionalText = isTotem
             )
         },
         text = {
@@ -48,11 +58,11 @@ fun DropItemDialog(
                 verticalAlignment = Alignment.Bottom
             ) {
                 CustomButton(
-                    clickHandler = onDrop,
+                    clickHandler = onButtonClick,
                     text = ButtonConstants.DROP,
                     buttonType = CustomButtonType.Outlined,
                     textStyle = MaterialTheme.typography.titleMedium,
-                    enabled = dropAmount.value != ""
+                    enabled = dropAmount.value != "" && dropAmount.value.isNumeric()
                 )
                 CustomTextField(
                     modifier = Modifier
@@ -60,8 +70,8 @@ fun DropItemDialog(
                         .padding(start = MaterialTheme.sizes.drop_item_dialog_spacer),
                     value = dropAmount.value,
                     onValueChange = {
-                        if (state.itemCount != null && it != "") {
-                            if (state.itemCount >= it.toInt()) dropAmount.value = it
+                        if (it != "") {
+                            if (itemCount >= it.toInt()) dropAmount.value = it
                         } else dropAmount.value = it
                     },
                     placeholder = FormFieldConstants.AMOUNT,
@@ -75,11 +85,10 @@ fun DropItemDialog(
         buttonType = CustomButtonType.Outlined,
         confirmButtonMatchParentWidth = true,
         confirmButtonText = ButtonConstants.PLACE,
-        confirmButtonVisible = state.dropTotem,
-        dismissButtonVisible = false,
+        confirmButtonVisible = dropTotem,
+        dismissButtonVisible = isHome,
+        dismissButtonText = "Take",
+        onDismissButtonClick = {},
         clickable = true,
-        onConfirmButtonClick = onPlaceTotem ?: {}
     )
 }
-
-

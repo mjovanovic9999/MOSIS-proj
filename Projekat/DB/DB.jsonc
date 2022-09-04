@@ -123,7 +123,7 @@
         "longitude": "",
         "items": {
             "wood": {
-                "currency": "",
+                "currency_type": "",
                 "amount_left": "",
                 "price": ""
             },

@@ -16,14 +16,15 @@ import androidx.compose.ui.text.font.FontWeight
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
 import mosis.streetsandtotems.core.ItemsConstants
+import mosis.streetsandtotems.core.PointsConversion
 import mosis.streetsandtotems.ui.theme.sizes
 
 sealed class IconType {
-    sealed class ResourceType : IconType() {
-        object Emerald : ResourceType()
-        object Wood : ResourceType()
-        object Stone : ResourceType()
-        object Brick : ResourceType()
+    sealed class ResourceType(val additionalText: String) : IconType() {
+        object Emerald : ResourceType(" (${PointsConversion.EMERALD}pts)")
+        object Wood : ResourceType(" (${PointsConversion.EMERALD}pts)")
+        object Stone : ResourceType(" (${PointsConversion.EMERALD}pts)")
+        object Brick : ResourceType(" (${PointsConversion.EMERALD}pts)")
     }
 
     sealed class OtherType : IconType() {
@@ -36,7 +37,8 @@ sealed class IconType {
 fun CustomDialogTitle(
     isTotem: Boolean = false,
     resourceType: IconType? = null,
-    countMessage: String? = null
+    countMessage: String? = null,
+    needAdditionalText: Boolean,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -65,7 +67,7 @@ fun CustomDialogTitle(
                         IconType.ResourceType.Brick -> ImageVector.vectorResource(id = R.drawable.brick)
                         IconType.OtherType.Home -> ImageVector.vectorResource(id = R.drawable.home)
                     },
-                    contentDescription = ImageContentDescriptionConstants.EDIT_PASSWORD,
+                    contentDescription = null,
                     modifier = Modifier
                         .size(MaterialTheme.sizes.drop_item_dialog_icon_size)
                         .padding(MaterialTheme.sizes.drop_item_dialog_icon_padding),
@@ -86,10 +88,10 @@ fun CustomDialogTitle(
                 )
             } else if (resourceType != null) Text(
                 text = when (resourceType) {
-                    IconType.ResourceType.Emerald -> ItemsConstants.EMERALD
-                    IconType.ResourceType.Wood -> ItemsConstants.WOOD
-                    IconType.ResourceType.Stone -> ItemsConstants.STONE
-                    IconType.ResourceType.Brick -> ItemsConstants.BRICK
+                    IconType.ResourceType.Emerald -> ItemsConstants.EMERALD + if (needAdditionalText) IconType.ResourceType.Emerald.additionalText else ""
+                    IconType.ResourceType.Wood -> ItemsConstants.WOOD + if (needAdditionalText) IconType.ResourceType.Wood.additionalText else ""
+                    IconType.ResourceType.Stone -> ItemsConstants.STONE + if (needAdditionalText) IconType.ResourceType.Stone.additionalText else ""
+                    IconType.ResourceType.Brick -> ItemsConstants.BRICK + if (needAdditionalText) IconType.ResourceType.Brick.additionalText else ""
                     IconType.OtherType.Home -> TODO()
                 },
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),

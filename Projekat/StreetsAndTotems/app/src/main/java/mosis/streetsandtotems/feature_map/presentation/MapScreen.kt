@@ -4,8 +4,12 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import com.ramcosta.composedestinations.annotation.Destination
+import mosis.streetsandtotems.core.presentation.components.CustomItemDialog
+import mosis.streetsandtotems.core.presentation.components.IconType
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
+import mosis.streetsandtotems.feature_map.domain.model.MarketItem
+import mosis.streetsandtotems.feature_map.domain.model.ResourceType
 import mosis.streetsandtotems.feature_map.presentation.components.CustomFilterDialog
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinDialog
 import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
@@ -69,5 +73,19 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
         filterResourceState = mapViewModel.mapScreenState.value.filterResources,
         filterFriendsState = mapViewModel.mapScreenState.value.filterPlayers,
         filterTotemsState = mapViewModel.mapScreenState.value.filterTotems,
+    )
+
+
+    CustomItemDialog(
+        isOpen = true,
+        itemCount = 4,
+        onDismissRequest = { /*TODO*/ },
+        onButtonClick = { /*TODO*/ },
+        isMarket = false,
+        isTotem = false,
+        isHome = !false,
+        resourceType = IconType.ResourceType.Emerald,
+        marketExchangeItem = MarketItem(ResourceType.Brick, 3, 2),//iz market
+        backpackItemCount = 3,
     )
 }
