@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.flow.MutableSharedFlow
 import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
 
 @Module
@@ -12,7 +13,7 @@ import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
 object MainModule {
     @Provides
     @ViewModelScoped
-    fun provideLocationBroadcastReceiver(): LocationBroadcastReceiver {
-        return LocationBroadcastReceiver()
+    fun provideLocationBroadcastReceiver(locationStateMutableFlow: MutableSharedFlow<Boolean>): LocationBroadcastReceiver {
+        return LocationBroadcastReceiver(locationStateMutableFlow)
     }
 }

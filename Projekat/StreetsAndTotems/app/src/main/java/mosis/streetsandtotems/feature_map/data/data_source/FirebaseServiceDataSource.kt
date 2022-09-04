@@ -23,12 +23,11 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
     }
 
 
-
     fun registerCallbacksOnUserInGameDataUpdate(
         currentUser: FirebaseUser,
-        userAddedCallback: (user: UserInGameData?) -> Unit,
-        userModifiedCallback: (user: UserInGameData?) -> Unit,
-        userRemovedCallback: (user: UserInGameData?) -> Unit
+        userAddedCallback: (user: UserInGameData) -> Unit,
+        userModifiedCallback: (user: UserInGameData) -> Unit,
+        userRemovedCallback: (user: UserInGameData) -> Unit
     ): ListenerRegistration {
         return db.collection(FirestoreConstants.USER_IN_GAME_DATA_COLLECTION)
             .whereNotEqualTo(FirestoreConstants.ID_FIELD, currentUser.uid)
@@ -46,9 +45,9 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
 
 
     fun registerCallbacksOnResourcesUpdate(
-        resourceAddedCallback: (resource: ResourceData?) -> Unit,
-        resourceModifiedCallback: (resource: ResourceData?) -> Unit,
-        resourceRemovedCallback: (resource: ResourceData?) -> Unit
+        resourceAddedCallback: (resource: ResourceData) -> Unit,
+        resourceModifiedCallback: (resource: ResourceData) -> Unit,
+        resourceRemovedCallback: (resource: ResourceData) -> Unit
     ): ListenerRegistration {
         return db.collection(FirestoreConstants.RESOURCES_COLLECTION)
             .addSnapshotListener { snapshots, e ->
@@ -66,9 +65,9 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
 
     fun registerCallbacksOnTotemsUpdate(
 //        currentUser: FirebaseUser,
-        totemAddedCallback: (totem: TotemData?) -> Unit,
-        totemModifiedCallback: (totem: TotemData?) -> Unit,
-        totemRemovedCallback: (totem: TotemData?) -> Unit
+        totemAddedCallback: (totem: TotemData) -> Unit,
+        totemModifiedCallback: (totem: TotemData) -> Unit,
+        totemRemovedCallback: (totem: TotemData) -> Unit
     ): ListenerRegistration {
         return db.collection(FirestoreConstants.TOTEMS_COLLECTION)
 //            .whereEqualTo(FirestoreConstants.ID_FIELD, currentUser.uid)//fali squad id
@@ -86,9 +85,9 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
 
 
     fun registerCallbacksOnCustomPinsUpdate(
-        customPinAddedCallback: (customPin: CustomPinData?) -> Unit,
-        customPinModifiedCallback: (customPin: CustomPinData?) -> Unit,
-        customPinRemovedCallback: (customPin: CustomPinData?) -> Unit
+        customPinAddedCallback: (customPin: CustomPinData) -> Unit,
+        customPinModifiedCallback: (customPin: CustomPinData) -> Unit,
+        customPinRemovedCallback: (customPin: CustomPinData) -> Unit
     ): ListenerRegistration {
         return db.collection(FirestoreConstants.CUSTOM_PINS_COLLECTION)
             .addSnapshotListener { snapshots, e ->
@@ -105,9 +104,9 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
 
 
     fun registerCallbacksOnHomesUpdate(
-        homeAddedCallback: (home: HomeData?) -> Unit,
-        homeModifiedCallback: (home: HomeData?) -> Unit,
-        homeRemovedCallback: (home: HomeData?) -> Unit
+        homeAddedCallback: (home: HomeData) -> Unit,
+        homeModifiedCallback: (home: HomeData) -> Unit,
+        homeRemovedCallback: (home: HomeData) -> Unit
     ): ListenerRegistration {
         return db.collection(FirestoreConstants.HOMES_COLLECTION)
             .addSnapshotListener { snapshots, e ->
@@ -162,9 +161,9 @@ db.collection(FirestoreConstants.USER_IN_GAME_DATA_COLLECTION)
     private inline fun <reified T> collectionSnapshotListenerCallback(
         e: FirebaseFirestoreException?,
         snapshots: QuerySnapshot?,
-        userAddedCallback: (user: T?) -> Unit,
-        userModifiedCallback: (user: T?) -> Unit,
-        userRemovedCallback: (user: T?) -> Unit,
+        userAddedCallback: (user: T) -> Unit,
+        userModifiedCallback: (user: T) -> Unit,
+        userRemovedCallback: (user: T) -> Unit,
         customConversion: (document: QueryDocumentSnapshot) -> T? = { it.toObject<T>() }
     ) {
         if (e != null) {
@@ -173,11 +172,13 @@ db.collection(FirestoreConstants.USER_IN_GAME_DATA_COLLECTION)
         }
 
         for (dc in snapshots!!.documentChanges) {
-            when (dc.type) {
-                DocumentChange.Type.ADDED -> userAddedCallback(customConversion(dc.document))
-                DocumentChange.Type.MODIFIED -> userModifiedCallback(customConversion(dc.document))
-                DocumentChange.Type.REMOVED -> userRemovedCallback(customConversion(dc.document))
-            }
+            val convertedSnapshot = customConversion(dc.document)
+            if (convertedSnapshot != null)
+                when (dc.type) {
+                    DocumentChange.Type.ADDED -> userAddedCallback(convertedSnapshot)
+                    DocumentChange.Type.MODIFIED -> userModifiedCallback(convertedSnapshot)
+                    DocumentChange.Type.REMOVED -> userRemovedCallback(convertedSnapshot)
+                }
         }
     }
 }

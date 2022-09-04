@@ -163,6 +163,7 @@ object MapConstants {
     const val MAP_PRECISION_METERS = 2f
     const val MAXIMUM_IGNORE_ACCURACY_METERS = 100f
     const val MAXIMUM_TRADE_DISTANCE_IN_METERS = 20f
+    const val PREFERRED_INTERVAL = 4000L
 }
 
 object VisualTransformationConstants {

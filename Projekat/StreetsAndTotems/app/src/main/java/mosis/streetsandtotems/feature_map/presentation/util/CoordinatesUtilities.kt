@@ -106,7 +106,7 @@ fun distanceBetweenGeoPoints(
     return result[0]
 }
 
-fun isTradePossible(myLocation: Location?, otherPlayerLocation: GeoPoint?): Boolean =
+fun isTradePossible(myLocation: GeoPoint?, otherPlayerLocation: GeoPoint?): Boolean =
     if (myLocation != null && otherPlayerLocation != null)
         distanceBetweenGeoPoints(
             GeoPoint(myLocation.latitude, myLocation.longitude), otherPlayerLocation
