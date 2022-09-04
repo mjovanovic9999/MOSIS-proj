@@ -3,7 +3,6 @@ package mosis.streetsandtotems.feature_map.presentation
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import com.ramcosta.composedestinations.annotation.Destination
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
@@ -12,7 +11,6 @@ import mosis.streetsandtotems.feature_map.presentation.components.CustomPinDialo
 import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
 import mosis.streetsandtotems.feature_map.presentation.components.MapFABs
 import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
-import mosis.streetsandtotems.services.LocationService
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,49 +23,51 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
     MapComponent(mapState = state.mapState.value)
     MapFABs(
         drawerState,
-        openCustomPinDialog = { mapViewModel.showPlayerDialog() },
-        locateMe = { mapViewModel.followMe() },
+        locateMe = { mapViewModel.onEvent(MapViewModelEvents.FollowMe) },
         followMe = state.followMe,
-        showFilterDialog = { mapViewModel.showFilterDialog() },
+        showFilterDialog = { mapViewModel.onEvent(MapViewModelEvents.ShowFilterDialog) },
     )
 
     CustomPinDialog(
-        isOpen = state.pinDialog.dialogOpen,
-        onDismissRequest = { mapViewModel.closeCustomPinDialog() },
-        dialogText = state.pinDialog.text,
-        isNewPin = state.pinDialog.id == null,
+        isOpen = state.customPinDialog.dialogOpen,
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseCustomPinDialog) },
+        dialogText = state.customPinDialog.text,
+        isNewPin = state.customPinDialog.id == null,
         isSquadMember = true,////////////////////////////squad_id!=null
-        placedBy = state.pinDialog.placedBy,
+        placedBy = state.customPinDialog.placedBy,
+        addCustomPinFB = { mapViewModel.onEvent(MapViewModelEvents.AddCustomPin) },
+        updateCustomPin = { mapViewModel.onEvent(MapViewModelEvents.UpdateCustomPin) },
+        deleteCustomPin = { mapViewModel.onEvent(MapViewModelEvents.RemoveCustomPin) }
     )
 
     PlayerDialog(
         isOpen = state.playerDialogOpen,
-        onDismissRequest = { mapViewModel.closePlayerDialog() },
-        isSquadMember = state.selectedPlayer.value.id == "MYID",////////////////////////////
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.ClosePlayerDialog) },
+        isSquadMember = state.selectedPlayer.id == "MYID",////////////////////////////
         tradeEnabled = isTradePossible(
-            LocationService.locationFlow.value,
-            state.selectedPlayer.value.l
+            state.playerLocation,
+            state.selectedPlayer.l
         ),
-        callsAllowed = state.selectedPlayer.value.calls_allowed,
-        messagingAllowed = state.selectedPlayer.value.messaging_allowed,
-        phoneNumber = state.selectedPlayer.value.display_data?.phone_number,
-        firstName = state.selectedPlayer.value.display_data?.first_name,
-        lastName = state.selectedPlayer.value.display_data?.last_name,
-        userName = state.selectedPlayer.value.display_data?.user_name,
+        callsAllowed = state.selectedPlayer.calls_allowed,
+        messagingAllowed = state.selectedPlayer.messaging_allowed,
+        phoneNumber = state.selectedPlayer.display_data?.phone_number,
+        firstName = state.selectedPlayer.display_data?.first_name,
+        lastName = state.selectedPlayer.display_data?.last_name,
+        userName = state.selectedPlayer.display_data?.user_name,
     )
 
     CustomFilterDialog(
         isOpen = state.filterDialogOpen,
-        onConfirmButtonClick = { mapViewModel.closeFilterDialog() },
+        onConfirmButtonClick = { mapViewModel.onEvent(MapViewModelEvents.CloseFilterDialog) },
         onDismissRequest = {
-            mapViewModel.closeFilterDialog()
-            mapViewModel.resetFilters()
+            mapViewModel.onEvent(MapViewModelEvents.CloseFilterDialog)
+            mapViewModel.onEvent(MapViewModelEvents.ResetFilters)
         },
-        updateFilterResources = { mapViewModel.updateFilterResources() },
-        updateFilterPlayers = { mapViewModel.updateFilterFriends() },
-        updateFilterTotems = { mapViewModel.updateFilterTotems() },
-        filterResourceState = mapViewModel.mapScreenState.value.filterResources.collectAsState(),
-        filterFriendsState = mapViewModel.mapScreenState.value.filterPlayers.collectAsState(),
-        filterTotemsState = mapViewModel.mapScreenState.value.filterTotems.collectAsState(),
+        updateFilterResources = { mapViewModel.onEvent(MapViewModelEvents.UpdateFilterResource) },
+        updateFilterPlayers = { mapViewModel.onEvent(MapViewModelEvents.UpdateFilterFriends) },
+        updateFilterTotems = { mapViewModel.onEvent(MapViewModelEvents.UpdateFilterTotems) },
+        filterResourceState = mapViewModel.mapScreenState.value.filterResources,
+        filterFriendsState = mapViewModel.mapScreenState.value.filterPlayers,
+        filterTotemsState = mapViewModel.mapScreenState.value.filterTotems,
     )
 }

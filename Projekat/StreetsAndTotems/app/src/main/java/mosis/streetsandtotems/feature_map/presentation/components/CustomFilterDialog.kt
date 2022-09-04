@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import mosis.streetsandtotems.core.PinConstants.FRIENDS
 import mosis.streetsandtotems.core.PinConstants.RESOURCES
@@ -21,9 +20,9 @@ fun CustomFilterDialog(
     updateFilterResources: () -> Unit,
     updateFilterPlayers: () -> Unit,
     updateFilterTotems: () -> Unit,
-    filterResourceState: State<Boolean>,
-    filterFriendsState: State<Boolean>,
-    filterTotemsState: State<Boolean>,
+    filterResourceState: Boolean,
+    filterFriendsState: Boolean,
+    filterTotemsState: Boolean
 ) {
     CustomDialog(
         modifier = Modifier.fillMaxWidth(),
@@ -36,17 +35,17 @@ fun CustomFilterDialog(
                 Text(text = "Category")
                 Row {
                     CustomFilterChip(
-                        filterResourceState.value,
+                        filterResourceState,
                         { updateFilterResources() },
                         RESOURCES
                     )
                     CustomFilterChip(
-                        filterFriendsState.value,
+                        filterFriendsState,
                         { updateFilterPlayers() },
                         FRIENDS
                     )
                     CustomFilterChip(
-                        filterTotemsState.value,
+                        filterTotemsState,
                         { updateFilterTotems() },
                         TOTEMS
                     )

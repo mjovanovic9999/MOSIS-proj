@@ -22,7 +22,6 @@ import mosis.streetsandtotems.ui.theme.sizes
 @Composable
 fun MapFABs(
     drawerState: DrawerState,
-    openCustomPinDialog: () -> Unit,
     locateMe: () -> Unit,
     followMe: Boolean,
     showFilterDialog: () -> Unit,
@@ -62,11 +61,6 @@ fun MapFABs(
                     modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
                 )
             }
-            CustomFAB(
-                imageVector = ImageVector.vectorResource(id = R.drawable.add_pin),
-                onClick = openCustomPinDialog,
-                modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
-            )
         }
     }
 }

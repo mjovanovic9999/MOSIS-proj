@@ -18,11 +18,10 @@ import mosis.streetsandtotems.destinations.SignInScreenDestination
 import mosis.streetsandtotems.feature_main.presentation.components.DrawerContent
 import mosis.streetsandtotems.feature_main.presentation.components.DrawerScreen
 import mosis.streetsandtotems.feature_main.presentation.components.LifecycleCompose
-import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestLocation
+import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestLocationDialog
 import mosis.streetsandtotems.feature_settings_persistence.PreferencesDataStore
 import mosis.streetsandtotems.feature_settings_persistence.PrivacySettings
 import mosis.streetsandtotems.feature_settings_persistence.UserSettings
-import mosis.streetsandtotems.services.LocationService
 import mosis.streetsandtotems.ui.theme.sizes
 
 
@@ -73,11 +72,12 @@ fun MainScreen(
     }
 
     LifecycleCompose(
-        viewModel.locationBroadcastReceiver,
-        viewModel.notificationProvider
+        onResume = { viewModel.onEvent(MainScreenViewModelEvents.OnResume) },
+        onPause = { viewModel.onEvent(MainScreenViewModelEvents.OnPause) }
     )
 
-    CustomRequestLocation(LocationService.isLocationEnabled)
+    if (!state.locationEnabled)
+        CustomRequestLocationDialog()
 
     ModalNavigationDrawer(
         drawerState = drawerState,

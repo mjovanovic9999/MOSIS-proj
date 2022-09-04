@@ -10,9 +10,55 @@ object FirestoreConstants {
     const val USER_IN_GAME_DATA_COLLECTION = "user_in_game_data"
     const val RESOURCES_COLLECTION = "resources"
     const val TOTEMS_COLLECTION = "totems"
+    const val CUSTOM_PINS_COLLECTION = "custom_pins"
+    const val HOMES_COLLECTION = "homes"
 
 
     const val ID_FIELD = "__name__"
+}
+
+object FirebaseErrorCodesConstants {
+    const val INVALID_CUSTOM_TOKEN = "ERROR_INVALID_CUSTOM_TOKEN"
+    const val CUSTOM_TOKEN_MISMATCH = "ERROR_CUSTOM_TOKEN_MISMATCH"
+    const val INVALID_CREDENTIAL = "ERROR_INVALID_CREDENTIAL"
+    const val INVALID_EMAIL = "ERROR_INVALID_EMAIL"
+    const val WRONG_PASSWORD = "ERROR_WRONG_PASSWORD"
+    const val USER_MISMATCH = "ERROR_USER_MISMATCH"
+    const val REQUIRES_RECENT_LOGIN = "ERROR_REQUIRES_RECENT_LOGIN"
+    const val ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL =
+        "ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL"
+    const val EMAIL_ALREADY_IN_USE = "ERROR_EMAIL_ALREADY_IN_USE"
+    const val CREDENTIAL_ALREADY_IN_USE = "ERROR_CREDENTIAL_ALREADY_IN_USE"
+    const val USER_DISABLED = "ERROR_USER_DISABLED"
+    const val USER_TOKEN_EXPIRED = "ERROR_USER_TOKEN_EXPIRED"
+    const val USER_NOT_FOUND = "ERROR_USER_NOT_FOUND"
+    const val INVALID_USER_TOKEN = "ERROR_INVALID_USER_TOKEN"
+    const val OPERATION_NOT_ALLOWED = "ERROR_OPERATION_NOT_ALLOWED"
+    const val WEAK_PASSWORD = "ERROR_WEAK_PASSWORD"
+}
+
+
+object FirebaseAuthConstants {
+    val AUTH_ERRORS = mapOf(
+        FirebaseErrorCodesConstants.INVALID_CUSTOM_TOKEN to "",
+        FirebaseErrorCodesConstants.CUSTOM_TOKEN_MISMATCH to "",
+        FirebaseErrorCodesConstants.INVALID_CREDENTIAL to "",
+        FirebaseErrorCodesConstants.INVALID_EMAIL to "Invalid email address!",
+        FirebaseErrorCodesConstants.WRONG_PASSWORD to "Wrong password!",
+        FirebaseErrorCodesConstants.USER_MISMATCH to "",
+        FirebaseErrorCodesConstants.REQUIRES_RECENT_LOGIN to "",
+        FirebaseErrorCodesConstants.ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL to "",
+        FirebaseErrorCodesConstants.EMAIL_ALREADY_IN_USE to "Account with provided email already exists!",
+        FirebaseErrorCodesConstants.CREDENTIAL_ALREADY_IN_USE to "",
+        FirebaseErrorCodesConstants.USER_DISABLED to "Account banned!",
+        FirebaseErrorCodesConstants.USER_TOKEN_EXPIRED to "",
+        FirebaseErrorCodesConstants.USER_NOT_FOUND to "Wrong email!",
+        FirebaseErrorCodesConstants.INVALID_USER_TOKEN to "",
+        FirebaseErrorCodesConstants.OPERATION_NOT_ALLOWED to "",
+        FirebaseErrorCodesConstants.WEAK_PASSWORD to "Provided password is weak!"
+    )
+    const val SIGN_IN_REQUEST = "SignInRequest"
+    const val SIGN_UP_REQUEST = "SignUpRequest"
 }
 
 object ButtonConstants {
@@ -117,6 +163,7 @@ object MapConstants {
     const val MAP_PRECISION_METERS = 2f
     const val MAXIMUM_IGNORE_ACCURACY_METERS = 100f
     const val MAXIMUM_TRADE_DISTANCE_IN_METERS = 20f
+    const val PREFERRED_INTERVAL = 4000L
 }
 
 object VisualTransformationConstants {
@@ -133,6 +180,9 @@ object HandleResponseConstants {
 }
 
 object MessageConstants {
+    const val TOO_MANY_LOGIN_ATTEMPTS = "Too many login attempts! Account temporarily disabled!"
+    const val DEFAULT_ERROR_MESSAGE = "Unknown error occured! Please try again or contact support!"
+    const val DEFAULT_SUCCESS_MESSAGE = "Success!"
     const val SIGN_UP_ERROR = "An error occured while signing up! Please try again!"
     const val SIGNED_UP = "Sign up successful!"
     const val SIGNED_OUT = "Sign out successful!"
