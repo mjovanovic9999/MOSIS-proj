@@ -38,7 +38,7 @@ fun DropItemDialog(
                 isTotem = state.dropTotem,
                 resourceType = state.itemType,
                 countMessage = state.itemCount?.toString() + ItemsConstants.ITEMS_LEFT,
-                needAdditionalText = false,
+                needTotemAdditionalText = false,
             )
         },
         text = {

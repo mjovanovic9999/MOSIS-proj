@@ -13,6 +13,7 @@ object FirestoreConstants {
     const val TOTEMS_COLLECTION = "totems"
     const val CUSTOM_PINS_COLLECTION = "custom_pins"
     const val HOMES_COLLECTION = "homes"
+    const val USER_INVENTORY = "user_inventory"
 
 
     const val ID_FIELD = "__name__"
@@ -86,6 +87,11 @@ object ButtonConstants {
     const val PLACE = "Place"
     const val EDIT = "Edit"
     const val REMOVE = "Remove"
+    const val INVEST = "Invest"
+    const val BUY = "Buy"
+    const val TAKE = "Take"
+    const val PUT = "PUT"
+    const val APPLY = "Apply"
     const val DIALOG_BACKGROUND_PERMISSION_CONFIRM_BUTTON = "Grant"
     const val DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON = "Don't grant"
     const val SHOW_ON_MAP = "Show on map"

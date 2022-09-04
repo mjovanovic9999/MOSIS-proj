@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
 
+import androidx.compose.runtime.ComposableOpenTarget
 import androidx.compose.runtime.MutableState
 import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.feature_map.domain.model.*
@@ -22,11 +23,15 @@ data class MapScreenState(
 
     val home: HomeData,
 
+    val playerLocation: GeoPoint,
+    val playerInventory: UserInventoryData,
 
     val playerDialogOpen: Boolean,
-    val playerLocation: GeoPoint,
+    val selectedPlayer: ProfileData,
 
-    val selectedPlayer: ProfileData
+
+    val resourceDialogOpen: Boolean,
+    val selectedResource: ResourceData,
 )
 
 

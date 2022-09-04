@@ -13,7 +13,6 @@ import mosis.streetsandtotems.core.TitleConstants
 import mosis.streetsandtotems.core.presentation.components.CustomPage
 import mosis.streetsandtotems.core.presentation.components.IconType
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
-import mosis.streetsandtotems.core.presentation.components.CustomItemDialog
 import mosis.streetsandtotems.feature_backpack.presentation.components.DropItemDialog
 import mosis.streetsandtotems.feature_backpack.presentation.components.FABWithBadge
 import mosis.streetsandtotems.feature_backpack.presentation.components.ItemRow

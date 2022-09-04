@@ -1,8 +1,14 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.ktx.getField
+import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FirestoreConstants
+import mosis.streetsandtotems.feature_map.domain.model.ResourceData
+import mosis.streetsandtotems.feature_map.domain.model.ResourceType
+import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 
 class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     fun addCustomPin(
@@ -63,4 +69,29 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     }
 
+
+    fun updateResource(resourceId: String, remaining: Int) {
+        db.collection(FirestoreConstants.RESOURCES_COLLECTION).document(resourceId)
+            .update(
+                mapOf("remaining" to remaining)
+            )
+    }
+
+    fun deleteResource(resourceId: String) {
+        db.collection(FirestoreConstants.RESOURCES_COLLECTION).document(resourceId).delete()
+    }
+
+    suspend fun getPlayerInventory(userId: String): UserInventoryData? {
+        return db.collection(FirestoreConstants.USER_INVENTORY).document(userId).get().await()
+            .toObject(UserInventoryData::class.java)
+
+
+    }
+
+    fun updateUserInventory(
+        myId: String,
+        newUserInventoryData: UserInventoryData
+    ) {
+        db.collection(FirestoreConstants.USER_INVENTORY).document(myId).set(newUserInventoryData)
+    }
 }

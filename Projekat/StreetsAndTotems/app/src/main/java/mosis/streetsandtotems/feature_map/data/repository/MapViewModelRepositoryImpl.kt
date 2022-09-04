@@ -1,9 +1,10 @@
 package mosis.streetsandtotems.feature_map.data.repository
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
-import mosis.streetsandtotems.feature_map.data.data_source.FirebaseServiceDataSource
+import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
 
 class MapViewModelRepositoryImpl(
@@ -50,4 +51,28 @@ class MapViewModelRepositoryImpl(
         }
     }
 
+    override suspend fun updateResource(resourceId: String, newCount: Int) {
+        auth.currentUser?.let {
+            if (newCount <= 0)
+                firebaseMapDataSource.deleteResource(resourceId)
+            else
+                firebaseMapDataSource.updateResource(resourceId, newCount)
+        }
+    }
+
+    override suspend fun updateUserInventory(
+        myId: String,
+        newUserInventoryData:UserInventoryData
+    ) {
+        firebaseMapDataSource.updateUserInventory(myId, newUserInventoryData)
+    }
+
+    override suspend fun getUserInventory(userId: String): UserInventoryData? {
+        return try {
+            firebaseMapDataSource.getPlayerInventory(userId)
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+            null
+        }
+    }
 }

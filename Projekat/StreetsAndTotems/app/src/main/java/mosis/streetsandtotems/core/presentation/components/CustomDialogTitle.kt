@@ -38,7 +38,7 @@ fun CustomDialogTitle(
     isTotem: Boolean = false,
     resourceType: IconType? = null,
     countMessage: String? = null,
-    needAdditionalText: Boolean,
+    needTotemAdditionalText: Boolean,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -88,10 +88,10 @@ fun CustomDialogTitle(
                 )
             } else if (resourceType != null) Text(
                 text = when (resourceType) {
-                    IconType.ResourceType.Emerald -> ItemsConstants.EMERALD + if (needAdditionalText) IconType.ResourceType.Emerald.additionalText else ""
-                    IconType.ResourceType.Wood -> ItemsConstants.WOOD + if (needAdditionalText) IconType.ResourceType.Wood.additionalText else ""
-                    IconType.ResourceType.Stone -> ItemsConstants.STONE + if (needAdditionalText) IconType.ResourceType.Stone.additionalText else ""
-                    IconType.ResourceType.Brick -> ItemsConstants.BRICK + if (needAdditionalText) IconType.ResourceType.Brick.additionalText else ""
+                    IconType.ResourceType.Emerald -> ItemsConstants.EMERALD + if (needTotemAdditionalText) IconType.ResourceType.Emerald.additionalText else ""
+                    IconType.ResourceType.Wood -> ItemsConstants.WOOD + if (needTotemAdditionalText) IconType.ResourceType.Wood.additionalText else ""
+                    IconType.ResourceType.Stone -> ItemsConstants.STONE + if (needTotemAdditionalText) IconType.ResourceType.Stone.additionalText else ""
+                    IconType.ResourceType.Brick -> ItemsConstants.BRICK + if (needTotemAdditionalText) IconType.ResourceType.Brick.additionalText else ""
                     IconType.OtherType.Home -> TODO()
                 },
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),

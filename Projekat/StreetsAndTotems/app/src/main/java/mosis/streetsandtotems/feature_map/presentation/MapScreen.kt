@@ -3,17 +3,14 @@ package mosis.streetsandtotems.feature_map.presentation
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.toLowerCase
 import com.ramcosta.composedestinations.annotation.Destination
-import mosis.streetsandtotems.core.presentation.components.CustomItemDialog
-import mosis.streetsandtotems.core.presentation.components.IconType
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
-import mosis.streetsandtotems.feature_map.domain.model.MarketItem
-import mosis.streetsandtotems.feature_map.domain.model.ResourceType
-import mosis.streetsandtotems.feature_map.presentation.components.CustomFilterDialog
-import mosis.streetsandtotems.feature_map.presentation.components.CustomPinDialog
-import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
-import mosis.streetsandtotems.feature_map.presentation.components.MapFABs
+import mosis.streetsandtotems.feature_map.domain.model.InventoryData
+import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
+import mosis.streetsandtotems.feature_map.presentation.components.*
+import mosis.streetsandtotems.feature_map.presentation.util.getCountResourceTypeFromInventory
 import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
 
 
@@ -44,7 +41,7 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
         deleteCustomPin = { mapViewModel.onEvent(MapViewModelEvents.RemoveCustomPin) }
     )
 
-    PlayerDialog(
+    PlayerDialog(//fale fje za interakciju sqaud
         isOpen = state.playerDialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.ClosePlayerDialog) },
         isSquadMember = state.selectedPlayer.id == "MYID",////////////////////////////
@@ -58,6 +55,7 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
         firstName = state.selectedPlayer.first_name,
         lastName = state.selectedPlayer.last_name,
         userName = state.selectedPlayer.user_name,
+        image = state.selectedPlayer.image
     )
 
     CustomFilterDialog(
@@ -76,16 +74,26 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
     )
 
 
-    CustomItemDialog(
-        isOpen = true,
-        itemCount = 4,
-        onDismissRequest = { /*TODO*/ },
-        onButtonClick = { /*TODO*/ },
-        isMarket = false,
-        isTotem = false,
-        isHome = !false,
-        resourceType = IconType.ResourceType.Emerald,
-        marketExchangeItem = MarketItem(ResourceType.Brick, 3, 2),//iz market
-        backpackItemCount = 3,
+
+
+    ResourceItemDialog(
+        isOpen = state.resourceDialogOpen,
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseResourceDialog) },
+        onTake = { newInventory, newEmptySpacesCount, newResourceItemsLeft ->
+            mapViewModel.onEvent(
+                MapViewModelEvents.UpdateInventory(
+                    UserInventoryData(
+                        inventory = newInventory,
+                        empty_spaces = newEmptySpacesCount
+                    ),
+                )
+            )
+            mapViewModel.onEvent(MapViewModelEvents.UpdateResource(newResourceItemsLeft))
+        },
+        resourceType = mapViewModel.mapScreenState.value.selectedResource.type,
+        itemsLeft = mapViewModel.mapScreenState.value.selectedResource.remaining,
+        emptySpaces = state.playerInventory.empty_spaces,
+        oldInventoryData = state.playerInventory.inventory ?: InventoryData(),
     )
+
 }

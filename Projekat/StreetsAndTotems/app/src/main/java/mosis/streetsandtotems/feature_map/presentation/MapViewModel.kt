@@ -92,6 +92,13 @@ class MapViewModel @Inject constructor(
         registerOnPinClick()
 
         registerOnLocationService()
+
+        viewModelScope.launch {
+            mapViewModelRepository.getUserInventory("VlYnaW2Mf5NuxzdnpYM2vBmckuE2")?.let {
+                mapScreenState.value = mapScreenState.value.copy(playerInventory = it)
+                Log.d("tag", it.toString())
+            }
+        }
     }
 
     fun onEvent(event: MapViewModelEvents) {
@@ -111,6 +118,12 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.UpdateFilterTotems -> updateFilterTotemsHandler()
             MapViewModelEvents.AddHome -> addHomeHandler()
             MapViewModelEvents.RemoveHome -> removeHomeHandler()
+            MapViewModelEvents.ShowResourceDialog -> showResourceDialogHandler()
+            MapViewModelEvents.CloseResourceDialog -> closeResourceDialogHandler()
+            is MapViewModelEvents.UpdateInventory -> updateInventoryHandler(event.newUserInventoryData)
+            is MapViewModelEvents.UpdateResource -> updateResourceHandler(
+                event.newCount,
+            )
         }
     }
 
@@ -172,8 +185,12 @@ class MapViewModel @Inject constructor(
             playerLocation = GeoPoint(
                 INIT_SCROLL_LAT,
                 INIT_SCROLL_LNG
-            )
-        ))
+            ),
+            resourceDialogOpen = false,
+            selectedResource = ResourceData(),
+            playerInventory = UserInventoryData(),
+        )
+        )
     }
 
     private fun registerOnLocationService() {
@@ -500,14 +517,15 @@ class MapViewModel @Inject constructor(
 
     private fun registerOnPinClick() {
         _mapState.onMarkerClick { id, x, y ->
-            Log.d("tag", "clicked na pin $id x je $x y je $y")
             if (mapScreenState.value.resourcesHashMap.containsKey(id)) {
-
+                _mapScreenState.value = _mapScreenState.value.copy(
+                    selectedResource = mapScreenState.value.resourcesHashMap[id]!!
+                )
+                showResourceDialogHandler()
             } else if (mapScreenState.value.playersHashMap.containsKey(id)) {
                 _mapScreenState.value = _mapScreenState.value.copy(
                     selectedPlayer =
                     mapScreenState.value.playersHashMap[id]!!
-
                 )
                 showPlayerDialogHandler()
 
@@ -587,7 +605,14 @@ class MapViewModel @Inject constructor(
 
     private fun closePlayerDialogHandler() {
         _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
-//        _mapScreenState.value.selectedPlayer.value = `UserIn`GameData()//treba li ovo?????
+    }
+
+    private fun showResourceDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(resourceDialogOpen = true)
+    }
+
+    private fun closeResourceDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(resourceDialogOpen = false)
     }
 
     private fun showFilterDialogHandler() {
@@ -601,18 +626,26 @@ class MapViewModel @Inject constructor(
     private fun updateFilterResourcesHandler() {
         viewModelScope.launch {
             filterResources.emit(!filterResources.value)
+            _mapScreenState.value =
+                _mapScreenState.value.copy(filterResources = !_mapScreenState.value.filterResources)
+
         }
     }
 
     private fun updateFilterFriendsHandler() {
         viewModelScope.launch {
             filterPlayers.emit(!filterPlayers.value)
+            _mapScreenState.value =
+                _mapScreenState.value.copy(filterPlayers = !_mapScreenState.value.filterPlayers)
         }
     }
 
     private fun updateFilterTotemsHandler() {
         viewModelScope.launch {
             filterTotems.emit(!filterTotems.value)
+            _mapScreenState.value =
+                _mapScreenState.value.copy(filterTotems = !_mapScreenState.value.filterTotems)
+
         }
     }
 
@@ -621,6 +654,12 @@ class MapViewModel @Inject constructor(
             filterResources.emit(false)
             filterTotems.emit(false)
             filterPlayers.emit(false)
+            _mapScreenState.value =
+                _mapScreenState.value.copy(
+                    filterResources = false,
+                    filterPlayers = false,
+                    filterTotems = false,
+                )
         }
     }
 
@@ -647,8 +686,7 @@ class MapViewModel @Inject constructor(
                     visible_to = "AAAAAAAAAAAAA",//,
                     placed_by = "BBBBBBBBBBB",//moj auth id
                     text = mapScreenState.value.customPinDialog.text.value,
-
-                    )
+                )
             }
         }
     }
@@ -680,6 +718,31 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    //endregion
+    private fun updateResourceHandler(
+        newCount: Int,
+    ) {
+        viewModelScope.launch {
+            mapScreenState.value.selectedResource.id?.let { id ->
+                mapViewModelRepository.updateResource(id, newCount)
+            }
+        }
+    }
+
+
+    private fun updateInventoryHandler(
+        newUserInventoryData: UserInventoryData
+    ) {
+        viewModelScope.launch {
+            mapScreenState.value.selectedResource.type?.let {
+                mapViewModelRepository.updateUserInventory(
+                    "VlYnaW2Mf5NuxzdnpYM2vBmckuE2",
+                    newUserInventoryData
+                )
+            }
+        }
+    }
+
+
+//endregion
 
 }

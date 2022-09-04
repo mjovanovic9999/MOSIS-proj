@@ -6,10 +6,10 @@ data class MarketData(
     override val id: String? = null,
     override val l: GeoPoint? = null,
     val items: Map<String, MarketItem>? = null,
-) : IData
+) : Data
 
 data class MarketItem(
     val currency_type: ResourceType? = null,
-    val amount_left: Number? = null,
-    val price: Number? = null,
+    val amount_left: Int? = null,
+    val price: Int? = null,
 )

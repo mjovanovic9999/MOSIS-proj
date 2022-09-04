@@ -4,9 +4,7 @@ import android.net.Uri
 import android.util.Log
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
-import com.google.firebase.firestore.ktx.getField
 import com.google.firebase.firestore.ktx.toObject
-import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FirestoreConstants
 import mosis.streetsandtotems.feature_map.domain.model.*
 import org.imperiumlabs.geofirestore.GeoFirestore
