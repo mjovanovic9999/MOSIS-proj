@@ -128,6 +128,23 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
             }
     }
 
+    fun registerCallbacksOnUserInventoryUpdate(
+        userInventoryAddedCallback: (userInventory: UserInventoryData) -> Unit,
+        userInventoryModifiedCallback: (userInventory: UserInventoryData) -> Unit,
+        userInventoryRemovedCallback: (userInventory: UserInventoryData) -> Unit
+    ): ListenerRegistration {
+        return db.collection(FirestoreConstants.HOMES_COLLECTION)
+            .addSnapshotListener { snapshots, e ->
+                collectionSnapshotListenerCallback(
+                    e,
+                    snapshots,
+                    userInventoryAddedCallback,
+                    userInventoryModifiedCallback,
+                    userInventoryRemovedCallback,
+                )
+            }
+    }
+
     private inline fun <reified T> collectionSnapshotListenerCallback(
         e: FirebaseFirestoreException?,
         snapshots: QuerySnapshot?,

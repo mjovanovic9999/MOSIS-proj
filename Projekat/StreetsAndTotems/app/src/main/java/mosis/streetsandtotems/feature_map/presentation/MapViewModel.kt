@@ -329,6 +329,7 @@ class MapViewModel @Inject constructor(
                             oldData = playersHashMap.put(it, dataType)
                         else addPinHash(dataType)
                     } else removePinHash(dataType)
+
                 }
             }
             if (oldData != null) {

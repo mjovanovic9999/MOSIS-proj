@@ -63,11 +63,12 @@ fun ResourceItemDialog(
                 CustomButton(
                     clickHandler = {
                         if (resourceType != null && emptySpaces != null && currentResourceCount != null && itemsLeft != null) {
+                            Log.d("tag", (emptySpaces - takeAmount.value.toInt()).toString()+"oduzeto")
                             onTake(
                                 updateOneInventoryData(
                                     oldInventoryData,
-                                    currentResourceCount + takeAmount.value.toInt(),
-                                    resourceType
+                                    newCount = (currentResourceCount + takeAmount.value.toInt()),
+                                    updateType = resourceType
                                 ),
                                 emptySpaces - takeAmount.value.toInt(),
                                 itemsLeft - takeAmount.value.toInt(),
@@ -80,7 +81,9 @@ fun ResourceItemDialog(
                     textStyle = MaterialTheme.typography.titleMedium,
                     enabled = takeAmount.value != ""
                             && emptySpaces != null
+                            && emptySpaces>0//mzd ne treba
                             && emptySpaces - takeAmount.value.toInt() >= 0
+                            && takeAmount.value.toInt() > 0
                             && itemsLeft != null
                             && itemsLeft - takeAmount.value.toInt() >= 0
                 )

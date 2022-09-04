@@ -82,6 +82,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     suspend fun getPlayerInventory(userId: String): UserInventoryData? {
         return db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION).document(userId).get()
             .await()
+
             .toObject(UserInventoryData::class.java)
 
 

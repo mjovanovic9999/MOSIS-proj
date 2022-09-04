@@ -73,7 +73,7 @@ class MapViewModelRepositoryImpl(
 
     override suspend fun getUserInventory(userId: String): UserInventoryData? {
         return try {
-            firebaseMapDataSource.getPlayerInventory(userId)
+            firebaseMapDataSource.getUserInventory(userId)
         } catch (e: Exception) {
             Log.d("tag", e.message.toString())
             null
