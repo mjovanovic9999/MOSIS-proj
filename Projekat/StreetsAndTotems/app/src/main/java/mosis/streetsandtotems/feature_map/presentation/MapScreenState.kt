@@ -16,7 +16,7 @@ data class MapScreenState(
     val filterTotems: Boolean,
 
     val resourcesHashMap: Map<String, ResourceData>,
-    val playersHashMap: Map<String, UserInGameData>,
+    val playersHashMap: Map<String, ProfileData>,
     val totemsHashMap: Map<String, TotemData>,
     val customPinsHashMap: Map<String, CustomPinData>,
 
@@ -26,7 +26,7 @@ data class MapScreenState(
     val playerDialogOpen: Boolean,
     val playerLocation: GeoPoint,
 
-    val selectedPlayer: UserInGameData
+    val selectedPlayer: ProfileData
 )
 
 

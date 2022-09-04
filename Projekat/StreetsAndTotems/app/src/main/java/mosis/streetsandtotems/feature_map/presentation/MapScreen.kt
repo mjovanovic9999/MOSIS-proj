@@ -54,10 +54,10 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
         ),
         callsAllowed = state.selectedPlayer.calls_allowed,
         messagingAllowed = state.selectedPlayer.messaging_allowed,
-        phoneNumber = state.selectedPlayer.user_profile_data?.phone_number,
-        firstName = state.selectedPlayer.user_profile_data?.first_name,
-        lastName = state.selectedPlayer.user_profile_data?.last_name,
-        userName = state.selectedPlayer.user_profile_data?.user_name,
+        phoneNumber = state.selectedPlayer.phone_number,
+        firstName = state.selectedPlayer.first_name,
+        lastName = state.selectedPlayer.last_name,
+        userName = state.selectedPlayer.user_name,
     )
 
     CustomFilterDialog(

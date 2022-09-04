@@ -65,7 +65,7 @@ class MapViewModel @Inject constructor(
     private val filterTotems = MutableStateFlow(false)
     private val filterResources = MutableStateFlow(false)
     private val resourcesHashMap = mutableMapOf<String, ResourceData>()
-    private val playersHashMap = mutableMapOf<String, UserInGameData>()
+    private val playersHashMap = mutableMapOf<String, ProfileData>()
     private val totemsHashMap = mutableMapOf<String, TotemData>()
     private val customPinsHashMap = mutableMapOf<String, CustomPinData>()
 
@@ -167,7 +167,7 @@ class MapViewModel @Inject constructor(
             playersHashMap = playersHashMap,
             totemsHashMap = totemsHashMap,
             customPinsHashMap = customPinsHashMap,
-            selectedPlayer = UserInGameData(),
+            selectedPlayer = ProfileData(),
             home = HomeData(),
             playerLocation = GeoPoint(
                 INIT_SCROLL_LAT,
@@ -203,7 +203,7 @@ class MapViewModel @Inject constructor(
     }
 
 
-    private fun <T : IData> handlePinAction(pinAction: PinAction<T>) {
+    private fun <T : Data> handlePinAction(pinAction: PinAction<T>) {
         when (pinAction.action) {
             PinActionType.Added -> addPinHash(pinAction.pinData)
             PinActionType.Modified -> modifyPinHash(pinAction.pinData)
@@ -211,7 +211,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun addPinHash(dataType: IData) {
+    private fun addPinHash(dataType: Data) {
         dataType.id?.let {
             var composable: @Composable() (() -> Unit)? = null
             when (dataType) {
@@ -241,12 +241,12 @@ class MapViewModel @Inject constructor(
                     totemsHashMap[it] = dataType
                     composable = { CustomPin(resourceId = R.drawable.pin_tiki) }
                 }
-                is UserInGameData -> {
+                is ProfileData -> {
                     playersHashMap[it] = dataType
                     composable =
                         {
                             CustomPinImage(
-                                imageUri = dataType.user_profile_data?.image ?: Uri.EMPTY,
+                                imageUri = dataType.image ?: Uri.EMPTY,
                                 true//userData.squad_id != null && "MYSQUADID" != null && userData.squad_id == "MYSQUADID"
                             )
                         }
@@ -271,9 +271,9 @@ class MapViewModel @Inject constructor(
         )
     }
 
-    private fun modifyPinHash(dataType: IData) {
+    private fun modifyPinHash(dataType: Data) {
         dataType.id?.let {
-            var oldData: IData? = null
+            var oldData: Data? = null
             when (dataType) {
                 is HomeData -> {
                     oldData = _mapScreenState.value.home
@@ -290,7 +290,7 @@ class MapViewModel @Inject constructor(
                     oldData = totemsHashMap.put(it, dataType)
 
                 }
-                is UserInGameData -> {
+                is ProfileData -> {
                     oldData = playersHashMap.put(it, dataType)
                 }
             }
@@ -309,7 +309,7 @@ class MapViewModel @Inject constructor(
     }
 
 
-    private fun removePinHash(dataType: IData) {
+    private fun removePinHash(dataType: Data) {
         dataType.id?.let {
             when (dataType) {
                 is HomeData -> {
@@ -324,7 +324,7 @@ class MapViewModel @Inject constructor(
                 is TotemData -> {
                     totemsHashMap.remove(it)
                 }
-                is UserInGameData -> {
+                is ProfileData -> {
                     playersHashMap.remove(it)
                 }
             }
@@ -587,7 +587,7 @@ class MapViewModel @Inject constructor(
 
     private fun closePlayerDialogHandler() {
         _mapScreenState.value = _mapScreenState.value.copy(playerDialogOpen = false)
-//        _mapScreenState.value.selectedPlayer.value = UserInGameData()//treba li ovo?????
+//        _mapScreenState.value.selectedPlayer.value = `UserIn`GameData()//treba li ovo?????
     }
 
     private fun showFilterDialogHandler() {

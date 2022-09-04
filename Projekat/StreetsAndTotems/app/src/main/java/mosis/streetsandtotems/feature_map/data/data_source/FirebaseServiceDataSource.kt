@@ -13,23 +13,23 @@ import org.imperiumlabs.geofirestore.GeoFirestore
 
 class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
     private val userGeoFirestore =
-        GeoFirestore(db.collection(FirestoreConstants.USER_IN_GAME_DATA_COLLECTION))
+        GeoFirestore(db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION))
 
     private val userGeoQuery =
-        GeoFirestore(db.collection(FirestoreConstants.USER_IN_GAME_DATA_COLLECTION))
+        GeoFirestore(db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION))
 
     fun updateUserLocation(user: FirebaseUser, newLocation: GeoPoint) {
         userGeoFirestore.setLocation(user.uid, newLocation)
     }
 
 
-    fun registerCallbacksOnUserInGameDataUpdate(
+    fun registerCallbacksOnProfileDataUpdate(
         currentUser: FirebaseUser,
-        userAddedCallback: (user: UserInGameData) -> Unit,
-        userModifiedCallback: (user: UserInGameData) -> Unit,
-        userRemovedCallback: (user: UserInGameData) -> Unit
+        userAddedCallback: (user: ProfileData) -> Unit,
+        userModifiedCallback: (user: ProfileData) -> Unit,
+        userRemovedCallback: (user: ProfileData) -> Unit
     ): ListenerRegistration {
-        return db.collection(FirestoreConstants.USER_IN_GAME_DATA_COLLECTION)
+        return db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION)
             .whereNotEqualTo(FirestoreConstants.ID_FIELD, currentUser.uid)
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
@@ -38,7 +38,13 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
                     userAddedCallback,
                     userModifiedCallback,
                     userRemovedCallback,
-                    customConversion = { it.toObject<UserInGameData>().copy(id = it.id)}
+                    customConversion = {
+                        it.toObject<ProfileData>()
+                            .copy(
+                                id = it.id,
+                                image = Uri.parse(it.data[FirestoreConstants.IMAGE_URI_FIELD].toString())
+                            )
+                    }
                 )
             }
     }
@@ -117,46 +123,12 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
                     homeModifiedCallback,
                     homeRemovedCallback,
                     customConversion = {
-/////////////////////////////check point ne znam sta treba
-//                        it.reference.collection("inventory").get().addOnCompleteListener { ness ->
-//                            Log.d(
-//                                "tag", "VRATIO MI" + ness.result.toString()
-//                            )
-
-
-//                        val hashmap = it.toObject<InventoryMapping>()
-
                         it.toObject<HomeData>()
-                            .copy(
-                                id = it.id,
-//                                emerald = hashmap.inventory?.get("emerald"),
-//                                wood = hashmap.inventory?.get("wood"),
-//                                stone = hashmap.inventory?.get("stone"),
-//                                totem = hashmap.inventory?.get("totem"),
-//                                brick = hashmap.inventory?.get("brick"),
-                            )
-
-
+                            .copy(id = it.id)
                     }
                 )
             }
     }
-
-/*
-db.collection(FirestoreConstants.USER_IN_GAME_DATA_COLLECTION)
-            .whereNotEqualTo(FirestoreConstants.ID_FIELD, currentUser.uid).get()
-            .await().documents.map {
-                val profileDataSnapshot =
-                    it.getField<DocumentReference>("profile_data")?.get()?.await()
-                val profileData = profileDataSnapshot?.toObject<ProfileData>()
-                    ?.copy(image = Uri.parse(profileDataSnapshot.getField<String>("image_uri")))
-                Log.d("tag", profileData.toString())
-                it.toObject<UserInGameData>()?.copy(
-                    id = it.id,
-                    display_data = profileData
-                )
-            }
-*/
 
     private inline fun <reified T> collectionSnapshotListenerCallback(
         e: FirebaseFirestoreException?,

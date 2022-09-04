@@ -11,7 +11,7 @@ data class TotemData(
     val last_visited: Timestamp? = null,
     val bonus_points: Int? = null,
     val protection_level: ProtectionLevel? = null,
-) : IData
+) : Data
 
 enum class ProtectionLevel {
     Unprotected,
