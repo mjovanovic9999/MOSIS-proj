@@ -4,34 +4,27 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import kotlinx.coroutines.launch
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.presentation.components.CustomFAB
 import mosis.streetsandtotems.ui.theme.sizes
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapFABs(
-    drawerState: DrawerState,
+    openDrawer: () -> Unit,
     locateMe: () -> Unit,
     followMe: Boolean,
     showFilterDialog: () -> Unit,
-
-    ) {
-    val scope = rememberCoroutineScope()
+) {
     Box(modifier = Modifier.fillMaxSize()) {
         CustomFAB(
             imageVector = ImageVector.vectorResource(id = R.drawable.menu),
-            onClick = { scope.launch { drawerState.open() } },
+            onClick = { openDrawer() },
             modifier = Modifier
                 .padding(MaterialTheme.sizes.fab_padding)
                 .align(Alignment.TopStart)

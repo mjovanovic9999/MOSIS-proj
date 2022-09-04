@@ -31,6 +31,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
+fun Modifier.drawHorizontalScrollbar(
+    state: LazyListState,
+    reverseScrolling: Boolean = false
+): Modifier = drawScrollbar(state, Orientation.Horizontal, reverseScrolling)
+
+fun Modifier.drawHorizontalScrollbar(
+    state: ScrollState,
+    reverseScrolling: Boolean = false
+): Modifier = drawScrollbar(state, Orientation.Horizontal, reverseScrolling)
 
 fun Modifier.drawVerticalScrollbar(
     state: ScrollState,

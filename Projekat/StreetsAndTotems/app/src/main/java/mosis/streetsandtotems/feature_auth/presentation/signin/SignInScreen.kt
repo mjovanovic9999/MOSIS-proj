@@ -31,7 +31,10 @@ import mosis.streetsandtotems.ui.theme.sizes
 @AuthNavGraph(start = true)
 @Destination
 @Composable
-fun SignInScreen(viewModel: SignInViewModel, destinationsNavigator: DestinationsNavigator) {
+fun SignInScreen(
+    viewModel: SignInViewModel,
+    destinationsNavigator: DestinationsNavigator
+) {
     val state = viewModel.signInState.value
 
     LaunchedEffect(Unit) {

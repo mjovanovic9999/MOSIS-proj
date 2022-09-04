@@ -1,8 +1,10 @@
 package mosis.streetsandtotems.feature_auth.data.data_source
 
-import android.net.Uri
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.*
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import javax.inject.Inject
 
 
@@ -19,13 +21,4 @@ class FirebaseAuthDataSource @Inject constructor(private val firebaseAuth: Fireb
 
     fun signInWithCredential(credentials: AuthCredential): Task<AuthResult> =
         firebaseAuth.signInWithCredential(credentials)
-
-    fun updateProfile(imageUri: Uri?, displayName: String): Task<Void>? =
-        getCurrentUser()?.updateProfile(
-            UserProfileChangeRequest.Builder().setDisplayName(displayName)
-                .setPhotoUri(imageUri).build()
-        )
-
-    fun updateEmail(email: String): Task<Void>? = getCurrentUser()?.verifyBeforeUpdateEmail(email)
-
 }

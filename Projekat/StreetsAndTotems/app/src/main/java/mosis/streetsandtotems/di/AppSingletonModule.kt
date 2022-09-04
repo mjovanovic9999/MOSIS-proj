@@ -1,7 +1,6 @@
 package mosis.streetsandtotems.di
 
 import android.app.Application
-import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -12,13 +11,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.MutableSharedFlow
-import mosis.streetsandtotems.core.DatabaseConstants
-import mosis.streetsandtotems.core.data.data_source.LocalDatabase
-import mosis.streetsandtotems.core.data.repository.UserRepositoryImpl
-import mosis.streetsandtotems.core.domain.repository.UserRepository
+import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
+import mosis.streetsandtotems.core.data.repository.PreferenceRepositoryImpl
+import mosis.streetsandtotems.core.domain.repository.PreferenceRepository
+import mosis.streetsandtotems.core.domain.use_case.*
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.di.util.SharedFlowWrapper
-import mosis.streetsandtotems.feature_settings_persistence.PreferencesDataStore
 import mosis.streetsandtotems.services.LocationServiceControlEvents
 import mosis.streetsandtotems.services.LocationServiceEvents
 import javax.inject.Singleton
@@ -40,26 +38,33 @@ object AppSingletonModule {
 
     @Provides
     @Singleton
+    fun providePreferenceRepository(preferencesDataStore: PreferencesDataStore): PreferenceRepository {
+        return PreferenceRepositoryImpl(preferencesDataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun providePreferenceUseCases(preferenceRepository: PreferenceRepository): PreferenceUseCases {
+        return PreferenceUseCases(
+            GetUserSettings(preferenceRepository),
+            UpdateUserSettings(preferenceRepository),
+            GetAuthProvider(preferenceRepository),
+            UpdateAuthProvider(preferenceRepository),
+            GetUserSettingsFlow(preferenceRepository),
+            SetSquadId(preferenceRepository),
+            SetUserId(preferenceRepository),
+            GetUserId(preferenceRepository),
+            GetSquadId(preferenceRepository),
+        )
+    }
+
+    @Provides
+    @Singleton
     fun provideFirebaseAuth(): FirebaseAuth = Firebase.auth
 
     @Provides
     @Singleton
     fun provideFirebaseFirestore(): FirebaseFirestore = Firebase.firestore
-
-    @Provides
-    @Singleton
-    fun provideLocalDatabase(app: Application): LocalDatabase =
-        Room.databaseBuilder(
-            app,
-            LocalDatabase::class.java,
-            DatabaseConstants.DATABASE_NAME
-        )
-            .build()
-
-    @Provides
-    @Singleton
-    fun provideUserRepository(db: LocalDatabase): UserRepository =
-        UserRepositoryImpl(db.userDao)
 
     @Provides
     @Singleton

@@ -4,8 +4,11 @@ import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
 import android.location.LocationManager
+import android.net.Uri
 import android.util.Log
-import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -18,21 +21,24 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import mosis.streetsandtotems.core.HandleResponseConstants
 import mosis.streetsandtotems.core.MapConstants
 import mosis.streetsandtotems.core.MessageConstants
+import mosis.streetsandtotems.core.domain.model.PrivacySettings
 import mosis.streetsandtotems.core.domain.model.SnackbarSettings
+import mosis.streetsandtotems.core.domain.model.UserSettings
+import mosis.streetsandtotems.core.domain.use_case.PreferenceUseCases
 import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
+import mosis.streetsandtotems.core.domain.util.handleResponse
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.feature_auth.domain.use_case.AuthUseCases
-import mosis.streetsandtotems.feature_settings_persistence.PreferencesDataStore
+import mosis.streetsandtotems.feature_main.domain.use_case.MainUseCases
 import mosis.streetsandtotems.services.LocationService
 import mosis.streetsandtotems.services.LocationServiceControlEvents
 import javax.inject.Inject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
     private val locationBroadcastReceiver: LocationBroadcastReceiver,
@@ -42,25 +48,40 @@ class MainScreenViewModel @Inject constructor(
     private val snackbarSettingsFlow: MutableStateFlow<SnackbarSettings?>,
     private val application: Application,
     private val locationServiceControlEventsFlow: MutableSharedFlow<LocationServiceControlEvents>,
-    private val locationStateMutableSharedFlow: MutableSharedFlow<Boolean>
+    private val locationStateMutableSharedFlow: MutableSharedFlow<Boolean>,
+    private val preferenceUseCases: PreferenceUseCases,
+    private val mainUseCases: MainUseCases,
 ) : ViewModel() {
     private var backgroundServiceEnabled = true
-    private val _mainScreenEventFlow = MutableStateFlow<MainScreenEvents?>(null)
+    private val _mainScreenEventFlow = MutableSharedFlow<MainScreenEvents>()
     private val _mainScreenState =
         mutableStateOf(
             MainScreenState(
                 mainScreenEventFlow = _mainScreenEventFlow,
-                locationEnabled = true
+                locationEnabled = true,
+                userSettings = UserSettings(
+                    runInBackground = false,
+                    showNotifications = false,
+                    callPrivacyLevel = PrivacySettings.NoOne,
+                    smsPrivacyLevel = PrivacySettings.NoOne,
+                ),
+                drawerState = DrawerState(DrawerValue.Closed),
+                username = "",
+                firstName = "",
+                lastName = "",
+                imageUri = Uri.EMPTY
             )
         )
     val mainScreenState: State<MainScreenState> = _mainScreenState
 
     init {
         viewModelScope.launch {
-            PreferencesDataStore(application).userSettingsFlow.map { it.runInBackground }.collect {
-                backgroundServiceEnabled = it
+            preferenceUseCases.getUserSettingsFlow().collect {
+                _mainScreenState.value = _mainScreenState.value.copy(userSettings = it)
             }
         }
+
+
         viewModelScope.launch {
             locationStateMutableSharedFlow.collectLatest {
                 _mainScreenState.value = _mainScreenState.value.copy(locationEnabled = it)
@@ -70,9 +91,58 @@ class MainScreenViewModel @Inject constructor(
 
     fun onEvent(event: MainScreenViewModelEvents) {
         when (event) {
-            MainScreenViewModelEvents.SignOut -> signOutHandler()
+            MainScreenViewModelEvents.SignOut -> onSignOutHandler()
             MainScreenViewModelEvents.OnPause -> onPauseHandler()
             MainScreenViewModelEvents.OnResume -> onResumeHandler()
+            is MainScreenViewModelEvents.ChangeCallPrivacyLevel -> onChangeCallPrivacyLevelHandler(
+                event.privacyLevel
+            )
+            is MainScreenViewModelEvents.ChangeSmsPrivacyLevel -> onChangeSmsPrivacyLevelHandler(
+                event.privacyLevel
+            )
+            MainScreenViewModelEvents.ToggleRunInBackground -> onToggleRunInBackground()
+            MainScreenViewModelEvents.ToggleNotifications -> onToggleNotifications()
+            MainScreenViewModelEvents.LeaveSquad -> TODO()
+        }
+    }
+
+    private fun onChangeCallPrivacyLevelHandler(privacyLevel: PrivacySettings) {
+        viewModelScope.launch {
+            preferenceUseCases.updateUserSettings(
+                _mainScreenState.value.userSettings.copy(
+                    callPrivacyLevel = privacyLevel
+                )
+            )
+        }
+    }
+
+    private fun onChangeSmsPrivacyLevelHandler(privacyLevel: PrivacySettings) {
+        viewModelScope.launch {
+            preferenceUseCases.updateUserSettings(
+                _mainScreenState.value.userSettings.copy(
+                    smsPrivacyLevel = privacyLevel
+                )
+            )
+        }
+    }
+
+    private fun onToggleRunInBackground() {
+        viewModelScope.launch {
+            preferenceUseCases.updateUserSettings(
+                _mainScreenState.value.userSettings.copy(
+                    runInBackground = !_mainScreenState.value.userSettings.runInBackground
+                )
+            )
+        }
+    }
+
+    private fun onToggleNotifications() {
+        viewModelScope.launch {
+            preferenceUseCases.updateUserSettings(
+                _mainScreenState.value.userSettings.copy(
+                    showNotifications = !_mainScreenState.value.userSettings.showNotifications
+                )
+            )
         }
     }
 
@@ -89,8 +159,6 @@ class MainScreenViewModel @Inject constructor(
         application.unregisterReceiver(
             locationBroadcastReceiver,
         )
-
-
     }
 
     private fun onResumeHandler() {
@@ -141,19 +209,20 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
-    private fun signOutHandler() {
+    private fun onSignOutHandler() {
         viewModelScope.launch {
-            authUseCases.signOut()
-            _mainScreenEventFlow.emit(MainScreenEvents.SignOutSuccessful)
-            snackbarSettingsFlow.emit(
-                SnackbarSettings(
-                    message = MessageConstants.SIGNED_OUT,
-                    duration = SnackbarDuration.Short,
-                    snackbarId = snackbarSettingsFlow.value?.snackbarId?.plus(
-                        HandleResponseConstants.ID_ADDITION_FACTOR
-                    )
-                        ?: HandleResponseConstants.DEFAULT_ID,
-                )
+            handleResponse(
+                responseFlow = authUseCases.signOut(),
+                showLoaderFlow = showLoaderFlow,
+                snackbarFlow = snackbarSettingsFlow,
+                successMessage = MessageConstants.SIGNED_OUT,
+                defaultErrorMessage = MessageConstants.SIGN_OUT_ERROR,
+                onSuccess = {
+                    viewModelScope.launch {
+                        _mainScreenEventFlow.emit(MainScreenEvents.SignOutSuccessful)
+                        application.stopService(Intent(application, LocationService::class.java))
+                    }
+                }
             )
         }
     }

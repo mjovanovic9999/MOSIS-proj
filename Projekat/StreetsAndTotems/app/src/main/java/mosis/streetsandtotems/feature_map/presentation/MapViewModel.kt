@@ -37,6 +37,7 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
+import mosis.streetsandtotems.core.domain.use_case.PreferenceUseCases
 import mosis.streetsandtotems.di.util.SharedFlowWrapper
 import mosis.streetsandtotems.feature_map.domain.model.*
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
@@ -57,7 +58,9 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
     private val appContext: Application,
     private val mapViewModelRepository: MapViewModelRepository,
-    private val locationServiceEvents: SharedFlowWrapper<LocationServiceEvents>
+    private val locationServiceEvents: SharedFlowWrapper<LocationServiceEvents>,
+    private val showLoader: MutableStateFlow<Boolean>,
+    private val preferenceUseCases: PreferenceUseCases
 ) : ViewModel() {
     private val _mapScreenState: MutableState<MapScreenState>
     private val _mapState: MapState
@@ -74,7 +77,14 @@ class MapViewModel @Inject constructor(
     private val mapDimensions = calculateMapDimensions()
     private val circleSize = mutableStateOf(MY_LOCATION_CIRCLE_SIZE.dp / MAX_SCALE)
 
+    private var initialFetchCompleted = false
+
+
     init {
+        viewModelScope.launch {
+            showLoader.emit(true)
+        }
+
         _mapScreenState = getInitMapState()
 
         mapScreenState = _mapScreenState
@@ -187,6 +197,10 @@ class MapViewModel @Inject constructor(
     private suspend fun onLocationServiceEvent(event: LocationServiceEvents) {
         when (event) {
             is LocationServiceEvents.PlayerLocationChanged -> {
+                if (!initialFetchCompleted) {
+                    showLoader.emit(false)
+                    initialFetchCompleted = true
+                }
                 movePinAtLatLng(MY_PIN, event.newLocation.latitude, event.newLocation.longitude)
 
                 if (mapScreenState.value.followMe) {
@@ -242,14 +256,16 @@ class MapViewModel @Inject constructor(
                     composable = { CustomPin(resourceId = R.drawable.pin_tiki) }
                 }
                 is ProfileData -> {
-                    playersHashMap[it] = dataType
-                    composable =
-                        {
-                            CustomPinImage(
-                                imageUri = dataType.image ?: Uri.EMPTY,
-                                true//userData.squad_id != null && "MYSQUADID" != null && userData.squad_id == "MYSQUADID"
-                            )
-                        }
+                    if (dataType.is_online == true) {
+                        playersHashMap[it] = dataType
+                        composable =
+                            {
+                                CustomPinImage(
+                                    imageUri = dataType.image ?: Uri.EMPTY,
+                                    true//userData.squad_id != null && "MYSQUADID" != null && userData.squad_id == "MYSQUADID"
+                                )
+                            }
+                    }
                 }
             }
             if (composable != null) {
@@ -291,7 +307,11 @@ class MapViewModel @Inject constructor(
 
                 }
                 is ProfileData -> {
-                    oldData = playersHashMap.put(it, dataType)
+                    if (dataType.is_online == true) {
+                        if (playersHashMap.containsKey(it))
+                            oldData = playersHashMap.put(it, dataType)
+                        else addPinHash(dataType)
+                    } else removePinHash(dataType)
                 }
             }
             if (oldData != null) {

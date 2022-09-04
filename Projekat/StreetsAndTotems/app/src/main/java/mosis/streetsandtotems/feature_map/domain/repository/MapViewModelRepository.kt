@@ -17,4 +17,5 @@ interface MapViewModelRepository {
     suspend fun addHome(myId: String, l: GeoPoint)
 
     suspend fun deleteHome(myId: String)
+
 }

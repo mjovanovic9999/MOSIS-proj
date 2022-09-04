@@ -1,7 +1,6 @@
 package mosis.streetsandtotems.feature_auth.presentation.signin
 
 import android.content.Intent
-import android.util.Log
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.State
@@ -109,20 +108,20 @@ class SignInViewModel @Inject constructor(
     private fun signInWithGoogleHandler(intent: Intent?) {
         intent?.let {
             viewModelScope.launch {
-                authUseCases.signInWithGoogle(it).collect {
-                    when (it) {
-                        Response.Loading -> showLoaderFlow.emit(true)
-                        is Response.Error -> {
-                            showLoaderFlow.emit(false)
-                            Log.d("tag", "ERRORRRRR")
+                handleResponse(
+                    responseFlow = authUseCases.signInWithGoogle(it),
+                    onSuccess = {
+                        viewModelScope.launch {
+                            _signInScreenEvents.emit(
+                                SignInScreenEvents.SignInSuccessful
+                            )
                         }
-                        is Response.Success -> {
-                            showLoaderFlow.emit(false)
-                            Log.d("tag", "SUCC")
-
-                        }
-                    }
-                }
+                    },
+                    snackbarFlow = snackbarFlow,
+                    showLoaderFlow = showLoaderFlow,
+                    successMessage = MessageConstants.SIGNED_IN,
+                    defaultErrorMessage = MessageConstants.GOOGLE_SIGN_IN_FAILED
+                )
             }
         }
     }

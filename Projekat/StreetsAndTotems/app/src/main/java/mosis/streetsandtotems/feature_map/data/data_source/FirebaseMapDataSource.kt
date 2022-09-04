@@ -1,8 +1,11 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FirestoreConstants
+import mosis.streetsandtotems.core.domain.model.UserData
 
 class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     fun addCustomPin(
@@ -63,4 +66,13 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     }
 
+    fun updateUserOnlineStatus(isOnline: Boolean, userId: String): Task<Void> {
+        return db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION).document(userId)
+            .update(FirestoreConstants.IS_ONLINE_FIELD, isOnline)
+    }
+
+    suspend fun getUserData(userId: String): UserData? {
+        return db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION).document(userId).get()
+            .await().toObject(UserData::class.java)
+    }
 }

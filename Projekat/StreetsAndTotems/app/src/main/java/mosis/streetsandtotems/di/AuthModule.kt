@@ -8,14 +8,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
 import mosis.streetsandtotems.R
-import mosis.streetsandtotems.core.FirebaseAuthConstants
+import mosis.streetsandtotems.core.DINameConstants
+import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.feature_auth.data.data_source.FirebaseAuthDataSource
+import mosis.streetsandtotems.feature_auth.data.data_source.FirestoreAuthDataSource
 import mosis.streetsandtotems.feature_auth.data.data_source.OneTapGoogleDataSource
 import mosis.streetsandtotems.feature_auth.data.repository.AuthRepositoryImpl
 import mosis.streetsandtotems.feature_auth.domain.repository.AuthRepository
@@ -27,6 +30,11 @@ import javax.inject.Named
 object AuthModule {
     @Provides
     @ViewModelScoped
+    fun provideFirestoreAuthDataSource(db: FirebaseFirestore): FirestoreAuthDataSource =
+        FirestoreAuthDataSource(db)
+
+    @Provides
+    @ViewModelScoped
     fun provideFirebaseDataSource(firebaseAuth: FirebaseAuth): FirebaseAuthDataSource =
         FirebaseAuthDataSource(firebaseAuth = firebaseAuth)
 
@@ -34,9 +42,9 @@ object AuthModule {
     @ViewModelScoped
     fun provideOneTapGoogleDataSource(
         oneTapClient: SignInClient,
-        @Named(FirebaseAuthConstants.SIGN_IN_REQUEST)
+        @Named(DINameConstants.SIGN_IN_REQUEST)
         signInRequest: BeginSignInRequest,
-        @Named(FirebaseAuthConstants.SIGN_UP_REQUEST)
+        @Named(DINameConstants.SIGN_UP_REQUEST)
         signUpRequest: BeginSignInRequest
     ): OneTapGoogleDataSource = OneTapGoogleDataSource(
         oneTapClient = oneTapClient,
@@ -49,11 +57,14 @@ object AuthModule {
     @ViewModelScoped
     fun provideAuthRepository(
         authDataSource: FirebaseAuthDataSource,
-        oneTapGoogleDataSource: OneTapGoogleDataSource
+        oneTapGoogleDataSource: OneTapGoogleDataSource,
+        preferencesDataStore: PreferencesDataStore,
+        firestoreAuthDataSource: FirestoreAuthDataSource
     ): AuthRepository =
         AuthRepositoryImpl(
             authDataSource = authDataSource,
-            oneTapGoogleDataSource = oneTapGoogleDataSource
+            oneTapGoogleDataSource = oneTapGoogleDataSource,
+            preferencesDataStore = preferencesDataStore,
         )
 
     @Provides
@@ -75,7 +86,7 @@ object AuthModule {
 
     @Provides
     @ViewModelScoped
-    @Named(FirebaseAuthConstants.SIGN_IN_REQUEST)
+    @Named(DINameConstants.SIGN_IN_REQUEST)
     fun provideSignInRequest(app: Application): BeginSignInRequest =
         BeginSignInRequest.builder()
             .setGoogleIdTokenRequestOptions(
@@ -90,7 +101,7 @@ object AuthModule {
 
     @Provides
     @ViewModelScoped
-    @Named(FirebaseAuthConstants.SIGN_UP_REQUEST)
+    @Named(DINameConstants.SIGN_UP_REQUEST)
     fun provideSignUpRequest(app: Application): BeginSignInRequest =
         BeginSignInRequest.builder()
             .setGoogleIdTokenRequestOptions(

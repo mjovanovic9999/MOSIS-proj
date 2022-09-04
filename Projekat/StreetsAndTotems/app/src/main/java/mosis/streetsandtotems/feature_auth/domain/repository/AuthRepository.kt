@@ -3,7 +3,6 @@ package mosis.streetsandtotems.feature_auth.domain.repository
 import android.content.Intent
 import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.auth.api.identity.SignInCredential
-import com.google.firebase.auth.AuthCredential
 import kotlinx.coroutines.flow.Flow
 import mosis.streetsandtotems.core.domain.model.Response
 import mosis.streetsandtotems.feature_auth.domain.model.SignInError
@@ -21,7 +20,8 @@ interface AuthRepository {
 
     suspend fun oneTapSignUpWithGoogle(): Flow<Response<BeginSignInResult>>
 
-    suspend fun firebaseSignInWithGoogle(googleCredential: AuthCredential): Flow<Response<Nothing>>
+    suspend fun firebaseSignInWithGoogle(credentials: SignInCredential): Flow<Response<Nothing>>
 
     fun getSignInCredentialFromIntent(intent: Intent): SignInCredential
+
 }

@@ -1,16 +1,14 @@
 package mosis.streetsandtotems.core.domain.model
 
 import android.net.Uri
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity
 data class UserData(
-    val firstName: String,
-    val lastName: String,
-    val phoneNumber: String,
-    val squadId: String?,
-    val email: String,
-    val imageUri: Uri,
-    @PrimaryKey(autoGenerate = false) val id: String
+    val id: String? = null,
+    val user_name: String? = null,
+    val first_name: String? = null,
+    val last_name: String? = null,
+    val phone_number: String? = null,
+    val squad_id: String? = null,
+    val email: String? = null,
+    val image: Uri? = null,
 )

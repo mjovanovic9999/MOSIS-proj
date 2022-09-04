@@ -3,19 +3,16 @@ package mosis.streetsandtotems.di
 import android.app.Application
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.scopes.ActivityRetainedScoped
-import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.MutableStateFlow
 import mosis.streetsandtotems.core.domain.model.SnackbarSettings
+import mosis.streetsandtotems.di.util.StateFlowWrapper
 import mosis.streetsandtotems.services.NetworkManager
 
 @Module
@@ -29,15 +26,25 @@ object ActivityModule {
 
     @Provides
     @ActivityRetainedScoped
-    fun provideNotificationFlow(): MutableStateFlow<SnackbarSettings?> {
-        return MutableStateFlow(value = null)
+    fun provideSnackbarMutableFLow(): MutableStateFlow<SnackbarSettings?> {
+        return MutableStateFlow(null)
     }
 
     @Provides
     @ActivityRetainedScoped
-    fun provideShowLoaderFlow(): MutableStateFlow<Boolean> {
-        return MutableStateFlow(value = false)
+    fun provideSnackbarFlow(snackbarMutableFlow: MutableStateFlow<SnackbarSettings?>): StateFlowWrapper<SnackbarSettings?> =
+        StateFlowWrapper(snackbarMutableFlow)
+
+    @Provides
+    @ActivityRetainedScoped
+    fun provideShowLoaderMutableFlow(): MutableStateFlow<Boolean> {
+        return MutableStateFlow(false)
     }
+
+    @Provides
+    @ActivityRetainedScoped
+    fun provideShowLoaderFlow(showLoaderMutableFlow: MutableStateFlow<Boolean>): StateFlowWrapper<Boolean> =
+        StateFlowWrapper(showLoaderMutableFlow)
 
     @Provides
     @ActivityRetainedScoped

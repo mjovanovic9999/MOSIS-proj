@@ -13,14 +13,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.MutableStateFlow
 import mosis.streetsandtotems.core.domain.model.SnackbarSettings
 import mosis.streetsandtotems.core.presentation.components.CustomLoader
 import mosis.streetsandtotems.core.presentation.components.CustomSnackbar
 import mosis.streetsandtotems.core.presentation.navigation.AppNavigation
+import mosis.streetsandtotems.di.util.StateFlowWrapper
 import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestNetwork
 import mosis.streetsandtotems.feature_map.presentation.components.CustomRequestPermission
-import mosis.streetsandtotems.feature_settings_persistence.PreferencesDataStore
 import mosis.streetsandtotems.services.NetworkManager
 import mosis.streetsandtotems.ui.theme.AppTheme
 import javax.inject.Inject
@@ -35,10 +34,10 @@ class MainActivity() : ComponentActivity() {
     lateinit var networkManager: NetworkManager
 
     @Inject
-    lateinit var snackbarFlow: MutableStateFlow<SnackbarSettings?>
+    lateinit var snackbarFlow: StateFlowWrapper<SnackbarSettings?>
 
     @Inject
-    lateinit var showLoaderFlow: MutableStateFlow<Boolean>
+    lateinit var showLoaderFlow: StateFlowWrapper<Boolean>
 
     @Inject
     lateinit var isUserAuthenticated: State<Boolean>
@@ -64,8 +63,8 @@ class MainActivity() : ComponentActivity() {
                         .background(MaterialTheme.colorScheme.background)
                 ) {
                     AppNavigation(isUserAuthenticated)
-                    CustomSnackbar(snackbarSettingsFlow = snackbarFlow)
-                    CustomLoader(showLoaderFlow = showLoaderFlow)
+                    CustomSnackbar(snackbarSettingsFlow = snackbarFlow.flow)
+                    CustomLoader(showLoaderFlow = showLoaderFlow.flow)
                 }
             }
         }

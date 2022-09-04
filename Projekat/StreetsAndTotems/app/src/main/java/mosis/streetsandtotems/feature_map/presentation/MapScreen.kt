@@ -1,7 +1,5 @@
 package mosis.streetsandtotems.feature_map.presentation
 
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import com.ramcosta.composedestinations.annotation.Destination
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
@@ -12,17 +10,15 @@ import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
 import mosis.streetsandtotems.feature_map.presentation.components.MapFABs
 import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @MainNavGraph(start = true)
 @Destination
 @Composable
-fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
+fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
     val state = mapViewModel.mapScreenState.value
 
     MapComponent(mapState = state.mapState.value)
     MapFABs(
-        drawerState,
+        openDrawer,
         locateMe = { mapViewModel.onEvent(MapViewModelEvents.FollowMe) },
         followMe = state.followMe,
         showFilterDialog = { mapViewModel.onEvent(MapViewModelEvents.ShowFilterDialog) },
@@ -48,8 +44,8 @@ fun MapScreen(drawerState: DrawerState, mapViewModel: MapViewModel) {
             state.playerLocation,
             state.selectedPlayer.l
         ),
-        callsAllowed = state.selectedPlayer.calls_allowed,
-        messagingAllowed = state.selectedPlayer.messaging_allowed,
+        callsAllowed = true,//state.selectedPlayer.call_privacy_level,
+        messagingAllowed = true,//state.selectedPlayer.messaging_privacy_level,
         phoneNumber = state.selectedPlayer.phone_number,
         firstName = state.selectedPlayer.first_name,
         lastName = state.selectedPlayer.last_name,

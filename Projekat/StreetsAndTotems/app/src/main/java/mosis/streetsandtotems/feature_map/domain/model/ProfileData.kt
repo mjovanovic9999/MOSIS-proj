@@ -2,6 +2,7 @@ package mosis.streetsandtotems.feature_map.domain.model
 
 import android.net.Uri
 import com.google.firebase.firestore.GeoPoint
+import mosis.streetsandtotems.core.domain.model.PrivacySettings
 
 data class ProfileData(
     override val id: String? = null,
@@ -13,6 +14,8 @@ data class ProfileData(
     val squad_id: String? = null,
     val email: String? = null,
     val image: Uri? = null,
-    val calls_allowed: Boolean? = null,
-    val messaging_allowed: Boolean? = null,
+    val call_privacy_level: PrivacySettings? = null,
+    val messaging_privacy_level: PrivacySettings? = null,
+    @field:JvmField
+    val is_online: Boolean? = null
 ) : Data

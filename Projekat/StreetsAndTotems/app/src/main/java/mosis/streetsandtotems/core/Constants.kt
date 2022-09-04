@@ -2,9 +2,6 @@ package mosis.streetsandtotems.core
 
 import kotlin.math.PI
 
-object DatabaseConstants {
-    const val DATABASE_NAME = "local_db"
-}
 
 object FirestoreConstants {
     const val PROFILE_DATA_COLLECTION = "profile_data"
@@ -12,10 +9,18 @@ object FirestoreConstants {
     const val TOTEMS_COLLECTION = "totems"
     const val CUSTOM_PINS_COLLECTION = "custom_pins"
     const val HOMES_COLLECTION = "homes"
-
+    const val USER_INVENTORY_COLLECTION = "user_inventory"
+    const val LEADERBOARD_COLLECTION = "leaderboard"
 
     const val ID_FIELD = "__name__"
     const val IMAGE_URI_FIELD = "image_uri"
+    const val FIRST_NAME_FIELD = "first_name"
+    const val LAST_NAME_FIELD = "last_name"
+    const val USER_NAME_FIELD = "user_name"
+    const val PHONE_NUMBER_FIELD = "phone_number"
+    const val EMAIL_FIELD = "email"
+    const val SQUAD_ID_FIELD = "squad_id"
+    const val IS_ONLINE_FIELD = "is_online"
 }
 
 object FirebaseErrorCodesConstants {
@@ -58,6 +63,9 @@ object FirebaseAuthConstants {
         FirebaseErrorCodesConstants.OPERATION_NOT_ALLOWED to "",
         FirebaseErrorCodesConstants.WEAK_PASSWORD to "Provided password is weak!"
     )
+}
+
+object DINameConstants {
     const val SIGN_IN_REQUEST = "SignInRequest"
     const val SIGN_UP_REQUEST = "SignUpRequest"
 }
@@ -181,13 +189,14 @@ object HandleResponseConstants {
 }
 
 object MessageConstants {
+    const val SIGN_OUT_ERROR = "An error occurred while signing you out!"
+    const val GOOGLE_SIGN_IN_FAILED = "Google sign in failed! Please try again or contact support!"
     const val TOO_MANY_LOGIN_ATTEMPTS = "Too many login attempts! Account temporarily disabled!"
-    const val DEFAULT_ERROR_MESSAGE = "Unknown error occured! Please try again or contact support!"
+    const val DEFAULT_ERROR_MESSAGE = "Unknown error occurred! Please try again or contact support!"
     const val DEFAULT_SUCCESS_MESSAGE = "Success!"
-    const val SIGN_UP_ERROR = "An error occured while signing up! Please try again!"
+    const val SIGN_UP_ERROR = "An error occurred while signing up! Please try again!"
     const val SIGNED_UP = "Sign up successful!"
     const val SIGNED_OUT = "Sign out successful!"
-    const val INVALID_CREDENTIALS = "Wrong email and/or password!"
     const val SIGNED_IN = "Sign in successful!"
     const val INVALID_EMAIL = "Invalid email!"
     const val EMAIL_REQUIRED = "Email is required!"
@@ -269,12 +278,6 @@ object DrawerConstants {
     val DROPDOWN_SELECT_LIST = listOf("No one", "Only squad members", "Everyone")
 }
 
-object WorkerKeys {
-    const val NEW_LOCATION = "newLocation"
-    const val ERROR = "error"
-    const val LOCATION_DISABLED = "locationDisabled"
-}
-
 object NotificationConstants {
     const val CHANNEL_ID = "StreetsAndTotems_channel"
     const val CHANNEL_NAME = "Streets And Totems Notifications"
@@ -328,7 +331,7 @@ object ConfirmationDialogTextConstants {
         "If you leave squad you won't be able to rejoin unless someone invites you!"
 }
 
-object UserSettingsConstants {
+object PreferencesDataStoreConstants {
     const val DATA_STORE_NAME = "USER_SETTINGS"
 
     const val RUN_IN_BACKGROUND_PREFERENCES = "RUN_IN_BACKGROUND"
@@ -336,4 +339,8 @@ object UserSettingsConstants {
     const val SHOW_MY_PHONE_NUMBER_PREFERENCES = "SHOW_MY_PHONE_NUMBER"
     const val CALL_PRIVACY_LEVEL_PREFERENCES = "CALL_PRIVACY_LEVEL"
     const val SMS_PRIVACY_LEVEL_PREFERENCES = "SMS_PRIVACY_LEVEL"
+    const val AUTH_PROVIDER_PREFERENCES = "AUTH_PROVIDER"
+
+    const val USER_ID_PREFERENCES = "USER_DATA"
+    const val SQUAD_ID_PREFERENCES = "SQUAD_ID"
 }

@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_main.presentation.components
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,10 +20,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.skydoves.landscapist.glide.GlideImage
 import mosis.streetsandtotems.core.ConfirmationDialogTextConstants
 import mosis.streetsandtotems.core.DrawerConstants
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
@@ -36,19 +39,20 @@ import mosis.streetsandtotems.ui.theme.sizes
 fun DrawerContent(
     modifier: Modifier,
     destinationsNavigator: DestinationsNavigator,
-    onSignOut: (DestinationsNavigator) -> Unit,
+    onSignOut: () -> Unit,
     runInBackground: Boolean,
     onRunInBackgroundChange: () -> Unit,
     showNotifications: Boolean,
     onShowNotificationsChange: () -> Unit,
-    showMyPhoneNumber: Boolean,
-    onShowMyPhoneNumberChange: () -> Unit,
     callPrivacyLevel: Int,
     onCallPrivacyLevelIndexChange: (Int) -> Unit,
     smsPrivacyLevel: Int,
     onSmsPrivacyLevelChange: (Int) -> Unit,
-
-    ) {
+    username: String,
+    firstName: String,
+    lastName: String,
+    imageUri: Uri
+) {
     val focusManager = LocalFocusManager.current
     val isConfirmDialogOpen = remember { mutableStateOf(false) }
 
@@ -77,6 +81,10 @@ fun DrawerContent(
                             RoundedCornerShape(MaterialTheme.sizes.default_shape_corner)
                         )
                 ) {
+                    GlideImage(
+                        imageModel = imageUri,
+                        modifier = Modifier.clip(RoundedCornerShape(MaterialTheme.sizes.default_shape_corner))
+                    )
                 }
                 CustomButton(
                     clickHandler = { destinationsNavigator.navigate(ProfileScreenDestination) },
@@ -89,12 +97,12 @@ fun DrawerContent(
                 verticalArrangement = Arrangement.SpaceAround
             ) {
                 Text(
-                    text = "KorisnickoIme",
+                    text = username,
                     style = MaterialTheme.typography.titleLarge.plus(TextStyle(fontWeight = FontWeight.ExtraBold)),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Petar Petrovic",
+                    text = "$firstName $lastName",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.titleMedium.plus(TextStyle(fontWeight = FontWeight.Bold))
                 )
@@ -130,10 +138,6 @@ fun DrawerContent(
             text = DrawerConstants.RUN_IN_BACKGROUND,
             switchState = runInBackground,
             onCheckedChangeHandler = { onRunInBackgroundChange() })
-        DrawerSwitchItem(
-            text = DrawerConstants.SHOW_PHONE_NUMBER,
-            switchState = showMyPhoneNumber,
-            onCheckedChangeHandler = { onShowMyPhoneNumberChange() })
         Divider(
             modifier = Modifier
                 .fillMaxWidth()
@@ -193,7 +197,7 @@ fun DrawerContent(
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 )
                 CustomButton(
-                    clickHandler = { onSignOut(destinationsNavigator) },
+                    clickHandler = { onSignOut() },
                     text = DrawerConstants.SIGN_OUT,
                     buttonType = CustomButtonType.Text,
                     icon = Icons.Outlined.Logout,
