@@ -27,6 +27,5 @@ interface MapViewModelRepository {
         myId: String, newUserInventoryData: UserInventoryData
     )
 
-    suspend fun getUserInventory(userId: String): UserInventoryData?
-
+//    suspend fun registerCallbackOnUserInventoryUpdate(callback: (UserInventoryData) -> Unit)
 }

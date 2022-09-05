@@ -103,12 +103,6 @@ class MapViewModel @Inject constructor(
 
         registerOnLocationService()
 
-        viewModelScope.launch {
-            mapViewModelRepository.getUserInventory("VlYnaW2Mf5NuxzdnpYM2vBmckuE2")?.let {
-                mapScreenState.value = mapScreenState.value.copy(playerInventory = it)
-                Log.d("tag", it.toString())
-            }
-        }
     }
 
     fun onEvent(event: MapViewModelEvents) {
@@ -230,9 +224,13 @@ class MapViewModel @Inject constructor(
 
             }
             is LocationServiceEvents.PinDataChanged<*> -> handlePinAction(event.pinAction)
+            is LocationServiceEvents.UserInventoryChanged -> onUserInventoryChangedHandler(event.newInventory)
         }
     }
 
+    private fun onUserInventoryChangedHandler(newInventory: UserInventoryData) {
+        _mapScreenState.value = _mapScreenState.value.copy(playerInventory = newInventory)
+    }
 
     private fun <T : Data> handlePinAction(pinAction: PinAction<T>) {
         when (pinAction.action) {

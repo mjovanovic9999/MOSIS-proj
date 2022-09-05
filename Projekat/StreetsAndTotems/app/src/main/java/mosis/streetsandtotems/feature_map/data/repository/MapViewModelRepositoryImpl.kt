@@ -71,12 +71,13 @@ class MapViewModelRepositoryImpl(
         firebaseMapDataSource.updateUserInventory(myId, newUserInventoryData)
     }
 
-    override suspend fun getUserInventory(userId: String): UserInventoryData? {
-        return try {
-            firebaseMapDataSource.getUserInventory(userId)
-        } catch (e: Exception) {
-            Log.d("tag", e.message.toString())
-            null
-        }
-    }
+
+//    override suspend fun registerCallbackOnUserInventoryUpdate(userId: String): UserInventoryData? {
+//        return try {
+//            firebaseMapDataSource.getUserInventory(userId)
+//        } catch (e: Exception) {
+//            Log.d("tag", e.message.toString())
+//            null
+//        }
+//    }
 }

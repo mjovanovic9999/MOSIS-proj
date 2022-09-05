@@ -147,6 +147,7 @@ class LocationService : Service() {
         initTotemsFlow()
         initCustomPinsFlow()
         initHomesFlow()
+        initUserInventoryFlow()
     }
 
     private fun initUserPinsFlow() {
@@ -320,6 +321,12 @@ class LocationService : Service() {
                 )
             }
         )
+    }
+
+    private fun initUserInventoryFlow() {
+        mapServiceRepository.registerCallbackOnUserInventoryUpdate {
+            emitLocationServiceEvent(LocationServiceEvents.UserInventoryChanged(it))
+        }
     }
 
     private fun emitLocationServiceEvent(event: LocationServiceEvents) {
