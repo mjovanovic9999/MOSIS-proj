@@ -32,6 +32,9 @@ data class MapScreenState(
 
     val resourceDialogOpen: Boolean,
     val selectedResource: ResourceData,
+
+    val market: MarketData,
+    val marketDialogOpen: Boolean,
 )
 
 

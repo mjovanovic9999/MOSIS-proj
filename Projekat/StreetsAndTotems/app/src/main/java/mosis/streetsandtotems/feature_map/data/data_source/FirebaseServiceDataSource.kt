@@ -143,6 +143,29 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
             }
     }
 
+
+    fun registerCallbacksOnMarketUpdate(
+        marketAddedCallback: (market: MarketData) -> Unit,
+        marketModifiedCallback: (market: MarketData) -> Unit,
+        marketRemovedCallback: (market: MarketData) -> Unit
+    ): ListenerRegistration {
+        return db.collection(FirestoreConstants.MARKET_COLLECTION)
+            .addSnapshotListener { snapshots, e ->
+                collectionSnapshotListenerCallback(
+                    e,
+                    snapshots,
+                    marketAddedCallback,
+                    marketModifiedCallback,
+                    marketRemovedCallback,
+                    customConversion = {
+                        it.toObject<MarketData>()
+                            .copy(id = it.id)
+                    }
+                )
+            }
+    }
+
+
     private inline fun <reified T> collectionSnapshotListenerCallback(
         e: FirebaseFirestoreException?,
         snapshots: QuerySnapshot?,

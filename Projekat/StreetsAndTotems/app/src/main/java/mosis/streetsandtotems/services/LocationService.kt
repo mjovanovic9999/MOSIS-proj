@@ -148,6 +148,7 @@ class LocationService : Service() {
         initCustomPinsFlow()
         initHomesFlow()
         initUserInventoryFlow()
+        initMarketFlow()
     }
 
     private fun initUserPinsFlow() {
@@ -327,6 +328,41 @@ class LocationService : Service() {
         mapServiceRepository.registerCallbackOnUserInventoryUpdate {
             emitLocationServiceEvent(LocationServiceEvents.UserInventoryChanged(it))
         }
+    }
+
+    private fun initMarketFlow() {
+        mapServiceRepository.registerCallbackOnMarketUpdate(
+            marketAddedCallback = {
+                emitLocationServiceEvent(
+                    LocationServiceEvents.MarketChanged(
+                        PinAction(
+                            it,
+                            PinActionType.Added
+                        )
+                    )
+                )
+            },
+            marketModifiedCallback = {
+                emitLocationServiceEvent(
+                    LocationServiceEvents.MarketChanged(
+                        PinAction(
+                            it,
+                            PinActionType.Modified
+                        )
+                    )
+                )
+            },
+            marketRemovedCallback = {
+                emitLocationServiceEvent(
+                    LocationServiceEvents.MarketChanged(
+                        PinAction(
+                            it,
+                            PinActionType.Removed
+                        )
+                    )
+                )
+            }
+        )
     }
 
     private fun emitLocationServiceEvent(event: LocationServiceEvents) {

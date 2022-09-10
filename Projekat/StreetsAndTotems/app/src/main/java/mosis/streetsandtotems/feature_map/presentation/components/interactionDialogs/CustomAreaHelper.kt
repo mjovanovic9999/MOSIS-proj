@@ -2,10 +2,8 @@ package mosis.streetsandtotems.feature_map.presentation.components.interactionDi
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,10 +16,12 @@ fun CustomAreaHelper(
     modifier: Modifier = Modifier,
     isTransparent: Boolean = false,
     title: (@Composable() () -> Unit)? = null,
-    row00: (@Composable() () -> Unit)? = null,//ako treba samo jedno polje koristiti ovo
-    row01: (@Composable() () -> Unit)? = null,
-    row10: (@Composable() () -> Unit)? = null,
-    row11: (@Composable() () -> Unit)? = null,
+    cell00: (@Composable() () -> Unit)? = null,//ako treba samo jedno polje koristiti ovo!!!
+    cell01: (@Composable() () -> Unit)? = null,
+    cell10: (@Composable() () -> Unit)? = null,
+    cell11: (@Composable() () -> Unit)? = null,
+    shouldAlignBottom: Boolean = false,
+    topPadding: Boolean = false,
 ) {
     Box(
         modifier = modifier
@@ -30,15 +30,14 @@ fun CustomAreaHelper(
                 if (isTransparent)
                     MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.9f)
                 else
-                    MaterialTheme.colorScheme.secondaryContainer//tako li boja??????
+                    MaterialTheme.colorScheme.secondaryContainer//ta li boja??????
             )
     ) {
         Column(
-//            Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Box(Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp)) {
+            Box(if (topPadding) Modifier.padding(top = 5.dp) else Modifier) {
                 if (title != null) {
                     title()
                 }
@@ -50,24 +49,27 @@ fun CustomAreaHelper(
             ) {
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    if (row00 != null) {
-                        row00()
+                    if (cell00 != null) {
+                        cell00()
                     }
-                    if (row01 != null) {
-                        row01()
+                    if (cell01 != null) {
+                        cell01()
                     }
                 }
                 Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = if (shouldAlignBottom) Alignment.Bottom else Alignment.CenterVertically,
                 ) {
-                    if (row10 != null) {
-                        row10()
+                    if (cell10 != null) {
+                        cell10()
                     }
-                    if (row11 != null) {
-                        row11()
+                    if (cell11 != null) {
+                        cell11()
                     }
                 }
             }

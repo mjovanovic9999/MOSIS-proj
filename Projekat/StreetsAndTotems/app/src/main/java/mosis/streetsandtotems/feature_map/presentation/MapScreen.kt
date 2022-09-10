@@ -1,19 +1,14 @@
 package mosis.streetsandtotems.feature_map.presentation
 
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.annotation.Destination
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import mosis.streetsandtotems.feature_map.presentation.components.*
-import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomAreaHelper
 import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomFilterDialog
-import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomMarkerDialog
+import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomMarketDialog
 import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomResourceDialog
 import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
 
@@ -75,9 +70,6 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         filterTotemsState = mapViewModel.mapScreenState.value.filterTotems,
     )
 
-
-
-
     CustomResourceDialog(
         isOpen = state.resourceDialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseResourceDialog) },
@@ -97,16 +89,10 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         emptySpaces = state.playerInventory.empty_spaces,
         oldInventoryData = state.playerInventory.inventory ?: InventoryData(),
     )
-//    CustomAreaHelper(
-//        row00 = {Text("00")},
-////        row01 = {Text("01")},
-////        row10 = {Text("10")},
-////        row11 = {Text("11")},
-////        title = {Text("titlw")},
-//        modifier = Modifier.size(200.dp)
-//    )
 
-    CustomMarkerDialog(isOpen = true)
+    CustomMarketDialog(
+        isOpen = state.marketDialogOpen,
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseMarketDialog) })
 
 
 }

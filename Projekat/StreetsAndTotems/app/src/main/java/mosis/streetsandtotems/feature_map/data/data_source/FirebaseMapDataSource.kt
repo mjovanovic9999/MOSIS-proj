@@ -105,4 +105,5 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         return db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION).document(userId).get()
             .await().toObject(UserData::class.java)
     }
+
 }
