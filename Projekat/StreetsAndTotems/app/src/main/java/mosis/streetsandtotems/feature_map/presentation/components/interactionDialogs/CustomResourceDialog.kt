@@ -1,20 +1,19 @@
-package mosis.streetsandtotems.feature_map.presentation.components
+package mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import mosis.streetsandtotems.core.ButtonConstants
 import mosis.streetsandtotems.core.FormFieldConstants
-import mosis.streetsandtotems.core.ItemsConstants
+import mosis.streetsandtotems.core.TitleConstants.BACKPACK_EMPTY_SPACES_LEFT
+import mosis.streetsandtotems.core.TitleConstants.ITEMS_LEFT
 import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.ResourceType
@@ -24,7 +23,7 @@ import mosis.streetsandtotems.feature_map.presentation.util.updateOneInventoryDa
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
-fun ResourceItemDialog(
+fun CustomResourceDialog(
     isOpen: Boolean,
     resourceType: ResourceType?,
     onDismissRequest: () -> Unit,
@@ -50,7 +49,8 @@ fun ResourceItemDialog(
             CustomDialogTitle(
                 isTotem = false,
                 resourceType = convertResourceTypeToIconType(resourceType),
-                countMessage = itemsLeft.toString() + ItemsConstants.ITEMS_LEFT,
+                countMessage = itemsLeft.toString() + ITEMS_LEFT,
+                backpackSpaceMessage = emptySpaces.toString() + BACKPACK_EMPTY_SPACES_LEFT,
                 needTotemAdditionalText = false,
             )
         },
@@ -63,7 +63,6 @@ fun ResourceItemDialog(
                 CustomButton(
                     clickHandler = {
                         if (resourceType != null && emptySpaces != null && currentResourceCount != null && itemsLeft != null) {
-                            Log.d("tag", (emptySpaces - takeAmount.value.toInt()).toString()+"oduzeto")
                             onTake(
                                 updateOneInventoryData(
                                     oldInventoryData,
@@ -81,7 +80,6 @@ fun ResourceItemDialog(
                     textStyle = MaterialTheme.typography.titleMedium,
                     enabled = takeAmount.value != ""
                             && emptySpaces != null
-                            && emptySpaces>0//mzd ne treba
                             && emptySpaces - takeAmount.value.toInt() >= 0
                             && takeAmount.value.toInt() > 0
                             && itemsLeft != null

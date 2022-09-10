@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import mosis.streetsandtotems.core.ButtonConstants
 import mosis.streetsandtotems.core.FormFieldConstants
 import mosis.streetsandtotems.core.ItemsConstants
+import mosis.streetsandtotems.core.TitleConstants.ITEMS_LEFT
 import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.feature_backpack.presentation.DropItemDialogState
 import mosis.streetsandtotems.ui.theme.sizes
@@ -37,7 +38,7 @@ fun DropItemDialog(
             CustomDialogTitle(
                 isTotem = state.dropTotem,
                 resourceType = state.itemType,
-                countMessage = state.itemCount?.toString() + ItemsConstants.ITEMS_LEFT,
+                countMessage = state.itemCount?.toString() + ITEMS_LEFT,
                 needTotemAdditionalText = false,
             )
         },

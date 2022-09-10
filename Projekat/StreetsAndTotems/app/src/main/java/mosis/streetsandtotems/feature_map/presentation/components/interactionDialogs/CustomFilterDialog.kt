@@ -1,13 +1,9 @@
-package mosis.streetsandtotems.feature_map.presentation.components
+package mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -16,6 +12,7 @@ import mosis.streetsandtotems.core.PinConstants.FRIENDS
 import mosis.streetsandtotems.core.PinConstants.RESOURCES
 import mosis.streetsandtotems.core.PinConstants.TOTEMS
 import mosis.streetsandtotems.core.presentation.components.CustomDialog
+import mosis.streetsandtotems.feature_map.presentation.components.CustomFilterChip
 
 @Composable
 fun CustomFilterDialog(
