@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs
 
+import android.text.style.BackgroundColorSpan
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import mosis.streetsandtotems.ui.theme.sizes
 
@@ -22,23 +24,25 @@ fun CustomAreaHelper(
     cell11: (@Composable() () -> Unit)? = null,
     shouldAlignBottom: Boolean = false,
     topPadding: Boolean = false,
+    backgroundColor: Color=MaterialTheme.colorScheme.secondaryContainer,
 ) {
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(MaterialTheme.sizes.default_shape_corner))
             .background(
                 if (isTransparent)
-                    MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.9f)
+                    backgroundColor.copy(alpha = 0.9f)
                 else
-                    MaterialTheme.colorScheme.secondaryContainer//ta li boja??????
+                    backgroundColor
             )
+            .padding(5.dp)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Box(if (topPadding) Modifier.padding(top = 5.dp) else Modifier) {
-                if (title != null) {
+            if (title != null) {
+                Box(if (topPadding) Modifier.padding(top = 5.dp) else Modifier) {
                     title()
                 }
             }

@@ -326,6 +326,7 @@ class LocationService : Service() {
 
     private fun initUserInventoryFlow() {
         mapServiceRepository.registerCallbackOnUserInventoryUpdate {
+            Log.d("d", it.toString())
             emitLocationServiceEvent(LocationServiceEvents.UserInventoryChanged(it))
         }
     }

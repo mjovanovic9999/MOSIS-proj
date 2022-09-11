@@ -129,9 +129,11 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
     }
 
     fun registerCallbacksOnUserInventoryUpdate(
+        currentUser: FirebaseUser,
         userInventoryCallback: (UserInventoryData) -> Unit
     ): ListenerRegistration {
         return db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION)
+            .whereEqualTo(FirestoreConstants.ID_FIELD, currentUser.uid)
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
                     e,

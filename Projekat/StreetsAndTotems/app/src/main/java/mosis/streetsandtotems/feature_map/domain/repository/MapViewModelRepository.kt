@@ -2,6 +2,7 @@ package mosis.streetsandtotems.feature_map.domain.repository
 
 import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
+import mosis.streetsandtotems.feature_map.domain.model.MarketItem
 import mosis.streetsandtotems.feature_map.domain.model.ResourceType
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 
@@ -23,9 +24,9 @@ interface MapViewModelRepository {
 
     suspend fun updateResource(resourceId: String, newCount: Int)
 
-    suspend fun updateUserInventory(
-        myId: String, newUserInventoryData: UserInventoryData
-    )
+    suspend fun updateUserInventory(myId: String, newUserInventoryData: UserInventoryData)
+
+    suspend fun updateMarket(newMarket: Map<String, MarketItem>)
 
 //    suspend fun registerCallbackOnUserInventoryUpdate(callback: (UserInventoryData) -> Unit)
 }

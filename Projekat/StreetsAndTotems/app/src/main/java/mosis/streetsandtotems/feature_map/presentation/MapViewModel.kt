@@ -2,6 +2,7 @@ package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -127,6 +128,7 @@ class MapViewModel @Inject constructor(
             is MapViewModelEvents.UpdateResource -> updateResourceHandler(event.newCount)
             MapViewModelEvents.ShowMarketDialog -> showMarketDialogHandler()
             MapViewModelEvents.CloseMarketDialog -> closeMarketDialogHandler()
+            is MapViewModelEvents.UpdateMarket -> updateMarketHandler(event.newMarket)
         }
     }
 
@@ -571,10 +573,9 @@ class MapViewModel @Inject constructor(
                     placedBy = customPin.placed_by,
                     customPin.text
                 )
-            } else if (mapScreenState.value.market.id == id) {
+            } else if (mapScreenState.value.market.id == "market_document_id") {
                 showMarketDialogHandler()
             }
-
         }
     }
 
@@ -664,7 +665,6 @@ class MapViewModel @Inject constructor(
             filterResources.emit(!filterResources.value)
             _mapScreenState.value =
                 _mapScreenState.value.copy(filterResources = !_mapScreenState.value.filterResources)
-
         }
     }
 
@@ -765,9 +765,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun updateResourceHandler(
-        newCount: Int,
-    ) {
+    private fun updateResourceHandler(newCount: Int) {
         viewModelScope.launch {
             mapScreenState.value.selectedResource.id?.let { id ->
                 mapViewModelRepository.updateResource(id, newCount)
@@ -776,19 +774,24 @@ class MapViewModel @Inject constructor(
     }
 
 
-    private fun updateInventoryHandler(
-        newUserInventoryData: UserInventoryData
-    ) {
+    private fun updateInventoryHandler(newUserInventoryData: UserInventoryData) {
         viewModelScope.launch {
+            Log.d("tagg", "VM "+newUserInventoryData.toString())
             mapScreenState.value.selectedResource.type?.let {
                 mapViewModelRepository.updateUserInventory(
-                    "VlYnaW2Mf5NuxzdnpYM2vBmckuE2",
+                    "Q0Wy3JXFjjNFSBDzgvw4L66Ud6J2",
                     newUserInventoryData
                 )
             }
         }
     }
 
+
+    private fun updateMarketHandler(newMarket: Map<String, MarketItem>) {
+        viewModelScope.launch {
+            mapViewModelRepository.updateMarket(newMarket)
+        }
+    }
 
 //endregion
 

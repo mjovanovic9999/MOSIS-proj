@@ -109,6 +109,7 @@ class MapServiceRepositoryImpl(
         auth.currentUser?.let {
             listenerRegistrations.add(
                 firebaseServiceDataSource.registerCallbacksOnUserInventoryUpdate(
+                    it,
                     userInventoryCallback
                 )
             )

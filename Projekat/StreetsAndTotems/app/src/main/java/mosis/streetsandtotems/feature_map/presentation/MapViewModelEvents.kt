@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
 
+import mosis.streetsandtotems.feature_map.domain.model.MarketItem
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 
 sealed class MapViewModelEvents {
@@ -24,5 +25,6 @@ sealed class MapViewModelEvents {
     data class UpdateInventory(val newUserInventoryData: UserInventoryData) : MapViewModelEvents()
     object ShowMarketDialog : MapViewModelEvents()
     object CloseMarketDialog : MapViewModelEvents()
+    data class UpdateMarket(val newMarket: Map<String, MarketItem>) : MapViewModelEvents()
 
 }

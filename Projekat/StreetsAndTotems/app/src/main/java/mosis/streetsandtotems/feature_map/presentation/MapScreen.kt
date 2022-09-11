@@ -92,7 +92,20 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
 
     CustomMarketDialog(
         isOpen = state.marketDialogOpen,
-        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseMarketDialog) })
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseMarketDialog) },
+        items = state.market.items,
+        userInventoryData = state.playerInventory,
+        updateUserInventoryData = {
+            mapViewModel.onEvent(MapViewModelEvents.UpdateInventory(it))
+        },
+        updateMarketItems = { mapViewModel.onEvent(MapViewModelEvents.UpdateMarket(it)) },
+        onBuy = { iniventory, map ->
+            mapViewModel.onEvent(MapViewModelEvents.UpdateMarket(map))
+            mapViewModel.onEvent(MapViewModelEvents.UpdateInventory(iniventory))
+        },
+//WTF BE STO SE NE POZIVAS???????????????????????????????????
+
+        )
 
 
 }

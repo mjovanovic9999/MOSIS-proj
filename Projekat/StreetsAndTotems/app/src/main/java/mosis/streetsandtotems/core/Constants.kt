@@ -13,6 +13,7 @@ object FirestoreConstants {
     const val USER_INVENTORY_COLLECTION = "user_inventory"
     const val MARKET_COLLECTION = "market"
     const val LEADERBOARD_COLLECTION = "leaderboard"
+    const val MARKET_DOCUMENT_ID = "market_document_id"
 
     const val ID_FIELD = "__name__"
     const val IMAGE_URI_FIELD = "image_uri"
@@ -241,7 +242,9 @@ object TitleConstants {
     const val CUSTOM_PIN_DIALOG_SOLO_PLACED_BY = "My pin"
     const val LEAVE_SQUAD = "Are you sure you want to leave your squad?"
     const val ITEMS_LEFT = " left"
-    const val BACKPACK_EMPTY_SPACES_LEFT = " backpack room"
+    const val BACKPACK_EMPTY_SPACES_LEFT = " backpack space"
+    const val BACKPACK_EMPTY_SPACE_AREA = "Backpack space"
+    const val PRICE = "Price"
 }
 
 object FormFieldConstants {
