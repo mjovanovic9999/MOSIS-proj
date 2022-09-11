@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
 import mosis.streetsandtotems.core.ItemsConstants
@@ -38,6 +39,7 @@ fun CustomDialogTitle(
     isTotem: Boolean = false,
     resourceType: IconType? = null,
     countMessage: String? = null,
+    backpackSpaceMessage: String? = null,
     needTotemAdditionalText: Boolean,
 ) {
     Row(
@@ -97,12 +99,23 @@ fun CustomDialogTitle(
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            if (countMessage != null)
-                Text(
-                    text = countMessage,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            if (countMessage != null && backpackSpaceMessage != null)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = countMessage,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                    Text(
+                        text = backpackSpaceMessage,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.End,
+                    )
+                }
         }
     }
 }

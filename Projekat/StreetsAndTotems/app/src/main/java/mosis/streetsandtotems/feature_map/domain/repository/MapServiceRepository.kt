@@ -37,7 +37,9 @@ interface MapServiceRepository {
         homeRemovedCallback: (home: HomeData) -> Unit,
     )
 
-    //fun registerCallbackOnUserDataUpdate()
+    fun registerCallbackOnUserInventoryUpdate(
+        userInventoryCallback: (userInventoryData: UserInventoryData) -> Unit
+    )
 
     //fun getCustomPins(): Flow<>
     fun removeAllCallbacks()

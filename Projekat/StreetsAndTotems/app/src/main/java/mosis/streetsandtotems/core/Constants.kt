@@ -250,6 +250,8 @@ object TitleConstants {
     const val CUSTOM_PIN_DIALOG_SQUAD_PLACED_BY = "Squad's pin placed by: "
     const val CUSTOM_PIN_DIALOG_SOLO_PLACED_BY = "My pin"
     const val LEAVE_SQUAD = "Are you sure you want to leave your squad?"
+    const val ITEMS_LEFT = " left"
+    const val BACKPACK_EMPTY_SPACES_LEFT=" backpack room"
 }
 
 object FormFieldConstants {
@@ -316,7 +318,6 @@ object ItemsConstants {
     const val BRICK = "Brick"
     const val EMERALD = "Emerald"
     const val TOTEM = "Totem"
-    const val ITEMS_LEFT = " left"
 }
 
 object TotemItemsConstants {

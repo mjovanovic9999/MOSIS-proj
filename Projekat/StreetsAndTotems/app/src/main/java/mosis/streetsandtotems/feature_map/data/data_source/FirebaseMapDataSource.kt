@@ -79,9 +79,10 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         db.collection(FirestoreConstants.RESOURCES_COLLECTION).document(resourceId).delete()
     }
 
-    suspend fun getPlayerInventory(userId: String): UserInventoryData? {
+    suspend fun getUserInventory(userId: String): UserInventoryData? {
         return db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION).document(userId).get()
             .await()
+
             .toObject(UserInventoryData::class.java)
 
 

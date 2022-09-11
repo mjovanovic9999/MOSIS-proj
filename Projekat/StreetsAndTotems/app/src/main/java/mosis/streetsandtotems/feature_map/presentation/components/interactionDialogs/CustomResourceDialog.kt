@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.feature_map.presentation.components
+package mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -14,7 +14,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import mosis.streetsandtotems.core.ButtonConstants
 import mosis.streetsandtotems.core.FormFieldConstants
-import mosis.streetsandtotems.core.ItemsConstants
+import mosis.streetsandtotems.core.TitleConstants.BACKPACK_EMPTY_SPACES_LEFT
+import mosis.streetsandtotems.core.TitleConstants.ITEMS_LEFT
 import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.ResourceType
@@ -24,7 +25,7 @@ import mosis.streetsandtotems.feature_map.presentation.util.updateOneInventoryDa
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
-fun ResourceItemDialog(
+fun CustomResourceDialog(
     isOpen: Boolean,
     resourceType: ResourceType?,
     onDismissRequest: () -> Unit,
@@ -50,7 +51,8 @@ fun ResourceItemDialog(
             CustomDialogTitle(
                 isTotem = false,
                 resourceType = convertResourceTypeToIconType(resourceType),
-                countMessage = itemsLeft.toString() + ItemsConstants.ITEMS_LEFT,
+                countMessage = itemsLeft.toString() + ITEMS_LEFT,
+                backpackSpaceMessage = emptySpaces.toString() + BACKPACK_EMPTY_SPACES_LEFT,
                 needTotemAdditionalText = false,
             )
         },
@@ -66,8 +68,8 @@ fun ResourceItemDialog(
                             onTake(
                                 updateOneInventoryData(
                                     oldInventoryData,
-                                    currentResourceCount + takeAmount.value.toInt(),
-                                    resourceType
+                                    newCount = (currentResourceCount + takeAmount.value.toInt()),
+                                    updateType = resourceType
                                 ),
                                 emptySpaces - takeAmount.value.toInt(),
                                 itemsLeft - takeAmount.value.toInt(),
@@ -81,6 +83,7 @@ fun ResourceItemDialog(
                     enabled = takeAmount.value != ""
                             && emptySpaces != null
                             && emptySpaces - takeAmount.value.toInt() >= 0
+                            && takeAmount.value.toInt() > 0
                             && itemsLeft != null
                             && itemsLeft - takeAmount.value.toInt() >= 0
                 )

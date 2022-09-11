@@ -105,6 +105,16 @@ class MapServiceRepositoryImpl(
         }
     }
 
+    override fun registerCallbackOnUserInventoryUpdate(userInventoryCallback: (userInventoryData: UserInventoryData) -> Unit) {
+        auth.currentUser?.let {
+            listenerRegistrations.add(
+                firebaseServiceDataSource.registerCallbacksOnUserInventoryUpdate(
+                    userInventoryCallback
+                )
+            )
+        }
+    }
+
 
     override fun removeAllCallbacks() {
         listenerRegistrations.forEach {
