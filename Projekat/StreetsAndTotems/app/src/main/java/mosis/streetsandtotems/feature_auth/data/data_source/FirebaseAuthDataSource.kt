@@ -21,4 +21,5 @@ class FirebaseAuthDataSource @Inject constructor(private val firebaseAuth: Fireb
 
     fun signInWithCredential(credentials: AuthCredential): Task<AuthResult> =
         firebaseAuth.signInWithCredential(credentials)
+
 }

@@ -278,7 +278,9 @@ class MapViewModel @Inject constructor(
                         composable =
                             {
                                 CustomPinImage(
-                                    imageUri = dataType.image ?: Uri.EMPTY,
+                                    imageUri = if (dataType.image_uri == null) Uri.EMPTY else Uri.parse(
+                                        dataType.image_uri
+                                    ),
                                     true//userData.squad_id != null && "MYSQUADID" != null && userData.squad_id == "MYSQUADID"
                                 )
                             }

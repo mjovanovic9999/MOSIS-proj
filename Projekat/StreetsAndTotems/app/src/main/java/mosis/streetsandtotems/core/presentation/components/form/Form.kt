@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import mosis.streetsandtotems.core.presentation.states.FormState
+import mosis.streetsandtotems.core.presentation.utils.drawVerticalScrollbar
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
@@ -25,7 +26,9 @@ fun <T : Any> Form(
 
     if (asColumn)
         Column(
-            modifier = modifier.verticalScroll(state = scrollState),
+            modifier = modifier
+                .verticalScroll(state = scrollState)
+                .drawVerticalScrollbar(scrollState),
             verticalArrangement = Arrangement.spacedBy(spacing),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

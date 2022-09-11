@@ -21,6 +21,7 @@ import mosis.streetsandtotems.core.domain.model.SnackbarSettings
 import mosis.streetsandtotems.core.domain.util.handleResponse
 import mosis.streetsandtotems.core.domain.validators.validatePhoneNumber
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
+import mosis.streetsandtotems.core.presentation.components.form.formfields.ImageSelectFormField
 import mosis.streetsandtotems.core.presentation.components.form.formfields.TextFormField
 import mosis.streetsandtotems.core.presentation.states.FormState
 import mosis.streetsandtotems.feature_auth.domain.use_case.AuthUseCases
@@ -40,6 +41,17 @@ class SignupViewModel @Inject constructor(
             SignUpState(
                 signUpScreenEventFlow = _signUpScreenEventFlow, formState = FormState(
                     fields = listOf(
+                        TextFormField(
+                            initial = "",
+                            name = FormFieldNamesConstants.USER_NAME,
+                            validators = listOf(Validators.Required(MessageConstants.USER_NAME_REQUIRED)),
+                            label = FormFieldConstants.USER_NAME,
+                            placeholder = FormFieldConstants.USER_NAME,
+                            textFieldType = CustomTextFieldType.Outlined,
+                            singleLine = true,
+                            clearable = true,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        ),
                         TextFormField(
                             initial = "",
                             name = FormFieldNamesConstants.FIRST_NAME,
@@ -90,7 +102,10 @@ class SignupViewModel @Inject constructor(
                             textFieldType = CustomTextFieldType.Outlined,
                             singleLine = true,
                             clearable = true,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Email,
+                                imeAction = ImeAction.Next
+                            )
                         ),
                         TextFormField(
                             initial = "",
@@ -149,10 +164,15 @@ class SignupViewModel @Inject constructor(
                                 )
                             },
                             keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Done,
+                                imeAction = ImeAction.Next,
                                 keyboardType = KeyboardType.Password
                             ),
-                            keyboardActions = KeyboardActions(onDone = { signUpWithEmailAndPasswordHandler() }),
+                            keyboardActions = KeyboardActions(onNext = { signUpWithEmailAndPasswordHandler() }),
+                        ),
+                        ImageSelectFormField(
+                            name = FormFieldNamesConstants.IMAGE_URI,
+                            initial = "",
+                            validators = listOf(Validators.Required(MessageConstants.IMAGE_REQUIRED))
                         )
                     ),
                     SignUpFields::class,
@@ -178,7 +198,7 @@ class SignupViewModel @Inject constructor(
             viewModelScope.launch {
                 handleResponse(
                     authUseCases.emailAndPasswordSignUp(
-                        signUpFields.email,
+                        profileData = signUpFields,
                         signUpFields.password
                     ),
                     snackbarFlow = snackbarFlow,
@@ -188,8 +208,9 @@ class SignupViewModel @Inject constructor(
                     onSuccess = {
                         viewModelScope.launch {
                             Log.d("tag", authUseCases.isUserAuthenticated().toString())
+                            authUseCases.signOut()
 
-                        //                            handleSignInWithEmailAndPassword(
+                            //                            handleSignInWithEmailAndPassword(
 //                                email = signUpFields.email,
 //                                password = signUpFields.password,
 //                                onSuccess = {

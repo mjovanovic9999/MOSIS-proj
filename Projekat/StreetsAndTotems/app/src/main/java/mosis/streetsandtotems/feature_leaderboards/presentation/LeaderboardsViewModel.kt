@@ -4,7 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import mosis.streetsandtotems.feature_leaderboards.domain.model.LeaderboardUser
+import mosis.streetsandtotems.feature_leaderboards.domain.model.LeaderboardUserData
 import javax.inject.Inject
 
 @HiltViewModel
@@ -13,28 +13,28 @@ class LeaderboardsViewModel @Inject constructor() : ViewModel() {
         mutableStateOf(
             LeaderboardsState(
                 listOf(
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
-                    LeaderboardUser("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
+                    LeaderboardUserData("KorisnickoIme1", 12345),
                 ),
                 playerDialogOpen = false
             ),

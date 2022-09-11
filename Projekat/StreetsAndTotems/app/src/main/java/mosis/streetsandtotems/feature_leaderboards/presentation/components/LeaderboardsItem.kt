@@ -10,11 +10,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import mosis.streetsandtotems.core.LeaderboardItemsConstants
 import mosis.streetsandtotems.core.presentation.components.CustomLazyColumnItem
-import mosis.streetsandtotems.feature_leaderboards.domain.model.LeaderboardUser
+import mosis.streetsandtotems.feature_leaderboards.domain.model.LeaderboardUserData
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
-fun LeaderboardsItem(index: Int, leaderboardUser: LeaderboardUser, onButtonClick: () -> Unit) {
+fun LeaderboardsItem(index: Int, leaderboardUser: LeaderboardUserData, onButtonClick: () -> Unit) {
     CustomLazyColumnItem(onButtonClick = onButtonClick) {
         Text(
             text = "$index.",

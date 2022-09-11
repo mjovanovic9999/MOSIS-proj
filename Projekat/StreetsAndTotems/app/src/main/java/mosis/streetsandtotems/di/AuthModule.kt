@@ -65,6 +65,7 @@ object AuthModule {
             authDataSource = authDataSource,
             oneTapGoogleDataSource = oneTapGoogleDataSource,
             preferencesDataStore = preferencesDataStore,
+            firestoreAuthDataSource = firestoreAuthDataSource
         )
 
     @Provides

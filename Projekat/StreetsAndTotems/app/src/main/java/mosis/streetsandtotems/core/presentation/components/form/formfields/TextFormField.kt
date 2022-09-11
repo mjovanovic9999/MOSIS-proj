@@ -20,7 +20,8 @@ import com.dsc.form_builder.Validators
 import mosis.streetsandtotems.core.presentation.components.CustomTextField
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 
-class TextFormField @OptIn(ExperimentalMaterial3Api::class) constructor(
+@OptIn(ExperimentalMaterial3Api::class)
+class TextFormField(
     initial: String,
     name: String,
     validators: List<Validators> = emptyList(),
@@ -51,7 +52,6 @@ class TextFormField @OptIn(ExperimentalMaterial3Api::class) constructor(
         transform = transform
     )
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         Column() {

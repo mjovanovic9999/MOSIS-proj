@@ -44,8 +44,6 @@ fun SignUpScreen(viewModel: SignupViewModel, destinationsNavigator: Destinations
         content = {
             Form(formState = state.formState, asColumn = false)
 
-            CustomImageSelectorAndCropper()
-
             CustomButton(
                 matchParentWidth = true,
                 clickHandler = { viewModel.onEvent(SignUpViewModelEvents.SignUpWithEmailAndPassword) },

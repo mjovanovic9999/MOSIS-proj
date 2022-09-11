@@ -9,7 +9,9 @@ data class SignUpFieldsEmpty(
     var phoneNumber: Boolean = true,
     var email: Boolean = true,
     var password: Boolean = true,
-    var repeatPassword: Boolean = true
+    var repeatPassword: Boolean = true,
+    var imageUri: Boolean = true,
+    var userName: Boolean = true
 ) : FieldsEmpty {
     override fun setFieldEmpty(name: String, empty: Boolean) {
         when (name) {
@@ -31,10 +33,16 @@ data class SignUpFieldsEmpty(
             FormFieldNamesConstants.REPEAT_PASSWORD -> {
                 repeatPassword = empty
             }
+            FormFieldNamesConstants.IMAGE_URI -> {
+                imageUri = empty
+            }
+            FormFieldNamesConstants.USER_NAME -> {
+                userName = empty
+            }
         }
     }
 
     override fun anyFieldIsEmpty(): Boolean {
-        return firstName || lastName || phoneNumber || email || password || repeatPassword
+        return firstName || lastName || phoneNumber || email || password || repeatPassword || imageUri || userName
     }
 }

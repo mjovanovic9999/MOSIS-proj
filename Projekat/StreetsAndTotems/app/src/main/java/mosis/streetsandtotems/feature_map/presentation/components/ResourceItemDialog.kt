@@ -1,15 +1,15 @@
 package mosis.streetsandtotems.feature_map.presentation.components
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import mosis.streetsandtotems.core.ButtonConstants
@@ -97,7 +97,11 @@ fun ResourceItemDialog(
                     placeholder = FormFieldConstants.AMOUNT,
                     label = FormFieldConstants.AMOUNT,
                     textFieldType = CustomTextFieldType.Outlined,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.NumberPassword,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(onAny = {}),
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
                 )
             }

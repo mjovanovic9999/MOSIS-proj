@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
-import android.net.Uri
 import android.util.Log
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
@@ -40,7 +39,7 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
                         it.toObject<ProfileData>()
                             .copy(
                                 id = it.id,
-                                image = Uri.parse(it.data[FirestoreConstants.IMAGE_URI_FIELD].toString())
+                                image_uri = it.data[FirestoreConstants.IMAGE_URI_FIELD].toString()
                             )
                     }
                 )

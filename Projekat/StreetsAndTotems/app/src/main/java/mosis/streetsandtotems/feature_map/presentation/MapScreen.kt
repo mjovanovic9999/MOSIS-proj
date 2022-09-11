@@ -1,14 +1,13 @@
 package mosis.streetsandtotems.feature_map.presentation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.toLowerCase
 import com.ramcosta.composedestinations.annotation.Destination
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import mosis.streetsandtotems.feature_map.presentation.components.*
-import mosis.streetsandtotems.feature_map.presentation.util.getCountResourceTypeFromInventory
 import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
 
 @MainNavGraph(start = true)
@@ -51,7 +50,7 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         firstName = state.selectedPlayer.first_name,
         lastName = state.selectedPlayer.last_name,
         userName = state.selectedPlayer.user_name,
-        image = state.selectedPlayer.image
+        image = if (state.selectedPlayer.image_uri == null) Uri.EMPTY else Uri.parse(state.selectedPlayer.image_uri)
     )
 
     CustomFilterDialog(

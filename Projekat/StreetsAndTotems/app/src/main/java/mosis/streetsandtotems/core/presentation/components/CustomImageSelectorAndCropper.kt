@@ -15,20 +15,28 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.options
 import com.skydoves.landscapist.glide.GlideImage
+import mosis.streetsandtotems.core.ConversionConstants
 import mosis.streetsandtotems.core.FormFieldConstants
 import mosis.streetsandtotems.ui.theme.sizes
+import java.io.File
+import java.util.*
 
 
 @Composable
 fun CustomImageSelectorAndCropper(
+    focusRequester: FocusRequester? = null,
     onImageSelected: ((Uri?) -> Unit)? = null,
-    showErrorSnackbar: ((String) -> Unit)? = null
+    showErrorSnackbar: ((String) -> Unit)? = null,
 ) {
+    val context = LocalContext.current
     var imageUri by remember {
         mutableStateOf<Uri?>(null)
     }
@@ -36,25 +44,32 @@ fun CustomImageSelectorAndCropper(
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
             imageUri = result.uriContent
-            onImageSelected?.invoke(imageUri)
+            val imagePath = result.getUriFilePath(context)
+            imagePath?.let {
+                val imageBytes = File(imagePath).readBytes()
+                val base64 = Base64.getEncoder().encodeToString(imageBytes)
+                onImageSelected?.invoke(Uri.parse(ConversionConstants.BASE64_IMAGE_PREFIX + base64))
+            }
         } else {
             showErrorSnackbar?.invoke(result.error?.message.toString())
         }
     }
 
+    val modifier = Modifier
+        .size(MaterialTheme.sizes.image_select_size)
+        .background(
+            MaterialTheme.colorScheme.secondaryContainer,
+            RoundedCornerShape(MaterialTheme.sizes.default_shape_corner)
+        )
+        .clickable {
+            imageCropLauncher.launch(options {
+                setImageSource(includeGallery = true, includeCamera = true)
+                setAspectRatio(1, 1)
+            })
+        }
+
     Box(
-        modifier = Modifier
-            .size(MaterialTheme.sizes.image_select_size)
-            .background(
-                MaterialTheme.colorScheme.secondaryContainer,
-                RoundedCornerShape(MaterialTheme.sizes.default_shape_corner)
-            )
-            .clickable {
-                imageCropLauncher.launch(options {
-                    setImageSource(includeGallery = true, includeCamera = true)
-                    setAspectRatio(1, 1)
-                })
-            }
+        modifier = if (focusRequester != null) modifier.focusRequester(focusRequester) else modifier
     ) {
         if (imageUri != null) {
             GlideImage(
@@ -82,14 +97,6 @@ fun CustomImageSelectorAndCropper(
                 )
             }
         }
-    }
-    if (imageUri != null) {
-        Text(
-            text = FormFieldConstants.CHANGE_PHOTO,
-            style = MaterialTheme.typography.labelSmall.plus(
-                TextStyle(MaterialTheme.colorScheme.primary)
-            )
-        )
     }
 }
 

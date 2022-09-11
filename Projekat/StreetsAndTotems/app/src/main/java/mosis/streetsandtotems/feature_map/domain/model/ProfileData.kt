@@ -13,7 +13,7 @@ data class ProfileData(
     val phone_number: String? = null,
     val squad_id: String? = null,
     val email: String? = null,
-    val image: Uri? = null,
+    val image_uri: String? = null,
     val call_privacy_level: PrivacySettings? = null,
     val messaging_privacy_level: PrivacySettings? = null,
     @field:JvmField

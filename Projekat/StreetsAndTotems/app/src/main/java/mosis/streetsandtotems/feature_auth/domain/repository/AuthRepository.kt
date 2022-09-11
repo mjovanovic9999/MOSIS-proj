@@ -6,15 +6,19 @@ import com.google.android.gms.auth.api.identity.SignInCredential
 import kotlinx.coroutines.flow.Flow
 import mosis.streetsandtotems.core.domain.model.Response
 import mosis.streetsandtotems.feature_auth.domain.model.SignInError
+import mosis.streetsandtotems.feature_auth.presentation.util.SignUpFields
 
 interface AuthRepository {
     fun isUserAuthenticated(): Boolean
 
     suspend fun emailAndPasswordSignIn(email: String, password: String): Flow<Response<SignInError>>
 
-    suspend fun emailAndPasswordSignUp(email: String, password: String): Flow<Response<Nothing>>
+    suspend fun emailAndPasswordSignUp(
+        password: String,
+        profileData: SignUpFields
+    ): Flow<Response<Nothing>>
 
-    suspend fun signOut(): Flow<Response<Nothing>>
+    suspend fun signOut(emitError: Boolean = true): Flow<Response<Nothing>>
 
     suspend fun oneTapSignInWithGoogle(): Flow<Response<BeginSignInResult>>
 
@@ -24,4 +28,5 @@ interface AuthRepository {
 
     fun getSignInCredentialFromIntent(intent: Intent): SignInCredential
 
+    suspend fun sendValidationEmail(): Flow<Response<Nothing>>
 }

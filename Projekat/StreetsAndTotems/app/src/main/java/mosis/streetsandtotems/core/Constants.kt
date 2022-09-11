@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.core
 
-import mosis.streetsandtotems.core.presentation.components.IconType
 import kotlin.math.PI
 
 
@@ -71,6 +70,10 @@ object DINameConstants {
     const val SIGN_UP_REQUEST = "SignUpRequest"
 }
 
+object ConversionConstants {
+    const val BASE64_IMAGE_PREFIX = "data:image/png;base64,"
+}
+
 object ButtonConstants {
     const val SIGN_IN = "Sign In"
     const val SIGN_IN_GOOGLE = "Sign in with Google"
@@ -121,6 +124,8 @@ object FormFieldNamesConstants {
     const val REPEAT_PASSWORD = "repeatPassword"
     const val CURRENT_PASSWORD = "currentPassword"
     const val NEW_PASSWORD = "newPassword"
+    const val IMAGE_URI = "imageUri"
+    const val USER_NAME = "userName"
 }
 
 object ImageContentDescriptionConstants {
@@ -195,6 +200,8 @@ object HandleResponseConstants {
 }
 
 object MessageConstants {
+    const val USER_NAME_REQUIRED = "Username is required!"
+    const val IMAGE_REQUIRED = "Image is required!"
     const val SIGN_OUT_ERROR = "An error occurred while signing you out!"
     const val GOOGLE_SIGN_IN_FAILED = "Google sign in failed! Please try again or contact support!"
     const val TOO_MANY_LOGIN_ATTEMPTS = "Too many login attempts! Account temporarily disabled!"
@@ -258,6 +265,7 @@ object FormFieldConstants {
     const val CURRENT_PASSWORD = "Current password"
     const val AMOUNT = "Amount"
     const val DEFAULT_AMOUNT = "1"
+    const val USER_NAME = "Username"
 }
 
 object NavBarConstants {
@@ -342,13 +350,17 @@ object PreferencesDataStoreConstants {
 
     const val RUN_IN_BACKGROUND_PREFERENCES = "RUN_IN_BACKGROUND"
     const val SHOW_NOTIFICATIONS_PREFERENCES = "SHOW_NOTIFICATIONS"
-    const val SHOW_MY_PHONE_NUMBER_PREFERENCES = "SHOW_MY_PHONE_NUMBER"
     const val CALL_PRIVACY_LEVEL_PREFERENCES = "CALL_PRIVACY_LEVEL"
     const val SMS_PRIVACY_LEVEL_PREFERENCES = "SMS_PRIVACY_LEVEL"
     const val AUTH_PROVIDER_PREFERENCES = "AUTH_PROVIDER"
 
     const val USER_ID_PREFERENCES = "USER_DATA"
     const val SQUAD_ID_PREFERENCES = "SQUAD_ID"
+}
+
+object BackpackConstants {
+    const val DEFAULT_SIZE = 20
+    const val DEFAULT_TOTEM_COUNT = 1
 }
 
 object PointsConversion {
@@ -362,5 +374,4 @@ object PointsConversion {
     const val HIGH = 200
 
 
-   
 }
