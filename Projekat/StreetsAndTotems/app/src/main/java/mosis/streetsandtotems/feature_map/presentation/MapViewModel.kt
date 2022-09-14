@@ -125,9 +125,10 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.ShowResourceDialog -> showResourceDialogHandler()
             MapViewModelEvents.CloseResourceDialog -> closeResourceDialogHandler()
             is MapViewModelEvents.UpdateInventory -> updateInventoryHandler(event.newUserInventoryData)
-            is MapViewModelEvents.UpdateResource -> updateResourceHandler(
-                event.newCount,
-            )
+            is MapViewModelEvents.UpdateResource -> updateResourceHandler(event.newCount)
+            MapViewModelEvents.ShowMarketDialog -> showMarketDialogHandler()
+            MapViewModelEvents.CloseMarketDialog -> closeMarketDialogHandler()
+            is MapViewModelEvents.UpdateMarket -> updateMarketHandler(event.newMarket)
         }
     }
 
@@ -193,6 +194,8 @@ class MapViewModel @Inject constructor(
             resourceDialogOpen = false,
             selectedResource = ResourceData(),
             playerInventory = UserInventoryData(),
+            market = MarketData(),
+            marketDialogOpen = false,
         )
         )
     }
@@ -224,7 +227,7 @@ class MapViewModel @Inject constructor(
 
             }
             is LocationServiceEvents.PinDataChanged<*> -> handlePinAction(event.pinAction)
-            is LocationServiceEvents.UserInventoryChanged -> onUserInventoryChangedHandler(event.newInventory)
+            is LocationServiceEvents.UserInventoryChanged -> onUserInventoryChangedHandler(event.newInventory)//treba li ovamo market home
         }
     }
 
@@ -284,6 +287,10 @@ class MapViewModel @Inject constructor(
                             }
                     }
                 }
+                is MarketData -> {
+                    _mapScreenState.value = _mapScreenState.value.copy(market = dataType)
+                    composable = { CustomPin(resourceId = R.drawable.pin_market) }
+                }
             }
             if (composable != null) {
                 addPin(it, dataType.l, composable)
@@ -314,14 +321,12 @@ class MapViewModel @Inject constructor(
                 }
                 is CustomPinData -> {
                     oldData = customPinsHashMap.put(it, dataType)
-
                 }
                 is ResourceData -> {
                     oldData = resourcesHashMap.put(it, dataType)
                 }
                 is TotemData -> {
                     oldData = totemsHashMap.put(it, dataType)
-
                 }
                 is ProfileData -> {
                     if (dataType.is_online == true) {
@@ -330,6 +335,10 @@ class MapViewModel @Inject constructor(
                         else addPinHash(dataType)
                     } else removePinHash(dataType)
 
+                }
+                is MarketData -> {
+                    oldData = _mapScreenState.value.market
+                    _mapScreenState.value = _mapScreenState.value.copy(market = dataType)
                 }
             }
             if (oldData != null) {
@@ -352,6 +361,7 @@ class MapViewModel @Inject constructor(
             when (dataType) {
                 is HomeData -> {
                     _mapScreenState.value = mapScreenState.value.copy(home = HomeData())
+                    customPinsHashMap.remove(it)
                 }
                 is CustomPinData -> {
                     customPinsHashMap.remove(it)
@@ -364,6 +374,10 @@ class MapViewModel @Inject constructor(
                 }
                 is ProfileData -> {
                     playersHashMap.remove(it)
+                }
+                is MarketData -> {
+                    _mapScreenState.value = mapScreenState.value.copy(home = HomeData())
+                    customPinsHashMap.remove(it)
                 }
             }
             removePin(it)
@@ -561,6 +575,8 @@ class MapViewModel @Inject constructor(
                     placedBy = customPin.placed_by,
                     customPin.text
                 )
+            } else if (mapScreenState.value.market.id == "market_document_id") {
+                showMarketDialogHandler()
             }
         }
     }
@@ -590,6 +606,8 @@ class MapViewModel @Inject constructor(
 //            R.drawable.pin_custom
 //        )
 //    }
+
+    //region handlers
 
     private fun showCustomPinDialogHandler(
         l: GeoPoint?,
@@ -649,7 +667,6 @@ class MapViewModel @Inject constructor(
             filterResources.emit(!filterResources.value)
             _mapScreenState.value =
                 _mapScreenState.value.copy(filterResources = !_mapScreenState.value.filterResources)
-
         }
     }
 
@@ -683,6 +700,17 @@ class MapViewModel @Inject constructor(
                 )
         }
     }
+
+    private fun showMarketDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(marketDialogOpen = true)
+    }
+
+    private fun closeMarketDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(marketDialogOpen = false)
+    }
+
+//endregion
+
 
     //region firebase functions
 
@@ -725,7 +753,7 @@ class MapViewModel @Inject constructor(
     private fun addHomeHandler() {
         viewModelScope.launch {
             mapViewModelRepository.addHome(
-                "MOJID",
+                "MOJID",////////////////////////////
                 GeoPoint(43.313198, 21.906673)
             )
         }
@@ -739,9 +767,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun updateResourceHandler(
-        newCount: Int,
-    ) {
+    private fun updateResourceHandler(newCount: Int) {
         viewModelScope.launch {
             mapScreenState.value.selectedResource.id?.let { id ->
                 mapViewModelRepository.updateResource(id, newCount)
@@ -750,19 +776,21 @@ class MapViewModel @Inject constructor(
     }
 
 
-    private fun updateInventoryHandler(
-        newUserInventoryData: UserInventoryData
-    ) {
+    private fun updateInventoryHandler(newUserInventoryData: UserInventoryData) {
         viewModelScope.launch {
-            mapScreenState.value.selectedResource.type?.let {
-                mapViewModelRepository.updateUserInventory(
-                    "VlYnaW2Mf5NuxzdnpYM2vBmckuE2",
-                    newUserInventoryData
-                )
-            }
+            mapViewModelRepository.updateUserInventory(
+                "Q0Wy3JXFjjNFSBDzgvw4L66Ud6J2",
+                newUserInventoryData
+            )
         }
     }
 
+
+    private fun updateMarketHandler(newMarket: Map<String, MarketItem>) {
+        viewModelScope.launch {
+            mapViewModelRepository.updateMarket(newMarket)
+        }
+    }
 
 //endregion
 

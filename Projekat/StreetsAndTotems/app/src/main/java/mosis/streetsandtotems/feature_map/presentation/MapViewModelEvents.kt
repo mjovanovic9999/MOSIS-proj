@@ -1,4 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
+
+import mosis.streetsandtotems.feature_map.domain.model.MarketItem
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 
 sealed class MapViewModelEvents {
@@ -19,9 +21,10 @@ sealed class MapViewModelEvents {
     object RemoveHome : MapViewModelEvents()
     object ShowResourceDialog : MapViewModelEvents()
     object CloseResourceDialog : MapViewModelEvents()
-    data class UpdateResource(val newCount: Int) :
-        MapViewModelEvents()
+    data class UpdateResource(val newCount: Int) : MapViewModelEvents()
+    data class UpdateInventory(val newUserInventoryData: UserInventoryData) : MapViewModelEvents()
+    object ShowMarketDialog : MapViewModelEvents()
+    object CloseMarketDialog : MapViewModelEvents()
+    data class UpdateMarket(val newMarket: Map<String, MarketItem>) : MapViewModelEvents()
 
-    data class UpdateInventory(val newUserInventoryData: UserInventoryData) :
-        MapViewModelEvents()
 }

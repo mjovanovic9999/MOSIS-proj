@@ -90,9 +90,9 @@ class MapServiceRepositoryImpl(
 
 
     override fun registerCallbackOnHomesUpdate(
-        homeAddedCallback: (user: HomeData) -> Unit,
-        homeModifiedCallback: (user: HomeData) -> Unit,
-        homeRemovedCallback: (user: HomeData) -> Unit,
+        homeAddedCallback: (home: HomeData) -> Unit,
+        homeModifiedCallback: (home: HomeData) -> Unit,
+        homeRemovedCallback: (home: HomeData) -> Unit,
     ) {
         auth.currentUser?.let {
             listenerRegistrations.add(
@@ -109,12 +109,28 @@ class MapServiceRepositoryImpl(
         auth.currentUser?.let {
             listenerRegistrations.add(
                 firebaseServiceDataSource.registerCallbacksOnUserInventoryUpdate(
+                    it,
                     userInventoryCallback
                 )
             )
         }
     }
 
+    override fun registerCallbackOnMarketUpdate(
+        marketAddedCallback: (market: MarketData) -> Unit,
+        marketModifiedCallback: (market: MarketData) -> Unit,
+        marketRemovedCallback: (market: MarketData) -> Unit,
+    ) {
+        auth.currentUser?.let {
+            listenerRegistrations.add(
+                firebaseServiceDataSource.registerCallbacksOnMarketUpdate(
+                    marketAddedCallback = marketAddedCallback,
+                    marketModifiedCallback = marketModifiedCallback,
+                    marketRemovedCallback = marketRemovedCallback,
+                )
+            )
+        }
+    }
 
     override fun removeAllCallbacks() {
         listenerRegistrations.forEach {

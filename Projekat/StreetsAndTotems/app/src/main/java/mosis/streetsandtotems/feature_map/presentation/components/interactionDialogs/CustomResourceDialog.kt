@@ -81,11 +81,10 @@ fun CustomResourceDialog(
                     buttonType = CustomButtonType.Outlined,
                     textStyle = MaterialTheme.typography.titleMedium,
                     enabled = takeAmount.value != ""
-                            && emptySpaces != null
-                            && emptySpaces - takeAmount.value.toInt() >= 0
                             && takeAmount.value.toInt() > 0
+                            && emptySpaces != null && emptySpaces > 0
                             && itemsLeft != null
-                            && itemsLeft - takeAmount.value.toInt() >= 0
+                            && itemsLeft >= takeAmount.value.toInt()
                 )
                 CustomTextField(
                     modifier = Modifier
@@ -94,18 +93,27 @@ fun CustomResourceDialog(
                     value = takeAmount.value,
                     onValueChange = {
                         if (it != "") {
-                            if (itemsLeft != null && itemsLeft >= it.toInt()) takeAmount.value = it
+                            if (itemsLeft != null
+                                && itemsLeft >= it.toInt()
+                                && (takeAmount.value == ""
+                                        || (emptySpaces != null
+                                        && emptySpaces - it.toInt() >= 0
+                                        && it.toInt() > 0
+                                        ))
+                            )
+                                if (it.length == 1)
+                                    takeAmount.value = it
+                                else if (it.first() == '0') {
+                                    takeAmount.value = it.toInt().toString()
+                                }
                         } else takeAmount.value = it
                     },
                     placeholder = FormFieldConstants.AMOUNT,
                     label = FormFieldConstants.AMOUNT,
                     textFieldType = CustomTextFieldType.Outlined,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.NumberPassword,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(onAny = {}),
-                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                    singleLine = true,
                 )
             }
         },

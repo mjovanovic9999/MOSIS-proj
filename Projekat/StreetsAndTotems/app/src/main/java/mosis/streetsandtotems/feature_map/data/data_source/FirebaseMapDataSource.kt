@@ -1,11 +1,14 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FirestoreConstants
+import mosis.streetsandtotems.core.FirestoreConstants.MARKET_DOCUMENT_ID
 import mosis.streetsandtotems.core.domain.model.UserData
+import mosis.streetsandtotems.feature_map.domain.model.MarketItem
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 
 class FirebaseMapDataSource(private val db: FirebaseFirestore) {
@@ -82,18 +85,15 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     suspend fun getUserInventory(userId: String): UserInventoryData? {
         return db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION).document(userId).get()
             .await()
-
             .toObject(UserInventoryData::class.java)
-
-
     }
 
-    fun updateUserInventory(
+    suspend fun updateUserInventory(
         myId: String,
         newUserInventoryData: UserInventoryData
     ) {
         db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION).document(myId)
-            .set(newUserInventoryData)
+            .set(newUserInventoryData).await()
     }
 
     fun updateUserOnlineStatus(isOnline: Boolean, userId: String): Task<Void> {
@@ -105,4 +105,10 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         return db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION).document(userId).get()
             .await().toObject(UserData::class.java)
     }
+
+    suspend fun updateMarket(newMarket: Map<String, MarketItem>) {
+        db.collection(FirestoreConstants.MARKET_COLLECTION).document(MARKET_DOCUMENT_ID)
+            .update(mapOf("items" to newMarket))
+    }
+
 }

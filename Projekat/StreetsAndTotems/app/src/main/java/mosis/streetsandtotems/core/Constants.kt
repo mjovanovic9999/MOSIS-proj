@@ -10,7 +10,9 @@ object FirestoreConstants {
     const val CUSTOM_PINS_COLLECTION = "custom_pins"
     const val HOMES_COLLECTION = "homes"
     const val USER_INVENTORY_COLLECTION = "user_inventory"
+    const val MARKET_COLLECTION = "market"
     const val LEADERBOARD_COLLECTION = "leaderboard"
+    const val MARKET_DOCUMENT_ID = "market_document_id"
 
     const val ID_FIELD = "__name__"
     const val IMAGE_URI_FIELD = "image_uri"
@@ -152,10 +154,6 @@ object PinConstants {
     const val HOME = "HOME"
     const val HOME_DISCOVERY = "HOME_DISCOVERY"
     const val RESOURCES = "RESOURCES"
-    const val RESOURCES_EMERALDS = RESOURCES + "_EMERALDS"
-    const val RESOURCES_BRICKS = RESOURCES + "_BRICKS"
-    const val RESOURCES_WOODS = RESOURCES + "_WOODS"
-    const val RESOURCES_STONES = RESOURCES + "_STONES"
     const val FRIENDS = "FRIENDS"
     const val TOTEMS = "TOTEMS"
     const val CUSTOM = "CUSTOM"
@@ -181,7 +179,7 @@ object MapConstants {
     const val TILE_URL_256 = "https://api.maptiler.com/maps/openstreetmap/256/"
     const val TILE_KEY = "njA6yIfsMq23cZHLTop1"
     const val MAP_PRECISION_METERS = 2f
-    const val MAXIMUM_IGNORE_ACCURACY_METERS = 100f
+    const val MAXIMUM_IGNORE_ACCURACY_METERS = 2000f
     const val MAXIMUM_TRADE_DISTANCE_IN_METERS = 20f
     const val PREFERRED_INTERVAL = 4000L
 }
@@ -251,7 +249,9 @@ object TitleConstants {
     const val CUSTOM_PIN_DIALOG_SOLO_PLACED_BY = "My pin"
     const val LEAVE_SQUAD = "Are you sure you want to leave your squad?"
     const val ITEMS_LEFT = " left"
-    const val BACKPACK_EMPTY_SPACES_LEFT=" backpack room"
+    const val BACKPACK_EMPTY_SPACES_LEFT = " backpack space"
+    const val BACKPACK_EMPTY_SPACE_AREA = "Backpack space"
+    const val PRICE = "Price"
 }
 
 object FormFieldConstants {

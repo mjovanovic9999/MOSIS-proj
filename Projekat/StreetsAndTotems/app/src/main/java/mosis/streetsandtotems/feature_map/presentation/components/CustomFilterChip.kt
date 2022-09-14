@@ -22,6 +22,5 @@ fun CustomFilterChip(selected: Boolean, updateFilter: () -> Unit, labelText: Str
                     contentDescription = null
                 )
         },
-//        trailingIcon = { Pin(resourceId = R.drawable.tiki) },
     )
 }

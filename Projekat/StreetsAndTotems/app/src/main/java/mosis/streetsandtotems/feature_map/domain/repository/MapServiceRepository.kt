@@ -41,6 +41,12 @@ interface MapServiceRepository {
         userInventoryCallback: (userInventoryData: UserInventoryData) -> Unit
     )
 
+    fun registerCallbackOnMarketUpdate(
+        marketAddedCallback: (market: MarketData) -> Unit,
+        marketModifiedCallback: (market: MarketData) -> Unit,
+        marketRemovedCallback: (market: MarketData) -> Unit,
+    )
+
     //fun getCustomPins(): Flow<>
     fun removeAllCallbacks()
 }

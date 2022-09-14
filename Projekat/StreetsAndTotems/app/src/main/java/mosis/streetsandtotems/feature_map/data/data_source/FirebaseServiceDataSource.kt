@@ -128,9 +128,11 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
     }
 
     fun registerCallbacksOnUserInventoryUpdate(
+        currentUser: FirebaseUser,
         userInventoryCallback: (UserInventoryData) -> Unit
     ): ListenerRegistration {
         return db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION)
+            .whereEqualTo(FirestoreConstants.ID_FIELD, currentUser.uid)
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
                     e,
@@ -141,6 +143,29 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
                 )
             }
     }
+
+
+    fun registerCallbacksOnMarketUpdate(
+        marketAddedCallback: (market: MarketData) -> Unit,
+        marketModifiedCallback: (market: MarketData) -> Unit,
+        marketRemovedCallback: (market: MarketData) -> Unit
+    ): ListenerRegistration {
+        return db.collection(FirestoreConstants.MARKET_COLLECTION)
+            .addSnapshotListener { snapshots, e ->
+                collectionSnapshotListenerCallback(
+                    e,
+                    snapshots,
+                    marketAddedCallback,
+                    marketModifiedCallback,
+                    marketRemovedCallback,
+                    customConversion = {
+                        it.toObject<MarketData>()
+                            .copy(id = it.id)
+                    }
+                )
+            }
+    }
+
 
     private inline fun <reified T> collectionSnapshotListenerCallback(
         e: FirebaseFirestoreException?,

@@ -45,6 +45,7 @@ data class Sizes(
     val drop_item_dialog_icon_size: Dp = 48.dp,
     val drop_item_dialog_icon_padding: Dp = 10.dp,
     val drop_item_dialog_width: Float = 0.9f,
+    val drop_item_dialog_width_extended: Float = 0.95f,
     val drop_item_dialog_amount_text_field_height: Dp = 60.dp,
     val drop_item_dialog_spacer: Dp = 10.dp,
     val lazy_column_spacing: Dp = 10.dp,
