@@ -21,7 +21,6 @@ data class MapScreenState(
     val totemsHashMap: Map<String, TotemData>,
     val customPinsHashMap: Map<String, CustomPinData>,
 
-    val home: HomeData,
 
     val playerLocation: GeoPoint,
     val playerInventory: UserInventoryData,
@@ -29,12 +28,14 @@ data class MapScreenState(
     val playerDialogOpen: Boolean,
     val selectedPlayer: ProfileData,
 
-
     val resourceDialogOpen: Boolean,
     val selectedResource: ResourceData,
 
     val market: MarketData,
     val marketDialogOpen: Boolean,
+
+    val home: HomeData,
+    val homeDialogOpen: Boolean,
 )
 
 

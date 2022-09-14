@@ -2,7 +2,6 @@ package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -129,6 +128,9 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.ShowMarketDialog -> showMarketDialogHandler()
             MapViewModelEvents.CloseMarketDialog -> closeMarketDialogHandler()
             is MapViewModelEvents.UpdateMarket -> updateMarketHandler(event.newMarket)
+            MapViewModelEvents.CloseHomeDialog -> showHomeDialogHandler()
+            MapViewModelEvents.ShowHomeDialog -> closeHomeDialogHandler()
+            is MapViewModelEvents.UpdateHome -> updateHomeDialogHandler(event.newHome)
         }
     }
 
@@ -186,7 +188,6 @@ class MapViewModel @Inject constructor(
             totemsHashMap = totemsHashMap,
             customPinsHashMap = customPinsHashMap,
             selectedPlayer = ProfileData(),
-            home = HomeData(),
             playerLocation = GeoPoint(
                 INIT_SCROLL_LAT,
                 INIT_SCROLL_LNG
@@ -196,6 +197,8 @@ class MapViewModel @Inject constructor(
             playerInventory = UserInventoryData(),
             market = MarketData(),
             marketDialogOpen = false,
+            home = HomeData(),
+            homeDialogOpen = false,
         )
         )
     }
@@ -575,8 +578,11 @@ class MapViewModel @Inject constructor(
                     placedBy = customPin.placed_by,
                     customPin.text
                 )
-            } else if (mapScreenState.value.market.id == "market_document_id") {
+            } else if (mapScreenState.value.market.id == id) {
                 showMarketDialogHandler()
+            }
+            else if (mapScreenState.value.home.id == "IAcU1GbsmLZNo3ujPgp8") {
+                showHomeDialogHandler()
             }
         }
     }
@@ -709,6 +715,14 @@ class MapViewModel @Inject constructor(
         _mapScreenState.value = _mapScreenState.value.copy(marketDialogOpen = false)
     }
 
+    private fun showHomeDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(homeDialogOpen = true)
+    }
+
+    private fun closeHomeDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(homeDialogOpen = false)
+    }
+
 //endregion
 
 
@@ -791,6 +805,16 @@ class MapViewModel @Inject constructor(
             mapViewModelRepository.updateMarket(newMarket)
         }
     }
+
+    private fun updateHomeDialogHandler(newHome: InventoryData) {
+        viewModelScope.launch {
+            mapScreenState.value.home.id?.let {
+
+//            mapViewModelRepository.updateHome(it,newHome)
+            }
+        }
+    }
+
 
 //endregion
 

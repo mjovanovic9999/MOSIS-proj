@@ -8,11 +8,12 @@ import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FirestoreConstants
 import mosis.streetsandtotems.core.FirestoreConstants.MARKET_DOCUMENT_ID
 import mosis.streetsandtotems.core.domain.model.UserData
+import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.MarketItem
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 
 class FirebaseMapDataSource(private val db: FirebaseFirestore) {
-    fun addCustomPin(
+    suspend fun addCustomPin(
         l: GeoPoint,
         visible_to: String,
         placed_by: String,
@@ -25,10 +26,10 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                 "placed_by" to placed_by,
                 "visible_to" to visible_to,
             )
-        )
+        ).await()
     }
 
-    fun updateCustomPin(
+    suspend fun updateCustomPin(
         id: String,
         visible_to: String?,
         placed_by: String?,
@@ -41,14 +42,14 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
         if (data.isNotEmpty())
             db.collection(FirestoreConstants.CUSTOM_PINS_COLLECTION).document(id)
-                .update(data)
+                .update(data).await()
     }
 
-    fun deleteCustomPin(id: String) {
-        db.collection(FirestoreConstants.CUSTOM_PINS_COLLECTION).document(id).delete()
+    suspend fun deleteCustomPin(id: String) {
+        db.collection(FirestoreConstants.CUSTOM_PINS_COLLECTION).document(id).delete().await()
     }
 
-    fun addHome(myId: String, l: GeoPoint) {
+    suspend fun addHome(myId: String, l: GeoPoint) {
         db.collection(FirestoreConstants.HOMES_COLLECTION).document(myId).set(
             mapOf(
                 "l" to l,
@@ -57,29 +58,42 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                     "brick" to 0,
                     "stone" to 0,
                     "emerald" to 0,
-                    "totem" to 1,
+                    "totem" to 0,
                 ),
             )
-        )
+        ).await()
     }
 
-    fun updateHome() {}
+    suspend fun updateHome(
+        homeId: String,
+        newInventoryData: InventoryData? = null,
+        l: GeoPoint? = null
+    ) {
+        val data: MutableMap<String, Any> = mutableMapOf()
+        if (newInventoryData != null) data["inventory"] = newInventoryData
+        if (l != null) data["l"] = l
 
-    fun deleteHome(myId: String) {//nestovano se drugacije brise?????????
-        db.collection(FirestoreConstants.HOMES_COLLECTION).document(myId).delete()
+        if (data.isNotEmpty())
+            db.collection(FirestoreConstants.HOMES_COLLECTION).document(homeId)
+                .update(
+                    mapOf("remaining" to newInventoryData)
+                ).await()
+    }
+
+    suspend fun deleteHome(myId: String) {
+        db.collection(FirestoreConstants.HOMES_COLLECTION).document(myId).delete().await()
 
     }
 
-
-    fun updateResource(resourceId: String, remaining: Int) {
+    suspend fun updateResource(resourceId: String, remaining: Int) {
         db.collection(FirestoreConstants.RESOURCES_COLLECTION).document(resourceId)
             .update(
                 mapOf("remaining" to remaining)
-            )
+            ).await()
     }
 
-    fun deleteResource(resourceId: String) {
-        db.collection(FirestoreConstants.RESOURCES_COLLECTION).document(resourceId).delete()
+    suspend fun deleteResource(resourceId: String) {
+        db.collection(FirestoreConstants.RESOURCES_COLLECTION).document(resourceId).delete().await()
     }
 
     suspend fun getUserInventory(userId: String): UserInventoryData? {

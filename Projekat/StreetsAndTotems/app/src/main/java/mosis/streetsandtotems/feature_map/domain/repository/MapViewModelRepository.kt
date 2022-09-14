@@ -28,5 +28,7 @@ interface MapViewModelRepository {
 
     suspend fun updateMarket(newMarket: Map<String, MarketItem>)
 
+    suspend fun updateHomeInventory(homeId: String, newInventoryData: InventoryData)
+
 //    suspend fun registerCallbackOnUserInventoryUpdate(callback: (UserInventoryData) -> Unit)
 }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FirestoreConstants
 import mosis.streetsandtotems.core.domain.model.UserData
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
+import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.MarketItem
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
@@ -74,6 +75,10 @@ class MapViewModelRepositoryImpl(
 
     override suspend fun updateMarket(newMarket: Map<String, MarketItem>) {
         firebaseMapDataSource.updateMarket(newMarket)
+    }
+
+    override suspend fun updateHomeInventory(homeId: String, newInventoryData: InventoryData) {
+        firebaseMapDataSource.updateHome(homeId, newInventoryData)
     }
 
 

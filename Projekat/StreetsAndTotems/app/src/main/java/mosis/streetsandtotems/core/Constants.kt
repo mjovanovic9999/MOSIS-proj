@@ -252,6 +252,8 @@ object TitleConstants {
     const val BACKPACK_EMPTY_SPACES_LEFT = " backpack space"
     const val BACKPACK_EMPTY_SPACE_AREA = "Backpack space"
     const val PRICE = "Price"
+    const val BACKPACK_INVENTORY = "Backpack inventory"
+    const val HOME_INVENTORY = "Home inventory"
 }
 
 object FormFieldConstants {

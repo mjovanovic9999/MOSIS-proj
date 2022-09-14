@@ -21,6 +21,7 @@ import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.ResourceType
 import mosis.streetsandtotems.feature_map.presentation.util.convertResourceTypeToIconType
 import mosis.streetsandtotems.feature_map.presentation.util.getCountResourceTypeFromInventory
+import mosis.streetsandtotems.feature_map.presentation.util.removeLeadingZerosIfAny
 import mosis.streetsandtotems.feature_map.presentation.util.updateOneInventoryData
 import mosis.streetsandtotems.ui.theme.sizes
 
@@ -101,11 +102,8 @@ fun CustomResourceDialog(
                                         && it.toInt() > 0
                                         ))
                             )
-                                if (it.length == 1)
-                                    takeAmount.value = it
-                                else if (it.first() == '0') {
-                                    takeAmount.value = it.toInt().toString()
-                                }
+                                takeAmount.value = removeLeadingZerosIfAny(it)
+
                         } else takeAmount.value = it
                     },
                     placeholder = FormFieldConstants.AMOUNT,

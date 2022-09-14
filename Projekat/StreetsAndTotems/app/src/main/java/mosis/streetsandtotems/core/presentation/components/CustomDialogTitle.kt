@@ -99,23 +99,24 @@ fun CustomDialogTitle(
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            if (countMessage != null && backpackSpaceMessage != null)
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (countMessage != null)
                     Text(
                         text = countMessage,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
+                if (backpackSpaceMessage != null)
                     Text(
                         text = backpackSpaceMessage,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.End,
                     )
-                }
+            }
         }
     }
 }

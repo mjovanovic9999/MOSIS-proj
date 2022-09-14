@@ -36,3 +36,13 @@ fun updateOneInventoryData(
         ResourceType.Stone -> oldInventoryData.copy(stone = newCount)
         ResourceType.Emerald -> oldInventoryData.copy(emerald = newCount)
     }
+
+
+fun removeLeadingZerosIfAny(value:String):String{
+    return if (value.length == 1)
+        value
+    else if (value.first() == '0') {
+        value.toInt().toString()
+    }
+    else ""
+}

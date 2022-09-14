@@ -1,8 +1,7 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+
 import android.net.Uri
 import com.ramcosta.composedestinations.annotation.Destination
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
@@ -11,6 +10,7 @@ import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import mosis.streetsandtotems.feature_map.presentation.components.*
 import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomFilterDialog
+import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomHomeDialog
 import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomMarketDialog
 import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomResourceDialog
 import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
@@ -98,17 +98,18 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseMarketDialog) },
         items = state.market.items,
         userInventoryData = state.playerInventory,
-        updateUserInventoryData = {
-            mapViewModel.onEvent(MapViewModelEvents.UpdateInventory(it))
-        },
+        updateUserInventoryData = { mapViewModel.onEvent(MapViewModelEvents.UpdateInventory(it)) },
         updateMarketItems = { mapViewModel.onEvent(MapViewModelEvents.UpdateMarket(it)) },
-        onBuy = { iniventory, map ->
-            mapViewModel.onEvent(MapViewModelEvents.UpdateMarket(map))
-            mapViewModel.onEvent(MapViewModelEvents.UpdateInventory(iniventory))
-        },
-//WTF BE STO SE NE POZIVAS???????????????????????????????????
+    )
 
-        )
 
+    CustomHomeDialog(
+        isOpen = state.homeDialogOpen,
+        inventoryData = state.home.inventory,
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseHomeDialog) },
+        userInventoryData = state.playerInventory,
+        updateUserInventoryData = { mapViewModel.onEvent(MapViewModelEvents.UpdateInventory(it)) },
+        updateHomeItems = { mapViewModel.onEvent(MapViewModelEvents.UpdateHome(it)) },
+    )
 
 }
