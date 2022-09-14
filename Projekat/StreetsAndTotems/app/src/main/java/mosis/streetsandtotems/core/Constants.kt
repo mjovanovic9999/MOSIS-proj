@@ -174,7 +174,7 @@ object MapConstants {
     const val TILE_URL_256 = "https://api.maptiler.com/maps/openstreetmap/256/"
     const val TILE_KEY = "njA6yIfsMq23cZHLTop1"
     const val MAP_PRECISION_METERS = 2f
-    const val MAXIMUM_IGNORE_ACCURACY_METERS = 1000f
+    const val MAXIMUM_IGNORE_ACCURACY_METERS = 2000f
     const val MAXIMUM_TRADE_DISTANCE_IN_METERS = 20f
     const val PREFERRED_INTERVAL = 4000L
 }

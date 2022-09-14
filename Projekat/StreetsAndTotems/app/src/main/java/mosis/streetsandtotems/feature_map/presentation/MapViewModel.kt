@@ -776,13 +776,10 @@ class MapViewModel @Inject constructor(
 
     private fun updateInventoryHandler(newUserInventoryData: UserInventoryData) {
         viewModelScope.launch {
-            Log.d("tagg", "VM "+newUserInventoryData.toString())
-            mapScreenState.value.selectedResource.type?.let {
-                mapViewModelRepository.updateUserInventory(
-                    "Q0Wy3JXFjjNFSBDzgvw4L66Ud6J2",
-                    newUserInventoryData
-                )
-            }
+            mapViewModelRepository.updateUserInventory(
+                "Q0Wy3JXFjjNFSBDzgvw4L66Ud6J2",
+                newUserInventoryData
+            )
         }
     }
 

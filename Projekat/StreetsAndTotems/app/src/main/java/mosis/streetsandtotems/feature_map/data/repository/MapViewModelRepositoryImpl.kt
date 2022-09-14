@@ -67,10 +67,8 @@ class MapViewModelRepositoryImpl(
 
     override suspend fun updateUserInventory(
         myId: String,
-        newUserInventoryData:UserInventoryData
+        newUserInventoryData: UserInventoryData
     ) {
-        Log.d("tagg"," impl "+ newUserInventoryData.toString())
-
         firebaseMapDataSource.updateUserInventory(myId, newUserInventoryData)
     }
 
