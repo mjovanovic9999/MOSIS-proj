@@ -18,6 +18,7 @@ import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.core.domain.model.Response
 import mosis.streetsandtotems.feature_auth.data.data_source.FirebaseAuthDataSource
 import mosis.streetsandtotems.feature_auth.data.data_source.FirestoreAuthDataSource
+import mosis.streetsandtotems.core.data.data_source.UserOnlineStatusDataSource
 import mosis.streetsandtotems.feature_auth.data.data_source.OneTapGoogleDataSource
 import mosis.streetsandtotems.feature_auth.domain.model.SignInError
 import mosis.streetsandtotems.feature_auth.domain.repository.AuthRepository
@@ -29,7 +30,8 @@ class AuthRepositoryImpl @Inject constructor(
     private val authDataSource: FirebaseAuthDataSource,
     private val oneTapGoogleDataSource: OneTapGoogleDataSource,
     private val preferencesDataStore: PreferencesDataStore,
-    private val firestoreAuthDataSource: FirestoreAuthDataSource
+    private val firestoreAuthDataSource: FirestoreAuthDataSource,
+    private val userOnlineStatusDataSource: UserOnlineStatusDataSource
 ) :
     AuthRepository {
     override fun isUserAuthenticated(): Boolean = authDataSource.getCurrentUser() != null
@@ -43,10 +45,7 @@ class AuthRepositoryImpl @Inject constructor(
                 emit(Response.Loading)
                 authDataSource.emailAndPasswordSignIn(email, password).await()
                 preferencesDataStore.saveAuthProvider(AuthProvider.EmailAndPassword)
-                firestoreAuthDataSource.updateUserOnlineStatus(
-                    isOnline = true,
-                    authDataSource.getCurrentUser()!!.uid
-                )
+                preferencesDataStore.setUserId(authDataSource.getCurrentUser()!!.uid)
                 emit(Response.Success())
             } catch (e: FirebaseAuthException) {
                 emit(
@@ -122,13 +121,14 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signOut(emitError: Boolean) = flow {
         try {
             emit(Response.Loading)
-            firestoreAuthDataSource.updateUserOnlineStatus(
-                isOnline = false,
+            userOnlineStatusDataSource.updateUserOnlineStatus(
+                false,
                 authDataSource.getCurrentUser()!!.uid
             )
             if (preferencesDataStore.getAuthProvider() == AuthProvider.Google)
                 oneTapGoogleDataSource.signOut()
             authDataSource.signOut()
+            preferencesDataStore.setUserId("")
             emit(Response.Success())
         } catch (e: Exception) {
             if (emitError)
@@ -168,13 +168,10 @@ class AuthRepositoryImpl @Inject constructor(
             val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
             val authResult = authDataSource.signInWithCredential(googleCredentials).await()
             preferencesDataStore.saveAuthProvider(AuthProvider.Google)
+            preferencesDataStore.setUserId(authDataSource.getCurrentUser()!!.uid)
 
             val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
             if (isNewUser) firestoreAuthDataSource.addUser(getProfileDataFromGoogle(credentials))
-            else firestoreAuthDataSource.updateUserOnlineStatus(
-                true,
-                authDataSource.getCurrentUser()!!.uid
-            )
             emit(Response.Success())
         } catch (e: Exception) {
             if (isUserAuthenticated())

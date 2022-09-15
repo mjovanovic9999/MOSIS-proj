@@ -10,9 +10,14 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.scopes.ServiceScoped
+import kotlinx.coroutines.flow.MutableSharedFlow
+import mosis.streetsandtotems.core.domain.repository.PreferenceRepository
+import mosis.streetsandtotems.core.domain.repository.UserOnlineStatusRepository
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseServiceDataSource
 import mosis.streetsandtotems.feature_map.data.repository.MapServiceRepositoryImpl
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
+import mosis.streetsandtotems.services.LocationServiceEvents
+import mosis.streetsandtotems.services.use_case.*
 
 @Module
 @InstallIn(ServiceComponent::class)
@@ -34,4 +39,19 @@ object LocationServiceModule {
         firebaseServiceDataSource: FirebaseServiceDataSource,
         auth: FirebaseAuth
     ): MapServiceRepository = MapServiceRepositoryImpl(firebaseServiceDataSource, auth)
+
+    @Provides
+    @ServiceScoped
+    fun provideLocationServiceUseCases(
+        mapServiceRepository: MapServiceRepository,
+        locationServiceEventsFlow: MutableSharedFlow<LocationServiceEvents>,
+        userOnlineStatusRepository: UserOnlineStatusRepository,
+        preferenceRepository: PreferenceRepository
+    ): LocationServiceUseCases =
+        LocationServiceUseCases(
+            UpdatePlayerLocation(mapServiceRepository),
+            RegisterCallbacks(mapServiceRepository, locationServiceEventsFlow),
+            RemoveCallbacks(mapServiceRepository),
+            ChangeUserOnlineStatus(userOnlineStatusRepository, preferenceRepository)
+        )
 }

@@ -12,8 +12,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
+import mosis.streetsandtotems.core.data.data_source.UserOnlineStatusDataSource
 import mosis.streetsandtotems.core.data.repository.PreferenceRepositoryImpl
+import mosis.streetsandtotems.core.data.repository.UserOnlineStatusRepositoryImpl
 import mosis.streetsandtotems.core.domain.repository.PreferenceRepository
+import mosis.streetsandtotems.core.domain.repository.UserOnlineStatusRepository
 import mosis.streetsandtotems.core.domain.use_case.*
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.di.util.SharedFlowWrapper
@@ -95,4 +98,17 @@ object AppSingletonModule {
     @Singleton
     fun provideLocationStateFlow(locationStateMutableFlow: MutableSharedFlow<Boolean>): SharedFlowWrapper<Boolean> =
         SharedFlowWrapper(locationStateMutableFlow)
+
+    @Provides
+    @Singleton
+    fun provideUserOnlineStatusDataSource(db: FirebaseFirestore): UserOnlineStatusDataSource =
+        UserOnlineStatusDataSource(db)
+
+    @Provides
+    @Singleton
+    fun provideUserOnlineStatusRepository(
+        preferencesDataStore: PreferencesDataStore,
+        userOnlineStatusDataSource: UserOnlineStatusDataSource
+    ): UserOnlineStatusRepository =
+        UserOnlineStatusRepositoryImpl(userOnlineStatusDataSource, preferencesDataStore)
 }

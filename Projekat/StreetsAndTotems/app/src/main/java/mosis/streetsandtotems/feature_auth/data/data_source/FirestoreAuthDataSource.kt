@@ -11,11 +11,6 @@ import mosis.streetsandtotems.feature_map.domain.model.ProfileData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 
 class FirestoreAuthDataSource(private val db: FirebaseFirestore) {
-    fun updateUserOnlineStatus(isOnline: Boolean, userId: String): Task<Void> {
-        return db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION).document(userId)
-            .update(FirestoreConstants.IS_ONLINE_FIELD, isOnline)
-    }
-
 //    suspend fun getUserData(userId: String): UserData? {
 //        val userSnapshot =
 //            db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION).document(userId).get()

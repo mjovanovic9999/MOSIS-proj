@@ -12,7 +12,6 @@ interface MapServiceRepository {
         userRemovedCallback: (user: ProfileData) -> Unit
     )
 
-
     fun registerCallbackOnResourcesUpdate(
         resourceAddedCallback: (resource: ResourceData) -> Unit,
         resourceModifiedCallback: (resource: ResourceData) -> Unit,
@@ -47,6 +46,7 @@ interface MapServiceRepository {
         marketRemovedCallback: (market: MarketData) -> Unit,
     )
 
-    //fun getCustomPins(): Flow<>
     fun removeAllCallbacks()
+
+
 }

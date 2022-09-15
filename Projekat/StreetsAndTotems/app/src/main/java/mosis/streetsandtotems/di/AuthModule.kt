@@ -19,6 +19,7 @@ import mosis.streetsandtotems.core.DINameConstants
 import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.feature_auth.data.data_source.FirebaseAuthDataSource
 import mosis.streetsandtotems.feature_auth.data.data_source.FirestoreAuthDataSource
+import mosis.streetsandtotems.core.data.data_source.UserOnlineStatusDataSource
 import mosis.streetsandtotems.feature_auth.data.data_source.OneTapGoogleDataSource
 import mosis.streetsandtotems.feature_auth.data.repository.AuthRepositoryImpl
 import mosis.streetsandtotems.feature_auth.domain.repository.AuthRepository
@@ -59,13 +60,15 @@ object AuthModule {
         authDataSource: FirebaseAuthDataSource,
         oneTapGoogleDataSource: OneTapGoogleDataSource,
         preferencesDataStore: PreferencesDataStore,
-        firestoreAuthDataSource: FirestoreAuthDataSource
+        firestoreAuthDataSource: FirestoreAuthDataSource,
+        userOnlineStatusDataSource: UserOnlineStatusDataSource
     ): AuthRepository =
         AuthRepositoryImpl(
             authDataSource = authDataSource,
             oneTapGoogleDataSource = oneTapGoogleDataSource,
             preferencesDataStore = preferencesDataStore,
-            firestoreAuthDataSource = firestoreAuthDataSource
+            firestoreAuthDataSource = firestoreAuthDataSource,
+            userOnlineStatusDataSource
         )
 
     @Provides
