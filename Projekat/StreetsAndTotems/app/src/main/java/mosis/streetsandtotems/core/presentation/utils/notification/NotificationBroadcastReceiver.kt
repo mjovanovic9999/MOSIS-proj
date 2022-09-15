@@ -5,10 +5,12 @@ import android.content.Context
 import android.content.Intent
 import mosis.streetsandtotems.services.LocationService
 
-class NotificationBroadcastReceiver : BroadcastReceiver() {
+class NotificationBroadcastReceiver :
+    BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {
         NotificationProvider(context).cancelDisableBackgroundServiceNotification()
+
         context.stopService(Intent(context, LocationService::class.java))
     }
 }

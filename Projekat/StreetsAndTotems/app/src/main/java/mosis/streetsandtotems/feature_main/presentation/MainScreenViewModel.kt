@@ -52,7 +52,6 @@ class MainScreenViewModel @Inject constructor(
     private val preferenceUseCases: PreferenceUseCases,
     private val mainUseCases: MainUseCases,
 ) : ViewModel() {
-    private var backgroundServiceEnabled = true
     private val _mainScreenEventFlow = MutableSharedFlow<MainScreenEvents>()
     private val _mainScreenState =
         mutableStateOf(
@@ -147,15 +146,16 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun onPauseHandler() {
-        if (backgroundServiceEnabled && LocationService.isServiceStarted) {
-            notificationProvider.notifyDisable(true)
-            viewModelScope.launch {
-                locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveCallbacks)
+        viewModelScope.launch {
+            if (preferenceUseCases.getUserSettings().runInBackground && LocationService.isServiceStarted) {
+                notificationProvider.notifyDisable(true)
+                viewModelScope.launch {
+                    locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveCallbacks)
+                }
+            } else {
+                application.stopService(Intent(application, LocationService::class.java))
             }
-        } else {
-            application.stopService(Intent(application, LocationService::class.java))
         }
-
         application.unregisterReceiver(
             locationBroadcastReceiver,
         )
@@ -200,10 +200,11 @@ class MainScreenViewModel @Inject constructor(
             )
 
         } else {
-            if (backgroundServiceEnabled) {
-                notificationProvider.notifyDisable(false)
-            }
             viewModelScope.launch {
+                if (preferenceUseCases.getUserSettings().runInBackground) {
+                    notificationProvider.notifyDisable(false)
+                }
+
                 locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RegisterCallbacks)
             }
         }
