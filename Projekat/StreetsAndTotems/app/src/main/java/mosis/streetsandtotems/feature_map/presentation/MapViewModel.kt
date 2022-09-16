@@ -2,6 +2,7 @@ package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -102,6 +103,8 @@ class MapViewModel @Inject constructor(
 
         registerOnLocationService()
 
+        Log.d("tag", preferenceUseCases.getUserId.toString() + "idd")
+
     }
 
     fun onEvent(event: MapViewModelEvents) {
@@ -128,8 +131,8 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.ShowMarketDialog -> showMarketDialogHandler()
             MapViewModelEvents.CloseMarketDialog -> closeMarketDialogHandler()
             is MapViewModelEvents.UpdateMarket -> updateMarketHandler(event.newMarket)
-            MapViewModelEvents.CloseHomeDialog -> showHomeDialogHandler()
-            MapViewModelEvents.ShowHomeDialog -> closeHomeDialogHandler()
+            MapViewModelEvents.CloseHomeDialog -> closeHomeDialogHandler()
+            MapViewModelEvents.ShowHomeDialog -> showHomeDialogHandler()
             is MapViewModelEvents.UpdateHome -> updateHomeDialogHandler(event.newHome)
         }
     }
@@ -580,8 +583,7 @@ class MapViewModel @Inject constructor(
                 )
             } else if (mapScreenState.value.market.id == id) {
                 showMarketDialogHandler()
-            }
-            else if (mapScreenState.value.home.id == "IAcU1GbsmLZNo3ujPgp8") {
+            } else if (mapScreenState.value.home.id == "IAcU1GbsmLZNo3ujPgp8") {
                 showHomeDialogHandler()
             }
         }
@@ -809,8 +811,7 @@ class MapViewModel @Inject constructor(
     private fun updateHomeDialogHandler(newHome: InventoryData) {
         viewModelScope.launch {
             mapScreenState.value.home.id?.let {
-
-//            mapViewModelRepository.updateHome(it,newHome)
+                mapViewModelRepository.updateHomeInventory(it, newHome)
             }
         }
     }

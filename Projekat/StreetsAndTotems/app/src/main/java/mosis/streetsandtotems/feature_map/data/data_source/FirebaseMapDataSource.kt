@@ -75,9 +75,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
         if (data.isNotEmpty())
             db.collection(FirestoreConstants.HOMES_COLLECTION).document(homeId)
-                .update(
-                    mapOf("remaining" to newInventoryData)
-                ).await()
+                .update(data).await()
     }
 
     suspend fun deleteHome(myId: String) {

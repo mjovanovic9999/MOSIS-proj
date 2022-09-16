@@ -30,5 +30,7 @@ interface MapViewModelRepository {
 
     suspend fun updateHomeInventory(homeId: String, newInventoryData: InventoryData)
 
+    suspend fun updateHomeLocation(homeId: String, l: GeoPoint)
+
 //    suspend fun registerCallbackOnUserInventoryUpdate(callback: (UserInventoryData) -> Unit)
 }

@@ -21,6 +21,7 @@ import mosis.streetsandtotems.core.TitleConstants.BACKPACK_INVENTORY
 import mosis.streetsandtotems.core.TitleConstants.PRICE
 import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.core.presentation.utils.drawVerticalScrollbar
+import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.MarketItem
 import mosis.streetsandtotems.feature_map.domain.model.ResourceType
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
@@ -77,51 +78,187 @@ fun CustomMarketDialog(
         text = {
             LazyColumn(Modifier.drawVerticalScrollbar(rememberScrollState())) {
                 items(items?.keys?.toList() ?: listOf()) { typeName ->
-                    ItemMarket(
-                        itemsLeft = items?.get(typeName)?.amount_left ?: 0,
-                        emptySpaces = userInventoryData?.empty_spaces ?: 0,
-                        resourceType = enumValueOf(typeName),
-                        onBuy = { newEmptySpacesCount: Int, newResourceItemsCount: Int, resourceType: ResourceType, amountLeft: Int ->
-                            val mutableMap = items?.toMutableMap()
-                            if (mutableMap != null) {
-                                mutableMap[typeName] = MarketItem(
-                                    amount_left = amountLeft,
-                                    currency_type = items[typeName]?.currency_type,
-                                    price = items[typeName]?.price ?: 0,
+                    val exchangeResourceCount =
+                        ItemMarket(
+                            itemsLeft = items?.get(typeName)?.amount_left ?: 0,
+                            emptySpaces = userInventoryData?.empty_spaces ?: 0,
+                            resourceType = enumValueOf(typeName),
+                            onBuy = { newEmptySpacesCount: Int, newResourceItemsCount: Int, resourceType: ResourceType, amountLeft: Int, exchangedResourceLeft: Int ->
+                                val mutableMap = items?.toMutableMap()
+                                if (mutableMap != null) {
+                                    mutableMap[typeName] = MarketItem(
+                                        amount_left = amountLeft,
+                                        currency_type = items[typeName]?.currency_type,
+                                        price = items[typeName]?.price ?: 0,
+                                    )
+                                    updateMarketItems(
+                                        mutableMap.toMap()
+                                    )
+                                }
+                                updateUserInventoryData(
+                                    UserInventoryData(
+                                        empty_spaces = newEmptySpacesCount+exchangedResourceLeft,
+                                        inventory =
+                                        when (resourceType) {
+                                            ResourceType.Wood -> {
+                                                when (items?.get(typeName)?.currency_type) {
+                                                    ResourceType.Wood -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            wood = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.wood
+                                                                ?: 0)
+                                                        )
+                                                    }
+                                                    ResourceType.Brick -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            wood = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.wood
+                                                                ?: 0),
+                                                            brick = exchangedResourceLeft,
+                                                        )
+                                                    }
+                                                    ResourceType.Stone -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            wood = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.wood
+                                                                ?: 0),
+                                                            stone = exchangedResourceLeft,
+                                                        )
+                                                    }
+                                                    ResourceType.Emerald -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            wood = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.wood
+                                                                ?: 0),
+                                                            emerald = exchangedResourceLeft,
+                                                        )
+                                                    }
+                                                    null -> InventoryData()
+                                                }
+                                            }
+                                            ResourceType.Brick -> {
+                                                when (items?.get(typeName)?.currency_type) {
+                                                    ResourceType.Wood -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            brick = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.brick
+                                                                ?: 0),
+                                                            wood = exchangedResourceLeft,
+                                                        )
+                                                    }
+                                                    ResourceType.Brick -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            brick = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.brick
+                                                                ?: 0),
+                                                        )
+                                                    }
+                                                    ResourceType.Stone -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            brick = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.brick
+                                                                ?: 0),
+                                                            stone = exchangedResourceLeft,
+                                                        )
+                                                    }
+                                                    ResourceType.Emerald -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            brick = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.brick
+                                                                ?: 0),
+                                                            emerald = exchangedResourceLeft,
+                                                        )
+                                                    }
+                                                    null -> InventoryData()
+                                                }
+                                            }
+                                            ResourceType.Stone -> {
+                                                when (items?.get(typeName)?.currency_type) {
+                                                    ResourceType.Wood -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            stone = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.stone
+                                                                ?: 0),
+                                                            wood = exchangedResourceLeft
+                                                        )
+                                                    }
+                                                    ResourceType.Brick -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            stone = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.stone
+                                                                ?: 0),
+                                                            brick = exchangedResourceLeft,
+                                                        )
+                                                    }
+                                                    ResourceType.Stone -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            stone = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.stone
+                                                                ?: 0),
+                                                        )
+                                                    }
+                                                    ResourceType.Emerald -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            stone = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.stone
+                                                                ?: 0),
+                                                            emerald = exchangedResourceLeft,
+                                                        )
+                                                    }
+                                                    null -> InventoryData()
+                                                }
+                                            }
+                                            ResourceType.Emerald -> {
+                                                when (items?.get(typeName)?.currency_type) {
+                                                    ResourceType.Wood -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            emerald = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.emerald
+                                                                ?: 0),
+                                                            wood = exchangedResourceLeft,
+                                                        )
+                                                    }
+                                                    ResourceType.Brick -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            emerald = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.emerald
+                                                                ?: 0),
+                                                            brick = exchangedResourceLeft,
+                                                        )
+                                                    }
+                                                    ResourceType.Stone -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            emerald = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.emerald
+                                                                ?: 0),
+                                                            stone = exchangedResourceLeft,
+                                                        )
+                                                    }
+                                                    ResourceType.Emerald -> {
+                                                        userInventoryData?.inventory?.copy(
+                                                            emerald = newResourceItemsCount
+                                                                    + (userInventoryData.inventory.emerald
+                                                                ?: 0),
+                                                        )
+                                                    }
+                                                    null -> InventoryData()
+                                                }
+                                            }
+                                        }
+                                    )
                                 )
-                                updateMarketItems(
-                                    mutableMap.toMap()
-                                )
+                            },
+                            onDismissRequest = onDismissRequest,
+                            exchangeCurrency = items?.get(typeName)?.price ?: 1,
+                            exchangeResourceType = items?.get(typeName)?.currency_type,
+                            exchangeResourceCount = when (items?.get(typeName)?.currency_type) {
+                                ResourceType.Wood -> userInventoryData?.inventory?.wood ?: 0
+                                ResourceType.Brick -> userInventoryData?.inventory?.brick ?: 0
+                                ResourceType.Stone -> userInventoryData?.inventory?.stone ?: 0
+                                ResourceType.Emerald -> userInventoryData?.inventory?.emerald ?: 0
+                                null -> 0
                             }
-                            updateUserInventoryData(
-                                UserInventoryData(
-                                    empty_spaces = newEmptySpacesCount,
-                                    inventory =
-                                    when (resourceType) {
-                                        ResourceType.Wood -> userInventoryData?.inventory?.copy(
-                                            wood = newResourceItemsCount
-                                                    + (userInventoryData.inventory.wood ?: 0)
-                                        )
-                                        ResourceType.Brick -> userInventoryData?.inventory?.copy(
-                                            brick = newResourceItemsCount
-                                                    + (userInventoryData.inventory.brick ?: 0)
-                                        )
-                                        ResourceType.Stone -> userInventoryData?.inventory?.copy(
-                                            stone = newResourceItemsCount
-                                                    + (userInventoryData.inventory.stone ?: 0)
-                                        )
-                                        ResourceType.Emerald -> userInventoryData?.inventory?.copy(
-                                            emerald = newResourceItemsCount
-                                                    + (userInventoryData.inventory.emerald ?: 0)
-                                        )
-                                    }
-                                )
-                            )
-                        },
-                        onDismissRequest = onDismissRequest,
-                        exchangeCurrency = items?.get(typeName)?.price ?: 0,
-                        exchangeResourceType = items?.get(typeName)?.currency_type,
-                    )
+                        )
                 }
             }
         },
@@ -142,10 +279,11 @@ private fun ItemMarket(
     itemsLeft: Int?,
     emptySpaces: Int?,
     resourceType: ResourceType,
-    onBuy: (newEmptySpacesCount: Int, newResourceItemsCount: Int, resourceType: ResourceType, amountLeft: Int) -> Unit,
+    onBuy: (newEmptySpacesCount: Int, newResourceItemsCount: Int, resourceType: ResourceType, amountLeft: Int, exchangedResourceLeft: Int) -> Unit,
     onDismissRequest: () -> Unit,
     exchangeResourceType: ResourceType?,
     exchangeCurrency: Int,
+    exchangeResourceCount: Int,
 ) {
     val takeAmount = mutableStateOf(FormFieldConstants.DEFAULT_AMOUNT)
 
@@ -174,7 +312,8 @@ private fun ItemMarket(
                             emptySpaces - takeAmount.value.toInt(),
                             takeAmount.value.toInt(),
                             resourceType,
-                            itemsLeft - takeAmount.value.toInt()
+                            itemsLeft - takeAmount.value.toInt(),
+                            exchangeResourceCount - takeAmount.value.toInt() * exchangeCurrency
                         )
                     }
                     onDismissRequest()
@@ -188,6 +327,7 @@ private fun ItemMarket(
                         && emptySpaces != null && emptySpaces > 0
                         && itemsLeft != null
                         && itemsLeft >= takeAmount.value.toInt()
+                        && exchangeResourceCount >= takeAmount.value.toInt() * exchangeCurrency
             )
         },
         cell11 = {
@@ -203,6 +343,7 @@ private fun ItemMarket(
                     if (it != "") {
                         if (itemsLeft != null
                             && itemsLeft >= it.toInt()
+                            && exchangeResourceCount >= it.toInt() * exchangeCurrency
                             && (takeAmount.value == ""
                                     || (emptySpaces != null
                                     && emptySpaces - it.toInt() >= 0

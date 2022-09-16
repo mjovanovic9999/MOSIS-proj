@@ -81,6 +81,10 @@ class MapViewModelRepositoryImpl(
         firebaseMapDataSource.updateHome(homeId, newInventoryData)
     }
 
+    override suspend fun updateHomeLocation(homeId: String, l: GeoPoint) {
+        firebaseMapDataSource.updateHome(homeId, l = l)
+    }
+
 
 //    override suspend fun registerCallbackOnUserInventoryUpdate(userId: String): UserInventoryData? {
 //        return try {

@@ -20,7 +20,6 @@ import mosis.streetsandtotems.core.TitleConstants.BACKPACK_INVENTORY
 import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.core.presentation.utils.drawVerticalScrollbar
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
-import mosis.streetsandtotems.feature_map.domain.model.MarketItem
 import mosis.streetsandtotems.feature_map.domain.model.ResourceType
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import mosis.streetsandtotems.feature_map.presentation.components.CustomUserInventory
@@ -81,7 +80,7 @@ fun CustomHomeDialog(
                             itemsLeft = inventoryData.wood ?: 0,
                             emptySpaces = userInventoryData?.empty_spaces ?: 0,
                             resourceType = ResourceType.Wood,
-                            onBuy = { newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int ->
+                            onMoveItem = { newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int ->
                                 updateHomeItems(inventoryData.copy(wood = amountLeft))
                                 updateUserInventoryData(
                                     UserInventoryData(
@@ -95,6 +94,7 @@ fun CustomHomeDialog(
                                 )
                             },
                             onDismissRequest = onDismissRequest,
+                            backpackItemCount = (userInventoryData?.inventory?.wood ?: 0),
                         )
                     }
                     item {
@@ -102,7 +102,7 @@ fun CustomHomeDialog(
                             itemsLeft = inventoryData.stone ?: 0,
                             emptySpaces = userInventoryData?.empty_spaces ?: 0,
                             resourceType = ResourceType.Stone,
-                            onBuy = { newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int ->
+                            onMoveItem = { newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int ->
                                 updateHomeItems(inventoryData.copy(stone = amountLeft))
                                 updateUserInventoryData(
                                     UserInventoryData(
@@ -116,14 +116,16 @@ fun CustomHomeDialog(
                                 )
                             },
                             onDismissRequest = onDismissRequest,
-                        )
+                            backpackItemCount = (userInventoryData?.inventory?.stone ?: 0),
+
+                            )
                     }
                     item {
                         ItemHome(
                             itemsLeft = inventoryData.brick ?: 0,
                             emptySpaces = userInventoryData?.empty_spaces ?: 0,
                             resourceType = ResourceType.Brick,
-                            onBuy = { newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int ->
+                            onMoveItem = { newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int ->
                                 updateHomeItems(inventoryData.copy(brick = amountLeft))
                                 updateUserInventoryData(
                                     UserInventoryData(
@@ -137,6 +139,7 @@ fun CustomHomeDialog(
                                 )
                             },
                             onDismissRequest = onDismissRequest,
+                            backpackItemCount = (userInventoryData?.inventory?.brick ?: 0),
                         )
                     }
                     item {
@@ -144,7 +147,7 @@ fun CustomHomeDialog(
                             itemsLeft = inventoryData.emerald ?: 0,
                             emptySpaces = userInventoryData?.empty_spaces ?: 0,
                             resourceType = ResourceType.Emerald,
-                            onBuy = { newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int ->
+                            onMoveItem = { newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int ->
                                 updateHomeItems(inventoryData.copy(emerald = amountLeft))
                                 updateUserInventoryData(
                                     UserInventoryData(
@@ -158,13 +161,14 @@ fun CustomHomeDialog(
                                 )
                             },
                             onDismissRequest = onDismissRequest,
+                            backpackItemCount = (userInventoryData?.inventory?.emerald ?: 0),
                         )
                     }
                     item {
                         ItemHome(
                             itemsLeft = inventoryData.totem ?: 0,
                             emptySpaces = userInventoryData?.empty_spaces ?: 0,
-                            onBuy = { newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int ->
+                            onMoveItem = { newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int ->
                                 updateHomeItems(inventoryData.copy(totem = amountLeft))
                                 updateUserInventoryData(
                                     UserInventoryData(
@@ -178,6 +182,7 @@ fun CustomHomeDialog(
                                 )
                             },
                             onDismissRequest = onDismissRequest,
+                            backpackItemCount = (userInventoryData?.inventory?.emerald ?: 0),
                         )
                     }
                 }
@@ -199,8 +204,9 @@ private fun ItemHome(
     itemsLeft: Int?,
     emptySpaces: Int?,
     resourceType: ResourceType? = null,
-    onBuy: (newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int) -> Unit,
+    onMoveItem: (newEmptySpacesCount: Int, newResourceItemsCount: Int, amountLeft: Int) -> Unit,
     onDismissRequest: () -> Unit,
+    backpackItemCount: Int,
 ) {
     val takeAmount = mutableStateOf(FormFieldConstants.DEFAULT_AMOUNT)
 
@@ -223,7 +229,16 @@ private fun ItemHome(
             Row {
                 CustomButton(
                     buttonModifier = Modifier.padding(5.dp),
-                    clickHandler = { },
+                    clickHandler = {
+                        if (emptySpaces != null && itemsLeft != null) {
+                            onMoveItem(
+                                emptySpaces - takeAmount.value.toInt(),
+                                takeAmount.value.toInt(),
+                                itemsLeft - takeAmount.value.toInt()
+                            )
+                        }
+                        onDismissRequest()
+                    },
                     text = ButtonConstants.TAKE,
                     contentPadding = ButtonDefaults.ContentPadding,
                     buttonType = CustomButtonType.Outlined,
@@ -239,10 +254,10 @@ private fun ItemHome(
                     buttonModifier = Modifier.padding(5.dp),
                     clickHandler = {
                         if (emptySpaces != null && itemsLeft != null) {
-                            onBuy(
-                                emptySpaces - takeAmount.value.toInt(),
-                                takeAmount.value.toInt(),
-                                itemsLeft - takeAmount.value.toInt()
+                            onMoveItem(
+                                emptySpaces + takeAmount.value.toInt(),
+                                takeAmount.value.toInt() * (-1),
+                                itemsLeft + takeAmount.value.toInt()
                             )
                         }
                         onDismissRequest()
@@ -253,9 +268,7 @@ private fun ItemHome(
                     textStyle = MaterialTheme.typography.titleMedium,
                     enabled = takeAmount.value != ""
                             && takeAmount.value.toInt() > 0
-                            && emptySpaces != null && emptySpaces > 0
-                            && itemsLeft != null
-                            && itemsLeft >= takeAmount.value.toInt()
+                            && backpackItemCount >= takeAmount.value.toInt()
                 )
             }
         },
@@ -271,13 +284,16 @@ private fun ItemHome(
                 value = takeAmount.value,
                 onValueChange = {
                     if (it != "") {
-                        if (itemsLeft != null
-                            && itemsLeft >= it.toInt()
-                            && (takeAmount.value == ""
+                        if (
+                            (itemsLeft != null
+                                    && itemsLeft >= it.toInt()
+                                    && (takeAmount.value == ""
                                     || (emptySpaces != null
                                     && emptySpaces - it.toInt() >= 0
                                     && it.toInt() > 0
                                     ))
+                                    )
+                            || backpackItemCount >= takeAmount.value.toInt()
                         )
                             takeAmount.value = removeLeadingZerosIfAny(it)
 

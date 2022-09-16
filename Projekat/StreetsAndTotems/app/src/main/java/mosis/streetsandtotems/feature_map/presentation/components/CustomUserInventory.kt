@@ -55,7 +55,7 @@ fun CustomUserInventory(
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "${ItemsConstants.STONE}: $brickCount",
+                    text = "${ItemsConstants.BRICK}: $brickCount",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 if (totemsCount != null)
