@@ -1,9 +1,11 @@
 package mosis.streetsandtotems.feature_map.presentation.util
 
+import mosis.streetsandtotems.core.PointsConversion
+import mosis.streetsandtotems.core.ProtectionLevelConstants
 import mosis.streetsandtotems.core.presentation.components.IconType
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
+import mosis.streetsandtotems.feature_map.domain.model.ProtectionLevel
 import mosis.streetsandtotems.feature_map.domain.model.ResourceType
-import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 
 fun convertResourceTypeToIconType(resourceType: ResourceType?): IconType =
     when (resourceType) {
@@ -38,11 +40,29 @@ fun updateOneInventoryData(
     }
 
 
-fun removeLeadingZerosIfAny(value:String):String{
+fun removeLeadingZerosIfAny(value: String): String {
     return if (value.length == 1)
         value
     else if (value.first() == '0') {
         value.toInt().toString()
-    }
-    else ""
+    } else ""
 }
+
+fun getNextLevelPoints(currentPoints: Int?): Int =
+    if (currentPoints == null) PointsConversion.LOW
+    else if (currentPoints < PointsConversion.LOW) PointsConversion.LOW - currentPoints
+    else if (currentPoints < PointsConversion.MEDIUM) PointsConversion.MEDIUM - currentPoints
+    else if (currentPoints < PointsConversion.HIGH) PointsConversion.HIGH - currentPoints
+    else 0
+
+
+fun getProtectionLevelFromPoints(points: Int?): String =
+    if (points == null || points < PointsConversion.LOW) ProtectionLevelConstants.UNPROTECTED
+    else if (points < PointsConversion.MEDIUM) ProtectionLevelConstants.LOW
+    else if (points < PointsConversion.HIGH) ProtectionLevelConstants.MEDIUM
+    else ProtectionLevelConstants.HIGH
+
+fun getProtectionLevelFromPointsNoUnprotected(points: Int): ProtectionLevel.RiddleProtectionLevel =
+    if (points < PointsConversion.MEDIUM) ProtectionLevel.RiddleProtectionLevel.Low
+    else if (points < PointsConversion.HIGH) ProtectionLevel.RiddleProtectionLevel.Medium
+    else ProtectionLevel.RiddleProtectionLevel.High

@@ -1,10 +1,9 @@
 package mosis.streetsandtotems.feature_auth.data.data_source
 
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.BackpackConstants
-import mosis.streetsandtotems.core.FirestoreConstants
+import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.feature_leaderboards.domain.model.LeaderboardUserData
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.ProfileData
@@ -26,13 +25,13 @@ class FirestoreAuthDataSource(private val db: FirebaseFirestore) {
         if (profileData.id != null && profileData.user_name != null) {
             db.runBatch {
                 it.set(
-                    db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION)
+                    db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION)
                         .document(profileData.id),
                     profileData
                 )
 
                 it.set(
-                    db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION)
+                    db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION)
                         .document(profileData.id),
                     UserInventoryData(
                         empty_spaces = BackpackConstants.DEFAULT_SIZE,
@@ -47,7 +46,7 @@ class FirestoreAuthDataSource(private val db: FirebaseFirestore) {
                 )
 
                 it.set(
-                    db.collection(FirestoreConstants.LEADERBOARD_COLLECTION).document(
+                    db.collection(FireStoreConstants.LEADERBOARD_COLLECTION).document(
                         profileData.id
                     ),
                     LeaderboardUserData(profileData.user_name, 0)

@@ -2,7 +2,6 @@ package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -37,6 +36,7 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
+import mosis.streetsandtotems.core.PointsConversion
 import mosis.streetsandtotems.core.domain.use_case.PreferenceUseCases
 import mosis.streetsandtotems.di.util.SharedFlowWrapper
 import mosis.streetsandtotems.feature_map.domain.model.*
@@ -103,8 +103,7 @@ class MapViewModel @Inject constructor(
 
         registerOnLocationService()
 
-        Log.d("tag", preferenceUseCases.getUserId.toString() + "idd")
-
+        registerGetMyIDs()
     }
 
     fun onEvent(event: MapViewModelEvents) {
@@ -134,6 +133,11 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.CloseHomeDialog -> closeHomeDialogHandler()
             MapViewModelEvents.ShowHomeDialog -> showHomeDialogHandler()
             is MapViewModelEvents.UpdateHome -> updateHomeDialogHandler(event.newHome)
+            MapViewModelEvents.CloseTotemDialog -> closeTotemDialogHandler()
+            MapViewModelEvents.ShowTotemDialog -> showTotemDialogHandler()
+            is MapViewModelEvents.UpdateTotem -> updateTotemDialogHandler(event.newTotem)
+            MapViewModelEvents.CloseRiddleDialog -> closeRiddleDialogHandler()
+            MapViewModelEvents.OpenRiddleDialog -> showRiddleDialogHandler()
         }
     }
 
@@ -202,6 +206,13 @@ class MapViewModel @Inject constructor(
             marketDialogOpen = false,
             home = HomeData(),
             homeDialogOpen = false,
+            myId = "",
+            mySquadId = null,
+            selectedTotem = TotemData(),
+            totemDialogOpen = false,
+            riddleDialogOpen = false,
+            takeTotemDialog = false,
+            riddleData = RiddleData(),
         )
         )
     }
@@ -211,6 +222,15 @@ class MapViewModel @Inject constructor(
             locationServiceEvents.flow.collect {
                 onLocationServiceEvent(it)
             }
+        }
+    }
+
+    private fun registerGetMyIDs() {
+        viewModelScope.launch {
+            _mapScreenState.value = _mapScreenState.value.copy(
+                myId = preferenceUseCases.getUserId(),
+                mySquadId = "" //preferenceUseCases.getSquadId()//treba flow
+            )
         }
     }
 
@@ -277,7 +297,9 @@ class MapViewModel @Inject constructor(
                 }
                 is TotemData -> {
                     totemsHashMap[it] = dataType
-                    composable = { CustomPin(resourceId = R.drawable.pin_tiki) }
+//da bi prikazalo svi totemi//                    if (dataType.placed_by != null && ((mapScreenState.value.mySquadId != null && dataType.placed_by == mapScreenState.value.mySquadId) || dataType.placed_by == mapScreenState.value.myId)) {
+                        composable = { CustomPin(resourceId = R.drawable.pin_tiki) }
+//                    }
                 }
                 is ProfileData -> {
                     if (dataType.is_online == true) {
@@ -571,7 +593,20 @@ class MapViewModel @Inject constructor(
                 showPlayerDialogHandler()
 
             } else if (mapScreenState.value.totemsHashMap.containsKey(id)) {
-
+                val totem = mapScreenState.value.totemsHashMap[id]!!
+                _mapScreenState.value = _mapScreenState.value.copy(
+                    selectedTotem = totem
+                )
+                if (totem.placed_by != null && ((mapScreenState.value.mySquadId != null && totem.placed_by == mapScreenState.value.mySquadId) || totem.placed_by == mapScreenState.value.myId)) {
+                    showTotemDialogHandler()
+                } else {//enemy totoem
+                    if (totem.protection_points == null || totem.protection_points < PointsConversion.LOW)
+                        showTakeTotemHandler()
+                    else {
+                        getRiddle(getProtectionLevelFromPointsNoUnprotected(totem.protection_points))
+//                        showRiddleDialogHandler()
+                    }
+                }
 
             } else if (mapScreenState.value.customPinsHashMap.containsKey(id)) {
                 val customPin = mapScreenState.value.customPinsHashMap[id]!!
@@ -725,6 +760,31 @@ class MapViewModel @Inject constructor(
         _mapScreenState.value = _mapScreenState.value.copy(homeDialogOpen = false)
     }
 
+    private fun showTotemDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(totemDialogOpen = true)
+    }
+
+    private fun closeTotemDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(totemDialogOpen = false)
+    }
+
+    private fun showRiddleDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(riddleDialogOpen = true)
+    }
+
+    private fun closeRiddleDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(riddleDialogOpen = false)
+    }
+
+    private fun showTakeTotemHandler() {
+        _mapScreenState.value =
+            _mapScreenState.value.copy(takeTotemDialog = true)//nema ga nije napravljen
+    }
+
+    private fun closeTakeTotemHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(takeTotemDialog = false)
+    }
+
 //endregion
 
 
@@ -769,7 +829,6 @@ class MapViewModel @Inject constructor(
     private fun addHomeHandler() {
         viewModelScope.launch {
             mapViewModelRepository.addHome(
-                "MOJID",////////////////////////////
                 GeoPoint(43.313198, 21.906673)
             )
         }
@@ -779,7 +838,7 @@ class MapViewModel @Inject constructor(
 
     private fun removeHomeHandler() {
         viewModelScope.launch {
-            mapViewModelRepository.deleteHome("MOJID")
+            mapViewModelRepository.deleteHome()
         }
     }
 
@@ -795,7 +854,6 @@ class MapViewModel @Inject constructor(
     private fun updateInventoryHandler(newUserInventoryData: UserInventoryData) {
         viewModelScope.launch {
             mapViewModelRepository.updateUserInventory(
-                "Q0Wy3JXFjjNFSBDzgvw4L66Ud6J2",
                 newUserInventoryData
             )
         }
@@ -816,7 +874,22 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    private fun updateTotemDialogHandler(newTotem: TotemData) {
+        viewModelScope.launch {
+            mapScreenState.value.selectedTotem.id?.let {
+                mapViewModelRepository.updateTotem(it, newTotem)
+            }
+        }
+    }
 
+    private fun getRiddle(protectionLevel: ProtectionLevel.RiddleProtectionLevel) {
+        viewModelScope.launch {
+            _mapScreenState.value = _mapScreenState.value.copy(
+                riddleData = mapViewModelRepository.getRiddle(protectionLevel) ?: RiddleData(),
+            )
+            showRiddleDialogHandler()
+        }
+    }
 //endregion
 
 }

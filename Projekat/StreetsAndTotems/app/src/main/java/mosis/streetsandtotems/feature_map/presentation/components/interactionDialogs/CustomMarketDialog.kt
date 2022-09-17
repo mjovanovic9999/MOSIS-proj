@@ -78,7 +78,6 @@ fun CustomMarketDialog(
         text = {
             LazyColumn(Modifier.drawVerticalScrollbar(rememberScrollState())) {
                 items(items?.keys?.toList() ?: listOf()) { typeName ->
-                    val exchangeResourceCount =
                         ItemMarket(
                             itemsLeft = items?.get(typeName)?.amount_left ?: 0,
                             emptySpaces = userInventoryData?.empty_spaces ?: 0,
@@ -334,6 +333,7 @@ private fun ItemMarket(
             CustomTextField(
                 modifier = Modifier
                     .height(MaterialTheme.sizes.drop_item_dialog_amount_text_field_height)
+                    .fillMaxWidth(.9f)
                     .padding(
                         start = MaterialTheme.sizes.drop_item_dialog_spacer,
                         end = 5.dp
@@ -359,7 +359,6 @@ private fun ItemMarket(
                 textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                 placeholder = FormFieldConstants.AMOUNT,
                 label = FormFieldConstants.AMOUNT,
-
                 )
         },
     )

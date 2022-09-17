@@ -3,7 +3,7 @@ package mosis.streetsandtotems.core
 import kotlin.math.PI
 
 
-object FirestoreConstants {
+object FireStoreConstants {
     const val PROFILE_DATA_COLLECTION = "profile_data"
     const val RESOURCES_COLLECTION = "resources"
     const val TOTEMS_COLLECTION = "totems"
@@ -23,6 +23,13 @@ object FirestoreConstants {
     const val EMAIL_FIELD = "email"
     const val SQUAD_ID_FIELD = "squad_id"
     const val IS_ONLINE_FIELD = "is_online"
+
+    const val EASY_RIDDLES = "easy_riddles"
+    const val MEDIUM_RIDDLES = "medium_riddles"
+    const val HARD_RIDDLES = "hard_riddles"
+    const val ITEM_COUNT = "item_count"
+    const val RIDDLE_COUNT_VALUE = "value"
+    const val ORDER_NUMBER = "order_number"
 }
 
 object FirebaseErrorCodesConstants {
@@ -115,6 +122,7 @@ object ButtonConstants {
     const val ACCEPT = "Accept"
     const val DECLINE = "Decline"
     const val DISMISS = "Dismiss"
+    const val SUBMIT_ANSWER = "Submit answer"
 }
 
 object FormFieldNamesConstants {
@@ -254,6 +262,7 @@ object TitleConstants {
     const val PRICE = "Price"
     const val BACKPACK_INVENTORY = "Backpack inventory"
     const val HOME_INVENTORY = "Home inventory"
+    const val VALUE_POINTS = "Value points: "
 }
 
 object FormFieldConstants {
@@ -270,6 +279,7 @@ object FormFieldConstants {
     const val AMOUNT = "Amount"
     const val DEFAULT_AMOUNT = "1"
     const val USER_NAME = "Username"
+    const val ANSWER = "Answer"
 }
 
 object NavBarConstants {
@@ -331,6 +341,9 @@ object TotemDialogConstants {
     const val PLACING_TIME = "Placing time:"
     const val LAST_VISIT = "Last visit:"
     const val DATE_TIME_FORMAT = "dd/MM/yy HH:mm"
+    const val TOTEM_STRENGTH = "Totem strength: "
+    const val POINTS_NEEDED_FOR_NEXT_LEVEL = "Next level for "
+    const val POINTS = " points"
 }
 
 object LeaderboardItemsConstants {
@@ -375,6 +388,11 @@ object PointsConversion {
     const val LOW = 50
     const val MEDIUM = 100
     const val HIGH = 200
+}
 
-
+object ProtectionLevelConstants {
+    const val UNPROTECTED = "Unprotected"
+    const val LOW = "Low"
+    const val MEDIUM = "Medium"
+    const val HIGH = "High"
 }

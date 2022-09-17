@@ -2,6 +2,7 @@ package mosis.streetsandtotems.feature_map.presentation
 
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.MarketItem
+import mosis.streetsandtotems.feature_map.domain.model.TotemData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 
 sealed class MapViewModelEvents {
@@ -30,5 +31,9 @@ sealed class MapViewModelEvents {
     object ShowHomeDialog : MapViewModelEvents()
     object CloseHomeDialog : MapViewModelEvents()
     data class UpdateHome(val newHome: InventoryData) : MapViewModelEvents()
-
+    object ShowTotemDialog : MapViewModelEvents()
+    object CloseTotemDialog : MapViewModelEvents()
+    data class UpdateTotem(val newTotem: TotemData) : MapViewModelEvents()
+    object OpenRiddleDialog : MapViewModelEvents()
+    object CloseRiddleDialog : MapViewModelEvents()
 }

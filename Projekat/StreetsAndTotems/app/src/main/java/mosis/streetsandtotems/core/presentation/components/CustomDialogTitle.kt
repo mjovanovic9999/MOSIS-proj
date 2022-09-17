@@ -23,9 +23,9 @@ import mosis.streetsandtotems.ui.theme.sizes
 sealed class IconType {
     sealed class ResourceType(val additionalText: String) : IconType() {
         object Emerald : ResourceType(" (${PointsConversion.EMERALD}pts)")
-        object Wood : ResourceType(" (${PointsConversion.EMERALD}pts)")
-        object Stone : ResourceType(" (${PointsConversion.EMERALD}pts)")
-        object Brick : ResourceType(" (${PointsConversion.EMERALD}pts)")
+        object Wood : ResourceType(" (${PointsConversion.WOOD}pts)")
+        object Stone : ResourceType(" (${PointsConversion.STONE}pts)")
+        object Brick : ResourceType(" (${PointsConversion.BRICK}pts)")
     }
 
     sealed class OtherType : IconType() {
