@@ -1,17 +1,16 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
-import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FireStoreConstants
-import mosis.streetsandtotems.core.FireStoreConstants.EASY_RIDDLES
-import mosis.streetsandtotems.core.FireStoreConstants.HARD_RIDDLES
-import mosis.streetsandtotems.core.FireStoreConstants.ID_FIELD
+import mosis.streetsandtotems.core.FireStoreConstants.EASY_RIDDLES_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.HARD_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.ITEM_COUNT
+import mosis.streetsandtotems.core.FireStoreConstants.LEADERBOARD_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.MARKET_DOCUMENT_ID
-import mosis.streetsandtotems.core.FireStoreConstants.MEDIUM_RIDDLES
+import mosis.streetsandtotems.core.FireStoreConstants.MEDIUM_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.ORDER_NUMBER
 import mosis.streetsandtotems.core.FireStoreConstants.RIDDLE_COUNT_VALUE
 import mosis.streetsandtotems.core.domain.model.UserData
@@ -126,24 +125,42 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         db.collection(FireStoreConstants.TOTEMS_COLLECTION).document(totemId).set(newTotem).await()
     }
 
+    suspend fun deleteTotem(totemId: String) {
+        db.collection(FireStoreConstants.TOTEMS_COLLECTION).document(totemId).delete().await()
+    }
+
     suspend fun getRiddle(protectionLevel: ProtectionLevel.RiddleProtectionLevel): RiddleData? {
         val collection = when (protectionLevel) {
-            ProtectionLevel.RiddleProtectionLevel.Low -> EASY_RIDDLES
-            ProtectionLevel.RiddleProtectionLevel.Medium -> MEDIUM_RIDDLES
-            ProtectionLevel.RiddleProtectionLevel.High -> HARD_RIDDLES
+            ProtectionLevel.RiddleProtectionLevel.Low -> EASY_RIDDLES_COLLECTION
+            ProtectionLevel.RiddleProtectionLevel.Medium -> MEDIUM_RIDDLES_COLLECTION
+            ProtectionLevel.RiddleProtectionLevel.High -> HARD_RIDDLES_COLLECTION
         }
+
         val count = db.collection(collection).document(ITEM_COUNT).get().await()
-            .get(RIDDLE_COUNT_VALUE)
+            .getLong(RIDDLE_COUNT_VALUE)
         val riddles =
             db.collection(collection)
                 .whereEqualTo(
                     ORDER_NUMBER,
-                    Random.nextInt(0, if (count is String) count.toInt() else 10)
+                    Random.nextInt(0, count?.toInt() ?: 10)
                 )
                 .get()
                 .await().toObjects(RiddleData::class.java)
 
         return riddles[0]
     }
+
+    suspend fun updateLeaderboard(userId: String, addLeaderboardPoints: Int) {
+        db.runTransaction {
+            val docRef = db.collection(LEADERBOARD_COLLECTION).document(userId)
+            val points = it.get(docRef).getLong("points")
+            it.update(docRef, "points", (points ?: 0) + addLeaderboardPoints)
+        }.await()
+
+    }
+
+    suspend fun onCorrectAnswerHandler() {}//vrv ne treba
+
+    suspend fun onIncorrectAnswerHandler() {}
 }
 

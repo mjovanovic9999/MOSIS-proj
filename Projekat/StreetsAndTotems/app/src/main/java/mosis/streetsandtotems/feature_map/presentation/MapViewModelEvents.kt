@@ -36,4 +36,9 @@ sealed class MapViewModelEvents {
     data class UpdateTotem(val newTotem: TotemData) : MapViewModelEvents()
     object OpenRiddleDialog : MapViewModelEvents()
     object CloseRiddleDialog : MapViewModelEvents()
+    object CorrectAnswer : MapViewModelEvents()
+    object IncorrectAnswer : MapViewModelEvents()
+    object ShowClaimTotemDialog : MapViewModelEvents()
+    object CloseClaimTotemDialog : MapViewModelEvents()
+    object ClaimTotem : MapViewModelEvents()
 }

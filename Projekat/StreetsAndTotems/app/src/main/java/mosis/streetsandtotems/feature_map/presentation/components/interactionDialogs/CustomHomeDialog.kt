@@ -291,9 +291,9 @@ private fun ItemHome(
                                     || (emptySpaces != null
                                     && emptySpaces - it.toInt() >= 0
                                     && it.toInt() > 0
-                                    ))
                                     )
-                            || backpackItemCount >= takeAmount.value.toInt()
+                                    ))
+                            || backpackItemCount >= it.toInt()
                         )
                             takeAmount.value = removeLeadingZerosIfAny(it)
 

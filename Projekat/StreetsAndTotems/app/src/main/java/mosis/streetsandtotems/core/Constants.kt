@@ -13,6 +13,9 @@ object FireStoreConstants {
     const val MARKET_COLLECTION = "market"
     const val LEADERBOARD_COLLECTION = "leaderboard"
     const val MARKET_DOCUMENT_ID = "market_document_id"
+    const val KICK_VOTE_COLLECTION = "kick_vote"
+    const val SQUADS_COLLECTION = "squads"
+    const val SQUAD_INVITES_COLLECTION = "squad_invites"
 
     const val ID_FIELD = "__name__"
     const val IMAGE_URI_FIELD = "image_uri"
@@ -24,9 +27,9 @@ object FireStoreConstants {
     const val SQUAD_ID_FIELD = "squad_id"
     const val IS_ONLINE_FIELD = "is_online"
 
-    const val EASY_RIDDLES = "easy_riddles"
-    const val MEDIUM_RIDDLES = "medium_riddles"
-    const val HARD_RIDDLES = "hard_riddles"
+    const val EASY_RIDDLES_COLLECTION = "easy_riddles"
+    const val MEDIUM_RIDDLES_COLLECTION = "medium_riddles"
+    const val HARD_RIDDLES_COLLECTION = "hard_riddles"
     const val ITEM_COUNT = "item_count"
     const val RIDDLE_COUNT_VALUE = "value"
     const val ORDER_NUMBER = "order_number"
@@ -123,6 +126,8 @@ object ButtonConstants {
     const val DECLINE = "Decline"
     const val DISMISS = "Dismiss"
     const val SUBMIT_ANSWER = "Submit answer"
+    const val CLAIM_TOTEM = "Claim totem"
+
 }
 
 object FormFieldNamesConstants {
@@ -157,6 +162,7 @@ object PinConstants {
     const val MY_PIN_RADIUS = 20f
     const val LAZY_LOADER_ID = "0"
     const val MY_PIN = "MY_PIN"
+    const val MY_PIN_Z_INDEX = 0.5f
 
     const val MARKET = "MARKET"
     const val HOME = "HOME"
@@ -241,6 +247,8 @@ object MessageConstants {
     const val DIALOG_BACKGROUND_PERMISSION_TITLE = "Background location permission is disabled"
     const val DIALOG_BACKGROUND_PERMISSION_TEXT =
         "In order to use Streets And Totems in background, background location permission has to be granted!"
+    const val CORRECT_ANSWER = "Your answer is correct!"
+    const val INCORRECT_ANSWER = "Your answer is incorrect!"
 }
 
 object TitleConstants {
@@ -263,6 +271,7 @@ object TitleConstants {
     const val BACKPACK_INVENTORY = "Backpack inventory"
     const val HOME_INVENTORY = "Home inventory"
     const val VALUE_POINTS = "Value points: "
+    const val SOLVE_ME = "Solve me"
 }
 
 object FormFieldConstants {
@@ -388,6 +397,10 @@ object PointsConversion {
     const val LOW = 50
     const val MEDIUM = 100
     const val HIGH = 200
+
+    const val TOTEM_BONUS_POINTS_INCORRECT_ANSWER = 100
+
+    const val HOURS_TO_POINTS_CONVERSION = 1
 }
 
 object ProtectionLevelConstants {

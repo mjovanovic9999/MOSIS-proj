@@ -53,9 +53,7 @@ class MapViewModelRepositoryImpl(
 
     }
 
-    override suspend fun updateUserInventory(
-        newUserInventoryData: UserInventoryData
-    ) {
+    override suspend fun updateUserInventory(newUserInventoryData: UserInventoryData) {
         firebaseMapDataSource.updateUserInventory(
             preferenceDataSource.getUserId(),
             newUserInventoryData
@@ -78,8 +76,16 @@ class MapViewModelRepositoryImpl(
         firebaseMapDataSource.updateTotem(totemId, newTotem)
     }
 
+    override suspend fun deleteTotem(totemId: String) {
+        firebaseMapDataSource.deleteTotem(totemId)
+    }
+
     override suspend fun getRiddle(protectionLevel: ProtectionLevel.RiddleProtectionLevel): RiddleData? {
         return firebaseMapDataSource.getRiddle(protectionLevel)
+    }
+
+    override suspend fun updateLeaderboard(userId: String, newLeaderboardPoints: Int) {
+        return firebaseMapDataSource.updateLeaderboard(userId, newLeaderboardPoints)
     }
 
 

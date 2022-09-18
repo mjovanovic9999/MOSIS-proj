@@ -31,7 +31,11 @@ interface MapViewModelRepository {
 
     suspend fun updateTotem(totemId: String, newTotem: TotemData)
 
+    suspend fun deleteTotem(totemId: String)
+
     suspend fun getRiddle(protectionLevel: ProtectionLevel.RiddleProtectionLevel): RiddleData?
+
+    suspend fun updateLeaderboard(userId: String, addLeaderboardPoints: Int)
 
 //    suspend fun registerCallbackOnUserInventoryUpdate(callback: (UserInventoryData) -> Unit)
 }

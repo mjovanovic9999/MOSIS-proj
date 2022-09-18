@@ -122,7 +122,15 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
     CustomRiddleDialog(
         isOpen = state.riddleDialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseRiddleDialog) },
-        onCorrectAnswerClick = {},
+        onCorrectAnswerClick = { mapViewModel.onEvent(MapViewModelEvents.CorrectAnswer) },
+        onIncorrectAnswerClick = { mapViewModel.onEvent(MapViewModelEvents.IncorrectAnswer) },
         riddleData = state.riddleData,
+    )
+
+    CustomClaimTotemDialog(
+        isOpen = state.claimTotemDialog,
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseClaimTotemDialog) },
+        onClaim = { mapViewModel.onEvent(MapViewModelEvents.ClaimTotem) },
+        backpackHasEmptySpace = state.playerInventory.empty_spaces != 0,
     )
 }

@@ -104,7 +104,7 @@ fun CustomResourceDialog(
                             )
                                 takeAmount.value = removeLeadingZerosIfAny(it)
 
-                        } else takeAmount.value = it
+                        } else takeAmount.value = ""
                     },
                     placeholder = FormFieldConstants.AMOUNT,
                     label = FormFieldConstants.AMOUNT,
