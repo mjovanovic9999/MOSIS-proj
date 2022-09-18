@@ -1,12 +1,12 @@
 package mosis.streetsandtotems.di
 
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
+import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
 import mosis.streetsandtotems.feature_map.data.repository.MapViewModelRepositoryImpl
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
@@ -22,8 +22,11 @@ object MapModule {
     @Provides
     @ViewModelScoped
     fun provideMapViewModelRepository(
-        auth: FirebaseAuth,
+        preferenceDataSource: PreferencesDataStore,
         firebaseMapDataSource: FirebaseMapDataSource
     ): MapViewModelRepository =
-        MapViewModelRepositoryImpl(auth = auth, firebaseMapDataSource = firebaseMapDataSource)
+        MapViewModelRepositoryImpl(
+            preferenceDataSource = preferenceDataSource,
+            firebaseMapDataSource = firebaseMapDataSource
+        )
 }

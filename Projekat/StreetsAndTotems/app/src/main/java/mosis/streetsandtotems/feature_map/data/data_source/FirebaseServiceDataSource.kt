@@ -4,16 +4,16 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
-import mosis.streetsandtotems.core.FirestoreConstants
+import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.feature_map.domain.model.*
 import org.imperiumlabs.geofirestore.GeoFirestore
 
 class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
     private val userGeoFirestore =
-        GeoFirestore(db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION))
+        GeoFirestore(db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION))
 
     private val userGeoQuery =
-        GeoFirestore(db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION))
+        GeoFirestore(db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION))
 
     fun updateUserLocation(user: FirebaseUser, newLocation: GeoPoint) {
         userGeoFirestore.setLocation(user.uid, newLocation)
@@ -26,8 +26,8 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
         userModifiedCallback: (user: ProfileData) -> Unit,
         userRemovedCallback: (user: ProfileData) -> Unit
     ): ListenerRegistration {
-        return db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION)
-            .whereNotEqualTo(FirestoreConstants.ID_FIELD, currentUser.uid)
+        return db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION)
+            .whereNotEqualTo(FireStoreConstants.ID_FIELD, currentUser.uid)
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
                     e,
@@ -39,7 +39,7 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
                         it.toObject<ProfileData>()
                             .copy(
                                 id = it.id,
-                                image_uri = it.data[FirestoreConstants.IMAGE_URI_FIELD].toString()
+                                image_uri = it.data[FireStoreConstants.IMAGE_URI_FIELD].toString()
                             )
                     }
                 )
@@ -52,7 +52,7 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
         resourceModifiedCallback: (resource: ResourceData) -> Unit,
         resourceRemovedCallback: (resource: ResourceData) -> Unit
     ): ListenerRegistration {
-        return db.collection(FirestoreConstants.RESOURCES_COLLECTION)
+        return db.collection(FireStoreConstants.RESOURCES_COLLECTION)
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
                     e,
@@ -72,7 +72,7 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
         totemModifiedCallback: (totem: TotemData) -> Unit,
         totemRemovedCallback: (totem: TotemData) -> Unit
     ): ListenerRegistration {
-        return db.collection(FirestoreConstants.TOTEMS_COLLECTION)
+        return db.collection(FireStoreConstants.TOTEMS_COLLECTION)
 //            .whereEqualTo(FirestoreConstants.ID_FIELD, currentUser.uid)//fali squad id
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
@@ -92,7 +92,7 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
         customPinModifiedCallback: (customPin: CustomPinData) -> Unit,
         customPinRemovedCallback: (customPin: CustomPinData) -> Unit
     ): ListenerRegistration {
-        return db.collection(FirestoreConstants.CUSTOM_PINS_COLLECTION)
+        return db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION)
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
                     e,
@@ -111,7 +111,7 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
         homeModifiedCallback: (home: HomeData) -> Unit,
         homeRemovedCallback: (home: HomeData) -> Unit
     ): ListenerRegistration {
-        return db.collection(FirestoreConstants.HOMES_COLLECTION)
+        return db.collection(FireStoreConstants.HOMES_COLLECTION)
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
                     e,
@@ -131,8 +131,8 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
         currentUser: FirebaseUser,
         userInventoryCallback: (UserInventoryData) -> Unit
     ): ListenerRegistration {
-        return db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION)
-            .whereEqualTo(FirestoreConstants.ID_FIELD, currentUser.uid)
+        return db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION)
+            .whereEqualTo(FireStoreConstants.ID_FIELD, currentUser.uid)
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
                     e,
@@ -150,7 +150,7 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
         marketModifiedCallback: (market: MarketData) -> Unit,
         marketRemovedCallback: (market: MarketData) -> Unit
     ): ListenerRegistration {
-        return db.collection(FirestoreConstants.MARKET_COLLECTION)
+        return db.collection(FireStoreConstants.MARKET_COLLECTION)
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
                     e,

@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -16,11 +17,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.R
+import mosis.streetsandtotems.core.HandleResponseConstants
 import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_LAT
 import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_LNG
 import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_X
@@ -32,12 +35,19 @@ import mosis.streetsandtotems.core.MapConstants.TILE_KEY
 import mosis.streetsandtotems.core.MapConstants.TILE_URL_512
 import mosis.streetsandtotems.core.MapConstants.TITLE_SIZE
 import mosis.streetsandtotems.core.MapConstants.WORKER_COUNT
+import mosis.streetsandtotems.core.MessageConstants.CORRECT_ANSWER
+import mosis.streetsandtotems.core.MessageConstants.INCORRECT_ANSWER
 import mosis.streetsandtotems.core.PinConstants.LAZY_LOADER_ID
 import mosis.streetsandtotems.core.PinConstants.MY_PIN
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
+import mosis.streetsandtotems.core.PinConstants.MY_PIN_Z_INDEX
+import mosis.streetsandtotems.core.PointsConversion
+import mosis.streetsandtotems.core.PointsConversion.TOTEM_BONUS_POINTS_INCORRECT_ANSWER
+import mosis.streetsandtotems.core.domain.model.SnackbarSettings
 import mosis.streetsandtotems.core.domain.use_case.PreferenceUseCases
+import mosis.streetsandtotems.core.presentation.components.SnackbarType
 import mosis.streetsandtotems.di.util.SharedFlowWrapper
 import mosis.streetsandtotems.feature_map.domain.model.*
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
@@ -60,7 +70,8 @@ class MapViewModel @Inject constructor(
     private val mapViewModelRepository: MapViewModelRepository,
     private val locationServiceEvents: SharedFlowWrapper<LocationServiceEvents>,
     private val showLoader: MutableStateFlow<Boolean>,
-    private val preferenceUseCases: PreferenceUseCases
+    private val preferenceUseCases: PreferenceUseCases,
+    private val snackbarSettingsFlow: MutableStateFlow<SnackbarSettings?>,
 ) : ViewModel() {
     private val _mapScreenState: MutableState<MapScreenState>
     private val _mapState: MapState
@@ -103,8 +114,7 @@ class MapViewModel @Inject constructor(
 
         registerOnLocationService()
 
-        Log.d("tag", preferenceUseCases.getUserId.toString() + "idd")
-
+        registerGetMyIDs()
     }
 
     fun onEvent(event: MapViewModelEvents) {
@@ -134,17 +144,25 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.CloseHomeDialog -> closeHomeDialogHandler()
             MapViewModelEvents.ShowHomeDialog -> showHomeDialogHandler()
             is MapViewModelEvents.UpdateHome -> updateHomeDialogHandler(event.newHome)
+            MapViewModelEvents.CloseTotemDialog -> closeTotemDialogHandler()
+            MapViewModelEvents.ShowTotemDialog -> showTotemDialogHandler()
+            is MapViewModelEvents.UpdateTotem -> updateTotemDialogHandler(event.newTotem)
+            MapViewModelEvents.CloseRiddleDialog -> closeRiddleDialogHandler()
+            MapViewModelEvents.OpenRiddleDialog -> showRiddleDialogHandler()
+            MapViewModelEvents.CorrectAnswer -> onCorrectAnswerHandler()
+            MapViewModelEvents.IncorrectAnswer -> onIncorrectAnswerHandler()
+            MapViewModelEvents.CloseClaimTotemDialog -> closeClaimTotemHandler()
+            MapViewModelEvents.ShowClaimTotemDialog -> showClaimTotemHandler()
+            MapViewModelEvents.ClaimTotem -> claimTotemHandler()
         }
     }
 
     private fun getInitMapState(): MutableState<MapScreenState> {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
             try {
-                val image = Glide.with(appContext)
-                    .downloadOnly()
+                val image = Glide.with(appContext).downloadOnly()
                     //   .load("https://api.maptiler.com/maps/streets/256/${zoomLvl}/${col}/${row}.png?key=HqIvIaAAnQt3ibV6COHi")
-                    .load("${TILE_URL_512}${zoomLvl}/${col}/${row}.jpg?key=${TILE_KEY}")
-                    .submit()
+                    .load("${TILE_URL_512}${zoomLvl}/${col}/${row}.jpg?key=${TILE_KEY}").submit()
                     .get()
 
 
@@ -156,22 +174,20 @@ class MapViewModel @Inject constructor(
         }
 
         return mutableStateOf(MapScreenState(
-            mapState = mutableStateOf(
-                MapState(
-                    levelCount = LEVEL_COUNT,
-                    fullWidth = mapDimensions,
-                    fullHeight = mapDimensions,
-                    workerCount = WORKER_COUNT,
-                    tileSize = TITLE_SIZE
-                ) {
-                    scroll(INIT_SCROLL_X, INIT_SCROLL_Y)
-                }.apply {
-                    addLayer(tileStreamProvider)
-                    enableRotation()
-                    maxScale = MAX_SCALE
-                    minimumScaleMode = Fill
-                }
-            ),
+            mapState = mutableStateOf(MapState(
+                levelCount = LEVEL_COUNT,
+                fullWidth = mapDimensions,
+                fullHeight = mapDimensions,
+                workerCount = WORKER_COUNT,
+                tileSize = TITLE_SIZE
+            ) {
+                scroll(INIT_SCROLL_X, INIT_SCROLL_Y)
+            }.apply {
+                addLayer(tileStreamProvider)
+                enableRotation()
+                maxScale = MAX_SCALE
+                minimumScaleMode = Fill
+            }),
             customPinDialog = SelectedCustomPinDialog(
                 dialogOpen = false,
                 id = null,
@@ -192,8 +208,7 @@ class MapViewModel @Inject constructor(
             customPinsHashMap = customPinsHashMap,
             selectedPlayer = ProfileData(),
             playerLocation = GeoPoint(
-                INIT_SCROLL_LAT,
-                INIT_SCROLL_LNG
+                INIT_SCROLL_LAT, INIT_SCROLL_LNG
             ),
             resourceDialogOpen = false,
             selectedResource = ResourceData(),
@@ -202,6 +217,13 @@ class MapViewModel @Inject constructor(
             marketDialogOpen = false,
             home = HomeData(),
             homeDialogOpen = false,
+            myId = "",
+            mySquadId = null,
+            selectedTotem = TotemData(),
+            totemDialogOpen = false,
+            riddleDialogOpen = false,
+            claimTotemDialog = false,
+            riddleData = RiddleData(),
         )
         )
     }
@@ -211,6 +233,15 @@ class MapViewModel @Inject constructor(
             locationServiceEvents.flow.collect {
                 onLocationServiceEvent(it)
             }
+        }
+    }
+
+    private fun registerGetMyIDs() {
+        viewModelScope.launch {
+            _mapScreenState.value = _mapScreenState.value.copy(
+                myId = preferenceUseCases.getUserId(),
+                mySquadId = "" //preferenceUseCases.getSquadId()//treba flow
+            )
         }
     }
 
@@ -277,20 +308,21 @@ class MapViewModel @Inject constructor(
                 }
                 is TotemData -> {
                     totemsHashMap[it] = dataType
+//da bi prikazalo svi totemi//                    if (dataType.placed_by != null && ((mapScreenState.value.mySquadId != null && dataType.placed_by == mapScreenState.value.mySquadId) || dataType.placed_by == mapScreenState.value.myId)) {
                     composable = { CustomPin(resourceId = R.drawable.pin_tiki) }
+//                    }
                 }
                 is ProfileData -> {
                     if (dataType.is_online == true) {
                         playersHashMap[it] = dataType
-                        composable =
-                            {
-                                CustomPinImage(
-                                    imageUri = if (dataType.image_uri == null) Uri.EMPTY else Uri.parse(
-                                        dataType.image_uri
-                                    ),
-                                    true//userData.squad_id != null && "MYSQUADID" != null && userData.squad_id == "MYSQUADID"
-                                )
-                            }
+                        composable = {
+                            CustomPinImage(
+                                imageUri = if (dataType.image_uri == null) Uri.EMPTY else Uri.parse(
+                                    dataType.image_uri
+                                ),
+                                true//userData.squad_id != null && "MYSQUADID" != null && userData.squad_id == "MYSQUADID"
+                            )
+                        }
                     }
                 }
                 is MarketData -> {
@@ -354,8 +386,9 @@ class MapViewModel @Inject constructor(
     }
 
     private fun movePinConditionally(id: String, newGeoPoint: GeoPoint?, oldGeoPoint: GeoPoint?) {
-        if (oldGeoPoint != null && newGeoPoint != null
-            && !areGeoPointsEqual(newGeoPoint, oldGeoPoint)
+        if (oldGeoPoint != null && newGeoPoint != null && !areGeoPointsEqual(
+                newGeoPoint, oldGeoPoint
+            )
         ) {
             movePinAtLatLng(id, newGeoPoint.latitude, newGeoPoint.longitude)
         }
@@ -392,8 +425,7 @@ class MapViewModel @Inject constructor(
 
 
     private fun registerOnMapStateChangeListener() {
-        var pinLocation =
-            GeoPoint(INIT_SCROLL_LAT, INIT_SCROLL_LNG)
+        var pinLocation = GeoPoint(INIT_SCROLL_LAT, INIT_SCROLL_LNG)
         var scale = _mapState.scale
 
         _mapState.setStateChangeListener {
@@ -405,21 +437,12 @@ class MapViewModel @Inject constructor(
             val markerInfo = _mapState.getMarkerInfo(MY_PIN)
             if (markerInfo != null) {
                 pinLocation = convertOffsetsToGeoPoint(
-                    markerInfo.x,
-                    markerInfo.y,
-                    mapDimensions,
-                    mapDimensions
+                    markerInfo.x, markerInfo.y, mapDimensions, mapDimensions
                 )
             }
-            if (
-                mapScreenState.value.followMe
-                && mapScreenState.value.detectScroll
-                && !areGeoPointsEqual(
+            if (mapScreenState.value.followMe && mapScreenState.value.detectScroll && !areGeoPointsEqual(
                     pinLocation, convertOffsetsToGeoPoint(
-                        this.centroidX,
-                        this.centroidY,
-                        mapDimensions,
-                        mapDimensions
+                        this.centroidX, this.centroidY, mapDimensions, mapDimensions
                     )
                 )
             ) {
@@ -484,15 +507,15 @@ class MapViewModel @Inject constructor(
             relativeOffset = Offset(-.5f, -.5f),
             renderingStrategy = RenderingStrategy.LazyLoading("0"),
             clickable = false,
+            zIndex = MY_PIN_Z_INDEX,
         )
     }
 
 
     private fun changeStateDetectScroll(shouldDetectScroll: Boolean) {
-        _mapScreenState.value =
-            _mapScreenState.value.copy(
-                detectScroll = shouldDetectScroll
-            )
+        _mapScreenState.value = _mapScreenState.value.copy(
+            detectScroll = shouldDetectScroll
+        )
     }
 
 
@@ -565,13 +588,24 @@ class MapViewModel @Inject constructor(
                 showResourceDialogHandler()
             } else if (mapScreenState.value.playersHashMap.containsKey(id)) {
                 _mapScreenState.value = _mapScreenState.value.copy(
-                    selectedPlayer =
-                    mapScreenState.value.playersHashMap[id]!!
+                    selectedPlayer = mapScreenState.value.playersHashMap[id]!!
                 )
                 showPlayerDialogHandler()
 
             } else if (mapScreenState.value.totemsHashMap.containsKey(id)) {
-
+                val totem = mapScreenState.value.totemsHashMap[id]!!
+                _mapScreenState.value = _mapScreenState.value.copy(
+                    selectedTotem = totem
+                )
+//                if (totem.placed_by != null && ((mapScreenState.value.mySquadId != null && totem.placed_by == mapScreenState.value.mySquadId) || totem.placed_by == mapScreenState.value.myId)) {
+                showTotemDialogHandler()
+//                } else {//enemy totoem
+//                    if (totem.protection_points == null || totem.protection_points < PointsConversion.LOW)
+//                        showClaimTotemHandler()
+//                    else {
+//                        getRiddle(getProtectionLevelFromPointsNoUnprotected(totem.protection_points))
+//                    }
+//                }
 
             } else if (mapScreenState.value.customPinsHashMap.containsKey(id)) {
                 val customPin = mapScreenState.value.customPinsHashMap[id]!!
@@ -594,34 +628,17 @@ class MapViewModel @Inject constructor(
             _mapState.onLongPress { x, y ->
                 showCustomPinDialogHandler(
                     convertOffsetsToGeoPoint(
-                        x,
-                        y,
-                        mapDimensions,
-                        mapDimensions
+                        x, y, mapDimensions, mapDimensions
                     )
                 )
             }
         }
     }
 
-
-//    fun addCustomPin() {//jos jedan flow
-//        val x = mapScreenState.value.pinDialog.x
-//        val y = mapScreenState.value.pinDialog.y
-//        addPinAtOffset(
-//            pinId = CUSTOM + x + y,
-//            x = x, y = y,
-//            R.drawable.pin_custom
-//        )
-//    }
-
     //region handlers
 
     private fun showCustomPinDialogHandler(
-        l: GeoPoint?,
-        id: String? = null,
-        placedBy: String? = null,
-        text: String? = null
+        l: GeoPoint?, id: String? = null, placedBy: String? = null, text: String? = null
     ) {
         _mapScreenState.value = _mapScreenState.value.copy(
             customPinDialog = _mapScreenState.value.customPinDialog.copy(
@@ -700,12 +717,11 @@ class MapViewModel @Inject constructor(
             filterResources.emit(false)
             filterTotems.emit(false)
             filterPlayers.emit(false)
-            _mapScreenState.value =
-                _mapScreenState.value.copy(
-                    filterResources = false,
-                    filterPlayers = false,
-                    filterTotems = false,
-                )
+            _mapScreenState.value = _mapScreenState.value.copy(
+                filterResources = false,
+                filterPlayers = false,
+                filterTotems = false,
+            )
         }
     }
 
@@ -723,6 +739,31 @@ class MapViewModel @Inject constructor(
 
     private fun closeHomeDialogHandler() {
         _mapScreenState.value = _mapScreenState.value.copy(homeDialogOpen = false)
+    }
+
+    private fun showTotemDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(totemDialogOpen = true)
+    }
+
+    private fun closeTotemDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(totemDialogOpen = false)
+    }
+
+    private fun showRiddleDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(riddleDialogOpen = true)
+    }
+
+    private fun closeRiddleDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(riddleDialogOpen = false)
+    }
+
+    private fun showClaimTotemHandler() {
+        _mapScreenState.value =
+            _mapScreenState.value.copy(claimTotemDialog = true)//nema ga nije napravljen
+    }
+
+    private fun closeClaimTotemHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(claimTotemDialog = false)
     }
 
 //endregion
@@ -769,7 +810,6 @@ class MapViewModel @Inject constructor(
     private fun addHomeHandler() {
         viewModelScope.launch {
             mapViewModelRepository.addHome(
-                "MOJID",////////////////////////////
                 GeoPoint(43.313198, 21.906673)
             )
         }
@@ -779,7 +819,7 @@ class MapViewModel @Inject constructor(
 
     private fun removeHomeHandler() {
         viewModelScope.launch {
-            mapViewModelRepository.deleteHome("MOJID")
+            mapViewModelRepository.deleteHome()
         }
     }
 
@@ -795,7 +835,6 @@ class MapViewModel @Inject constructor(
     private fun updateInventoryHandler(newUserInventoryData: UserInventoryData) {
         viewModelScope.launch {
             mapViewModelRepository.updateUserInventory(
-                "Q0Wy3JXFjjNFSBDzgvw4L66Ud6J2",
                 newUserInventoryData
             )
         }
@@ -812,6 +851,87 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             mapScreenState.value.home.id?.let {
                 mapViewModelRepository.updateHomeInventory(it, newHome)
+            }
+        }
+    }
+
+    private fun updateTotemDialogHandler(newTotem: TotemData) {
+        viewModelScope.launch {
+            mapScreenState.value.selectedTotem.id?.let {
+                mapViewModelRepository.updateTotem(it, newTotem)
+            }
+        }
+    }
+
+    private fun getRiddle(protectionLevel: ProtectionLevel.RiddleProtectionLevel) {
+        viewModelScope.launch {
+            _mapScreenState.value = _mapScreenState.value.copy(
+                riddleData = mapViewModelRepository.getRiddle(protectionLevel) ?: RiddleData(),
+            )
+            showRiddleDialogHandler()
+        }
+    }
+
+
+    private fun onCorrectAnswerHandler() {
+        val selectedTotem = mapScreenState.value.selectedTotem.copy(protection_points = 0)
+        selectedTotem.id?.let {
+            viewModelScope.launch {
+                mapViewModelRepository.updateTotem(it, selectedTotem)
+                snackbarSettingsFlow.emit(
+                    SnackbarSettings(
+                        message = CORRECT_ANSWER,
+                        duration = SnackbarDuration.Short,
+                        snackbarType = SnackbarType.Info,
+                        snackbarId = snackbarSettingsFlow.value?.snackbarId?.plus(other = HandleResponseConstants.ID_ADDITION_FACTOR)
+                            ?: HandleResponseConstants.DEFAULT_ID
+                    )
+                )
+                showClaimTotemHandler()
+            }
+        }
+    }
+
+    private fun onIncorrectAnswerHandler() {
+        val selectedTotem = mapScreenState.value.selectedTotem.copy(
+            bonus_points = (mapScreenState.value.selectedTotem.bonus_points ?: 0)
+                    + TOTEM_BONUS_POINTS_INCORRECT_ANSWER
+        )
+        selectedTotem.id?.let {
+            viewModelScope.launch {
+                mapViewModelRepository.updateTotem(it, selectedTotem)
+                snackbarSettingsFlow.emit(
+                    SnackbarSettings(
+                        message = INCORRECT_ANSWER,
+                        duration = SnackbarDuration.Short,
+                        snackbarType = SnackbarType.Error,
+                        snackbarId = snackbarSettingsFlow.value?.snackbarId?.plus(other = HandleResponseConstants.ID_ADDITION_FACTOR)
+                            ?: HandleResponseConstants.DEFAULT_ID
+                    )
+                )
+            }
+        }
+    }
+
+    private fun claimTotemHandler() {
+        val selectedTotem = mapScreenState.value.selectedTotem
+
+        selectedTotem.id?.let {
+            viewModelScope.launch {
+                mapViewModelRepository.updateLeaderboard(
+                    mapScreenState.value.myId,
+                    (selectedTotem.bonus_points ?: 0)
+                            + calculateTotemTimePoints(selectedTotem.last_visited)
+                )//ako nije u squaddd????????
+                mapViewModelRepository.updateUserInventory(
+                    UserInventoryData(
+                        empty_spaces = (mapScreenState.value.playerInventory.empty_spaces ?: 1) - 1,
+                        inventory = mapScreenState.value.playerInventory.inventory?.copy(
+                            totem = (mapScreenState.value.playerInventory.inventory?.totem ?: 0) + 1
+                        )
+                    )
+                )
+                mapViewModelRepository.deleteTotem(it)
             }
         }
     }

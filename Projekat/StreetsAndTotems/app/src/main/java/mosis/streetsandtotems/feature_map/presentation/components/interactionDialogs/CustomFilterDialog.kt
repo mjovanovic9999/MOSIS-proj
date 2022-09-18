@@ -58,19 +58,14 @@ fun CustomFilterDialog(
                     )
                 }
             }
-//            FlowRow(mainAxisAlignment = FlowMainAxisAlignment.SpaceEvenly) {
-//
-//
-//
-//            }
-
         },
         confirmButtonEnabled = true,
         confirmButtonText = ButtonConstants.APPLY,
         onConfirmButtonClick = { onConfirmButtonClick() },
         dismissButtonEnabled = true,
         dismissButtonText = ButtonConstants.DISMISS,
-        onDismissButtonClick = { onDismissRequest() },
+        onDismissButtonClick = onDismissRequest,
+        onDismissRequest = onDismissRequest
     )
 
 

@@ -3,16 +3,15 @@ package mosis.streetsandtotems.feature_map.presentation
 import androidx.compose.runtime.Composable
 
 import android.net.Uri
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import com.ramcosta.composedestinations.annotation.Destination
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import mosis.streetsandtotems.feature_map.presentation.components.*
-import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomFilterDialog
-import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomHomeDialog
-import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomMarketDialog
-import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.CustomResourceDialog
+import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.*
 import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
 
 @MainNavGraph(start = true)
@@ -44,7 +43,7 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
     PlayerDialog(//fale fje za interakciju sqaud
         isOpen = state.playerDialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.ClosePlayerDialog) },
-        isSquadMember = state.selectedPlayer.id == "MYID",////////////////////////////
+        isSquadMember = state.selectedPlayer.squad_id == "squadid",////////////////////////////
         tradeEnabled = isTradePossible(
             state.playerLocation,
             state.selectedPlayer.l
@@ -102,7 +101,6 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         updateMarketItems = { mapViewModel.onEvent(MapViewModelEvents.UpdateMarket(it)) },
     )
 
-
     CustomHomeDialog(
         isOpen = state.homeDialogOpen,
         inventoryData = state.home.inventory,
@@ -112,4 +110,27 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         updateHomeItems = { mapViewModel.onEvent(MapViewModelEvents.UpdateHome(it)) },
     )
 
+    CustomTotemDialog(
+        isOpen = state.totemDialogOpen,
+        userInventoryData = state.playerInventory,
+        updateUserInventoryData = { mapViewModel.onEvent(MapViewModelEvents.UpdateInventory(it)) },
+        updateTotem = { mapViewModel.onEvent(MapViewModelEvents.UpdateTotem(it)) },
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseTotemDialog) },
+        currentTotem = state.selectedTotem,
+    )
+
+    CustomRiddleDialog(
+        isOpen = state.riddleDialogOpen,
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseRiddleDialog) },
+        onCorrectAnswerClick = { mapViewModel.onEvent(MapViewModelEvents.CorrectAnswer) },
+        onIncorrectAnswerClick = { mapViewModel.onEvent(MapViewModelEvents.IncorrectAnswer) },
+        riddleData = state.riddleData,
+    )
+
+    CustomClaimTotemDialog(
+        isOpen = state.claimTotemDialog,
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseClaimTotemDialog) },
+        onClaim = { mapViewModel.onEvent(MapViewModelEvents.ClaimTotem) },
+        backpackHasEmptySpace = state.playerInventory.empty_spaces != 0,
+    )
 }

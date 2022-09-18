@@ -4,12 +4,18 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.tasks.await
-import mosis.streetsandtotems.core.FirestoreConstants
-import mosis.streetsandtotems.core.FirestoreConstants.MARKET_DOCUMENT_ID
-import mosis.streetsandtotems.feature_map.domain.model.UserData
-import mosis.streetsandtotems.feature_map.domain.model.InventoryData
-import mosis.streetsandtotems.feature_map.domain.model.MarketItem
-import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
+import mosis.streetsandtotems.core.FireStoreConstants
+import mosis.streetsandtotems.core.FireStoreConstants.EASY_RIDDLES_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.HARD_RIDDLES_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.ITEM_COUNT
+import mosis.streetsandtotems.core.FireStoreConstants.LEADERBOARD_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.MARKET_DOCUMENT_ID
+import mosis.streetsandtotems.core.FireStoreConstants.MEDIUM_RIDDLES_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.ORDER_NUMBER
+import mosis.streetsandtotems.core.FireStoreConstants.RIDDLE_COUNT_VALUE
+import mosis.streetsandtotems.core.domain.model.UserData
+import mosis.streetsandtotems.feature_map.domain.model.*
+import kotlin.random.Random
 
 class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     suspend fun addCustomPin(
@@ -18,7 +24,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         placed_by: String,
         text: String,
     ) {
-        db.collection(FirestoreConstants.CUSTOM_PINS_COLLECTION).add(
+        db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION).add(
             mapOf(
                 "l" to l,
                 "text" to text,
@@ -39,17 +45,16 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         if (placed_by != null) data["placed_by"] = placed_by as Any
         if (text != null) data["text"] = text as Any
 
-        if (data.isNotEmpty())
-            db.collection(FirestoreConstants.CUSTOM_PINS_COLLECTION).document(id)
-                .update(data).await()
+        if (data.isNotEmpty()) db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION).document(id)
+            .update(data).await()
     }
 
     suspend fun deleteCustomPin(id: String) {
-        db.collection(FirestoreConstants.CUSTOM_PINS_COLLECTION).document(id).delete().await()
+        db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION).document(id).delete().await()
     }
 
     suspend fun addHome(myId: String, l: GeoPoint) {
-        db.collection(FirestoreConstants.HOMES_COLLECTION).document(myId).set(
+        db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId).set(
             mapOf(
                 "l" to l,
                 "inventory" to mapOf(
@@ -64,62 +69,98 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     suspend fun updateHome(
-        homeId: String,
-        newInventoryData: InventoryData? = null,
-        l: GeoPoint? = null
+        homeId: String, newInventoryData: InventoryData? = null, l: GeoPoint? = null
     ) {
         val data: MutableMap<String, Any> = mutableMapOf()
         if (newInventoryData != null) data["inventory"] = newInventoryData
         if (l != null) data["l"] = l
 
-        if (data.isNotEmpty())
-            db.collection(FirestoreConstants.HOMES_COLLECTION).document(homeId)
-                .update(data).await()
+        if (data.isNotEmpty()) db.collection(FireStoreConstants.HOMES_COLLECTION).document(homeId)
+            .update(data).await()
     }
 
     suspend fun deleteHome(myId: String) {
-        db.collection(FirestoreConstants.HOMES_COLLECTION).document(myId).delete().await()
+        db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId).delete().await()
 
     }
 
     suspend fun updateResource(resourceId: String, remaining: Int) {
-        db.collection(FirestoreConstants.RESOURCES_COLLECTION).document(resourceId)
-            .update(
-                mapOf("remaining" to remaining)
-            ).await()
+        db.collection(FireStoreConstants.RESOURCES_COLLECTION).document(resourceId).update(
+            mapOf("remaining" to remaining)
+        ).await()
     }
 
     suspend fun deleteResource(resourceId: String) {
-        db.collection(FirestoreConstants.RESOURCES_COLLECTION).document(resourceId).delete().await()
+        db.collection(FireStoreConstants.RESOURCES_COLLECTION).document(resourceId).delete().await()
     }
 
     suspend fun getUserInventory(userId: String): UserInventoryData? {
-        return db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION).document(userId).get()
-            .await()
-            .toObject(UserInventoryData::class.java)
+        return db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION).document(userId).get()
+            .await().toObject(UserInventoryData::class.java)
     }
 
     suspend fun updateUserInventory(
-        myId: String,
-        newUserInventoryData: UserInventoryData
+        myId: String, newUserInventoryData: UserInventoryData
     ) {
-        db.collection(FirestoreConstants.USER_INVENTORY_COLLECTION).document(myId)
+        db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION).document(myId)
             .set(newUserInventoryData).await()
     }
 
     fun updateUserOnlineStatus(isOnline: Boolean, userId: String): Task<Void> {
-        return db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION).document(userId)
-            .update(FirestoreConstants.IS_ONLINE_FIELD, isOnline)
+        return db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION).document(userId)
+            .update(FireStoreConstants.IS_ONLINE_FIELD, isOnline)
     }
 
     suspend fun getUserData(userId: String): UserData? {
-        return db.collection(FirestoreConstants.PROFILE_DATA_COLLECTION).document(userId).get()
+        return db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION).document(userId).get()
             .await().toObject(UserData::class.java)
     }
 
     suspend fun updateMarket(newMarket: Map<String, MarketItem>) {
-        db.collection(FirestoreConstants.MARKET_COLLECTION).document(MARKET_DOCUMENT_ID)
-            .update(mapOf("items" to newMarket))
+        db.collection(FireStoreConstants.MARKET_COLLECTION).document(MARKET_DOCUMENT_ID)
+            .update(mapOf("items" to newMarket)).await()
     }
 
+    suspend fun updateTotem(totemId: String, newTotem: TotemData) {
+        db.collection(FireStoreConstants.TOTEMS_COLLECTION).document(totemId).set(newTotem).await()
+    }
+
+    suspend fun deleteTotem(totemId: String) {
+        db.collection(FireStoreConstants.TOTEMS_COLLECTION).document(totemId).delete().await()
+    }
+
+    suspend fun getRiddle(protectionLevel: ProtectionLevel.RiddleProtectionLevel): RiddleData? {
+        val collection = when (protectionLevel) {
+            ProtectionLevel.RiddleProtectionLevel.Low -> EASY_RIDDLES_COLLECTION
+            ProtectionLevel.RiddleProtectionLevel.Medium -> MEDIUM_RIDDLES_COLLECTION
+            ProtectionLevel.RiddleProtectionLevel.High -> HARD_RIDDLES_COLLECTION
+        }
+
+        val count = db.collection(collection).document(ITEM_COUNT).get().await()
+            .getLong(RIDDLE_COUNT_VALUE)
+        val riddles =
+            db.collection(collection)
+                .whereEqualTo(
+                    ORDER_NUMBER,
+                    Random.nextInt(0, count?.toInt() ?: 10)
+                )
+                .get()
+                .await().toObjects(RiddleData::class.java)
+
+        return riddles[0]
+    }
+
+    suspend fun updateLeaderboard(userId: String, addLeaderboardPoints: Int) {
+        db.runTransaction {
+            val docRef = db.collection(LEADERBOARD_COLLECTION).document(userId)
+            val points = it.get(docRef).getLong("points")
+            it.update(docRef, "points", (points ?: 0) + addLeaderboardPoints)
+        }.await()
+
+    }
+
+    suspend fun onCorrectAnswerHandler() {}//vrv ne treba
+
+    suspend fun onIncorrectAnswerHandler() {}
 }
+

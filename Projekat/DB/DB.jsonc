@@ -52,11 +52,10 @@
 {
     "id": "squad_id",
     "data":{
-        "user_one": "auth_id",
-        "user_two": "",
-        "user_three": "",
-        "user_four": "",
-        "user_five": ""
+        "users": [
+             "auth_id1",
+             "2",
+        ],
     }
 }
 
@@ -144,4 +143,25 @@
             },
         }
     }
+}
+
+//squad_invites
+{
+    "id":"",
+    "data":{
+        "squad_id":"",
+        "user_id":"",
+    }
+}
+
+//"kick_vote":
+{    "id":"",
+     "data":{
+        "squad_id":"",
+        "user_id":"",
+        "votes":{
+            "user_id":"yes no unanswered",
+        }
+     },
+
 }

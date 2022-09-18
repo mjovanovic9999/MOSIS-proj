@@ -1,10 +1,9 @@
 package mosis.streetsandtotems.feature_auth.data.data_source
 
-import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import mosis.streetsandtotems.core.BackpackConstants
-import mosis.streetsandtotems.core.FirestoreConstants
+import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.feature_leaderboards.domain.model.LeaderboardUserData
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.ProfileData
@@ -78,7 +77,7 @@ class FirestoreAuthDataSource(private val db: FirebaseFirestore) {
                 )
 
                 it.set(
-                    db.collection(FirestoreConstants.LEADERBOARD_COLLECTION).document(
+                    db.collection(FireStoreConstants.LEADERBOARD_COLLECTION).document(
                         profileData.id
                     ), LeaderboardUserData(profileData.user_name, 0)
                 )

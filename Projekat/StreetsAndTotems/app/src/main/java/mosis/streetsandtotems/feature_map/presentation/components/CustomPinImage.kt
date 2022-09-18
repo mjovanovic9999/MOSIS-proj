@@ -19,8 +19,8 @@ fun CustomPinImage(imageUri: Uri, isMyFriend: Boolean) {
         GlideImage(
             imageModel = imageUri,
             modifier = Modifier
-                .height(31.dp)
-                .width(31.dp)
+                .height(32.dp)
+                .width(32.dp)
                 .offset(3.dp, 3.dp)
         )
         Image(
