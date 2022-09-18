@@ -1,8 +1,11 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
+import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.ktx.getField
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.core.FireStoreConstants.EASY_RIDDLES_COLLECTION
@@ -13,6 +16,8 @@ import mosis.streetsandtotems.core.FireStoreConstants.MARKET_DOCUMENT_ID
 import mosis.streetsandtotems.core.FireStoreConstants.MEDIUM_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.ORDER_NUMBER
 import mosis.streetsandtotems.core.FireStoreConstants.RIDDLE_COUNT_VALUE
+import mosis.streetsandtotems.core.FireStoreConstants.SQUADS_COLLECTION
+import mosis.streetsandtotems.core.PointsConversion.SQUAD_MEMBERS_POINTS_COEFFICIENT
 import mosis.streetsandtotems.core.domain.model.UserData
 import mosis.streetsandtotems.feature_map.domain.model.*
 import kotlin.random.Random
@@ -156,11 +161,20 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             val points = it.get(docRef).getLong("points")
             it.update(docRef, "points", (points ?: 0) + addLeaderboardPoints)
         }.await()
-
     }
 
-    suspend fun onCorrectAnswerHandler() {}//vrv ne treba
-
-    suspend fun onIncorrectAnswerHandler() {}
+    suspend fun updateSquadLeaderboard(squadId: String, addSquadLeaderboardPoints: Int) {
+        val ids =
+            db.collection(SQUADS_COLLECTION).document("ScrImM23lmrLjRL0oMiz"/*squadId*/)
+                .get()///////////////////
+                .await().get("users") as List<*>
+        for (item in ids) {
+            if (item is String)
+                updateLeaderboard(
+                    item,
+                    (addSquadLeaderboardPoints * SQUAD_MEMBERS_POINTS_COEFFICIENT).toInt()
+                )
+        }
+    }
 }
 

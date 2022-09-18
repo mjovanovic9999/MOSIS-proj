@@ -39,6 +39,8 @@ fun CustomTotemDialog(
     updateUserInventoryData: (newUserInventoryData: UserInventoryData) -> Unit,
     updateTotem: (newTotem: TotemData) -> Unit,
     currentTotem: TotemData,
+    onHarvestTotemPoints: () -> Unit,
+    onPickUpTotem: () -> Unit,
 ) {
     CustomDialog(
         isOpen = isOpen,
@@ -201,13 +203,24 @@ fun CustomTotemDialog(
             }
         },
         buttonType = CustomButtonType.Outlined,
-        confirmButtonMatchParentWidth = true,
-        confirmButtonVisible = false,
+        onConfirmButtonClick = {
+            onHarvestTotemPoints()
+            onDismissRequest()
+        },
+        confirmButtonText = ButtonConstants.HARVEST,
+        confirmButtonVisible = true,
+        confirmButtonMatchParentWidth = false,
+
+        onDismissButtonClick = {
+            onPickUpTotem()
+            onDismissRequest()
+        },
+        dismissButtonText = ButtonConstants.PICK_UP_TOTEM,
         dismissButtonVisible = true,
-        dismissButtonText = ButtonConstants.DISMISS,
-        onDismissButtonClick = onDismissRequest,
+        dismissButtonMatchParentWidth = false,
+        dismissButtonEnabled = (userInventoryData?.empty_spaces ?: 0) > 0,
+
         clickable = true,
-        dismissButtonMatchParentWidth = true,
     )
 }
 

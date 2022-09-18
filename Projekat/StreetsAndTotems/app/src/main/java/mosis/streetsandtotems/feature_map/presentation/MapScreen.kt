@@ -117,6 +117,8 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         updateTotem = { mapViewModel.onEvent(MapViewModelEvents.UpdateTotem(it)) },
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseTotemDialog) },
         currentTotem = state.selectedTotem,
+        onHarvestTotemPoints = { mapViewModel.onEvent(MapViewModelEvents.HarvestTotemPoints) },
+        onPickUpTotem = { mapViewModel.onEvent(MapViewModelEvents.ClaimTotem) }
     )
 
     CustomRiddleDialog(

@@ -88,7 +88,9 @@ class MapViewModelRepositoryImpl(
         return firebaseMapDataSource.updateLeaderboard(userId, newLeaderboardPoints)
     }
 
-
+    override suspend fun updateSquadLeaderboard(squadId: String, addSquadLeaderboardPoints: Int) {
+        return firebaseMapDataSource.updateSquadLeaderboard(squadId, addSquadLeaderboardPoints)
+    }
 //    override suspend fun registerCallbackOnUserInventoryUpdate(userId: String): UserInventoryData? {
 //        return try {
 //            firebaseMapDataSource.getUserInventory(userId)
