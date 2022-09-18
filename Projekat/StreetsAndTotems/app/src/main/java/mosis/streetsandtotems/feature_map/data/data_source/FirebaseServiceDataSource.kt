@@ -73,7 +73,7 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
         totemRemovedCallback: (totem: TotemData) -> Unit
     ): ListenerRegistration {
         return db.collection(FireStoreConstants.TOTEMS_COLLECTION)
-//            .whereEqualTo(FirestoreConstants.ID_FIELD, currentUser.uid)//fali squad id
+//            .whereEqualTo(FireStoreConstants.ID_FIELD, currentUser.uid)//fali squad id
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
                     e,

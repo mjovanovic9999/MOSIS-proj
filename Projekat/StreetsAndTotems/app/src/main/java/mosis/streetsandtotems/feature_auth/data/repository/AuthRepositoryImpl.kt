@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FirebaseAuthConstants
 import mosis.streetsandtotems.core.FirebaseErrorCodesConstants
-import mosis.streetsandtotems.core.FirestoreConstants
+import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.core.MessageConstants
 import mosis.streetsandtotems.core.data.data_source.AuthProvider
 import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
@@ -45,7 +45,7 @@ class AuthRepositoryImpl @Inject constructor(
         try {
             emit(Response.Loading)
             if (firestoreAuthDataSource.getUsersWithEmail(email).await().documents.firstOrNull()
-                    ?.getBoolean(FirestoreConstants.IS_ONLINE_FIELD) == true
+                    ?.getBoolean(FireStoreConstants.IS_ONLINE_FIELD) == true
             ) emit(Response.Error(message = MessageConstants.ALREADY_LOGGED_IN))
             else {
                 authDataSource.emailAndPasswordSignIn(email, password).await()

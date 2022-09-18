@@ -13,7 +13,6 @@ import mosis.streetsandtotems.core.FireStoreConstants.MARKET_DOCUMENT_ID
 import mosis.streetsandtotems.core.FireStoreConstants.MEDIUM_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.ORDER_NUMBER
 import mosis.streetsandtotems.core.FireStoreConstants.RIDDLE_COUNT_VALUE
-import mosis.streetsandtotems.core.domain.model.UserData
 import mosis.streetsandtotems.feature_map.domain.model.*
 import kotlin.random.Random
 
