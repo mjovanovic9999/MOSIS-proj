@@ -1,7 +1,5 @@
 package mosis.streetsandtotems.feature_auth.presentation.signup
 
-import android.util.Log
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -36,150 +34,131 @@ class SignupViewModel @Inject constructor(
     private val showLoaderFlow: MutableStateFlow<Boolean>
 ) : ViewModel() {
     private val _signUpScreenEventFlow = MutableStateFlow<SignUpScreenEvents?>(value = null)
-    private val _signUpScreenState =
-        mutableStateOf(
-            SignUpState(
-                signUpScreenEventFlow = _signUpScreenEventFlow, formState = FormState(
-                    fields = listOf(
-                        TextFormField(
-                            initial = "",
-                            name = FormFieldNamesConstants.USER_NAME,
-                            validators = listOf(Validators.Required(MessageConstants.USER_NAME_REQUIRED)),
-                            label = FormFieldConstants.USER_NAME,
-                            placeholder = FormFieldConstants.USER_NAME,
-                            textFieldType = CustomTextFieldType.Outlined,
-                            singleLine = true,
-                            clearable = true,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+    private val _signUpScreenState = mutableStateOf(
+        SignUpState(
+            signUpScreenEventFlow = _signUpScreenEventFlow, formState = FormState(
+                fields = listOf(
+                    TextFormField(
+                        initial = "",
+                        name = FormFieldNamesConstants.USER_NAME,
+                        validators = listOf(Validators.Required(MessageConstants.USER_NAME_REQUIRED)),
+                        label = FormFieldConstants.USER_NAME,
+                        placeholder = FormFieldConstants.USER_NAME,
+                        textFieldType = CustomTextFieldType.Outlined,
+                        singleLine = true,
+                        clearable = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    ), TextFormField(
+                        initial = "",
+                        name = FormFieldNamesConstants.FIRST_NAME,
+                        validators = listOf(Validators.Required(MessageConstants.FIRST_NAME_REQUIRED)),
+                        label = FormFieldConstants.FIRST_NAME,
+                        placeholder = FormFieldConstants.FIRST_NAME,
+                        textFieldType = CustomTextFieldType.Outlined,
+                        singleLine = true,
+                        clearable = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    ), TextFormField(
+                        initial = "",
+                        name = FormFieldNamesConstants.LAST_NAME,
+                        validators = listOf(Validators.Required(MessageConstants.LAST_NAME_REQUIRED)),
+                        label = FormFieldConstants.LAST_NAME,
+                        placeholder = FormFieldConstants.LAST_NAME,
+                        textFieldType = CustomTextFieldType.Outlined,
+                        singleLine = true,
+                        clearable = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    ), TextFormField(
+                        initial = "",
+                        name = FormFieldNamesConstants.PHONE_NUMBER,
+                        validators = listOf(
+                            Validators.Custom(
+                                MessageConstants.INVALID_PHONE_NUMBER, ::validatePhoneNumber
+                            ), Validators.Required(MessageConstants.PHONE_NUMBER_REQUIRED)
                         ),
-                        TextFormField(
-                            initial = "",
-                            name = FormFieldNamesConstants.FIRST_NAME,
-                            validators = listOf(Validators.Required(MessageConstants.FIRST_NAME_REQUIRED)),
-                            label = FormFieldConstants.FIRST_NAME,
-                            placeholder = FormFieldConstants.FIRST_NAME,
-                            textFieldType = CustomTextFieldType.Outlined,
-                            singleLine = true,
-                            clearable = true,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        label = FormFieldConstants.PHONE_NUMBER,
+                        placeholder = FormFieldConstants.PHONE_NUMBER,
+                        textFieldType = CustomTextFieldType.Outlined,
+                        singleLine = true,
+                        clearable = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    ), TextFormField(
+                        initial = "",
+                        name = FormFieldNamesConstants.EMAIL,
+                        validators = listOf(
+                            Validators.Email(MessageConstants.EMAIL_REQUIRED),
+                            Validators.Required(MessageConstants.EMAIL_REQUIRED)
                         ),
-                        TextFormField(
-                            initial = "",
-                            name = FormFieldNamesConstants.LAST_NAME,
-                            validators = listOf(Validators.Required(MessageConstants.LAST_NAME_REQUIRED)),
-                            label = FormFieldConstants.LAST_NAME,
-                            placeholder = FormFieldConstants.LAST_NAME,
-                            textFieldType = CustomTextFieldType.Outlined,
-                            singleLine = true,
-                            clearable = true,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        ),
-                        TextFormField(
-                            initial = "",
-                            name = FormFieldNamesConstants.PHONE_NUMBER,
-                            validators = listOf(
-                                Validators.Custom(
-                                    MessageConstants.INVALID_PHONE_NUMBER,
-                                    ::validatePhoneNumber
-                                ), Validators.Required(MessageConstants.PHONE_NUMBER_REQUIRED)
-                            ),
-                            label = FormFieldConstants.PHONE_NUMBER,
-                            placeholder = FormFieldConstants.PHONE_NUMBER,
-                            textFieldType = CustomTextFieldType.Outlined,
-                            singleLine = true,
-                            clearable = true,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                        ),
-                        TextFormField(
-                            initial = "",
-                            name = FormFieldNamesConstants.EMAIL,
-                            validators = listOf(
-                                Validators.Email(MessageConstants.EMAIL_REQUIRED),
-                                Validators.Required(MessageConstants.EMAIL_REQUIRED)
-                            ),
-                            label = FormFieldConstants.EMAIL,
-                            placeholder = FormFieldConstants.EMAIL,
-                            textFieldType = CustomTextFieldType.Outlined,
-                            singleLine = true,
-                            clearable = true,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Email,
-                                imeAction = ImeAction.Next
-                            )
-                        ),
-                        TextFormField(
-                            initial = "",
-                            name = FormFieldNamesConstants.PASSWORD,
-                            validators = listOf(
-                                Validators.Required(MessageConstants.PASSWORD_REQUIRED),
-                                Validators.Min(8, MessageConstants.PASSWORD_LENGTH)
-                            ),
-                            label = FormFieldConstants.PASSWORD,
-                            placeholder = FormFieldConstants.PASSWORD,
-                            textFieldType = CustomTextFieldType.Outlined,
-                            singleLine = true,
-                            clearable = true,
-                            visualTransformation = { text ->
-                                TransformedText(
-                                    AnnotatedString(
-                                        VisualTransformationConstants.PASSWORD.repeat(
-                                            text.length
-                                        )
-                                    ),
-                                    OffsetMapping.Identity
-                                )
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Next,
-                                keyboardType = KeyboardType.Password
-                            ),
-                        ),
-                        TextFormField(
-                            initial = "",
-                            name = FormFieldNamesConstants.REPEAT_PASSWORD,
-                            validators = listOf(
-                                Validators.Custom(
-                                    MessageConstants.PASSWORDS_DO_NOT_MATCH,
-                                    ::validateRepeatedPassword
-                                ),
-                                Validators.Min(
-                                    FormFieldLengthConstants.PASSWORD,
-                                    MessageConstants.PASSWORD_LENGTH
-                                ),
-                                Validators.Required(MessageConstants.REPEAT_PASSWORD_REQUIRED),
-                            ),
-                            label = FormFieldConstants.REPEAT_PASSWORD,
-                            placeholder = FormFieldConstants.REPEAT_PASSWORD,
-                            textFieldType = CustomTextFieldType.Outlined,
-                            singleLine = true,
-                            clearable = true,
-                            visualTransformation = { text ->
-                                TransformedText(
-                                    AnnotatedString(
-                                        VisualTransformationConstants.PASSWORD.repeat(
-                                            text.length
-                                        )
-                                    ),
-                                    OffsetMapping.Identity
-                                )
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                imeAction = ImeAction.Next,
-                                keyboardType = KeyboardType.Password
-                            ),
-                            keyboardActions = KeyboardActions(onNext = { signUpWithEmailAndPasswordHandler() }),
-                        ),
-                        ImageSelectFormField(
-                            name = FormFieldNamesConstants.IMAGE_URI,
-                            initial = "",
-                            validators = listOf(Validators.Required(MessageConstants.IMAGE_REQUIRED))
+                        label = FormFieldConstants.EMAIL,
+                        placeholder = FormFieldConstants.EMAIL,
+                        textFieldType = CustomTextFieldType.Outlined,
+                        singleLine = true,
+                        clearable = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email, imeAction = ImeAction.Next
                         )
-                    ),
-                    SignUpFields::class,
-                    SignUpFieldsEmpty()
-                )
+                    ), TextFormField(
+                        initial = "",
+                        name = FormFieldNamesConstants.PASSWORD,
+                        validators = listOf(
+                            Validators.Required(MessageConstants.PASSWORD_REQUIRED),
+                            Validators.Min(8, MessageConstants.PASSWORD_LENGTH)
+                        ),
+                        label = FormFieldConstants.PASSWORD,
+                        placeholder = FormFieldConstants.PASSWORD,
+                        textFieldType = CustomTextFieldType.Outlined,
+                        singleLine = true,
+                        clearable = true,
+                        visualTransformation = { text ->
+                            TransformedText(
+                                AnnotatedString(
+                                    VisualTransformationConstants.PASSWORD.repeat(
+                                        text.length
+                                    )
+                                ), OffsetMapping.Identity
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next, keyboardType = KeyboardType.Password
+                        ),
+                    ), TextFormField(
+                        initial = "",
+                        name = FormFieldNamesConstants.REPEAT_PASSWORD,
+                        validators = listOf(
+                            Validators.Custom(
+                                MessageConstants.PASSWORDS_DO_NOT_MATCH, ::validateRepeatedPassword
+                            ),
+                            Validators.Min(
+                                FormFieldLengthConstants.PASSWORD, MessageConstants.PASSWORD_LENGTH
+                            ),
+                            Validators.Required(MessageConstants.REPEAT_PASSWORD_REQUIRED),
+                        ),
+                        label = FormFieldConstants.REPEAT_PASSWORD,
+                        placeholder = FormFieldConstants.REPEAT_PASSWORD,
+                        textFieldType = CustomTextFieldType.Outlined,
+                        singleLine = true,
+                        clearable = true,
+                        visualTransformation = { text ->
+                            TransformedText(
+                                AnnotatedString(
+                                    VisualTransformationConstants.PASSWORD.repeat(
+                                        text.length
+                                    )
+                                ), OffsetMapping.Identity
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Done, keyboardType = KeyboardType.Password
+                        ),
+                    ), ImageSelectFormField(
+                        name = FormFieldNamesConstants.IMAGE_PATH,
+                        initial = "",
+                        validators = listOf(Validators.Required(MessageConstants.IMAGE_REQUIRED))
+                    )
+                ), SignUpFields::class, SignUpFieldsEmpty()
             )
         )
+    )
     val signUpScreenState: State<SignUpState> = _signUpScreenState
 
     private fun validateRepeatedPassword(repeatedPassword: Any): Boolean {
@@ -189,44 +168,30 @@ class SignupViewModel @Inject constructor(
     fun onEvent(event: SignUpViewModelEvents) {
         when (event) {
             SignUpViewModelEvents.SignUpWithEmailAndPassword -> signUpWithEmailAndPasswordHandler()
+            SignUpViewModelEvents.SignUpWithGoogle -> signUpWithGoogle()
         }
+    }
+
+    private fun signUpWithGoogle() {
+
     }
 
     private fun signUpWithEmailAndPasswordHandler() {
         val signUpFields = _signUpScreenState.value.formState.getDataWithValidation()
         if (signUpFields != null) {
             viewModelScope.launch {
-                handleResponse(
-                    authUseCases.emailAndPasswordSignUp(
-                        profileData = signUpFields,
-                        signUpFields.password
-                    ),
+                handleResponse(authUseCases.emailAndPasswordSignUp(
+                    profileData = signUpFields, signUpFields.password
+                ),
                     snackbarFlow = snackbarFlow,
                     showLoaderFlow = showLoaderFlow,
                     defaultErrorMessage = MessageConstants.SIGN_UP_ERROR,
                     successMessage = MessageConstants.SIGNED_UP,
                     onSuccess = {
                         viewModelScope.launch {
-                            Log.d("tag", authUseCases.isUserAuthenticated().toString())
-                            authUseCases.signOut()
-
-                            //                            handleSignInWithEmailAndPassword(
-//                                email = signUpFields.email,
-//                                password = signUpFields.password,
-//                                onSuccess = {
-//                                    viewModelScope.launch {
-//                                        _signUpScreenEventFlow.emit(
-//                                            SignUpScreenEvents.SignUpSuccessful
-//                                        )
-//                                    }
-//                                },
-//                                authUseCases = authUseCases,
-//                                snackbarFlow = snackbarFlow,
-//                                showLoaderFlow = showLoaderFlow
-//                            )
+                            _signUpScreenEventFlow.emit(SignUpScreenEvents.SignUpSuccessful)
                         }
-                    }
-                )
+                    })
             }
         }
     }

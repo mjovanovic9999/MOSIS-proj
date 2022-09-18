@@ -6,5 +6,7 @@ data class AuthUseCases(
     val isUserAuthenticated: IsUserAuthenticated,
     val emailAndPasswordSignUp: EmailAndPasswordSignUp,
     val oneTapSignInWithGoogle: OneTapSignInWithGoogle,
-    val signInWithGoogle: SignInWithGoogle
+    val signInWithGoogle: SignInWithGoogle,
+    val sendVerificationEmail: SendVerificationEmail,
+    val sendRecoveryEmail: SendRecoveryEmail
 )

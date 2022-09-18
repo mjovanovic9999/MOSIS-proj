@@ -2,6 +2,7 @@ package mosis.streetsandtotems.feature_map.data.repository
 
 import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
+import com.google.firebase.auth.FirebaseAuth
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
 import mosis.streetsandtotems.feature_map.domain.model.*
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository

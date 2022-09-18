@@ -22,4 +22,12 @@ class FirebaseAuthDataSource @Inject constructor(private val firebaseAuth: Fireb
     fun signInWithCredential(credentials: AuthCredential): Task<AuthResult> =
         firebaseAuth.signInWithCredential(credentials)
 
+    fun removeCurrentUser(): Task<Void>? {
+        return firebaseAuth.currentUser?.delete()
+    }
+
+    fun sendRecoveryEmail(email: String): Task<Void> {
+        return firebaseAuth.sendPasswordResetEmail(email)
+    }
+
 }

@@ -368,9 +368,9 @@ class MapViewModel @Inject constructor(
                 }
                 is ProfileData -> {
                     if (dataType.is_online == true) {
-                        if (playersHashMap.containsKey(it)) oldData =
-                            playersHashMap.put(it, dataType)
-                        else addPinHash(dataType)
+                        if (playersHashMap.containsKey(it)) {
+                            oldData = playersHashMap.put(it, dataType)
+                        } else addPinHash(dataType)
                     } else removePinHash(dataType)
 
                 }

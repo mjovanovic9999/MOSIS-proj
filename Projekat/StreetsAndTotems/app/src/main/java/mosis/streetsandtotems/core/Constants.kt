@@ -87,6 +87,9 @@ object ConversionConstants {
 }
 
 object ButtonConstants {
+    const val RECOVERY_EMAIL = "Send recovery email"
+    const val RESEND_EMAIL = "Send new verification email"
+    const val GO_TO_SIGN_IN = "Go to sign in screen"
     const val SIGN_IN = "Sign In"
     const val SIGN_IN_GOOGLE = "Sign in with Google"
     const val SIGN_IN_FACEBOOK = "Sign in with Facebook"
@@ -140,7 +143,7 @@ object FormFieldNamesConstants {
     const val REPEAT_PASSWORD = "repeatPassword"
     const val CURRENT_PASSWORD = "currentPassword"
     const val NEW_PASSWORD = "newPassword"
-    const val IMAGE_URI = "imageUri"
+    const val IMAGE_PATH = "imagePath"
     const val USER_NAME = "userName"
 }
 
@@ -213,6 +216,16 @@ object HandleResponseConstants {
 }
 
 object MessageConstants {
+    const val NO_USER_ACCOUNT_WITH_THIS_EMAIL = "Account with provided email doesn't exist!"
+    const val RECOVERY_EMAIL_SENT = "Recovery email sent!"
+    const val PASSWORD_RESET = "Enter email address for sending recovery email!"
+    const val ALREADY_LOGGED_IN = "This account is already online on another device!"
+    const val USERNAME_TAKEN = "Username is taken!"
+    const val EMAIL_NOT_VERIFIED = "Unverified email!"
+    const val EMAIL_TIMEOUT =
+        "Email sent recently! You have to wait before you can send another one!"
+    const val EMAIL_SENT = "Email sent!"
+    const val EMAIL_VERIFICATION = "Verification email sent! Please verify your email to sign in!"
     const val USER_NAME_REQUIRED = "Username is required!"
     const val IMAGE_REQUIRED = "Image is required!"
     const val SIGN_OUT_ERROR = "An error occurred while signing you out!"
@@ -253,6 +266,8 @@ object MessageConstants {
 }
 
 object TitleConstants {
+    const val PASSWORD_RESET = "Reset password"
+    const val EMAIL_VERIFICATION = "Email verification"
     const val SIGN_UP = "Sign up"
     const val PROFILE = "My profile"
     const val EDIT_PROFILE = "Edit profile"
@@ -412,4 +427,9 @@ object ProtectionLevelConstants {
     const val LOW = "Low"
     const val MEDIUM = "Medium"
     const val HIGH = "High"
+
+}
+
+object FirebaseStorageConstants {
+    const val IMAGES = "profile_images"
 }

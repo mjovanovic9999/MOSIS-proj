@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.core.presentation.components.form.formfields
 
-import android.util.Log
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,13 +22,9 @@ class ImageSelectFormField(
         CustomImageSelectorAndCropper(
             focusRequester = focusRequester,
             onImageSelected = {
-                Log.d(
-                    "tag",
-                    it.toString()
-                )
-                fieldState.change(it.toString())
+                fieldState.change(it)
                 onValueChanged.invoke(
-                    it.toString()
+                    it
                 )
             })
         Text(

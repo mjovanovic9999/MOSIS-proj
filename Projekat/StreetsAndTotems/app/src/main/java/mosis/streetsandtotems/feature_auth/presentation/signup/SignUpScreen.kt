@@ -12,11 +12,11 @@ import mosis.streetsandtotems.core.ButtonConstants
 import mosis.streetsandtotems.core.TitleConstants
 import mosis.streetsandtotems.core.presentation.components.CustomButton
 import mosis.streetsandtotems.core.presentation.components.CustomButtonType
-import mosis.streetsandtotems.core.presentation.components.CustomImageSelectorAndCropper
 import mosis.streetsandtotems.core.presentation.components.CustomPage
 import mosis.streetsandtotems.core.presentation.components.form.Form
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.AuthNavGraph
-import mosis.streetsandtotems.destinations.MainScreenDestination
+import mosis.streetsandtotems.core.presentation.screens.tiki.TikiScreenContentType
+import mosis.streetsandtotems.destinations.TikiScreenDestination
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtons
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtonsType
 import mosis.streetsandtotems.ui.theme.sizes
@@ -29,19 +29,17 @@ fun SignUpScreen(viewModel: SignupViewModel, destinationsNavigator: Destinations
 
     LaunchedEffect(Unit) {
         state.signUpScreenEventFlow.collectLatest {
-            if (it != null)
-                when (it) {
-                    SignUpScreenEvents.SignUpSuccessful -> {
-                        destinationsNavigator.popBackStack()
-                        destinationsNavigator.navigate(MainScreenDestination)
-                    }
+            if (it != null) when (it) {
+                SignUpScreenEvents.SignUpSuccessful -> {
+                    destinationsNavigator.popBackStack()
+                    destinationsNavigator.navigate(TikiScreenDestination(TikiScreenContentType.EmailVerification))
                 }
+            }
         }
     }
 
     CustomPage(
-        titleText = TitleConstants.SIGN_UP,
-        content = {
+        titleText = TitleConstants.SIGN_UP, content = {
             Form(formState = state.formState, asColumn = false)
 
             CustomButton(
@@ -54,7 +52,6 @@ fun SignUpScreen(viewModel: SignupViewModel, destinationsNavigator: Destinations
                 enabled = state.formState.isFormFilled.value
             )
             AuthButtons(type = AuthButtonsType.SignUp)
-        },
-        scrollable = true
+        }, scrollable = true
     )
 }

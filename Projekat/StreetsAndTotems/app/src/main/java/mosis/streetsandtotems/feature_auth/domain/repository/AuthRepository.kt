@@ -14,8 +14,7 @@ interface AuthRepository {
     suspend fun emailAndPasswordSignIn(email: String, password: String): Flow<Response<SignInError>>
 
     suspend fun emailAndPasswordSignUp(
-        password: String,
-        profileData: SignUpFields
+        password: String, profileData: SignUpFields
     ): Flow<Response<Nothing>>
 
     suspend fun signOut(emitError: Boolean = true): Flow<Response<Nothing>>
@@ -29,4 +28,6 @@ interface AuthRepository {
     fun getSignInCredentialFromIntent(intent: Intent): SignInCredential
 
     suspend fun sendValidationEmail(): Flow<Response<Nothing>>
+
+    suspend fun sendRecoveryEmail(email: String): Flow<Response<Nothing>>
 }

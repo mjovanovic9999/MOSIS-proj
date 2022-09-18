@@ -18,7 +18,6 @@ import mosis.streetsandtotems.core.FireStoreConstants.ORDER_NUMBER
 import mosis.streetsandtotems.core.FireStoreConstants.RIDDLE_COUNT_VALUE
 import mosis.streetsandtotems.core.FireStoreConstants.SQUADS_COLLECTION
 import mosis.streetsandtotems.core.PointsConversion.SQUAD_MEMBERS_POINTS_COEFFICIENT
-import mosis.streetsandtotems.core.domain.model.UserData
 import mosis.streetsandtotems.feature_map.domain.model.*
 import kotlin.random.Random
 
