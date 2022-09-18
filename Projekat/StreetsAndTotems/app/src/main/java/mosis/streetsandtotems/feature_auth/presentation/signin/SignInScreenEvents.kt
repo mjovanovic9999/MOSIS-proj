@@ -4,4 +4,5 @@ sealed class SignInScreenEvents {
     object SignInSuccessful : SignInScreenEvents()
     object WrongEmail : SignInScreenEvents()
     object WrongPassword : SignInScreenEvents()
+    object EmailNotVerified : SignInScreenEvents()
 }

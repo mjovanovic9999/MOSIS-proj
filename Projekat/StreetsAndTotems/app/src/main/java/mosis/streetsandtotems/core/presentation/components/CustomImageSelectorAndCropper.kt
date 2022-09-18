@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,17 +24,14 @@ import androidx.compose.ui.text.style.TextAlign
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.options
 import com.skydoves.landscapist.glide.GlideImage
-import mosis.streetsandtotems.core.ConversionConstants
 import mosis.streetsandtotems.core.FormFieldConstants
 import mosis.streetsandtotems.ui.theme.sizes
-import java.io.File
-import java.util.*
 
 
 @Composable
 fun CustomImageSelectorAndCropper(
     focusRequester: FocusRequester? = null,
-    onImageSelected: ((Uri?) -> Unit)? = null,
+    onImageSelected: ((String) -> Unit)? = null,
     showErrorSnackbar: ((String) -> Unit)? = null,
 ) {
     val context = LocalContext.current
@@ -46,9 +44,10 @@ fun CustomImageSelectorAndCropper(
             imageUri = result.uriContent
             val imagePath = result.getUriFilePath(context)
             imagePath?.let {
-                val imageBytes = File(imagePath).readBytes()
-                val base64 = Base64.getEncoder().encodeToString(imageBytes)
-                onImageSelected?.invoke(Uri.parse(ConversionConstants.BASE64_IMAGE_PREFIX + base64))
+                onImageSelected?.invoke(imagePath)
+//                val imageBytes = File(imagePath).readBytes()
+//                val base64 = Base64.getEncoder().encodeToString(imageBytes)
+//                onImageSelected?.invoke(Uri.parse(ConversionConstants.BASE64_IMAGE_PREFIX + base64))
             }
         } else {
             showErrorSnackbar?.invoke(result.error?.message.toString())
@@ -69,7 +68,9 @@ fun CustomImageSelectorAndCropper(
         }
 
     Box(
-        modifier = if (focusRequester != null) modifier.focusRequester(focusRequester) else modifier
+        modifier = if (focusRequester != null) modifier
+            .focusable()
+            .focusRequester(focusRequester) else modifier
     ) {
         if (imageUri != null) {
             GlideImage(

@@ -67,7 +67,9 @@ data class Sizes(
     val profile_dialog_initials_weight: Float = 0.22f,
     val profile_dialog_username_and_name_weight: Float = 0.53f,
     val loader_stroke_width: Dp = 8.dp,
-    val loader_width: Float = 0.25f
+    val loader_width: Float = 0.25f,
+    val tiki_message_aspect_ratio: Float = 1.55f,
+    val tiki_message_triangle_aspect_ratio: Float = 0.45f
 )
 
 val LocalWidth = compositionLocalOf { Sizes() }

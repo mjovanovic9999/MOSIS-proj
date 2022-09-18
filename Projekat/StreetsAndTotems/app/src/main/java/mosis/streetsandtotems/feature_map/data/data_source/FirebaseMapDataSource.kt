@@ -1,13 +1,12 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
-import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FirestoreConstants
 import mosis.streetsandtotems.core.FirestoreConstants.MARKET_DOCUMENT_ID
-import mosis.streetsandtotems.core.domain.model.UserData
+import mosis.streetsandtotems.feature_map.domain.model.UserData
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.MarketItem
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData

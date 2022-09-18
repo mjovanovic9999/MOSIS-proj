@@ -1,3 +1,7 @@
 package mosis.streetsandtotems.feature_auth.domain.model
 
-data class SignInError(val wrongEmail: Boolean, val wrongPassword: Boolean)
+data class SignInError(
+    val wrongEmail: Boolean,
+    val wrongPassword: Boolean,
+    val emailNotVerified: Boolean
+)

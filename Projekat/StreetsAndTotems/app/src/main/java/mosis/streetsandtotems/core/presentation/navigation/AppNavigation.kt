@@ -6,6 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.dependency
 import mosis.streetsandtotems.NavGraphs
+import mosis.streetsandtotems.core.presentation.screens.tiki.TikiScreenViewModel
 import mosis.streetsandtotems.destinations.*
 import mosis.streetsandtotems.feature_auth.presentation.profile.ProfileViewModel
 import mosis.streetsandtotems.feature_auth.presentation.signin.SignInViewModel
@@ -25,5 +26,6 @@ fun AppNavigation(isUserAuthenticated: State<Boolean>) {
             dependency(ProfileScreenDestination) { hiltViewModel<ProfileViewModel>() }
             dependency(LeaderboardsScreenDestination) { hiltViewModel<LeaderboardsViewModel>() }
             dependency(MainScreenDestination) { hiltViewModel<MainScreenViewModel>() }
+            dependency(TikiScreenDestination) { hiltViewModel<TikiScreenViewModel>() }
         })
 }

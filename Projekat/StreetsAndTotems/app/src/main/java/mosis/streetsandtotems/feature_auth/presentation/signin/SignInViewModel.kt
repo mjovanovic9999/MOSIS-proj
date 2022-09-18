@@ -56,11 +56,9 @@ class SignInViewModel @Inject constructor(
                         singleLine = true,
                         clearable = true,
                         keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
-                            keyboardType = KeyboardType.Email
+                            imeAction = ImeAction.Next, keyboardType = KeyboardType.Email
                         ),
-                    ),
-                    TextFormField(
+                    ), TextFormField(
                         initial = "",
                         name = FormFieldNamesConstants.PASSWORD,
                         validators = listOf(
@@ -81,18 +79,13 @@ class SignInViewModel @Inject constructor(
                             )
                         },
                         keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Done,
-                            keyboardType = KeyboardType.Password
+                            imeAction = ImeAction.Done, keyboardType = KeyboardType.Password
                         ),
                         keyboardActions = KeyboardActions(onDone = { signInWithEmailAndPasswordHandler() }),
 
                         )
-                ),
-                SignInFields::class,
-                SignInFieldsEmpty()
-            ),
-            _signInScreenEvents,
-            _oneTapSignInResult
+                ), SignInFields::class, SignInFieldsEmpty()
+            ), _signInScreenEvents, _oneTapSignInResult
         )
     )
     val signInState: State<SignInState> = _signInState
@@ -157,6 +150,9 @@ class SignInViewModel @Inject constructor(
                                 )
                                 else if (errorData.wrongPassword) _signInScreenEvents.emit(
                                     SignInScreenEvents.WrongPassword
+                                )
+                                else if (errorData.emailNotVerified) _signInScreenEvents.emit(
+                                    SignInScreenEvents.EmailNotVerified
                                 )
                             }
                         }

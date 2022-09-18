@@ -1,4 +1,4 @@
-package mosis.streetsandtotems.core.domain.model
+package mosis.streetsandtotems.feature_map.domain.model
 
 import android.net.Uri
 
