@@ -1,22 +1,24 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
-import android.util.Log
 import com.google.android.gms.tasks.Task
-import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
-import com.google.firebase.firestore.ktx.getField
+import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.core.FireStoreConstants.EASY_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.HARD_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.ITEM_COUNT
+import mosis.streetsandtotems.core.FireStoreConstants.KICK_VOTE_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.LEADERBOARD_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.MARKET_DOCUMENT_ID
 import mosis.streetsandtotems.core.FireStoreConstants.MEDIUM_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.ORDER_NUMBER
+import mosis.streetsandtotems.core.FireStoreConstants.PROFILE_DATA_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.RIDDLE_COUNT_VALUE
 import mosis.streetsandtotems.core.FireStoreConstants.SQUADS_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.SQUAD_INVITES_COLLECTION
+import mosis.streetsandtotems.core.PointsConversion.MAX_SQUAD_MEMBERS_COUNT
 import mosis.streetsandtotems.core.PointsConversion.SQUAD_MEMBERS_POINTS_COEFFICIENT
 import mosis.streetsandtotems.feature_map.domain.model.*
 import kotlin.random.Random
@@ -175,5 +177,203 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                 )
         }
     }
+
+    //region squad interaction
+
+    private fun addUserToSquadAndUpdateUser(
+        transaction: Transaction,
+        squadId: String,
+        inviteeId: String
+    ) {
+        val docRef = db.collection(SQUADS_COLLECTION).document(squadId)
+
+        val list = mutableListOf<String>()
+        for (item in transaction.get(docRef).get("users") as List<*>) {
+            if (item is String)
+                list.add(item)
+        }
+        if (list.isNotEmpty()) {
+            list.add(inviteeId)
+            transaction.update(docRef, "users", list)
+        }
+
+        transaction.update(
+            db.collection(PROFILE_DATA_COLLECTION).document(inviteeId),
+            "squad_id",
+            squadId
+        )
+    }
+
+    private fun createSquad(
+        transaction: Transaction,
+        inviterId: String,
+        inviteeId: String
+    ) {
+        val newSquadId = db.collection(SQUADS_COLLECTION).document().id
+        transaction.set(
+            db.collection(SQUADS_COLLECTION).document(newSquadId),
+            mapOf("users" to listOf(inviterId, inviteeId))
+        )
+
+        transaction.update(
+            db.collection(PROFILE_DATA_COLLECTION).document(inviterId),
+            "squad_id",
+            newSquadId
+        )
+        transaction.update(
+            db.collection(PROFILE_DATA_COLLECTION).document(inviteeId),
+            "squad_id",
+            newSquadId
+        )
+    }
+
+    //check da l je user vec u squad i da l sam ga vec pozvao
+    suspend fun initInviteToSquad(inviterId: String, inviteeId: String) {//treb se i pretplati
+        db.collection(SQUAD_INVITES_COLLECTION).document().set(
+            mapOf(
+                "inviter_id" to inviterId,
+                "invitee_id" to inviteeId,
+            )
+        ).await()
+    }
+
+    suspend fun isUserInSquad(inviteeId: String) =
+        db.collection(PROFILE_DATA_COLLECTION).document(inviteeId).get().await()
+            .getString("squad_id").let {
+                !(it == null || it == "")
+            }
+
+    suspend fun isSquadFull(squadId: String): Boolean =
+        (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
+            .get("users") as List<*>).size == MAX_SQUAD_MEMBERS_COUNT
+
+
+    suspend fun acceptInviteToSquad(inviterId: String, inviteeId: String) {
+        getInviteIdOrNull(inviterId, inviteeId)?.let { docId ->
+            db.runTransaction {
+
+                val inviterSquadId = it.get(
+                    db.collection(PROFILE_DATA_COLLECTION).document(inviterId)
+                ).getString("squad_id")
+
+                if (inviterSquadId == null || inviterSquadId == "") {
+                    createSquad(it, inviterId, inviteeId)
+                } else {
+                    addUserToSquadAndUpdateUser(it, inviterSquadId, inviteeId)
+                }
+
+                it.delete(db.collection(SQUAD_INVITES_COLLECTION).document(docId))
+
+            }.await()
+        }
+    }
+
+    suspend fun removeFromSquad(userId: String) {
+        db.runTransaction { transaction ->
+            val docRefProfile = db.collection(PROFILE_DATA_COLLECTION).document(userId)
+            val squadId = transaction.get(docRefProfile).getString("squad_id")
+
+            if (squadId != null && squadId != "") {
+                val docRefSquads = db.collection(SQUADS_COLLECTION).document(squadId)
+
+                val list = mutableListOf<String>()
+                for (item in transaction.get(docRefSquads).get("users") as List<*>) {
+                    if (item is String)
+                        list.add(item)
+                }
+                if (list.isNotEmpty()) {
+                    list.remove(userId)
+                    if (list.size == 1) {
+                        transaction.delete(docRefSquads)
+                        transaction.update(
+                            db.collection(PROFILE_DATA_COLLECTION).document(list[0]),
+                            "squad_id",
+                            ""
+                        )
+                    } else
+                        transaction.update(docRefSquads, "users", list)
+                }
+
+                transaction.update(docRefProfile, "squad_id", "")
+
+            }
+        }.await()
+    }
+
+    suspend fun declineInviteToSquad(inviterId: String, inviteeId: String) =
+        getInviteIdOrNull(inviterId, inviteeId)?.let {
+            db.collection(SQUAD_INVITES_COLLECTION).document(it).delete()
+        }
+
+    private suspend fun getInviteIdOrNull(inviterId: String, inviteeId: String): String? =
+        db.collection(SQUAD_INVITES_COLLECTION)
+            .whereEqualTo("inviter_id", inviterId)
+            .whereEqualTo("invitee_id", inviteeId)
+            .get().await().firstOrNull()?.id
+
+
+    suspend fun initKickVote(kickVote: KickVoteData) {//userid je odma glasao za No i ostali unanswewre
+        val list = db.collection(SQUADS_COLLECTION).document(kickVote.squad_id ?: "").get().await()
+            .get("users") as List<*>
+
+        if (list.size <= 2) {
+            removeFromSquad(kickVote.user_id ?: "")
+
+        } else {
+            if (db.collection(KICK_VOTE_COLLECTION)
+                    .whereEqualTo("squad_id", kickVote.squad_id)
+                    .whereEqualTo("user_id", kickVote.user_id)
+                    .get().await().firstOrNull() == null
+            )
+                db.collection(KICK_VOTE_COLLECTION).document().set(kickVote)
+        }
+    }//treba se pretplate ostali
+
+    suspend fun kickVote(myId: String, squadId: String, userId: String, myVote: Vote) {
+        val squadNum = (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
+            .get("users") as List<*>).size
+
+        val id = db.collection(KICK_VOTE_COLLECTION)
+            .whereEqualTo("squad_id", squadId)
+            .whereEqualTo("user_id", userId)
+            .get().await().firstOrNull()?.id
+
+        if (id != null) {
+            db.collection(KICK_VOTE_COLLECTION).document(id).get().await()
+                .toObject(KickVoteData::class.java)?.let {
+                    val newMap = it.votes?.toMutableMap() ?: mutableMapOf()
+                    newMap[myId] = myVote
+                    var voteYes = 0
+                    var voteNo = 0
+                    for (vote in newMap.values) {
+                        when (vote) {
+                            Vote.Unanswered -> {}
+                            Vote.No -> voteNo++
+                            Vote.Yes -> voteYes++
+                        }
+                    }
+
+                    ((squadNum + 1) / 2).let { votesHalf ->
+                        if (votesHalf <= voteYes) {//kick
+                            removeFromSquad(userId)
+                            db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
+
+                        } else if (votesHalf <= voteNo) {
+                            db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
+
+                        } else {
+                            db.collection(KICK_VOTE_COLLECTION).document(id).set(
+                                it.copy(votes = newMap)
+                            ).await()
+                        }
+                    }
+
+
+                }
+        }
+
+    }
+
+//endregion
 }
 

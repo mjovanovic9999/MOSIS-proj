@@ -16,7 +16,7 @@ data class MapScreenState(
     val filterTotems: Boolean,
 
     val myId: String,
-    val mySquadId: String?,
+    val mySquadId: String,
 
     val resourcesHashMap: Map<String, ResourceData>,
     val playersHashMap: Map<String, ProfileData>,

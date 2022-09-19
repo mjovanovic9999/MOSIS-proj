@@ -2,7 +2,6 @@ package mosis.streetsandtotems.feature_map.data.repository
 
 import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
-import com.google.firebase.auth.FirebaseAuth
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
 import mosis.streetsandtotems.feature_map.domain.model.*
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
@@ -17,7 +16,36 @@ class MapViewModelRepositoryImpl(
         placed_by: String,
         text: String,
     ) {
-        firebaseMapDataSource.addCustomPin(l, visible_to, placed_by, text)
+//        firebaseMapDataSource.addCustomPin(l, visible_to, placed_by, text)
+
+
+//        firebaseMapDataSource.initInviteToSquad(
+//            "q9W74PZ8kJRzmcx9n7i1D7qlSCp2",
+//            "Q0Wy3JXFjjNFSBDzgvw4L66Ud6J2",
+//        )
+
+
+//        firebaseMapDataSource.acceptInviteToSquad(
+//                "q9W74PZ8kJRzmcx9n7i1D7qlSCp2",
+//            "Q0Wy3JXFjjNFSBDzgvw4L66Ud6J2",)
+
+
+        firebaseMapDataSource.initKickVote(
+            KickVoteData(
+                "vyGHsEIUpZeyRFSRKGxr",
+                "Q0Wy3JXFjjNFSBDzgvw4L66Ud6J2",
+                mapOf(
+                    "q9W74PZ8kJRzmcx9n7i1D7qlSCp2" to Vote.Yes,
+                    "Q0Wy3JXFjjNFSBDzgvw4L66Ud6J2" to Vote.No,
+                )
+            )
+        )
+
+//        firebaseMapDataSource.kickVote(
+//            "aaaaaaaaaaa", "vyGHsEIUpZeyRFSRKGxr", "Q0Wy3JXFjjNFSBDzgvw4L66Ud6J2", Vote.Yes
+//        )
+
+//        firebaseMapDataSource.kickVote("MOJID2", "SQUAD", "IS bre", Vote.No)
 
     }
 

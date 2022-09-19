@@ -420,6 +420,7 @@ object PointsConversion {
 
     const val SQUAD_MEMBERS_POINTS_COEFFICIENT = 0.5
 
+    const val MAX_SQUAD_MEMBERS_COUNT = 5
 }
 
 object ProtectionLevelConstants {

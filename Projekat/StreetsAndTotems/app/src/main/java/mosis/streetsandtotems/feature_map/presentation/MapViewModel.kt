@@ -218,7 +218,7 @@ class MapViewModel @Inject constructor(
             home = HomeData(),
             homeDialogOpen = false,
             myId = "",
-            mySquadId = null,
+            mySquadId = "",
             selectedTotem = TotemData(),
             totemDialogOpen = false,
             riddleDialogOpen = false,
@@ -240,7 +240,7 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             _mapScreenState.value = _mapScreenState.value.copy(
                 myId = preferenceUseCases.getUserId(),
-                mySquadId = null, //preferenceUseCases.getSquadId()//treba flow
+                mySquadId = "", //preferenceUseCases.getSquadId()//treba flow
             )
         }
     }
