@@ -1,0 +1,3 @@
+package mosis.streetsandtotems.services
+
+sealed interface LocationServiceMainScreenEvents
