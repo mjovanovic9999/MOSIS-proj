@@ -89,7 +89,6 @@ class MapViewModel @Inject constructor(
 
     private var initialFetchCompleted = false
 
-
     init {
         viewModelScope.launch {
             showLoader.emit(true)
@@ -160,6 +159,10 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.DeclineSquadInvite -> declineSquadInviteHandler()
             MapViewModelEvents.InitKickFromSquad -> initKickFromSquadHandler()
             MapViewModelEvents.InviteToSquad -> inviteToSquadHandler()
+            MapViewModelEvents.CloseVoteDialog -> closeVoteHandler()
+            MapViewModelEvents.ShowVoteDialog -> showVotedHandler()
+            MapViewModelEvents.KickAnswerNoInvite -> kickAnswerHandler(false)
+            MapViewModelEvents.KickAnswerYesInvite -> kickAnswerHandler(true)
         }
     }
 
@@ -231,8 +234,9 @@ class MapViewModel @Inject constructor(
             claimTotemDialog = false,
             riddleData = RiddleData(),
             inviteDialogOpen = false,
-            userNameForSquadInteraction = "",
-            inviterId = null,
+            interactionUserName = "",
+            interactionUserId = null,
+            voteDialogOpen = true,
         )
         )
     }
@@ -288,7 +292,9 @@ class MapViewModel @Inject constructor(
             }
             is LocationServiceMapScreenEvents.SquadInvite -> {
                 _mapScreenState.value = _mapScreenState.value.copy(
-                    inviterId = event.squadInvite.inviter_id,
+                    interactionUserId = event.squadInvite.inviter_id,
+                    interactionUserName = mapScreenState.value.playersHashMap[event.squadInvite.inviter_id]?.user_name
+                        ?: ""
                 )
                 showInviteToSquadHandler()
             }
@@ -802,6 +808,15 @@ class MapViewModel @Inject constructor(
         _mapScreenState.value = _mapScreenState.value.copy(inviteDialogOpen = false)
     }
 
+    private fun showVotedHandler() {
+        _mapScreenState.value =
+            _mapScreenState.value.copy(voteDialogOpen = true)
+    }
+
+    private fun closeVoteHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(voteDialogOpen = false)
+    }
+
 //endregion
 
 
@@ -988,7 +1003,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun declineSquadInviteHandler() {
-        _mapScreenState.value.inviterId?.let {
+        _mapScreenState.value.interactionUserId?.let {
             viewModelScope.launch {
                 mapViewModelRepository.declineInviteToSquad(it)
             }
@@ -996,7 +1011,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun acceptSquadInviteHandler() {
-        _mapScreenState.value.inviterId?.let {
+        _mapScreenState.value.interactionUserId?.let {
             viewModelScope.launch {
                 mapViewModelRepository.acceptInviteToSquad(it)
             }
@@ -1020,6 +1035,13 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    private fun kickAnswerHandler(kick: Boolean) {
+        _mapScreenState.value.interactionUserId?.let {
+            viewModelScope.launch {
+                mapViewModelRepository.kickVote(it, if (kick) Vote.Yes else Vote.No)
+            }
+        }
+    }
 }
 
 //endregion

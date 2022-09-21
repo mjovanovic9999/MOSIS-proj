@@ -19,7 +19,7 @@ class AppNavigationViewModel @Inject constructor(
         splashScreenCondition: MutableState<Boolean>, startRoute: MutableState<Route?>
     ) {
         if (authUseCases.isUserAuthenticated()) {
-            if (!authUseCases.isUserAlreadyLoggedIn() && (preferenceUseCases.getAuthProvider() != AuthProvider.EmailAndPassword || !authUseCases.isUserEmailVerified())) startRoute.value =
+            if (!authUseCases.isUserAlreadyLoggedIn() && (preferenceUseCases.getAuthProvider() != AuthProvider.EmailAndPassword || authUseCases.isUserEmailVerified())) startRoute.value =
                 MainScreenDestination
         }
         if (startRoute.value == null) startRoute.value = NavGraphs.root.startRoute
