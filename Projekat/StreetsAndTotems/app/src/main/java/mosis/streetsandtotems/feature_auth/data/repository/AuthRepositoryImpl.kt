@@ -7,12 +7,15 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.GeoPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.core.FirebaseAuthConstants
 import mosis.streetsandtotems.core.FirebaseErrorCodesConstants
-import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.core.MessageConstants
 import mosis.streetsandtotems.core.data.data_source.AuthProvider
 import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
@@ -44,9 +47,7 @@ class AuthRepositoryImpl @Inject constructor(
     ): Flow<Response<SignInError>> = flow {
         try {
             emit(Response.Loading)
-            if (firestoreAuthDataSource.getUsersWithEmail(email).await().documents.firstOrNull()
-                    ?.getBoolean(FireStoreConstants.IS_ONLINE_FIELD) == true
-            ) emit(Response.Error(message = MessageConstants.ALREADY_LOGGED_IN))
+            if (isUserAlreadyLoggedIn(email)) emit(Response.Error(message = MessageConstants.ALREADY_LOGGED_IN))
             else {
                 authDataSource.emailAndPasswordSignIn(email, password).await()
                 preferencesDataStore.saveAuthProvider(AuthProvider.EmailAndPassword)
@@ -139,7 +140,9 @@ class AuthRepositoryImpl @Inject constructor(
                     authDataSource.removeCurrentUser()?.await()
                     firestoreAuthDataSource.removeUser(currentUserId)
                     firebaseStorageDataSource.getDownloadUrl(currentUserId).addOnSuccessListener {
-                        firebaseStorageDataSource.removeProfileImage(currentUserId)
+                        CoroutineScope(Dispatchers.Default).launch {
+                            firebaseStorageDataSource.removeProfileImage(currentUserId).await()
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -157,6 +160,7 @@ class AuthRepositoryImpl @Inject constructor(
             if (preferencesDataStore.getAuthProvider() == AuthProvider.Google) oneTapGoogleDataSource.signOut()
             authDataSource.signOut()
             preferencesDataStore.setUserId("")
+            preferencesDataStore.setSquadId("")
             emit(Response.Success())
         } catch (e: Exception) {
             if (emitError) emit(Response.Error())
@@ -193,14 +197,17 @@ class AuthRepositoryImpl @Inject constructor(
             emit(Response.Loading)
             val googleIdToken = credentials.googleIdToken
             val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
-            val authResult = authDataSource.signInWithCredential(googleCredentials).await()
-            preferencesDataStore.saveAuthProvider(AuthProvider.Google)
-            preferencesDataStore.setUserId(authDataSource.getCurrentUser()!!.uid)
+            if (isUserAlreadyLoggedIn(credentials.id)) emit(Response.Error(message = MessageConstants.ALREADY_LOGGED_IN))
+            else {
+                val authResult = authDataSource.signInWithCredential(googleCredentials).await()
+                preferencesDataStore.saveAuthProvider(AuthProvider.Google)
+                preferencesDataStore.setUserId(authDataSource.getCurrentUser()!!.uid)
 
-            val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
-            if (isNewUser) firestoreAuthDataSource.addUser(getProfileDataFromGoogle(credentials))
-                ?.await()
-            emit(Response.Success())
+                val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
+                if (isNewUser) firestoreAuthDataSource.addUser(getProfileDataFromGoogle(credentials))
+                    ?.await()
+                emit(Response.Success())
+            }
         } catch (e: Exception) {
             if (isUserAuthenticated()) signOut(emitError = false)
             Log.d("tag", e.message.toString())
@@ -236,6 +243,22 @@ class AuthRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             emit(Response.Error(e.message))
         }
+    }
+
+    private suspend fun isUserAlreadyLoggedIn(email: String): Boolean {
+        return firestoreAuthDataSource.getUsersWithEmail(email).await().documents.firstOrNull()
+            ?.getBoolean(FireStoreConstants.IS_ONLINE_FIELD) == true
+    }
+
+    override suspend fun isCurrentUserAlreadyLoggedIn(): Boolean {
+        val currentUser = authDataSource.getCurrentUser()
+        return if (currentUser != null && currentUser.email != null) isUserAlreadyLoggedIn(
+            currentUser.email!!
+        ) else false
+    }
+
+    override suspend fun isCurrentUserEmailValidated(): Boolean {
+        return authDataSource.getCurrentUser()?.isEmailVerified ?: false
     }
 
     private suspend fun getProfileDataFromGoogle(credentials: SignInCredential): ProfileData {

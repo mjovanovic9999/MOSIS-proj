@@ -44,4 +44,8 @@ class PreferenceRepositoryImpl(private val preferenceDataStore: PreferencesDataS
         return preferenceDataStore.setSquadId(squadId)
     }
 
+    override fun getUserSquadIdFlow(): Flow<String> {
+        return preferenceDataStore.getUserSquadIdFlow()
+    }
+
 }

@@ -38,7 +38,8 @@ fun CustomConfirmationDialog(
             Text(
                 text = text,
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Justify
             )
         },
         confirmButtonText = confirmButtonText,

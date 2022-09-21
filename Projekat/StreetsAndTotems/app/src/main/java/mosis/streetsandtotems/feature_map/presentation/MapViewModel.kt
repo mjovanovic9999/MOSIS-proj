@@ -53,7 +53,7 @@ import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelReposito
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
 import mosis.streetsandtotems.feature_map.presentation.util.*
-import mosis.streetsandtotems.services.LocationServiceEvents
+import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
 import ovh.plrapps.mapcompose.ui.layout.Fill
@@ -67,7 +67,7 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
     private val appContext: Application,
     private val mapViewModelRepository: MapViewModelRepository,
-    private val locationServiceEvents: SharedFlowWrapper<LocationServiceEvents>,
+    private val locationServiceMapScreenEvents: SharedFlowWrapper<LocationServiceMapScreenEvents>,
     private val showLoader: MutableStateFlow<Boolean>,
     private val preferenceUseCases: PreferenceUseCases,
     private val snackbarSettingsFlow: MutableStateFlow<SnackbarSettings?>,
@@ -234,7 +234,7 @@ class MapViewModel @Inject constructor(
 
     private fun registerOnLocationService() {
         viewModelScope.launch {
-            locationServiceEvents.flow.collect {
+            locationServiceMapScreenEvents.flow.collect {
                 onLocationServiceEvent(it)
             }
         }
@@ -249,9 +249,9 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private suspend fun onLocationServiceEvent(event: LocationServiceEvents) {
+    private suspend fun onLocationServiceEvent(event: LocationServiceMapScreenEvents) {
         when (event) {
-            is LocationServiceEvents.PlayerLocationChanged -> {
+            is LocationServiceMapScreenEvents.PlayerMapScreenLocationChanged -> {
                 if (!initialFetchCompleted) {
                     showLoader.emit(false)
                     initialFetchCompleted = true
@@ -267,8 +267,17 @@ class MapViewModel @Inject constructor(
                 }
 
             }
-            is LocationServiceEvents.PinDataChanged<*> -> handlePinAction(event.pinAction)
-            is LocationServiceEvents.UserInventoryChanged -> onUserInventoryChangedHandler(event.newInventory)//treba li ovamo market home
+            is LocationServiceMapScreenEvents.PinDataChanged<*> -> handlePinAction(event.pinAction)
+            is LocationServiceMapScreenEvents.UserInventoryChanged -> onUserInventoryChangedHandler(
+                event.newInventory
+            )//treba li ovamo market home
+            is LocationServiceMapScreenEvents.KickVote -> {
+                when(event.kickAction.type){
+                    KickActionType.VoteStarted -> Log.d("tag", "KICK VOTE STARTED")
+                    KickActionType.VoteEnded -> Log.d("tag", "KICK VOTE ENDED")
+                }
+            }
+            is LocationServiceMapScreenEvents.SquadInvite -> Log.d("tag", "SQUAD INVITE")
         }
     }
 
@@ -762,8 +771,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun showClaimTotemHandler() {
-        _mapScreenState.value =
-            _mapScreenState.value.copy(claimTotemDialog = true)
+        _mapScreenState.value = _mapScreenState.value.copy(claimTotemDialog = true)
     }
 
     private fun closeClaimTotemHandler() {
@@ -907,8 +915,8 @@ class MapViewModel @Inject constructor(
 
     private fun onIncorrectAnswerHandler() {
         val selectedTotem = mapScreenState.value.selectedTotem.copy(
-            bonus_points = (mapScreenState.value.selectedTotem.bonus_points ?: 0)
-                    + TOTEM_BONUS_POINTS_INCORRECT_ANSWER
+            bonus_points = (mapScreenState.value.selectedTotem.bonus_points
+                ?: 0) + TOTEM_BONUS_POINTS_INCORRECT_ANSWER
         )
         selectedTotem.id?.let {
             viewModelScope.launch {
@@ -946,27 +954,24 @@ class MapViewModel @Inject constructor(
         val selectedTotem = mapScreenState.value.selectedTotem
         selectedTotem.id?.let {
             viewModelScope.launch {
-                if (mapScreenState.value.mySquadId == null)
-                    mapViewModelRepository.updateLeaderboard(
-                        mapScreenState.value.myId,
-                        (selectedTotem.bonus_points ?: 0)
-                                + calculateTotemTimePoints(selectedTotem.last_visited)
-                    )
+                if (mapScreenState.value.mySquadId == null) mapViewModelRepository.updateLeaderboard(
+                    mapScreenState.value.myId,
+                    (selectedTotem.bonus_points
+                        ?: 0) + calculateTotemTimePoints(selectedTotem.last_visited)
+                )
                 else {
                     mapViewModelRepository.updateSquadLeaderboard(
                         mapScreenState.value.mySquadId!!,
-                        (selectedTotem.bonus_points ?: 0)
-                                + calculateTotemTimePoints(selectedTotem.last_visited)
+                        (selectedTotem.bonus_points
+                            ?: 0) + calculateTotemTimePoints(selectedTotem.last_visited)
                     )
                 }
                 if (shouldDeleteTotem) {
                     mapViewModelRepository.deleteTotem(it)
                 } else {
                     mapViewModelRepository.updateTotem(
-                        it,
-                        selectedTotem.copy(
-                            bonus_points = 0,
-                            last_visited = Timestamp.now()
+                        it, selectedTotem.copy(
+                            bonus_points = 0, last_visited = Timestamp.now()
                         )
                     )
                 }

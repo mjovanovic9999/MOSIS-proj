@@ -17,9 +17,9 @@ class FirebaseStorageDataSource(private val storage: FirebaseStorage) {
         return userImageRef.downloadUrl
     }
 
-    fun removeProfileImage(userId: String){
+    fun removeProfileImage(userId: String): Task<Void> {
         val userImageRef = getUserImageRef(userId)
-
+        return userImageRef.delete()
     }
 
     private fun getUserImageRef(userId: String) =

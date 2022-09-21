@@ -48,58 +48,54 @@ fun MainScreen(
         }
     }
 
-    LifecycleCompose(
-        onResume = { viewModel.onEvent(MainScreenViewModelEvents.OnResume) },
-        onPause = { viewModel.onEvent(MainScreenViewModelEvents.OnPause) }
-    )
+    LifecycleCompose(onResume = { viewModel.onEvent(MainScreenViewModelEvents.OnResume) },
+        onPause = { viewModel.onEvent(MainScreenViewModelEvents.OnPause) })
 
-    if (!state.locationEnabled)
-        CustomRequestLocationDialog()
+    if (!state.locationEnabled) CustomRequestLocationDialog()
 
-    ModalNavigationDrawer(
-        drawerState = state.drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                DrawerContent(
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .fillMaxSize()
-                        .padding(MaterialTheme.sizes.drawer_column_padding),
-                    destinationsNavigator,
-                    onSignOut = { viewModel.onEvent(MainScreenViewModelEvents.SignOut) },
-                    runInBackground = state.userSettings.runInBackground,
-                    onRunInBackgroundChange = { viewModel.onEvent(MainScreenViewModelEvents.ToggleRunInBackground) },
-                    showNotifications = state.userSettings.showNotifications,
-                    onShowNotificationsChange = { viewModel.onEvent(MainScreenViewModelEvents.ToggleNotifications) },
-                    callPrivacyLevel = state.userSettings.callPrivacyLevel.ordinal,
-                    onCallPrivacyLevelIndexChange = {
-                        viewModel.onEvent(
-                            MainScreenViewModelEvents.ChangeCallPrivacyLevel(
-                                PrivacySettings.values()[it]
-                            )
+    ModalNavigationDrawer(drawerState = state.drawerState, drawerContent = {
+        ModalDrawerSheet {
+            DrawerContent(
+                Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .fillMaxSize()
+                    .padding(MaterialTheme.sizes.drawer_column_padding),
+                destinationsNavigator,
+                onSignOut = { viewModel.onEvent(MainScreenViewModelEvents.SignOut) },
+                runInBackground = state.userSettings.runInBackground,
+                onRunInBackgroundChange = { viewModel.onEvent(MainScreenViewModelEvents.ToggleRunInBackground) },
+                showNotifications = state.userSettings.showNotifications,
+                onShowNotificationsChange = { viewModel.onEvent(MainScreenViewModelEvents.ToggleNotifications) },
+                callPrivacyLevel = state.userSettings.callPrivacyLevel.ordinal,
+                onCallPrivacyLevelIndexChange = {
+                    viewModel.onEvent(
+                        MainScreenViewModelEvents.ChangeCallPrivacyLevel(
+                            PrivacySettings.values()[it]
                         )
-                    },
-                    smsPrivacyLevel = state.userSettings.smsPrivacyLevel.ordinal,
-                    onSmsPrivacyLevelChange = {
-                        viewModel.onEvent(
-                            MainScreenViewModelEvents.ChangeSmsPrivacyLevel(
-                                PrivacySettings.values()[it]
-                            )
+                    )
+                },
+                smsPrivacyLevel = state.userSettings.smsPrivacyLevel.ordinal,
+                onSmsPrivacyLevelChange = {
+                    viewModel.onEvent(
+                        MainScreenViewModelEvents.ChangeSmsPrivacyLevel(
+                            PrivacySettings.values()[it]
                         )
-                    },
-                    username = state.username,
-                    firstName = state.firstName,
-                    lastName = state.lastName,
-                    imageUri = state.imageUri
-                )
-            }
-        },
-        content = {
-            DrawerScreen(
-                navController = navController,
-                openDrawer = { scope.launch { state.drawerState.open() } })
+                    )
+                },
+                username = state.currentUserData.user_name ?: "",
+                firstName = state.currentUserData.first_name ?: "",
+                lastName = state.currentUserData.last_name ?: "",
+                imagePath = state.currentUserData.image_uri ?: "",
+                squadId = state.currentUserData.squad_id ?: "",
+                phoneNumber = state.currentUserData.phone_number ?: "",
+                email = state.currentUserData.email ?: "",
+                onLeaveSquad = {}
+            )
         }
-    )
+    }, content = {
+        DrawerScreen(navController = navController,
+            openDrawer = { scope.launch { state.drawerState.open() } })
+    })
 }
 
 

@@ -23,7 +23,8 @@ import mosis.streetsandtotems.core.domain.use_case.*
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.di.util.SharedFlowWrapper
 import mosis.streetsandtotems.services.LocationServiceControlEvents
-import mosis.streetsandtotems.services.LocationServiceEvents
+import mosis.streetsandtotems.services.LocationServiceMainScreenEvents
+import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 import javax.inject.Singleton
 
 @Module
@@ -73,7 +74,7 @@ object AppSingletonModule {
 
     @Provides
     @Singleton
-    fun provideLocationServiceEventsMutableFlow(): MutableSharedFlow<LocationServiceEvents> =
+    fun provideLocationServiceMapScreenEventsMutableFlow(): MutableSharedFlow<LocationServiceMapScreenEvents> =
         MutableSharedFlow()
 
     @Provides
@@ -83,8 +84,8 @@ object AppSingletonModule {
 
     @Provides
     @Singleton
-    fun provideLocationServiceEventFlow(locationServiceEventsMutableFlow: MutableSharedFlow<LocationServiceEvents>): SharedFlowWrapper<LocationServiceEvents> =
-        SharedFlowWrapper(locationServiceEventsMutableFlow)
+    fun provideLocationServiceMapScreenEventFlow(locationServiceMapScreenEventsMutableFlow: MutableSharedFlow<LocationServiceMapScreenEvents>): SharedFlowWrapper<LocationServiceMapScreenEvents> =
+        SharedFlowWrapper(locationServiceMapScreenEventsMutableFlow)
 
     @Provides
     @Singleton
@@ -117,4 +118,14 @@ object AppSingletonModule {
     @Provides
     @Singleton
     fun provideFirebaseStorage(): FirebaseStorage = Firebase.storage
+
+    @Provides
+    @Singleton
+    fun provideLocationServiceMainScreenEventsMutableFlow(): MutableSharedFlow<LocationServiceMainScreenEvents> =
+        MutableSharedFlow()
+
+    @Provides
+    @Singleton
+    fun provideLocationServiceMainScreenEventsFlow(locationServiceMainScreenEventsMutableFlow: MutableSharedFlow<LocationServiceMainScreenEvents>): SharedFlowWrapper<LocationServiceMainScreenEvents> =
+        SharedFlowWrapper(locationServiceMainScreenEventsMutableFlow)
 }

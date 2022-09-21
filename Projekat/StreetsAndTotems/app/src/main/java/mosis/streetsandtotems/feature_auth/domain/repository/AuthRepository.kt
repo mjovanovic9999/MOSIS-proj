@@ -30,4 +30,8 @@ interface AuthRepository {
     suspend fun sendValidationEmail(): Flow<Response<Nothing>>
 
     suspend fun sendRecoveryEmail(email: String): Flow<Response<Nothing>>
+
+    suspend fun isCurrentUserAlreadyLoggedIn(): Boolean
+
+    suspend fun isCurrentUserEmailValidated(): Boolean
 }

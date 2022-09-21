@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Intent
 import android.content.IntentFilter
 import android.location.LocationManager
-import android.net.Uri
 import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -32,10 +31,13 @@ import mosis.streetsandtotems.core.domain.use_case.PreferenceUseCases
 import mosis.streetsandtotems.core.domain.util.LocationBroadcastReceiver
 import mosis.streetsandtotems.core.domain.util.handleResponse
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
+import mosis.streetsandtotems.di.util.SharedFlowWrapper
 import mosis.streetsandtotems.feature_auth.domain.use_case.AuthUseCases
 import mosis.streetsandtotems.feature_main.domain.use_case.MainUseCases
+import mosis.streetsandtotems.feature_map.domain.model.ProfileData
 import mosis.streetsandtotems.services.LocationService
 import mosis.streetsandtotems.services.LocationServiceControlEvents
+import mosis.streetsandtotems.services.LocationServiceMainScreenEvents
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,6 +53,7 @@ class MainScreenViewModel @Inject constructor(
     private val locationStateMutableSharedFlow: MutableSharedFlow<Boolean>,
     private val preferenceUseCases: PreferenceUseCases,
     private val mainUseCases: MainUseCases,
+    private val locationServiceMainScreenEventFlow: SharedFlowWrapper<LocationServiceMainScreenEvents>
 ) : ViewModel() {
     private val _mainScreenEventFlow = MutableSharedFlow<MainScreenEvents>()
     private val _mainScreenState =
@@ -65,10 +68,7 @@ class MainScreenViewModel @Inject constructor(
                     smsPrivacyLevel = PrivacySettings.NoOne,
                 ),
                 drawerState = DrawerState(DrawerValue.Closed),
-                username = "",
-                firstName = "",
-                lastName = "",
-                imageUri = Uri.EMPTY
+                currentUserData = ProfileData()
             )
         )
     val mainScreenState: State<MainScreenState> = _mainScreenState
@@ -84,6 +84,21 @@ class MainScreenViewModel @Inject constructor(
         viewModelScope.launch {
             locationStateMutableSharedFlow.collectLatest {
                 _mainScreenState.value = _mainScreenState.value.copy(locationEnabled = it)
+            }
+        }
+
+        viewModelScope.launch {
+            locationServiceMainScreenEventFlow.flow.collect {
+                when (it) {
+                    is LocationServiceMainScreenEvents.CurrentUserProfileDataChanged -> {
+                        _mainScreenState.value =
+                            _mainScreenState.value.copy(
+                                currentUserData = it.newUserData
+                            )
+
+                        preferenceUseCases.setSquadId(it.newUserData.squad_id ?: "")
+                    }
+                }
             }
         }
     }

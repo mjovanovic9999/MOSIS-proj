@@ -11,12 +11,14 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.scopes.ServiceScoped
 import kotlinx.coroutines.flow.MutableSharedFlow
+import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.core.domain.repository.PreferenceRepository
 import mosis.streetsandtotems.core.domain.repository.UserOnlineStatusRepository
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseServiceDataSource
 import mosis.streetsandtotems.feature_map.data.repository.MapServiceRepositoryImpl
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
-import mosis.streetsandtotems.services.LocationServiceEvents
+import mosis.streetsandtotems.services.LocationServiceMainScreenEvents
+import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 import mosis.streetsandtotems.services.use_case.*
 
 @Module
@@ -37,21 +39,42 @@ object LocationServiceModule {
     @ServiceScoped
     fun provideMapRepository(
         firebaseServiceDataSource: FirebaseServiceDataSource,
-        auth: FirebaseAuth
-    ): MapServiceRepository = MapServiceRepositoryImpl(firebaseServiceDataSource, auth)
+        auth: FirebaseAuth,
+        preferencesDataStore: PreferencesDataStore
+    ): MapServiceRepository =
+        MapServiceRepositoryImpl(firebaseServiceDataSource, auth, preferencesDataStore)
 
     @Provides
     @ServiceScoped
     fun provideLocationServiceUseCases(
         mapServiceRepository: MapServiceRepository,
-        locationServiceEventsFlow: MutableSharedFlow<LocationServiceEvents>,
+        locationServiceMapScreenEventsFlow: MutableSharedFlow<LocationServiceMapScreenEvents>,
         userOnlineStatusRepository: UserOnlineStatusRepository,
-        preferenceRepository: PreferenceRepository
-    ): LocationServiceUseCases =
-        LocationServiceUseCases(
-            UpdatePlayerLocation(mapServiceRepository),
-            RegisterCallbacks(mapServiceRepository, locationServiceEventsFlow),
-            RemoveCallbacks(mapServiceRepository),
-            ChangeUserOnlineStatus(userOnlineStatusRepository, preferenceRepository)
-        )
+        preferenceRepository: PreferenceRepository,
+        locationServiceMainScreenEventsFlow: MutableSharedFlow<LocationServiceMainScreenEvents>
+    ): LocationServiceUseCases = LocationServiceUseCases(
+        UpdatePlayerLocation(mapServiceRepository),
+        RegisterCallbacks(
+            preferenceRepository,
+            mapServiceRepository,
+            locationServiceMapScreenEventsFlow,
+            locationServiceMainScreenEventsFlow,
+            RegisterCallbackOnSquadInvite(
+                mapServiceRepository, locationServiceMapScreenEventsFlow
+            ),
+            RegisterCallbackOnKickVote(
+                mapServiceRepository, locationServiceMapScreenEventsFlow
+            ),
+        ),
+        RemoveCallbacks(mapServiceRepository),
+        ChangeUserOnlineStatus(userOnlineStatusRepository, preferenceRepository),
+        RegisterCallbackOnSquadInvite(
+            mapServiceRepository, locationServiceMapScreenEventsFlow
+        ),
+        RegisterCallbackOnKickVote(
+            mapServiceRepository, locationServiceMapScreenEventsFlow
+        ),
+        RemoveCallbackOnKickVote(mapServiceRepository),
+        RemoveCallbackOnSquadInvite(mapServiceRepository)
+    )
 }

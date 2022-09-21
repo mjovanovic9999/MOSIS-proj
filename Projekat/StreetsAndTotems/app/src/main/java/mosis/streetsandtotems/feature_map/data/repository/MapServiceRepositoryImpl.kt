@@ -3,19 +3,70 @@ package mosis.streetsandtotems.feature_map.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ListenerRegistration
+import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseServiceDataSource
 import mosis.streetsandtotems.feature_map.domain.model.*
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
 
 class MapServiceRepositoryImpl(
     private val firebaseServiceDataSource: FirebaseServiceDataSource,
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val preferencesDataStore: PreferencesDataStore
 ) : MapServiceRepository {
-    private var listenerRegistrations: MutableList<ListenerRegistration> = mutableListOf()
+    private val listenerRegistrations: MutableList<ListenerRegistration> = mutableListOf()
+    private var onKickVoteListenerRegistration: ListenerRegistration? = null
+    private var onSquadInviteListenerRegistration: ListenerRegistration? = null
 
     override suspend fun updateMyLocation(newLocation: GeoPoint) {
         auth.currentUser?.let {
             firebaseServiceDataSource.updateUserLocation(it, newLocation)
+        }
+    }
+
+    override fun removeCallbackOnKickVoteDataUpdate() {
+        onKickVoteListenerRegistration?.let {
+            it.remove()
+            onKickVoteListenerRegistration = null
+        }
+    }
+
+    override fun removeCallbackOnSquadInviteDataUpdate() {
+        onSquadInviteListenerRegistration?.let {
+            it.remove()
+            onSquadInviteListenerRegistration = null
+        }
+    }
+
+    override suspend fun registerCallbackOnKickVoteDataUpdate(
+        kickVoteStartedCallback: (kickVote: KickVoteData) -> Unit,
+        kickVoteEndedCallback: (kickVote: KickVoteData) -> Unit
+    ) {
+        val squadId = preferencesDataStore.getUserSquadId()
+        if (squadId != "") auth.currentUser?.let {
+            onKickVoteListenerRegistration =
+                firebaseServiceDataSource.registerCallbacksOnKickVoteDataUpdate(
+                    it, squadId, kickVoteStartedCallback, kickVoteEndedCallback
+                )
+        }
+    }
+
+    override suspend fun registerCallbackOnSquadInviteDataUpdate(squadInviteCallback: (squadInvite: SquadInviteData) -> Unit) {
+        val squadId = preferencesDataStore.getUserSquadId()
+        if (squadId == "") auth.currentUser?.let {
+            onSquadInviteListenerRegistration =
+                firebaseServiceDataSource.registerCallbacksOnSquadIdInviteDataUpdate(
+                    it, squadInviteCallback
+                )
+        }
+    }
+
+    override fun registerCallbackOnCurrentUserProfileDataUpdate(currentUserCallback: (currentUser: ProfileData) -> Unit) {
+        auth.currentUser?.let {
+            listenerRegistrations.add(
+                firebaseServiceDataSource.registerCallbacksOnCurrentUserProfileDataUpdate(
+                    it, currentUserCallback
+                )
+            )
         }
     }
 
@@ -46,9 +97,7 @@ class MapServiceRepositoryImpl(
         auth.currentUser?.let {
             listenerRegistrations.add(
                 firebaseServiceDataSource.registerCallbacksOnResourcesUpdate(
-                    resourceAddedCallback,
-                    resourceModifiedCallback,
-                    resourceRemovedCallback
+                    resourceAddedCallback, resourceModifiedCallback, resourceRemovedCallback
                 )
             )
         }
@@ -63,9 +112,7 @@ class MapServiceRepositoryImpl(
         auth.currentUser?.let {
             listenerRegistrations.add(
                 firebaseServiceDataSource.registerCallbacksOnTotemsUpdate(
-                    totemAddedCallback,
-                    totemModifiedCallback,
-                    totemRemovedCallback
+                    totemAddedCallback, totemModifiedCallback, totemRemovedCallback
                 )
             )
         }
@@ -80,9 +127,7 @@ class MapServiceRepositoryImpl(
         auth.currentUser?.let {
             listenerRegistrations.add(
                 firebaseServiceDataSource.registerCallbacksOnCustomPinsUpdate(
-                    customPinAddedCallback,
-                    customPinModifiedCallback,
-                    customPinRemovedCallback
+                    customPinAddedCallback, customPinModifiedCallback, customPinRemovedCallback
                 )
             )
         }
@@ -109,8 +154,7 @@ class MapServiceRepositoryImpl(
         auth.currentUser?.let {
             listenerRegistrations.add(
                 firebaseServiceDataSource.registerCallbacksOnUserInventoryUpdate(
-                    it,
-                    userInventoryCallback
+                    it, userInventoryCallback
                 )
             )
         }
@@ -136,5 +180,7 @@ class MapServiceRepositoryImpl(
         listenerRegistrations.forEach {
             it.remove()
         }
+        removeCallbackOnKickVoteDataUpdate()
+        removeCallbackOnKickVoteDataUpdate()
     }
 }

@@ -1,10 +1,10 @@
 package mosis.streetsandtotems.feature_main.presentation
 
-import android.net.Uri
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import kotlinx.coroutines.flow.SharedFlow
 import mosis.streetsandtotems.core.domain.model.UserSettings
+import mosis.streetsandtotems.feature_map.domain.model.ProfileData
 
 @OptIn(ExperimentalMaterial3Api::class)
 data class MainScreenState(
@@ -12,8 +12,5 @@ data class MainScreenState(
     val locationEnabled: Boolean,
     val userSettings: UserSettings,
     val drawerState: DrawerState,
-    val firstName: String,
-    val lastName: String,
-    val username: String,
-    val imageUri: Uri
+    val currentUserData: ProfileData
 )
