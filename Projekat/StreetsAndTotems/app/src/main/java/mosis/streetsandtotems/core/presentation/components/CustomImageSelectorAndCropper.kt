@@ -36,7 +36,8 @@ fun CustomImageSelectorAndCropper(
     onImageSelected: ((String) -> Unit)? = null,
     showErrorSnackbar: ((String) -> Unit)? = null,
     initialImageUri: Uri? = null,
-    modifier: Modifier = Modifier.size(MaterialTheme.sizes.image_select_size)
+    modifier: Modifier = Modifier.size(MaterialTheme.sizes.image_select_size),
+    selectEnabled: Boolean = true
 ) {
     val context = LocalContext.current
     val imageUri = remember {
@@ -58,12 +59,15 @@ fun CustomImageSelectorAndCropper(
         }
     }
 
-    val boxModifier = modifier
+    var boxModifier = modifier
         .background(
             MaterialTheme.colorScheme.secondaryContainer,
             RoundedCornerShape(MaterialTheme.sizes.default_shape_corner)
         )
-        .clickable {
+
+
+    if (selectEnabled)
+        boxModifier = boxModifier.clickable {
             imageCropLauncher.launch(options {
                 setImageSource(includeGallery = true, includeCamera = true)
                 setAspectRatio(1, 1)

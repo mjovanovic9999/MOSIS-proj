@@ -239,6 +239,7 @@ object MessageConstants {
     const val USER_NAME_REQUIRED = "Username is required!"
     const val IMAGE_REQUIRED = "Image is required!"
     const val SIGN_OUT_ERROR = "An error occurred while signing you out!"
+    const val GOOGLE_SIGN_UP_FAILED = "Google sign up failed! Please try again or contact support!"
     const val GOOGLE_SIGN_IN_FAILED = "Google sign in failed! Please try again or contact support!"
     const val TOO_MANY_LOGIN_ATTEMPTS = "Too many login attempts! Account temporarily disabled!"
     const val DEFAULT_ERROR_MESSAGE = "Unknown error occurred! Please try again or contact support!"

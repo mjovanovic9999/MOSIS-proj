@@ -6,6 +6,7 @@ import com.google.android.gms.auth.api.identity.SignInCredential
 import kotlinx.coroutines.flow.Flow
 import mosis.streetsandtotems.core.domain.model.Response
 import mosis.streetsandtotems.feature_auth.domain.model.SignInError
+import mosis.streetsandtotems.feature_auth.presentation.util.ProfileFields
 import mosis.streetsandtotems.feature_auth.presentation.util.SignUpFields
 
 interface AuthRepository {
@@ -34,4 +35,6 @@ interface AuthRepository {
     suspend fun isCurrentUserAlreadyLoggedIn(): Boolean
 
     suspend fun isCurrentUserEmailValidated(): Boolean
+
+    suspend fun updateUserProfile(newProfileData: ProfileFields): Flow<Response<Nothing>>
 }

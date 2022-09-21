@@ -49,8 +49,7 @@ fun TikiScreen(
         state.tikiScreenEventFlow.collect {
             when (it) {
                 TikiScreenEvents.GoToSignInScreen -> {
-                    destinationsNavigator.popBackStack()
-                    destinationsNavigator.navigate(SignInScreenDestination)
+                    destinationsNavigator.popBackStack(SignInScreenDestination, inclusive = false)
                 }
                 TikiScreenEvents.ClearFocus -> focusManager.clearFocus()
             }

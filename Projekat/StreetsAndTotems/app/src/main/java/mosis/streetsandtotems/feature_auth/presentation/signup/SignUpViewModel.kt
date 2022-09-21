@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_auth.presentation.signup
 
+import android.content.Intent
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.*
+import mosis.streetsandtotems.core.domain.model.Response
 import mosis.streetsandtotems.core.domain.model.SnackbarSettings
 import mosis.streetsandtotems.core.domain.util.handleResponse
 import mosis.streetsandtotems.core.domain.validators.validatePhoneNumber
@@ -36,7 +38,9 @@ class SignupViewModel @Inject constructor(
     private val _signUpScreenEventFlow = MutableStateFlow<SignUpScreenEvents?>(value = null)
     private val _signUpScreenState = mutableStateOf(
         SignUpState(
-            signUpScreenEventFlow = _signUpScreenEventFlow, formState = FormState(
+            signUpScreenEventFlow = _signUpScreenEventFlow,
+            oneTapSignUpResult = null,
+            formState = FormState(
                 fields = listOf(
                     TextFormField(
                         initial = "",
@@ -168,12 +172,48 @@ class SignupViewModel @Inject constructor(
     fun onEvent(event: SignUpViewModelEvents) {
         when (event) {
             SignUpViewModelEvents.SignUpWithEmailAndPassword -> signUpWithEmailAndPasswordHandler()
-            SignUpViewModelEvents.SignUpWithGoogle -> signUpWithGoogle()
+            SignUpViewModelEvents.OneTapGoogleSignUp -> oneTapGoogleSignUpHandler()
+            is SignUpViewModelEvents.SignUpWithGoogle -> signUpWithGoogleHandler(event.intent)
         }
     }
 
-    private fun signUpWithGoogle() {
+    private fun signUpWithGoogleHandler(intent: Intent?) {
+        intent?.let {
+            viewModelScope.launch {
+                handleResponse(
+                    responseFlow = authUseCases.signInWithGoogle(it),
+                    onSuccess = {
+                        viewModelScope.launch {
+                            _signUpScreenEventFlow.emit(
+                                SignUpScreenEvents.SignUpWithGoogleSuccessful
+                            )
+                        }
+                    },
+                    snackbarFlow = snackbarFlow,
+                    showLoaderFlow = showLoaderFlow,
+                    successMessage = MessageConstants.SIGNED_IN,
+                    defaultErrorMessage = MessageConstants.GOOGLE_SIGN_UP_FAILED
+                )
+            }
+        }
+    }
 
+    private fun oneTapGoogleSignUpHandler() {
+        viewModelScope.launch {
+            authUseCases.oneTapSignUpWithGoogle().collect { response ->
+                when (response) {
+                    Response.Loading -> showLoaderFlow.emit(true)
+                    is Response.Error -> {
+                        showLoaderFlow.emit(false)
+                    }
+                    is Response.Success -> {
+                        showLoaderFlow.emit(false)
+                        _signUpScreenState.value =
+                            _signUpScreenState.value.copy(oneTapSignUpResult = response.data)
+                    }
+                }
+            }
+        }
     }
 
     private fun signUpWithEmailAndPasswordHandler() {

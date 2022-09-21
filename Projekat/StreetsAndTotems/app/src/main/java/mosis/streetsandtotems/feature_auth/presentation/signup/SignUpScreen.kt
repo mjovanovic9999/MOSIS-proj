@@ -16,9 +16,11 @@ import mosis.streetsandtotems.core.presentation.components.CustomPage
 import mosis.streetsandtotems.core.presentation.components.form.Form
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.AuthNavGraph
 import mosis.streetsandtotems.core.presentation.screens.tiki.TikiScreenContentType
+import mosis.streetsandtotems.destinations.MainScreenDestination
 import mosis.streetsandtotems.destinations.TikiScreenDestination
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtons
 import mosis.streetsandtotems.feature_auth.presentation.components.AuthButtonsType
+import mosis.streetsandtotems.feature_auth.presentation.components.OneTapGoogle
 import mosis.streetsandtotems.ui.theme.sizes
 
 @AuthNavGraph
@@ -33,6 +35,10 @@ fun SignUpScreen(viewModel: SignupViewModel, destinationsNavigator: Destinations
                 SignUpScreenEvents.SignUpSuccessful -> {
                     destinationsNavigator.popBackStack()
                     destinationsNavigator.navigate(TikiScreenDestination(TikiScreenContentType.EmailVerification))
+                }
+                SignUpScreenEvents.SignUpWithGoogleSuccessful -> {
+                    destinationsNavigator.popBackStack()
+                    destinationsNavigator.navigate(MainScreenDestination)
                 }
             }
         }
@@ -51,7 +57,12 @@ fun SignUpScreen(viewModel: SignupViewModel, destinationsNavigator: Destinations
                 textStyle = MaterialTheme.typography.titleMedium,
                 enabled = state.formState.isFormFilled.value
             )
-            AuthButtons(type = AuthButtonsType.SignUp)
+            AuthButtons(type = AuthButtonsType.SignUp, onSignInWithGoogleClick = {
+                viewModel.onEvent(SignUpViewModelEvents.OneTapGoogleSignUp)
+            })
         }, scrollable = true
     )
+
+    OneTapGoogle(signInResult = state.oneTapSignUpResult,
+        onAccountSelected = { viewModel.onEvent(SignUpViewModelEvents.SignUpWithGoogle(it)) })
 }

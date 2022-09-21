@@ -267,8 +267,8 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
         when (event) {
             is ProfileViewModelEvents.InitializeFormFields -> onInitializeFormFields(event.currentUserFields)
             ProfileViewModelEvents.ChangeMode -> onChangeModeHandler()
-            ProfileViewModelEvents.HideEditPasswordDialog -> onShowEditPasswordDialogHandler()
-            ProfileViewModelEvents.ShowEditPasswordDialog -> onHideEditPasswordDialogHandler()
+            ProfileViewModelEvents.HideEditPasswordDialog -> onHideEditPasswordDialogHandler()
+            ProfileViewModelEvents.ShowEditPasswordDialog -> onShowEditPasswordDialogHandler()
         }
     }
 
