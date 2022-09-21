@@ -3,8 +3,6 @@ package mosis.streetsandtotems.feature_map.presentation
 import androidx.compose.runtime.Composable
 
 import android.net.Uri
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import com.ramcosta.composedestinations.annotation.Destination
 import mosis.streetsandtotems.core.ButtonConstants.ACCEPT
 import mosis.streetsandtotems.core.ButtonConstants.DECLINE
@@ -46,10 +44,11 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         deleteCustomPin = { mapViewModel.onEvent(MapViewModelEvents.RemoveCustomPin) }
     )
 
-    PlayerDialog(//fale fje za interakciju sqaud
+    PlayerDialog(
+//fale fje za interakciju
         isOpen = state.playerDialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.ClosePlayerDialog) },
-        isSquadMember = state.selectedPlayer.squad_id == "squadid",////////////////////////////
+        isSquadMember = state.selectedPlayer.squad_id == state.mySquadId,
         tradeEnabled = isTradePossible(
             state.playerLocation,
             state.selectedPlayer.l
@@ -60,7 +59,9 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         firstName = state.selectedPlayer.first_name,
         lastName = state.selectedPlayer.last_name,
         userName = state.selectedPlayer.user_name,
-        image = if (state.selectedPlayer.image_uri == null) Uri.EMPTY else Uri.parse(state.selectedPlayer.image_uri)
+        image = if (state.selectedPlayer.image_uri == null) Uri.EMPTY else Uri.parse(state.selectedPlayer.image_uri),
+        onInviteToSquad = { mapViewModel.onEvent(MapViewModelEvents.InviteToSquad) },
+        onKickFromSquad = { mapViewModel.onEvent(MapViewModelEvents.InitKickFromSquad) },
     )
 
     CustomFilterDialog(
@@ -147,8 +148,8 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         isOpen = state.inviteDialogOpen,
         title = SQUAD_INVITE,
         text = state.userNameForSquadInteraction + SQUAD_INVITE_QUESTION,
-        onConfirmButtonClick = { /*TODO*/ },
-        onDismissButtonClick = { /*TODO*/ },
+        onConfirmButtonClick = { mapViewModel.onEvent(MapViewModelEvents.AcceptSquadInvite) },
+        onDismissButtonClick = { mapViewModel.onEvent(MapViewModelEvents.DeclineSquadInvite) },
         confirmButtonText = ACCEPT,
         dismissButtonText = DECLINE,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseInviteToSquadDialog) }

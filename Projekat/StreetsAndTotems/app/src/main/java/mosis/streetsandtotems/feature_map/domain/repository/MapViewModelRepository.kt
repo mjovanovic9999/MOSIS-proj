@@ -49,7 +49,7 @@ interface MapViewModelRepository {
 
     suspend fun declineInviteToSquad(inviterId: String)
 
-    suspend fun initKickVote(kickVote: KickVoteData)
+    suspend fun initKickVote(user_id: String)
 
     suspend fun kickVote(userId: String, myVote: Vote)
 

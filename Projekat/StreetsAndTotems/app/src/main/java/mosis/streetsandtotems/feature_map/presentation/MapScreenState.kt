@@ -48,8 +48,11 @@ data class MapScreenState(
     val claimTotemDialog: Boolean,
 
     val userNameForSquadInteraction: String,
+
     val inviteDialogOpen: Boolean,
-)
+    val inviterId: String?,
+
+    )
 
 
 data class SelectedCustomPinDialog(

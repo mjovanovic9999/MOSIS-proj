@@ -156,6 +156,10 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.HarvestTotemPoints -> harvestPointsAndUpdateTotemHandler()
             MapViewModelEvents.CloseInviteToSquadDialog -> closeInviteToSquadHandler()
             MapViewModelEvents.ShowInviteToSquadDialog -> showInviteToSquadHandler()
+            MapViewModelEvents.AcceptSquadInvite -> acceptSquadInviteHandler()
+            MapViewModelEvents.DeclineSquadInvite -> declineSquadInviteHandler()
+            MapViewModelEvents.InitKickFromSquad -> initKickFromSquadHandler()
+            MapViewModelEvents.InviteToSquad -> inviteToSquadHandler()
         }
     }
 
@@ -226,8 +230,9 @@ class MapViewModel @Inject constructor(
             riddleDialogOpen = false,
             claimTotemDialog = false,
             riddleData = RiddleData(),
-            inviteDialogOpen = true,
-            userNameForSquadInteraction = "UserName111",
+            inviteDialogOpen = false,
+            userNameForSquadInteraction = "",
+            inviterId = null,
         )
         )
     }
@@ -244,8 +249,12 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             _mapScreenState.value = _mapScreenState.value.copy(
                 myId = preferenceUseCases.getUserId(),
-                mySquadId = "", //preferenceUseCases.getSquadId()//treba flow
             )
+            preferenceUseCases.getUserSquadIdFlow().collect {
+                _mapScreenState.value = _mapScreenState.value.copy(
+                    mySquadId = it
+                )
+            }
         }
     }
 
@@ -272,12 +281,17 @@ class MapViewModel @Inject constructor(
                 event.newInventory
             )//treba li ovamo market home
             is LocationServiceMapScreenEvents.KickVote -> {
-                when(event.kickAction.type){
+                when (event.kickAction.type) {
                     KickActionType.VoteStarted -> Log.d("tag", "KICK VOTE STARTED")
                     KickActionType.VoteEnded -> Log.d("tag", "KICK VOTE ENDED")
                 }
             }
-            is LocationServiceMapScreenEvents.SquadInvite -> Log.d("tag", "SQUAD INVITE")
+            is LocationServiceMapScreenEvents.SquadInvite -> {
+                _mapScreenState.value = _mapScreenState.value.copy(
+                    inviterId = event.squadInvite.inviter_id,
+                )
+                showInviteToSquadHandler()
+            }
         }
     }
 
@@ -321,7 +335,8 @@ class MapViewModel @Inject constructor(
                 }
                 is TotemData -> {
                     totemsHashMap[it] = dataType
-//da bi prikazalo svi totemi//                    if (dataType.placed_by != null && ((mapScreenState.value.mySquadId != null && dataType.placed_by == mapScreenState.value.mySquadId) || dataType.placed_by == mapScreenState.value.myId)) {
+//da bi prikazalo svi totemi
+//                    if (dataType.placed_by != null && ((mapScreenState.value.mySquadId != null && dataType.placed_by == mapScreenState.value.mySquadId) || dataType.placed_by == mapScreenState.value.myId)) {
                     composable = { CustomPin(resourceId = R.drawable.pin_tiki) }
 //                    }
                 }
@@ -954,18 +969,11 @@ class MapViewModel @Inject constructor(
         val selectedTotem = mapScreenState.value.selectedTotem
         selectedTotem.id?.let {
             viewModelScope.launch {
-                if (mapScreenState.value.mySquadId == null) mapViewModelRepository.updateLeaderboard(
-                    mapScreenState.value.myId,
+                mapViewModelRepository.updateSquadLeaderboard(
+                    mapScreenState.value.mySquadId,
                     (selectedTotem.bonus_points
                         ?: 0) + calculateTotemTimePoints(selectedTotem.last_visited)
                 )
-                else {
-                    mapViewModelRepository.updateSquadLeaderboard(
-                        mapScreenState.value.mySquadId!!,
-                        (selectedTotem.bonus_points
-                            ?: 0) + calculateTotemTimePoints(selectedTotem.last_visited)
-                    )
-                }
                 if (shouldDeleteTotem) {
                     mapViewModelRepository.deleteTotem(it)
                 } else {
@@ -978,6 +986,40 @@ class MapViewModel @Inject constructor(
             }
         }
     }
+
+    private fun declineSquadInviteHandler() {
+        _mapScreenState.value.inviterId?.let {
+            viewModelScope.launch {
+                mapViewModelRepository.declineInviteToSquad(it)
+            }
+        }
+    }
+
+    private fun acceptSquadInviteHandler() {
+        _mapScreenState.value.inviterId?.let {
+            viewModelScope.launch {
+                mapViewModelRepository.acceptInviteToSquad(it)
+            }
+        }
+    }
+
+
+    private fun initKickFromSquadHandler() {
+        _mapScreenState.value.selectedPlayer.id?.let {
+            viewModelScope.launch {
+                mapViewModelRepository.initKickVote(it)
+            }
+        }
+    }
+
+    private fun inviteToSquadHandler() {
+        _mapScreenState.value.selectedPlayer.id?.let {
+            viewModelScope.launch {
+                mapViewModelRepository.initInviteToSquad(it)
+            }
+        }
+    }
+
 }
 
 //endregion

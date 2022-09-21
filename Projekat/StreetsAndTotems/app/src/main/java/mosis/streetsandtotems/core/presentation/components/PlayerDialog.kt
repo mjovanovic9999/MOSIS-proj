@@ -37,6 +37,8 @@ fun PlayerDialog(
     lastName: String? = null,
     userName: String? = null,
     image: Uri? = null,
+    onInviteToSquad: () -> Unit,
+    onKickFromSquad: () -> Unit,
 ) {
     val context = LocalContext.current
     CustomDialog(
@@ -125,6 +127,7 @@ fun PlayerDialog(
         },
         confirmButtonText = if (isSquadMember) ButtonConstants.KICK else ButtonConstants.INVITE_TO_SQUAD,
         confirmButtonMatchParentWidth = true,
+        onConfirmButtonClick = { if (isSquadMember) onKickFromSquad() else onInviteToSquad() },
         dismissButtonText = ButtonConstants.TRADE,
         dismissButtonVisible = tradeEnabled,
         dismissButtonMatchParentWidth = true,
@@ -132,7 +135,7 @@ fun PlayerDialog(
     )
 }
 
-fun callNumber(context: Context, number: String?) {
+private fun callNumber(context: Context, number: String?) {
     if (number != null) {
         val intent = Intent(Intent.ACTION_DIAL)
         intent.data = Uri.parse("tel:$number")
@@ -140,7 +143,7 @@ fun callNumber(context: Context, number: String?) {
     }
 }
 
-fun sendSms(context: Context, number: String?) {
+private fun sendSms(context: Context, number: String?) {
     if (number != null) {
         val uri = Uri.parse("smsto:$number")
         val intent = Intent(Intent.ACTION_SENDTO, uri)
