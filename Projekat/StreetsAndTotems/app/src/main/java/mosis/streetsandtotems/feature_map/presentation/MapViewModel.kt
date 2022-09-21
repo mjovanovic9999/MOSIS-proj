@@ -235,8 +235,8 @@ class MapViewModel @Inject constructor(
             riddleData = RiddleData(),
             inviteDialogOpen = false,
             interactionUserName = "",
-            interactionUserId = null,
-            voteDialogOpen = true,
+            interactionUserId = "",
+            voteDialogOpen = false,
         )
         )
     }
@@ -292,8 +292,9 @@ class MapViewModel @Inject constructor(
             }
             is LocationServiceMapScreenEvents.SquadInvite -> {
                 _mapScreenState.value = _mapScreenState.value.copy(
-                    interactionUserId = event.squadInvite.inviter_id,
-                    interactionUserName = mapScreenState.value.playersHashMap[event.squadInvite.inviter_id]?.user_name
+                    interactionUserId = event.squadInvite.inviter_id ?: "",
+                    interactionUserName =
+                    mapScreenState.value.playersHashMap[event.squadInvite.inviter_id]?.user_name
                         ?: ""
                 )
                 showInviteToSquadHandler()
@@ -1003,18 +1004,20 @@ class MapViewModel @Inject constructor(
     }
 
     private fun declineSquadInviteHandler() {
-        _mapScreenState.value.interactionUserId?.let {
-            viewModelScope.launch {
-                mapViewModelRepository.declineInviteToSquad(it)
-            }
+        _mapScreenState.value.interactionUserId.let {
+            if (it != "")
+                viewModelScope.launch {
+                    mapViewModelRepository.declineInviteToSquad(it)
+                }
         }
     }
 
     private fun acceptSquadInviteHandler() {
-        _mapScreenState.value.interactionUserId?.let {
-            viewModelScope.launch {
-                mapViewModelRepository.acceptInviteToSquad(it)
-            }
+        _mapScreenState.value.interactionUserId.let {
+            if (it != "")
+                viewModelScope.launch {
+                    mapViewModelRepository.acceptInviteToSquad(it)
+                }
         }
     }
 
@@ -1036,10 +1039,11 @@ class MapViewModel @Inject constructor(
     }
 
     private fun kickAnswerHandler(kick: Boolean) {
-        _mapScreenState.value.interactionUserId?.let {
-            viewModelScope.launch {
-                mapViewModelRepository.kickVote(it, if (kick) Vote.Yes else Vote.No)
-            }
+        _mapScreenState.value.interactionUserId.let {
+            if (it != "")
+                viewModelScope.launch {
+                    mapViewModelRepository.kickVote(it, if (kick) Vote.Yes else Vote.No)
+                }
         }
     }
 }

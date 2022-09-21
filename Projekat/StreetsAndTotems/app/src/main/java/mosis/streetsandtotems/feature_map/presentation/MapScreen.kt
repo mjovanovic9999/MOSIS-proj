@@ -21,7 +21,9 @@ import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import mosis.streetsandtotems.feature_map.presentation.components.*
 import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.*
+import mosis.streetsandtotems.feature_map.presentation.util.isSquadMember
 import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
+import mosis.streetsandtotems.feature_map.presentation.util.shouldEnableNumber
 
 @MainNavGraph(start = true)
 @Destination
@@ -53,13 +55,24 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
 //fale fje za interakciju
         isOpen = state.playerDialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.ClosePlayerDialog) },
-        isSquadMember = state.selectedPlayer.squad_id == state.mySquadId,
+        isSquadMember = isSquadMember(state.mySquadId, state.selectedPlayer.squad_id),
         tradeEnabled = isTradePossible(
             state.playerLocation,
             state.selectedPlayer.l
         ),
-        callsAllowed = true,//state.selectedPlayer.call_privacy_level,
-        messagingAllowed = true,//state.selectedPlayer.messaging_privacy_level,
+        callsAllowed = shouldEnableNumber(
+            state.selectedPlayer.call_privacy_level,
+            state.mySquadId,
+            state.selectedPlayer.squad_id,
+            state.selectedPlayer.phone_number
+        ),
+        messagingAllowed =
+        shouldEnableNumber(
+            state.selectedPlayer.messaging_privacy_level,
+            state.mySquadId,
+            state.selectedPlayer.squad_id,
+            state.selectedPlayer.phone_number
+        ),
         phoneNumber = state.selectedPlayer.phone_number,
         firstName = state.selectedPlayer.first_name,
         lastName = state.selectedPlayer.last_name,

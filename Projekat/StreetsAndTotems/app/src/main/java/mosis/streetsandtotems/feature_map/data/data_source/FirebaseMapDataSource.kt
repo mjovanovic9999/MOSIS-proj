@@ -392,7 +392,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                         if (votesHalf <= voteYes) {//kick
                             removeFromSquad(userId)
                             db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
-
+                            reevaluateVoteAfterKick(userId, squadId)
+                            //promeniti listu na kickvote kad se neko izbaci
                         } else if (votesHalf <= voteNo) {
                             db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
 
@@ -407,6 +408,50 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     }
 
+    private suspend fun reevaluateVoteAfterKick(userId: String, squadId: String) {
+        val kicksList = db.collection(KICK_VOTE_COLLECTION)
+            .whereEqualTo(FIELD_SQUAD_ID, squadId)
+            .get().await().documents.toList()
+        //.toObjects(KickVoteData::class.java)
+
+        val squadNum = (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
+            .get(FIELD_USERS) as List<*>).size
+
+        for (itemDoc in kicksList) {
+            val item = itemDoc.toObject(KickVoteData::class.java)
+            if (item != null) {
+                val newMap = item.votes?.toMutableMap() ?: mutableMapOf()
+                newMap.remove(userId)
+                var voteYes = 0
+                var voteNo = 0
+                for (vote in newMap.values) {
+                    when (vote) {
+                        Vote.Unanswered -> {}
+                        Vote.No -> voteNo++
+                        Vote.Yes -> voteYes++
+                    }
+                }
+
+                (squadNum / 2).let { votesHalf ->
+                    if (votesHalf <= voteYes) {//kick
+                        removeFromSquad(userId)
+                        db.collection(KICK_VOTE_COLLECTION).document().delete().await()
+                        reevaluateVoteAfterKick(userId, squadId)
+                        //promeniti listu na kickvote kad se neko izbaci
+                    } else if (votesHalf <= voteNo) {
+                        db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete().await()
+
+                    } else {
+                        db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).set(
+                            item.copy(votes = newMap)
+                        ).await()
+                    }
+                }
+            }
+        }
+    }
+
+    
 //endregion
 }
 

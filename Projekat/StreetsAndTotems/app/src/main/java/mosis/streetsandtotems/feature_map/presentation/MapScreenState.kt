@@ -50,7 +50,7 @@ data class MapScreenState(
 
     val inviteDialogOpen: Boolean,
     val voteDialogOpen: Boolean,
-    val interactionUserId: String?,
+    val interactionUserId: String,
     val interactionUserName: String,
 
     )
