@@ -154,6 +154,8 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.ShowClaimTotemDialog -> showClaimTotemHandler()
             MapViewModelEvents.ClaimTotem -> claimTotemHandler()
             MapViewModelEvents.HarvestTotemPoints -> harvestPointsAndUpdateTotemHandler()
+            MapViewModelEvents.CloseInviteToSquadDialog -> closeInviteToSquadHandler()
+            MapViewModelEvents.ShowInviteToSquadDialog -> showInviteToSquadHandler()
         }
     }
 
@@ -224,6 +226,8 @@ class MapViewModel @Inject constructor(
             riddleDialogOpen = false,
             claimTotemDialog = false,
             riddleData = RiddleData(),
+            inviteDialogOpen = true,
+            userNameForSquadInteraction = "UserName111",
         )
         )
     }
@@ -766,6 +770,15 @@ class MapViewModel @Inject constructor(
         _mapScreenState.value = _mapScreenState.value.copy(claimTotemDialog = false)
     }
 
+    private fun showInviteToSquadHandler() {
+        _mapScreenState.value =
+            _mapScreenState.value.copy(inviteDialogOpen = true)
+    }
+
+    private fun closeInviteToSquadHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(inviteDialogOpen = false)
+    }
+
 //endregion
 
 
@@ -947,7 +960,7 @@ class MapViewModel @Inject constructor(
                     )
                 }
                 if (shouldDeleteTotem) {
-                mapViewModelRepository.deleteTotem(it)
+                    mapViewModelRepository.deleteTotem(it)
                 } else {
                     mapViewModelRepository.updateTotem(
                         it,

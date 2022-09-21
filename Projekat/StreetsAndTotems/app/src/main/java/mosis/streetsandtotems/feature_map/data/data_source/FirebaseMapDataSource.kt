@@ -255,27 +255,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             .get(FIELD_USERS) as List<*>).size == MAX_SQUAD_MEMBERS_COUNT
 
 
-    suspend fun acceptInviteToSquad(inviterId: String, inviteeId: String) {
-        getInviteIdOrNull(inviterId, inviteeId)?.let { docId ->
-            db.runTransaction {
-
-                val inviterSquadId = it.get(
-                    db.collection(PROFILE_DATA_COLLECTION).document(inviterId)
-                ).getString(FIELD_SQUAD_ID)
-
-                if (inviterSquadId == null || inviterSquadId == "") {
-                    createSquad(it, inviterId, inviteeId)
-                } else {
-                    addUserToSquadAndUpdateUser(it, inviterSquadId, inviteeId)
-                }
-
-                it.delete(db.collection(SQUAD_INVITES_COLLECTION).document(docId))
-
-            }.await()
-        }
-    }
-
-    suspend fun removeFromSquad(userId: String) {
+    private suspend fun removeFromSquad(userId: String) {
         db.runTransaction { transaction ->
             val docRefProfile = db.collection(PROFILE_DATA_COLLECTION).document(userId)
             val squadId = transaction.get(docRefProfile).getString(FIELD_SQUAD_ID)
@@ -307,10 +287,31 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         }.await()
     }
 
-    suspend fun declineInviteToSquad(inviterId: String, inviteeId: String) =
+    suspend fun acceptInviteToSquad(inviterId: String, inviteeId: String) {
+        getInviteIdOrNull(inviterId, inviteeId)?.let { docId ->
+            db.runTransaction {
+
+                val inviterSquadId = it.get(
+                    db.collection(PROFILE_DATA_COLLECTION).document(inviterId)
+                ).getString(FIELD_SQUAD_ID)
+
+                if (inviterSquadId == null || inviterSquadId == "") {
+                    createSquad(it, inviterId, inviteeId)
+                } else {
+                    addUserToSquadAndUpdateUser(it, inviterSquadId, inviteeId)
+                }
+
+                it.delete(db.collection(SQUAD_INVITES_COLLECTION).document(docId))
+
+            }.await()
+        }
+    }
+
+    suspend fun declineInviteToSquad(inviterId: String, inviteeId: String) {
         getInviteIdOrNull(inviterId, inviteeId)?.let {
             db.collection(SQUAD_INVITES_COLLECTION).document(it).delete()
         }
+    }
 
     private suspend fun getInviteIdOrNull(inviterId: String, inviteeId: String): String? =
         db.collection(SQUAD_INVITES_COLLECTION)

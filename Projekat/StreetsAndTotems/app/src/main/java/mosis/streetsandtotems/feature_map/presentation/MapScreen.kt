@@ -6,6 +6,12 @@ import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.ramcosta.composedestinations.annotation.Destination
+import mosis.streetsandtotems.core.ButtonConstants.ACCEPT
+import mosis.streetsandtotems.core.ButtonConstants.DECLINE
+import mosis.streetsandtotems.core.MessageConstants.SQUAD_INVITE
+import mosis.streetsandtotems.core.MessageConstants.SQUAD_INVITE_QUESTION
+import mosis.streetsandtotems.core.presentation.components.ConfirmationDialogType
+import mosis.streetsandtotems.core.presentation.components.CustomConfirmationDialog
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
@@ -135,4 +141,18 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         onClaim = { mapViewModel.onEvent(MapViewModelEvents.ClaimTotem) },
         backpackHasEmptySpace = state.playerInventory.empty_spaces != 0,
     )
+
+    CustomConfirmationDialog(
+        type = ConfirmationDialogType.Confirm,
+        isOpen = state.inviteDialogOpen,
+        title = SQUAD_INVITE,
+        text = state.userNameForSquadInteraction + SQUAD_INVITE_QUESTION,
+        onConfirmButtonClick = { /*TODO*/ },
+        onDismissButtonClick = { /*TODO*/ },
+        confirmButtonText = ACCEPT,
+        dismissButtonText = DECLINE,
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseInviteToSquadDialog) }
+    )
+
+
 }

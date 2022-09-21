@@ -46,6 +46,9 @@ data class MapScreenState(
     val riddleData: RiddleData,
 
     val claimTotemDialog: Boolean,
+
+    val userNameForSquadInteraction: String,
+    val inviteDialogOpen: Boolean,
 )
 
 

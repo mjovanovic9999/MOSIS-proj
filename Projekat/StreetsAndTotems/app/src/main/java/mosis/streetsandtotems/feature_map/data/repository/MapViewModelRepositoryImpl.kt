@@ -120,6 +120,44 @@ class MapViewModelRepositoryImpl(
     override suspend fun updateSquadLeaderboard(squadId: String, addSquadLeaderboardPoints: Int) {
         return firebaseMapDataSource.updateSquadLeaderboard(squadId, addSquadLeaderboardPoints)
     }
+
+    override suspend fun initInviteToSquad(inviteeId: String) {
+        return firebaseMapDataSource.initInviteToSquad(preferenceDataSource.getUserId(), inviteeId)
+    }
+
+    override suspend fun acceptInviteToSquad(inviterId: String) {
+        return firebaseMapDataSource.acceptInviteToSquad(
+            inviterId,
+            preferenceDataSource.getUserId()
+        )
+    }
+
+    override suspend fun declineInviteToSquad(inviterId: String) {
+        firebaseMapDataSource.declineInviteToSquad(
+            inviterId,
+            preferenceDataSource.getUserId()
+        )
+    }
+
+    override suspend fun isSquadFull(squadId: String): Boolean =
+        firebaseMapDataSource.isSquadFull(squadId)
+
+    override suspend fun isUserInSquad(inviteeId: String): Boolean =
+        firebaseMapDataSource.isUserInSquad(inviteeId)
+
+    override suspend fun initKickVote(kickVote: KickVoteData) {//da l ostali params pa tu da se setuje
+        firebaseMapDataSource.initKickVote(kickVote)
+    }
+
+    override suspend fun kickVote(userId: String, myVote: Vote) {
+        firebaseMapDataSource.kickVote(
+            preferenceDataSource.getUserId(),
+            preferenceDataSource.getUserSquadId(),
+            userId,
+            myVote
+        )
+    }
+
 //    override suspend fun registerCallbackOnUserInventoryUpdate(userId: String): UserInventoryData? {
 //        return try {
 //            firebaseMapDataSource.getUserInventory(userId)
