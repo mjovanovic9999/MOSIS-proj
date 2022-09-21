@@ -59,7 +59,7 @@ fun LeaderboardsScreen(viewModel: LeaderboardsViewModel) {
             }
         })
 
-    PlayerDialog(
-        isOpen = state.playerDialogOpen,
-        onDismissRequest = { viewModel.closePlayerDialog() })
+//    PlayerDialog(
+//        isOpen = state.playerDialogOpen,
+//        onDismissRequest = { viewModel.closePlayerDialog() })
 }
