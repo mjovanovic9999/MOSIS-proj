@@ -33,6 +33,14 @@ object FireStoreConstants {
     const val ITEM_COUNT = "item_count"
     const val RIDDLE_COUNT_VALUE = "value"
     const val ORDER_NUMBER = "order_number"
+
+    const val FIELD_USERS = "users"
+    const val FIELD_SQUAD_ID = "squad_id"
+    const val FIELD_USER_ID = "user_id"
+    const val FIELD_INVITER_ID = "inviter_id"
+    const val FIELD_INVITEE_ID = "invitee_id"
+    const val FIELD_INVENTORY = "inventory"
+    const val L = "l"
 }
 
 object FirebaseErrorCodesConstants {
@@ -113,6 +121,7 @@ object ButtonConstants {
     const val EDIT = "Edit"
     const val REMOVE = "Remove"
     const val INVEST = "Invest"
+    const val HARVEST = "Harvest"
     const val BUY = "Buy"
     const val TAKE = "Take"
     const val PUT = "PUT"
@@ -130,7 +139,7 @@ object ButtonConstants {
     const val DISMISS = "Dismiss"
     const val SUBMIT_ANSWER = "Submit answer"
     const val CLAIM_TOTEM = "Claim totem"
-
+    const val PICK_UP_TOTEM = "Pick up"
 }
 
 object FormFieldNamesConstants {
@@ -416,6 +425,10 @@ object PointsConversion {
     const val TOTEM_BONUS_POINTS_INCORRECT_ANSWER = 100
 
     const val HOURS_TO_POINTS_CONVERSION = 1
+
+    const val SQUAD_MEMBERS_POINTS_COEFFICIENT = 0.5
+
+    const val MAX_SQUAD_MEMBERS_COUNT = 5
 }
 
 object ProtectionLevelConstants {

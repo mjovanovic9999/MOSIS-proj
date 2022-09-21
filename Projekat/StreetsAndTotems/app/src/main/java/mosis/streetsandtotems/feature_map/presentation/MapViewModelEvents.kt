@@ -41,4 +41,5 @@ sealed class MapViewModelEvents {
     object ShowClaimTotemDialog : MapViewModelEvents()
     object CloseClaimTotemDialog : MapViewModelEvents()
     object ClaimTotem : MapViewModelEvents()
+    object HarvestTotemPoints : MapViewModelEvents()
 }

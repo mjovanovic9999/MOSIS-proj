@@ -37,5 +37,7 @@ interface MapViewModelRepository {
 
     suspend fun updateLeaderboard(userId: String, addLeaderboardPoints: Int)
 
+    suspend fun updateSquadLeaderboard(squadId: String, addSquadLeaderboardPoints: Int)
+
 //    suspend fun registerCallbackOnUserInventoryUpdate(callback: (UserInventoryData) -> Unit)
 }

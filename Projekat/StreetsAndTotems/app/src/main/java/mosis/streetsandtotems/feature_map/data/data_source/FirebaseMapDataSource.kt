@@ -3,16 +3,30 @@ package mosis.streetsandtotems.feature_map.data.data_source
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.core.FireStoreConstants.EASY_RIDDLES_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVENTORY
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVITEE_ID
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVITER_ID
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_SQUAD_ID
 import mosis.streetsandtotems.core.FireStoreConstants.HARD_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.ITEM_COUNT
+import mosis.streetsandtotems.core.FireStoreConstants.KICK_VOTE_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.LEADERBOARD_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.MARKET_DOCUMENT_ID
 import mosis.streetsandtotems.core.FireStoreConstants.MEDIUM_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.ORDER_NUMBER
+import mosis.streetsandtotems.core.FireStoreConstants.PROFILE_DATA_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.RIDDLE_COUNT_VALUE
+import mosis.streetsandtotems.core.FireStoreConstants.SQUADS_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.SQUAD_INVITES_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_USERS
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_USER_ID
+import mosis.streetsandtotems.core.FireStoreConstants.L
+import mosis.streetsandtotems.core.PointsConversion.MAX_SQUAD_MEMBERS_COUNT
+import mosis.streetsandtotems.core.PointsConversion.SQUAD_MEMBERS_POINTS_COEFFICIENT
 import mosis.streetsandtotems.feature_map.domain.model.*
 import kotlin.random.Random
 
@@ -25,7 +39,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     ) {
         db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION).add(
             mapOf(
-                "l" to l,
+                L to l,
                 "text" to text,
                 "placed_by" to placed_by,
                 "visible_to" to visible_to,
@@ -55,8 +69,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     suspend fun addHome(myId: String, l: GeoPoint) {
         db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId).set(
             mapOf(
-                "l" to l,
-                "inventory" to mapOf(
+                L to l,
+                FIELD_INVENTORY to mapOf(
                     "wood" to 0,
                     "brick" to 0,
                     "stone" to 0,
@@ -71,8 +85,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         homeId: String, newInventoryData: InventoryData? = null, l: GeoPoint? = null
     ) {
         val data: MutableMap<String, Any> = mutableMapOf()
-        if (newInventoryData != null) data["inventory"] = newInventoryData
-        if (l != null) data["l"] = l
+        if (newInventoryData != null) data[FIELD_INVENTORY] = newInventoryData
+        if (l != null) data[L] = l
 
         if (data.isNotEmpty()) db.collection(FireStoreConstants.HOMES_COLLECTION).document(homeId)
             .update(data).await()
@@ -155,11 +169,218 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             val points = it.get(docRef).getLong("points")
             it.update(docRef, "points", (points ?: 0) + addLeaderboardPoints)
         }.await()
+    }
+
+    suspend fun updateSquadLeaderboard(squadId: String, addSquadLeaderboardPoints: Int) {
+        val ids =
+            db.collection(SQUADS_COLLECTION).document("ScrImM23lmrLjRL0oMiz"/*squadId*/)
+                .get()///////////////////
+                .await().get(FIELD_USERS) as List<*>
+        for (item in ids) {
+            if (item is String)
+                updateLeaderboard(
+                    item,
+                    (addSquadLeaderboardPoints * SQUAD_MEMBERS_POINTS_COEFFICIENT).toInt()
+                )
+        }
+    }
+
+    //region squad interaction
+
+    private fun addUserToSquadAndUpdateUser(
+        transaction: Transaction,
+        squadId: String,
+        inviteeId: String
+    ) {
+        val docRef = db.collection(SQUADS_COLLECTION).document(squadId)
+
+        val list = mutableListOf<String>()
+        for (item in transaction.get(docRef).get(FIELD_USERS) as List<*>) {
+            if (item is String)
+                list.add(item)
+        }
+        if (list.isNotEmpty()) {
+            list.add(inviteeId)
+            transaction.update(docRef, FIELD_USERS, list)
+        }
+
+        transaction.update(
+            db.collection(PROFILE_DATA_COLLECTION).document(inviteeId),
+            FIELD_SQUAD_ID,
+            squadId
+        )
+    }
+
+    private fun createSquad(
+        transaction: Transaction,
+        inviterId: String,
+        inviteeId: String
+    ) {
+        val newSquadId = db.collection(SQUADS_COLLECTION).document().id
+        transaction.set(
+            db.collection(SQUADS_COLLECTION).document(newSquadId),
+            mapOf(FIELD_USERS to listOf(inviterId, inviteeId))
+        )
+
+        transaction.update(
+            db.collection(PROFILE_DATA_COLLECTION).document(inviterId),
+            FIELD_SQUAD_ID,
+            newSquadId
+        )
+        transaction.update(
+            db.collection(PROFILE_DATA_COLLECTION).document(inviteeId),
+            FIELD_SQUAD_ID,
+            newSquadId
+        )
+    }
+
+    //check da l je user vec u squad i da l sam ga vec pozvao
+    suspend fun initInviteToSquad(inviterId: String, inviteeId: String) {//treb se i pretplati
+        db.collection(SQUAD_INVITES_COLLECTION).document().set(
+            mapOf(
+                FIELD_INVITER_ID to inviterId,
+                FIELD_INVITEE_ID to inviteeId,
+            )
+        ).await()
+    }
+
+    suspend fun isUserInSquad(inviteeId: String) =
+        db.collection(PROFILE_DATA_COLLECTION).document(inviteeId).get().await()
+            .getString(FIELD_SQUAD_ID).let {
+                !(it == null || it == "")
+            }
+
+    suspend fun isSquadFull(squadId: String): Boolean =
+        (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
+            .get(FIELD_USERS) as List<*>).size == MAX_SQUAD_MEMBERS_COUNT
+
+
+    suspend fun acceptInviteToSquad(inviterId: String, inviteeId: String) {
+        getInviteIdOrNull(inviterId, inviteeId)?.let { docId ->
+            db.runTransaction {
+
+                val inviterSquadId = it.get(
+                    db.collection(PROFILE_DATA_COLLECTION).document(inviterId)
+                ).getString(FIELD_SQUAD_ID)
+
+                if (inviterSquadId == null || inviterSquadId == "") {
+                    createSquad(it, inviterId, inviteeId)
+                } else {
+                    addUserToSquadAndUpdateUser(it, inviterSquadId, inviteeId)
+                }
+
+                it.delete(db.collection(SQUAD_INVITES_COLLECTION).document(docId))
+
+            }.await()
+        }
+    }
+
+    suspend fun removeFromSquad(userId: String) {
+        db.runTransaction { transaction ->
+            val docRefProfile = db.collection(PROFILE_DATA_COLLECTION).document(userId)
+            val squadId = transaction.get(docRefProfile).getString(FIELD_SQUAD_ID)
+
+            if (squadId != null && squadId != "") {
+                val docRefSquads = db.collection(SQUADS_COLLECTION).document(squadId)
+
+                val list = mutableListOf<String>()
+                for (item in transaction.get(docRefSquads).get(FIELD_USERS) as List<*>) {
+                    if (item is String)
+                        list.add(item)
+                }
+                if (list.isNotEmpty()) {
+                    list.remove(userId)
+                    if (list.size == 1) {
+                        transaction.delete(docRefSquads)
+                        transaction.update(
+                            db.collection(PROFILE_DATA_COLLECTION).document(list[0]),
+                            FIELD_SQUAD_ID,
+                            ""
+                        )
+                    } else
+                        transaction.update(docRefSquads, FIELD_USERS, list)
+                }
+
+                transaction.update(docRefProfile, FIELD_SQUAD_ID, "")
+
+            }
+        }.await()
+    }
+
+    suspend fun declineInviteToSquad(inviterId: String, inviteeId: String) =
+        getInviteIdOrNull(inviterId, inviteeId)?.let {
+            db.collection(SQUAD_INVITES_COLLECTION).document(it).delete()
+        }
+
+    private suspend fun getInviteIdOrNull(inviterId: String, inviteeId: String): String? =
+        db.collection(SQUAD_INVITES_COLLECTION)
+            .whereEqualTo(FIELD_INVITER_ID, inviterId)
+            .whereEqualTo(FIELD_INVITEE_ID, inviteeId)
+            .get().await().firstOrNull()?.id
+
+
+    suspend fun initKickVote(kickVote: KickVoteData) {//userid je odma glasao za No i ostali unanswewre
+        val list = db.collection(SQUADS_COLLECTION).document(kickVote.squad_id ?: "").get().await()
+            .get(FIELD_USERS) as List<*>
+
+        if (list.size <= 2) {
+            removeFromSquad(kickVote.user_id ?: "")
+
+        } else {
+            if (db.collection(KICK_VOTE_COLLECTION)
+                    .whereEqualTo(FIELD_SQUAD_ID, kickVote.squad_id)
+                    .whereEqualTo(FIELD_USER_ID, kickVote.user_id)
+                    .get().await().firstOrNull() == null
+            )
+                db.collection(KICK_VOTE_COLLECTION).document().set(kickVote)
+        }
+    }//treba se pretplate ostali
+
+    suspend fun kickVote(myId: String, squadId: String, userId: String, myVote: Vote) {
+        val squadNum = (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
+            .get(FIELD_USERS) as List<*>).size
+
+        val id = db.collection(KICK_VOTE_COLLECTION)
+            .whereEqualTo(FIELD_SQUAD_ID, squadId)
+            .whereEqualTo(FIELD_USER_ID, userId)
+            .get().await().firstOrNull()?.id
+
+        if (id != null) {
+            db.collection(KICK_VOTE_COLLECTION).document(id).get().await()
+                .toObject(KickVoteData::class.java)?.let {
+                    val newMap = it.votes?.toMutableMap() ?: mutableMapOf()
+                    newMap[myId] = myVote
+                    var voteYes = 0
+                    var voteNo = 0
+                    for (vote in newMap.values) {
+                        when (vote) {
+                            Vote.Unanswered -> {}
+                            Vote.No -> voteNo++
+                            Vote.Yes -> voteYes++
+                        }
+                    }
+
+                    ((squadNum + 1) / 2).let { votesHalf ->
+                        if (votesHalf <= voteYes) {//kick
+                            removeFromSquad(userId)
+                            db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
+
+                        } else if (votesHalf <= voteNo) {
+                            db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
+
+                        } else {
+                            db.collection(KICK_VOTE_COLLECTION).document(id).set(
+                                it.copy(votes = newMap)
+                            ).await()
+                        }
+                    }
+
+
+                }
+        }
 
     }
 
-    suspend fun onCorrectAnswerHandler() {}//vrv ne treba
-
-    suspend fun onIncorrectAnswerHandler() {}
+//endregion
 }
 

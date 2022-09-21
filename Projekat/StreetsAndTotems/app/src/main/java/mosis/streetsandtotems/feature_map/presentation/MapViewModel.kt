@@ -43,7 +43,6 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_Z_INDEX
-import mosis.streetsandtotems.core.PointsConversion
 import mosis.streetsandtotems.core.PointsConversion.TOTEM_BONUS_POINTS_INCORRECT_ANSWER
 import mosis.streetsandtotems.core.domain.model.SnackbarSettings
 import mosis.streetsandtotems.core.domain.use_case.PreferenceUseCases
@@ -154,6 +153,7 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.CloseClaimTotemDialog -> closeClaimTotemHandler()
             MapViewModelEvents.ShowClaimTotemDialog -> showClaimTotemHandler()
             MapViewModelEvents.ClaimTotem -> claimTotemHandler()
+            MapViewModelEvents.HarvestTotemPoints -> harvestPointsAndUpdateTotemHandler()
         }
     }
 
@@ -218,7 +218,7 @@ class MapViewModel @Inject constructor(
             home = HomeData(),
             homeDialogOpen = false,
             myId = "",
-            mySquadId = null,
+            mySquadId = "",
             selectedTotem = TotemData(),
             totemDialogOpen = false,
             riddleDialogOpen = false,
@@ -240,7 +240,7 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             _mapScreenState.value = _mapScreenState.value.copy(
                 myId = preferenceUseCases.getUserId(),
-                mySquadId = "" //preferenceUseCases.getSquadId()//treba flow
+                mySquadId = "", //preferenceUseCases.getSquadId()//treba flow
             )
         }
     }
@@ -601,9 +601,9 @@ class MapViewModel @Inject constructor(
                 showTotemDialogHandler()
 //                } else {//enemy totoem
 //                    if (totem.protection_points == null || totem.protection_points < PointsConversion.LOW)
-//                        showClaimTotemHandler()
+//                showClaimTotemHandler()
 //                    else {
-//                        getRiddle(getProtectionLevelFromPointsNoUnprotected(totem.protection_points))
+//                getRiddle(getProtectionLevelFromPointsNoUnprotected(totem.protection_points!!))//bez !!
 //                    }
 //                }
 
@@ -759,7 +759,7 @@ class MapViewModel @Inject constructor(
 
     private fun showClaimTotemHandler() {
         _mapScreenState.value =
-            _mapScreenState.value.copy(claimTotemDialog = true)//nema ga nije napravljen
+            _mapScreenState.value.copy(claimTotemDialog = true)
     }
 
     private fun closeClaimTotemHandler() {
@@ -914,15 +914,8 @@ class MapViewModel @Inject constructor(
     }
 
     private fun claimTotemHandler() {
-        val selectedTotem = mapScreenState.value.selectedTotem
-
-        selectedTotem.id?.let {
+        mapScreenState.value.selectedTotem.id?.let {
             viewModelScope.launch {
-                mapViewModelRepository.updateLeaderboard(
-                    mapScreenState.value.myId,
-                    (selectedTotem.bonus_points ?: 0)
-                            + calculateTotemTimePoints(selectedTotem.last_visited)
-                )//ako nije u squaddd????????
                 mapViewModelRepository.updateUserInventory(
                     UserInventoryData(
                         empty_spaces = (mapScreenState.value.playerInventory.empty_spaces ?: 1) - 1,
@@ -931,12 +924,43 @@ class MapViewModel @Inject constructor(
                         )
                     )
                 )
-                mapViewModelRepository.deleteTotem(it)
+                harvestPointsAndUpdateTotemHandler(true)
             }
         }
     }
 
+    private fun harvestPointsAndUpdateTotemHandler(shouldDeleteTotem: Boolean = false) {
+        val selectedTotem = mapScreenState.value.selectedTotem
+        selectedTotem.id?.let {
+            viewModelScope.launch {
+                if (mapScreenState.value.mySquadId == null)
+                    mapViewModelRepository.updateLeaderboard(
+                        mapScreenState.value.myId,
+                        (selectedTotem.bonus_points ?: 0)
+                                + calculateTotemTimePoints(selectedTotem.last_visited)
+                    )
+                else {
+                    mapViewModelRepository.updateSquadLeaderboard(
+                        mapScreenState.value.mySquadId!!,
+                        (selectedTotem.bonus_points ?: 0)
+                                + calculateTotemTimePoints(selectedTotem.last_visited)
+                    )
+                }
+                if (shouldDeleteTotem) {
+                mapViewModelRepository.deleteTotem(it)
+                } else {
+                    mapViewModelRepository.updateTotem(
+                        it,
+                        selectedTotem.copy(
+                            bonus_points = 0,
+                            last_visited = Timestamp.now()
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
 
 //endregion
 
-}
