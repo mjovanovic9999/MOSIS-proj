@@ -33,6 +33,14 @@ object FireStoreConstants {
     const val ITEM_COUNT = "item_count"
     const val RIDDLE_COUNT_VALUE = "value"
     const val ORDER_NUMBER = "order_number"
+
+    const val FIELD_USERS = "users"
+    const val FIELD_SQUAD_ID = "squad_id"
+    const val FIELD_USER_ID = "user_id"
+    const val FIELD_INVITER_ID = "inviter_id"
+    const val FIELD_INVITEE_ID = "invitee_id"
+    const val FIELD_INVENTORY = "inventory"
+    const val L = "l"
 }
 
 object FirebaseErrorCodesConstants {

@@ -7,6 +7,10 @@ import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.core.FireStoreConstants.EASY_RIDDLES_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVENTORY
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVITEE_ID
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVITER_ID
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_SQUAD_ID
 import mosis.streetsandtotems.core.FireStoreConstants.HARD_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.ITEM_COUNT
 import mosis.streetsandtotems.core.FireStoreConstants.KICK_VOTE_COLLECTION
@@ -18,6 +22,9 @@ import mosis.streetsandtotems.core.FireStoreConstants.PROFILE_DATA_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.RIDDLE_COUNT_VALUE
 import mosis.streetsandtotems.core.FireStoreConstants.SQUADS_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.SQUAD_INVITES_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_USERS
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_USER_ID
+import mosis.streetsandtotems.core.FireStoreConstants.L
 import mosis.streetsandtotems.core.PointsConversion.MAX_SQUAD_MEMBERS_COUNT
 import mosis.streetsandtotems.core.PointsConversion.SQUAD_MEMBERS_POINTS_COEFFICIENT
 import mosis.streetsandtotems.feature_map.domain.model.*
@@ -32,7 +39,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     ) {
         db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION).add(
             mapOf(
-                "l" to l,
+                L to l,
                 "text" to text,
                 "placed_by" to placed_by,
                 "visible_to" to visible_to,
@@ -62,8 +69,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     suspend fun addHome(myId: String, l: GeoPoint) {
         db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId).set(
             mapOf(
-                "l" to l,
-                "inventory" to mapOf(
+                L to l,
+                FIELD_INVENTORY to mapOf(
                     "wood" to 0,
                     "brick" to 0,
                     "stone" to 0,
@@ -78,8 +85,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         homeId: String, newInventoryData: InventoryData? = null, l: GeoPoint? = null
     ) {
         val data: MutableMap<String, Any> = mutableMapOf()
-        if (newInventoryData != null) data["inventory"] = newInventoryData
-        if (l != null) data["l"] = l
+        if (newInventoryData != null) data[FIELD_INVENTORY] = newInventoryData
+        if (l != null) data[L] = l
 
         if (data.isNotEmpty()) db.collection(FireStoreConstants.HOMES_COLLECTION).document(homeId)
             .update(data).await()
@@ -168,7 +175,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         val ids =
             db.collection(SQUADS_COLLECTION).document("ScrImM23lmrLjRL0oMiz"/*squadId*/)
                 .get()///////////////////
-                .await().get("users") as List<*>
+                .await().get(FIELD_USERS) as List<*>
         for (item in ids) {
             if (item is String)
                 updateLeaderboard(
@@ -188,18 +195,18 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         val docRef = db.collection(SQUADS_COLLECTION).document(squadId)
 
         val list = mutableListOf<String>()
-        for (item in transaction.get(docRef).get("users") as List<*>) {
+        for (item in transaction.get(docRef).get(FIELD_USERS) as List<*>) {
             if (item is String)
                 list.add(item)
         }
         if (list.isNotEmpty()) {
             list.add(inviteeId)
-            transaction.update(docRef, "users", list)
+            transaction.update(docRef, FIELD_USERS, list)
         }
 
         transaction.update(
             db.collection(PROFILE_DATA_COLLECTION).document(inviteeId),
-            "squad_id",
+            FIELD_SQUAD_ID,
             squadId
         )
     }
@@ -212,17 +219,17 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         val newSquadId = db.collection(SQUADS_COLLECTION).document().id
         transaction.set(
             db.collection(SQUADS_COLLECTION).document(newSquadId),
-            mapOf("users" to listOf(inviterId, inviteeId))
+            mapOf(FIELD_USERS to listOf(inviterId, inviteeId))
         )
 
         transaction.update(
             db.collection(PROFILE_DATA_COLLECTION).document(inviterId),
-            "squad_id",
+            FIELD_SQUAD_ID,
             newSquadId
         )
         transaction.update(
             db.collection(PROFILE_DATA_COLLECTION).document(inviteeId),
-            "squad_id",
+            FIELD_SQUAD_ID,
             newSquadId
         )
     }
@@ -231,21 +238,21 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     suspend fun initInviteToSquad(inviterId: String, inviteeId: String) {//treb se i pretplati
         db.collection(SQUAD_INVITES_COLLECTION).document().set(
             mapOf(
-                "inviter_id" to inviterId,
-                "invitee_id" to inviteeId,
+                FIELD_INVITER_ID to inviterId,
+                FIELD_INVITEE_ID to inviteeId,
             )
         ).await()
     }
 
     suspend fun isUserInSquad(inviteeId: String) =
         db.collection(PROFILE_DATA_COLLECTION).document(inviteeId).get().await()
-            .getString("squad_id").let {
+            .getString(FIELD_SQUAD_ID).let {
                 !(it == null || it == "")
             }
 
     suspend fun isSquadFull(squadId: String): Boolean =
         (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
-            .get("users") as List<*>).size == MAX_SQUAD_MEMBERS_COUNT
+            .get(FIELD_USERS) as List<*>).size == MAX_SQUAD_MEMBERS_COUNT
 
 
     suspend fun acceptInviteToSquad(inviterId: String, inviteeId: String) {
@@ -254,7 +261,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
                 val inviterSquadId = it.get(
                     db.collection(PROFILE_DATA_COLLECTION).document(inviterId)
-                ).getString("squad_id")
+                ).getString(FIELD_SQUAD_ID)
 
                 if (inviterSquadId == null || inviterSquadId == "") {
                     createSquad(it, inviterId, inviteeId)
@@ -271,13 +278,13 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     suspend fun removeFromSquad(userId: String) {
         db.runTransaction { transaction ->
             val docRefProfile = db.collection(PROFILE_DATA_COLLECTION).document(userId)
-            val squadId = transaction.get(docRefProfile).getString("squad_id")
+            val squadId = transaction.get(docRefProfile).getString(FIELD_SQUAD_ID)
 
             if (squadId != null && squadId != "") {
                 val docRefSquads = db.collection(SQUADS_COLLECTION).document(squadId)
 
                 val list = mutableListOf<String>()
-                for (item in transaction.get(docRefSquads).get("users") as List<*>) {
+                for (item in transaction.get(docRefSquads).get(FIELD_USERS) as List<*>) {
                     if (item is String)
                         list.add(item)
                 }
@@ -287,14 +294,14 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                         transaction.delete(docRefSquads)
                         transaction.update(
                             db.collection(PROFILE_DATA_COLLECTION).document(list[0]),
-                            "squad_id",
+                            FIELD_SQUAD_ID,
                             ""
                         )
                     } else
-                        transaction.update(docRefSquads, "users", list)
+                        transaction.update(docRefSquads, FIELD_USERS, list)
                 }
 
-                transaction.update(docRefProfile, "squad_id", "")
+                transaction.update(docRefProfile, FIELD_SQUAD_ID, "")
 
             }
         }.await()
@@ -307,22 +314,22 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     private suspend fun getInviteIdOrNull(inviterId: String, inviteeId: String): String? =
         db.collection(SQUAD_INVITES_COLLECTION)
-            .whereEqualTo("inviter_id", inviterId)
-            .whereEqualTo("invitee_id", inviteeId)
+            .whereEqualTo(FIELD_INVITER_ID, inviterId)
+            .whereEqualTo(FIELD_INVITEE_ID, inviteeId)
             .get().await().firstOrNull()?.id
 
 
     suspend fun initKickVote(kickVote: KickVoteData) {//userid je odma glasao za No i ostali unanswewre
         val list = db.collection(SQUADS_COLLECTION).document(kickVote.squad_id ?: "").get().await()
-            .get("users") as List<*>
+            .get(FIELD_USERS) as List<*>
 
         if (list.size <= 2) {
             removeFromSquad(kickVote.user_id ?: "")
 
         } else {
             if (db.collection(KICK_VOTE_COLLECTION)
-                    .whereEqualTo("squad_id", kickVote.squad_id)
-                    .whereEqualTo("user_id", kickVote.user_id)
+                    .whereEqualTo(FIELD_SQUAD_ID, kickVote.squad_id)
+                    .whereEqualTo(FIELD_USER_ID, kickVote.user_id)
                     .get().await().firstOrNull() == null
             )
                 db.collection(KICK_VOTE_COLLECTION).document().set(kickVote)
@@ -331,11 +338,11 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     suspend fun kickVote(myId: String, squadId: String, userId: String, myVote: Vote) {
         val squadNum = (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
-            .get("users") as List<*>).size
+            .get(FIELD_USERS) as List<*>).size
 
         val id = db.collection(KICK_VOTE_COLLECTION)
-            .whereEqualTo("squad_id", squadId)
-            .whereEqualTo("user_id", userId)
+            .whereEqualTo(FIELD_SQUAD_ID, squadId)
+            .whereEqualTo(FIELD_USER_ID, userId)
             .get().await().firstOrNull()?.id
 
         if (id != null) {
