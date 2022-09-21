@@ -1,7 +1,7 @@
 buildscript {
     ext {
         compose_version = '1.3.0-beta02'
-        google_accompanist_verison ='0.25.0'
+        google_accompanist_verison = '0.25.0'
         work_version = "2.7.1"
     }
     dependencies {

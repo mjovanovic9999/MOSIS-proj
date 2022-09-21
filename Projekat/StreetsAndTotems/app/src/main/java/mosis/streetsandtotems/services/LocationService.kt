@@ -7,7 +7,6 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
-import androidx.datastore.preferences.preferencesDataStore
 import com.google.android.gms.location.*
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +34,7 @@ class LocationService : Service() {
     lateinit var locationServiceControlEventsFlow: SharedFlowWrapper<LocationServiceControlEvents>
 
     @Inject
-    lateinit var locationServiceEventsFlow: MutableSharedFlow<LocationServiceEvents>
+    lateinit var locationServiceMapScreenEventsFlow: MutableSharedFlow<LocationServiceMapScreenEvents>
 
     @Inject
     lateinit var context: Application
@@ -64,8 +63,8 @@ class LocationService : Service() {
             serviceScope.launch {
                 result.lastLocation?.let {
                     if (it.accuracy <= MAXIMUM_IGNORE_ACCURACY_METERS) {
-                        locationServiceEventsFlow.emit(
-                            LocationServiceEvents.PlayerLocationChanged(
+                        locationServiceMapScreenEventsFlow.emit(
+                            LocationServiceMapScreenEvents.PlayerMapScreenLocationChanged(
                                 GeoPoint(it.latitude, it.longitude)
                             )
                         )
@@ -98,6 +97,10 @@ class LocationService : Service() {
                 when (it) {
                     LocationServiceControlEvents.RegisterCallbacks -> locationServiceUseCases.registerCallbacks()
                     LocationServiceControlEvents.RemoveCallbacks -> locationServiceUseCases.removeCallbacks()
+                    LocationServiceControlEvents.RegisterKickVoteCallback -> locationServiceUseCases.registerCallbackOnKickVote()
+                    LocationServiceControlEvents.RegisterSquadInviteCallback -> locationServiceUseCases.registerCallbackOnSquadInvite()
+                    LocationServiceControlEvents.RemoveKickVoteCallback -> locationServiceUseCases.removeCallbackOnKickVote()
+                    LocationServiceControlEvents.RemoveSquadInviteCallback -> locationServiceUseCases.removeCallbackOnSquadInvite()
                 }
             }
         }
@@ -109,7 +112,9 @@ class LocationService : Service() {
             }
         }
 
-        locationServiceUseCases.registerCallbacks()
+        serviceScope.launch {
+            locationServiceUseCases.registerCallbacks()
+        }
 
         serviceScope.launch {
             locationServiceUseCases.changeUserOnlineStatus(true)

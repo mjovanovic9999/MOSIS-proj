@@ -83,12 +83,13 @@ class PreferencesDataStore(val context: Context) {
             it[_userId] = userId
         }
     }
+
+    fun getUserSquadIdFlow(): Flow<String> {
+        return context.dataStore.data.map { preferences -> preferences[_squadId] ?: "" }
+    }
 }
 
 enum class AuthProvider {
-    None,
-    EmailAndPassword,
-    Google,
-    Facebook
+    None, EmailAndPassword, Google, Facebook
 }
 

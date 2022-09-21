@@ -23,4 +23,5 @@ interface PreferenceRepository {
 
     suspend fun setSquadId(squadId: String)
 
+    fun getUserSquadIdFlow(): Flow<String>
 }

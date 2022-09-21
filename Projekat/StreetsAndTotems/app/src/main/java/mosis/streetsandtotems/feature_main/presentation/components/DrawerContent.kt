@@ -33,6 +33,7 @@ import mosis.streetsandtotems.core.TitleConstants
 import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.destinations.LeaderboardsScreenDestination
 import mosis.streetsandtotems.destinations.ProfileScreenDestination
+import mosis.streetsandtotems.feature_auth.presentation.util.ProfileFields
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
@@ -51,7 +52,11 @@ fun DrawerContent(
     username: String,
     firstName: String,
     lastName: String,
-    imageUri: Uri
+    imagePath: String,
+    squadId: String,
+    phoneNumber: String,
+    email: String,
+    onLeaveSquad: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val isConfirmDialogOpen = remember { mutableStateOf(false) }
@@ -82,12 +87,24 @@ fun DrawerContent(
                         )
                 ) {
                     GlideImage(
-                        imageModel = imageUri,
+                        imageModel = Uri.parse(imagePath),
                         modifier = Modifier.clip(RoundedCornerShape(MaterialTheme.sizes.default_shape_corner))
                     )
                 }
                 CustomButton(
-                    clickHandler = { destinationsNavigator.navigate(ProfileScreenDestination) },
+                    clickHandler = {
+                        destinationsNavigator.navigate(
+                            ProfileScreenDestination(
+                                currentUserFields = ProfileFields(
+                                    firstName = firstName,
+                                    lastName = lastName,
+                                    phoneNumber = phoneNumber,
+                                    email = email,
+                                    imagePath = imagePath
+                                )
+                            )
+                        )
+                    },
                     buttonType = CustomButtonType.Text,
                     text = DrawerConstants.PROFILE
                 )
@@ -182,20 +199,21 @@ fun DrawerContent(
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.End
             ) {
-                CustomButton(
-                    clickHandler = { isConfirmDialogOpen.value = true },
-                    text = DrawerConstants.LEAVE_SQUAD,
-                    buttonType = CustomButtonType.Text,
-                    icon = Icons.Outlined.GroupRemove,
-                    iconPosition = IconPosition.End,
-                    iconSize = MaterialTheme.sizes.icon,
-                    textStyle = MaterialTheme.typography.titleMedium.plus(
-                        TextStyle(
-                            fontWeight = FontWeight.Bold
-                        )
-                    ),
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                )
+                if (squadId != "")
+                    CustomButton(
+                        clickHandler = { isConfirmDialogOpen.value = true },
+                        text = DrawerConstants.LEAVE_SQUAD,
+                        buttonType = CustomButtonType.Text,
+                        icon = Icons.Outlined.GroupRemove,
+                        iconPosition = IconPosition.End,
+                        iconSize = MaterialTheme.sizes.icon,
+                        textStyle = MaterialTheme.typography.titleMedium.plus(
+                            TextStyle(
+                                fontWeight = FontWeight.Bold
+                            )
+                        ),
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    )
                 CustomButton(
                     clickHandler = { onSignOut() },
                     text = DrawerConstants.SIGN_OUT,

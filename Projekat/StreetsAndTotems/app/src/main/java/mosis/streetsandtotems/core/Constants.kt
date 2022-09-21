@@ -200,7 +200,7 @@ object MapConstants {
     const val DEGREES_TO_RADIANS_COEFFICIENT = PI / 180
     const val RADIANS_TO_DEGREES_COEFFICIENT = 180 / PI
     const val MAX_SCALE = 2.5f
-    const val MY_LOCATION_CIRCLE_SIZE = 60f
+    const val MY_LOCATION_CIRCLE_SIZE = 80f
     const val TILE_URL_512 = "https://api.maptiler.com/maps/openstreetmap/"
     const val TILE_URL_256 = "https://api.maptiler.com/maps/openstreetmap/256/"
     const val TILE_KEY = "njA6yIfsMq23cZHLTop1"

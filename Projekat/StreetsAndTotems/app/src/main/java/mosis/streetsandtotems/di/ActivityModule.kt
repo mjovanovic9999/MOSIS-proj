@@ -1,10 +1,6 @@
 package mosis.streetsandtotems.di
 
 import android.app.Application
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,11 +41,5 @@ object ActivityModule {
     @ActivityRetainedScoped
     fun provideShowLoaderFlow(showLoaderMutableFlow: MutableStateFlow<Boolean>): StateFlowWrapper<Boolean> =
         StateFlowWrapper(showLoaderMutableFlow)
-
-    @Provides
-    @ActivityRetainedScoped
-    fun provideIsUserAuthenticated(): State<Boolean> {
-        return mutableStateOf(value = Firebase.auth.currentUser != null)
-    }
 
 }

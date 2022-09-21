@@ -6,6 +6,23 @@ import mosis.streetsandtotems.feature_map.domain.model.*
 interface MapServiceRepository {
     suspend fun updateMyLocation(newLocation: GeoPoint)
 
+    fun removeCallbackOnKickVoteDataUpdate()
+
+    fun removeCallbackOnSquadInviteDataUpdate()
+
+    suspend fun registerCallbackOnKickVoteDataUpdate(
+        kickVoteStartedCallback: (kickVote: KickVoteData) -> Unit,
+        kickVoteEndedCallback: (kickVote: KickVoteData) -> Unit
+    )
+
+    suspend fun registerCallbackOnSquadInviteDataUpdate(
+        squadInviteCallback: (squadInvite: SquadInviteData) -> Unit
+    )
+
+    fun registerCallbackOnCurrentUserProfileDataUpdate(
+        currentUserCallback: (currentUser: ProfileData) -> Unit
+    )
+
     fun registerCallbacksOnProfileDataUpdate(
         userAddedCallback: (user: ProfileData) -> Unit,
         userModifiedCallback: (user: ProfileData) -> Unit,

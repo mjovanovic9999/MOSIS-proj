@@ -12,7 +12,9 @@ import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,15 +35,17 @@ fun CustomImageSelectorAndCropper(
     focusRequester: FocusRequester? = null,
     onImageSelected: ((String) -> Unit)? = null,
     showErrorSnackbar: ((String) -> Unit)? = null,
+    initialImageUri: Uri? = null,
+    modifier: Modifier = Modifier.size(MaterialTheme.sizes.image_select_size)
 ) {
     val context = LocalContext.current
-    var imageUri by remember {
+    val imageUri = remember {
         mutableStateOf<Uri?>(null)
     }
 
     val imageCropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
-            imageUri = result.uriContent
+            imageUri.value = result.uriContent
             val imagePath = result.getUriFilePath(context)
             imagePath?.let {
                 onImageSelected?.invoke(imagePath)
@@ -54,8 +58,7 @@ fun CustomImageSelectorAndCropper(
         }
     }
 
-    val modifier = Modifier
-        .size(MaterialTheme.sizes.image_select_size)
+    val boxModifier = modifier
         .background(
             MaterialTheme.colorScheme.secondaryContainer,
             RoundedCornerShape(MaterialTheme.sizes.default_shape_corner)
@@ -68,13 +71,13 @@ fun CustomImageSelectorAndCropper(
         }
 
     Box(
-        modifier = if (focusRequester != null) modifier
+        modifier = if (focusRequester != null) boxModifier
             .focusable()
-            .focusRequester(focusRequester) else modifier
+            .focusRequester(focusRequester) else boxModifier
     ) {
-        if (imageUri != null) {
+        if (imageUri.value != null || initialImageUri != null) {
             GlideImage(
-                imageModel = imageUri,
+                imageModel = imageUri.value ?: initialImageUri,
                 modifier = Modifier.clip(RoundedCornerShape(MaterialTheme.sizes.default_shape_corner))
             )
         } else {

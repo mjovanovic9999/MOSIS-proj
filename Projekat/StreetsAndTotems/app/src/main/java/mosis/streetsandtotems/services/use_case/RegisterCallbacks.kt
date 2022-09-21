@@ -5,24 +5,37 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import mosis.streetsandtotems.core.domain.repository.PreferenceRepository
 import mosis.streetsandtotems.feature_map.domain.model.PinAction
 import mosis.streetsandtotems.feature_map.domain.model.PinActionType
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
-import mosis.streetsandtotems.services.LocationServiceEvents
+import mosis.streetsandtotems.services.LocationServiceMainScreenEvents
+import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 
 class RegisterCallbacks(
+    private val preferenceRepository: PreferenceRepository,
     private val mapServiceRepository: MapServiceRepository,
-    private val locationServiceEventsFlow: MutableSharedFlow<LocationServiceEvents>
+    private val locationServiceMapScreenEventsFlow: MutableSharedFlow<LocationServiceMapScreenEvents>,
+    private val locationServiceMainScreenEventsFlow: MutableSharedFlow<LocationServiceMainScreenEvents>,
+    private val registerCallbackOnSquadInvite: RegisterCallbackOnSquadInvite,
+    private val registerCallbackOnKickVote: RegisterCallbackOnKickVote
 ) {
-    operator fun invoke() = registerCallbacks()
+    suspend operator fun invoke() = registerCallbacks()
 
-    private fun emitLocationServiceEvent(event: LocationServiceEvents) {
+    private fun emitLocationServiceMapScreenEvent(event: LocationServiceMapScreenEvents) {
         CoroutineScope(Dispatchers.Default).launch {
-            locationServiceEventsFlow.emit(event)
+            locationServiceMapScreenEventsFlow.emit(event)
         }
     }
 
-    private fun registerCallbacks() {
+    private fun emitLocationServiceMainScreenEvent(event: LocationServiceMainScreenEvents) {
+        CoroutineScope(Dispatchers.Default).launch {
+            locationServiceMainScreenEventsFlow.emit(event)
+        }
+    }
+
+    private suspend fun registerCallbacks() {
+        initCurrentUserFlow()
         initUserPinsFlow()
         initResourcesFlow()
         initTotemsFlow()
@@ -30,220 +43,193 @@ class RegisterCallbacks(
         initHomesFlow()
         initUserInventoryFlow()
         initMarketFlow()
+        if (preferenceRepository.getSquadId() == "")
+            registerCallbackOnSquadInvite()
+        else registerCallbackOnKickVote()
+    }
+
+    private fun initCurrentUserFlow() {
+        mapServiceRepository.registerCallbackOnCurrentUserProfileDataUpdate(currentUserCallback = {
+            emitLocationServiceMainScreenEvent(
+                LocationServiceMainScreenEvents.CurrentUserProfileDataChanged(
+                    it
+                )
+            )
+        })
     }
 
     private fun initUserPinsFlow() {
-        mapServiceRepository.registerCallbacksOnProfileDataUpdate(
-            userAddedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.ProfileDataChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Added
-                        )
+        mapServiceRepository.registerCallbacksOnProfileDataUpdate(userAddedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.ProfileDataChanged(
+                    PinAction(
+                        it, PinActionType.Added
                     )
                 )
-            },
-            userModifiedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.ProfileDataChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Modified
-                        )
+            )
+        }, userModifiedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.ProfileDataChanged(
+                    PinAction(
+                        it, PinActionType.Modified
                     )
                 )
-            },
-            userRemovedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.ProfileDataChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Added
-                        )
+            )
+        }, userRemovedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.ProfileDataChanged(
+                    PinAction(
+                        it, PinActionType.Added
                     )
                 )
-            }
-        )
+            )
+        })
     }
 
     private fun initResourcesFlow() {
-        mapServiceRepository.registerCallbackOnResourcesUpdate(
-            resourceAddedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.ResourcesChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Added
-                        )
+        mapServiceRepository.registerCallbackOnResourcesUpdate(resourceAddedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.ResourcesChanged(
+                    PinAction(
+                        it, PinActionType.Added
                     )
                 )
-            },
-            resourceModifiedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.ResourcesChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Modified
-                        )
+            )
+        }, resourceModifiedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.ResourcesChanged(
+                    PinAction(
+                        it, PinActionType.Modified
                     )
                 )
-            },
-            resourceRemovedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.ResourcesChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Removed
-                        )
+            )
+        }, resourceRemovedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.ResourcesChanged(
+                    PinAction(
+                        it, PinActionType.Removed
                     )
                 )
-            }
-        )
+            )
+        })
     }
 
     private fun initTotemsFlow() {
-        mapServiceRepository.registerCallbackOnTotemsUpdate(
-            totemAddedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.TotemChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Added
-                        )
+        mapServiceRepository.registerCallbackOnTotemsUpdate(totemAddedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.TotemChanged(
+                    PinAction(
+                        it, PinActionType.Added
                     )
                 )
-            },
-            totemModifiedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.TotemChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Modified
-                        )
+            )
+        }, totemModifiedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.TotemChanged(
+                    PinAction(
+                        it, PinActionType.Modified
                     )
                 )
-            },
-            totemRemovedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.TotemChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Removed
-                        )
+            )
+        }, totemRemovedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.TotemChanged(
+                    PinAction(
+                        it, PinActionType.Removed
                     )
                 )
-            }
-        )
+            )
+        })
     }
 
     private fun initCustomPinsFlow() {
-        mapServiceRepository.registerCallbackOnCustomPinsUpdate(
-            customPinAddedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.CustomPinChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Added
-                        )
+        mapServiceRepository.registerCallbackOnCustomPinsUpdate(customPinAddedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.CustomPinChanged(
+                    PinAction(
+                        it, PinActionType.Added
                     )
                 )
-            }, customPinModifiedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.CustomPinChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Modified
-                        )
+            )
+        }, customPinModifiedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.CustomPinChanged(
+                    PinAction(
+                        it, PinActionType.Modified
                     )
                 )
-            }, customPinRemovedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.CustomPinChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Removed
-                        )
+            )
+        }, customPinRemovedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.CustomPinChanged(
+                    PinAction(
+                        it, PinActionType.Removed
                     )
                 )
-            }
-        )
+            )
+        })
     }
 
     private fun initHomesFlow() {
-        mapServiceRepository.registerCallbackOnHomesUpdate(
-            homeAddedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.HomeChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Added
-                        )
+        mapServiceRepository.registerCallbackOnHomesUpdate(homeAddedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.HomeChanged(
+                    PinAction(
+                        it, PinActionType.Added
                     )
                 )
-            },
-            homeModifiedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.HomeChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Modified
-                        )
+            )
+        }, homeModifiedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.HomeChanged(
+                    PinAction(
+                        it, PinActionType.Modified
                     )
                 )
-            },
-            homeRemovedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.HomeChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Removed
-                        )
+            )
+        }, homeRemovedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.HomeChanged(
+                    PinAction(
+                        it, PinActionType.Removed
                     )
                 )
-            }
-        )
+            )
+        })
     }
 
     private fun initUserInventoryFlow() {
         mapServiceRepository.registerCallbackOnUserInventoryUpdate {
             Log.d("d", it.toString())
-            emitLocationServiceEvent(LocationServiceEvents.UserInventoryChanged(it))
+            emitLocationServiceMapScreenEvent(LocationServiceMapScreenEvents.UserInventoryChanged(it))
         }
     }
 
     private fun initMarketFlow() {
-        mapServiceRepository.registerCallbackOnMarketUpdate(
-            marketAddedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.MarketChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Added
-                        )
+        mapServiceRepository.registerCallbackOnMarketUpdate(marketAddedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.MarketChanged(
+                    PinAction(
+                        it, PinActionType.Added
                     )
                 )
-            },
-            marketModifiedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.MarketChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Modified
-                        )
+            )
+        }, marketModifiedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.MarketChanged(
+                    PinAction(
+                        it, PinActionType.Modified
                     )
                 )
-            },
-            marketRemovedCallback = {
-                emitLocationServiceEvent(
-                    LocationServiceEvents.MarketChanged(
-                        PinAction(
-                            it,
-                            PinActionType.Removed
-                        )
+            )
+        }, marketRemovedCallback = {
+            emitLocationServiceMapScreenEvent(
+                LocationServiceMapScreenEvents.MarketChanged(
+                    PinAction(
+                        it, PinActionType.Removed
                     )
                 )
-            }
-        )
+            )
+        })
     }
 }

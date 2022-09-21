@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.feature_map.domain.model
 
-import android.net.Uri
 import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.core.domain.model.PrivacySettings
 
@@ -16,6 +15,5 @@ data class ProfileData(
     val image_uri: String? = null,
     val call_privacy_level: PrivacySettings? = null,
     val messaging_privacy_level: PrivacySettings? = null,
-    @field:JvmField
-    val is_online: Boolean? = null
+    @field:JvmField val is_online: Boolean? = null
 ) : Data
