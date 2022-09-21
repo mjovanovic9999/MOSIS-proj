@@ -27,6 +27,7 @@ import mosis.streetsandtotems.feature_auth.data.data_source.FirestoreAuthDataSou
 import mosis.streetsandtotems.feature_auth.data.data_source.OneTapGoogleDataSource
 import mosis.streetsandtotems.feature_auth.domain.model.SignInError
 import mosis.streetsandtotems.feature_auth.domain.repository.AuthRepository
+import mosis.streetsandtotems.feature_auth.presentation.util.ProfileFields
 import mosis.streetsandtotems.feature_auth.presentation.util.SignUpFields
 import mosis.streetsandtotems.feature_map.domain.model.ProfileData
 import java.io.File
@@ -259,6 +260,10 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun isCurrentUserEmailValidated(): Boolean {
         return authDataSource.getCurrentUser()?.isEmailVerified ?: false
+    }
+
+    override suspend fun updateUserProfile(newProfileData: ProfileFields): Flow<Response<Nothing>> {
+        TODO("Not yet implemented")
     }
 
     private suspend fun getProfileDataFromGoogle(credentials: SignInCredential): ProfileData {

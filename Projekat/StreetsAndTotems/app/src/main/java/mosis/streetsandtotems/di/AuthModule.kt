@@ -82,7 +82,8 @@ object AuthModule {
         sendVerificationEmail = SendVerificationEmail(repository = authRepository),
         sendRecoveryEmail = SendRecoveryEmail(repository = authRepository),
         isUserAlreadyLoggedIn = IsUserAlreadyLoggedIn(repository = authRepository),
-        isUserEmailVerified = IsUserEmailVerified(repository = authRepository)
+        isUserEmailVerified = IsUserEmailVerified(repository = authRepository),
+        oneTapSignUpWithGoogle = OneTapSignUpWithGoogle(repository = authRepository),
     )
 
     @Provides

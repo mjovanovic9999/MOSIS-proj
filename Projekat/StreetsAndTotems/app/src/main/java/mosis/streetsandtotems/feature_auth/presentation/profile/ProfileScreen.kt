@@ -45,16 +45,6 @@ fun ProfileScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(MaterialTheme.sizes.profile_screen_spacing)
             ) {
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .aspectRatio(MaterialTheme.sizes.default_aspect_ratio)
-//                        .background(
-//                            MaterialTheme.colorScheme.onSurfaceVariant,
-//                            RoundedCornerShape(MaterialTheme.sizes.default_shape_corner)
-//                        )
-//                ) {
-//                }
                 Form(state.formState, spacing = MaterialTheme.sizes.none)
             }
             if (state.editMode) {

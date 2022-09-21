@@ -10,5 +10,6 @@ data class AuthUseCases(
     val sendVerificationEmail: SendVerificationEmail,
     val sendRecoveryEmail: SendRecoveryEmail,
     val isUserAlreadyLoggedIn: IsUserAlreadyLoggedIn,
-    val isUserEmailVerified: IsUserEmailVerified
+    val isUserEmailVerified: IsUserEmailVerified,
+    val oneTapSignUpWithGoogle: OneTapSignUpWithGoogle,
 )
