@@ -55,9 +55,7 @@ class LocationService : Service() {
         override fun onLocationResult(result: LocationResult) {
 
             Toast.makeText(
-                context,
-                result.lastLocation?.accuracy.toString(),
-                Toast.LENGTH_SHORT
+                context, result.lastLocation?.accuracy.toString(), Toast.LENGTH_SHORT
             ).show()
 
             serviceScope.launch {
@@ -69,6 +67,8 @@ class LocationService : Service() {
                             )
                         )
                         locationServiceUseCases.updatePlayerLocation(it.latitude, it.longitude)
+                        lastKnownLocation = GeoPoint(it.latitude, it.longitude)
+                        Log.d("tag", lastKnownLocation.toString())
                     }
                 }
                 Log.d(
@@ -88,8 +88,7 @@ class LocationService : Service() {
         isServiceStarted = true
         super.onCreate()
         startForeground(
-            1,
-            notificationProvider.returnDisableBackgroundServiceNotification(false)
+            1, notificationProvider.returnDisableBackgroundServiceNotification(false)
         )
 
         serviceScope.launch {
@@ -136,6 +135,7 @@ class LocationService : Service() {
         }
         notificationProvider.cancelDisableBackgroundServiceNotification()
         isServiceStarted = false
+        lastKnownLocation = null
         networkManager.unregister()
 
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
@@ -149,20 +149,18 @@ class LocationService : Service() {
 
 
     private fun startListeningUserLocation() {
-        val locationRequest = LocationRequest.create()
-            .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
-            .setWaitForAccurateLocation(true)
-            .setInterval(MapConstants.PREFERRED_INTERVAL)
-            .setSmallestDisplacement(MAP_PRECISION_METERS)
+        val locationRequest =
+            LocationRequest.create().setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+                .setWaitForAccurateLocation(true).setInterval(MapConstants.PREFERRED_INTERVAL)
+                .setSmallestDisplacement(MAP_PRECISION_METERS)
 
         fusedLocationProviderClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.getMainLooper()
+            locationRequest, locationCallback, Looper.getMainLooper()
         )
     }
 
     companion object {
         var isServiceStarted = false
+        var lastKnownLocation: GeoPoint? = null
     }
 }

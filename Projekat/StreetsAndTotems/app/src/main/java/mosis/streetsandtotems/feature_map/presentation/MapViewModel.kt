@@ -53,6 +53,7 @@ import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelReposito
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
 import mosis.streetsandtotems.feature_map.presentation.util.*
+import mosis.streetsandtotems.services.LocationService
 import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
@@ -87,15 +88,14 @@ class MapViewModel @Inject constructor(
     private val mapDimensions = calculateMapDimensions()
     private val circleSize = mutableStateOf(MY_LOCATION_CIRCLE_SIZE.dp / MAX_SCALE)
 
-    private var initialFetchCompleted = false
-
+    private var initialFetchCompleted: Boolean = LocationService.lastKnownLocation != null
 
     init {
-        viewModelScope.launch {
+        if (!initialFetchCompleted) viewModelScope.launch {
             showLoader.emit(true)
         }
 
-        _mapScreenState = getInitMapState()
+        _mapScreenState = getInitMapState(LocationService.lastKnownLocation)
 
         mapScreenState = _mapScreenState
         _mapState = mapScreenState.value.mapState.value
@@ -163,7 +163,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun getInitMapState(): MutableState<MapScreenState> {
+    private fun getInitMapState(lastKnownLocation: GeoPoint?): MutableState<MapScreenState> {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
             try {
                 val image = Glide.with(appContext).downloadOnly()
@@ -213,7 +213,7 @@ class MapViewModel @Inject constructor(
             totemsHashMap = totemsHashMap,
             customPinsHashMap = customPinsHashMap,
             selectedPlayer = ProfileData(),
-            playerLocation = GeoPoint(
+            playerLocation = lastKnownLocation ?: GeoPoint(
                 INIT_SCROLL_LAT, INIT_SCROLL_LNG
             ),
             resourceDialogOpen = false,
@@ -453,8 +453,18 @@ class MapViewModel @Inject constructor(
 
 
     private fun registerOnMapStateChangeListener() {
-        var pinLocation = GeoPoint(INIT_SCROLL_LAT, INIT_SCROLL_LNG)
+        var pinLocation = mapScreenState.value.playerLocation//GeoPoint(INIT_SCROLL_LAT, INIT_SCROLL_LNG)
         var scale = _mapState.scale
+
+        viewModelScope.launch   {
+            if (mapScreenState.value.followMe) {
+                changeStateDetectScroll(false)
+
+                centerMeOnMyPin()
+
+                changeStateDetectScroll(true)
+            }
+        }
 
         _mapState.setStateChangeListener {
             if (scale != this.scale) {
@@ -520,11 +530,12 @@ class MapViewModel @Inject constructor(
     }
 
     private fun initMyLocationPinAndRegisterMove() {
+        val offset =convertGeoPointNullToOffsets(mapScreenState.value.playerLocation,mapDimensions,mapDimensions,)
         _mapState.addLazyLoader(LAZY_LOADER_ID)
         _mapState.addMarker(
             MY_PIN,
-            INIT_SCROLL_X,
-            INIT_SCROLL_Y,
+            offset[0],
+            offset[1],
             c = {
                 Canvas(modifier = Modifier.size(circleSize.value), onDraw = {
                     drawCircle(color = Color(MY_PIN_COLOR_OPACITY))
@@ -794,8 +805,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun showInviteToSquadHandler() {
-        _mapScreenState.value =
-            _mapScreenState.value.copy(inviteDialogOpen = true)
+        _mapScreenState.value = _mapScreenState.value.copy(inviteDialogOpen = true)
     }
 
     private fun closeInviteToSquadHandler() {

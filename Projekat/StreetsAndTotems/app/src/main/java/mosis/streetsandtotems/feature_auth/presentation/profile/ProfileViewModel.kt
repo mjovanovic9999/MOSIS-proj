@@ -43,29 +43,6 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
                 listOf(
                     TextFormField(
                         initial = "",
-                        name = FormFieldNamesConstants.CURRENT_PASSWORD,
-                        validators = listOf(
-                            Validators.Min(
-                                FormFieldLengthConstants.PASSWORD, MessageConstants.PASSWORD_LENGTH
-                            ),
-                            Validators.Required(MessageConstants.CURRENT_PASSWORD_REQUIRED),
-                        ),
-                        label = FormFieldConstants.CURRENT_PASSWORD,
-                        placeholder = FormFieldConstants.CURRENT_PASSWORD,
-                        textFieldType = CustomTextFieldType.Outlined,
-                        singleLine = true,
-                        clearable = true,
-                        visualTransformation = { text ->
-                            TransformedText(
-                                AnnotatedString(VisualTransformationConstants.PASSWORD.repeat(text.length)),
-                                OffsetMapping.Identity
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next, keyboardType = KeyboardType.Password
-                        ),
-                    ), TextFormField(
-                        initial = "",
                         name = FormFieldNamesConstants.NEW_PASSWORD,
                         validators = listOf(
                             Validators.Required(MessageConstants.NEW_PASSWORD_REQUIRED),

@@ -266,6 +266,16 @@ class AuthRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
+    override suspend fun updateUserPassword(newPassword: String): Flow<Response<Nothing>> = flow {
+        try {
+            emit(Response.Loading)
+            authDataSource.getCurrentUser()?.updatePassword(newPassword)?.await()
+            emit(Response.Success())
+        } catch (e: Exception) {
+            emit(Response.Error())
+        }
+    }
+
     private suspend fun getProfileDataFromGoogle(credentials: SignInCredential): ProfileData {
         val userSettings = preferencesDataStore.getUserSettings()
         return ProfileData(

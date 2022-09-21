@@ -37,4 +37,6 @@ interface AuthRepository {
     suspend fun isCurrentUserEmailValidated(): Boolean
 
     suspend fun updateUserProfile(newProfileData: ProfileFields): Flow<Response<Nothing>>
+
+    suspend fun updateUserPassword(newPassword: String): Flow<Response<Nothing>>
 }
