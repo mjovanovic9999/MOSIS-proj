@@ -39,7 +39,7 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
                 ProfileFields(
                     firstName = "", lastName = "", phoneNumber = "", email = "", imagePath = ""
                 ), editMode = false
-            ), editPasswordDialogOpen = true, passwordDialogFormState = FormState(
+            ), editPasswordDialogOpen = false, passwordDialogFormState = FormState(
                 listOf(
                     TextFormField(
                         initial = "",
@@ -267,8 +267,8 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
         when (event) {
             is ProfileViewModelEvents.InitializeFormFields -> onInitializeFormFields(event.currentUserFields)
             ProfileViewModelEvents.ChangeMode -> onChangeModeHandler()
-            ProfileViewModelEvents.HideEditPasswordDialog -> onShowEditPasswordDialogHandler()
-            ProfileViewModelEvents.ShowEditPasswordDialog -> onHideEditPasswordDialogHandler()
+            ProfileViewModelEvents.HideEditPasswordDialog -> onHideEditPasswordDialogHandler()
+            ProfileViewModelEvents.ShowEditPasswordDialog -> onShowEditPasswordDialogHandler()
         }
     }
 
@@ -292,7 +292,7 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun onShowEditPasswordDialogHandler() {
-        _profileScreenState.value = _profileScreenState.value.copy(editPasswordDialogOpen = false)
+        _profileScreenState.value = _profileScreenState.value.copy(editPasswordDialogOpen = true)
     }
 
     private fun onHideEditPasswordDialogHandler() {
