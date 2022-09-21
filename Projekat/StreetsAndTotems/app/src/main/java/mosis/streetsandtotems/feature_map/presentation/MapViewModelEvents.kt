@@ -42,4 +42,10 @@ sealed class MapViewModelEvents {
     object CloseClaimTotemDialog : MapViewModelEvents()
     object ClaimTotem : MapViewModelEvents()
     object HarvestTotemPoints : MapViewModelEvents()
+    object ShowInviteToSquadDialog : MapViewModelEvents()
+    object CloseInviteToSquadDialog : MapViewModelEvents()
+    object AcceptSquadInvite : MapViewModelEvents()
+    object DeclineSquadInvite : MapViewModelEvents()
+    object InviteToSquad : MapViewModelEvents()
+    object InitKickFromSquad : MapViewModelEvents()
 }

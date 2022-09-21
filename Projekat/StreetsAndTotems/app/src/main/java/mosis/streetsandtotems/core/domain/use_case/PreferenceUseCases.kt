@@ -10,4 +10,5 @@ data class PreferenceUseCases(
     val setUserId: SetUserId,
     val getUserId: GetUserId,
     val getSquadId: GetSquadId,
+    val getUserSquadIdFlow: GetUserSquadIdFlow,
 )

@@ -39,5 +39,19 @@ interface MapViewModelRepository {
 
     suspend fun updateSquadLeaderboard(squadId: String, addSquadLeaderboardPoints: Int)
 
+    suspend fun initInviteToSquad(inviteeId: String)
+
+    suspend fun isUserInSquad(inviteeId: String): Boolean
+
+    suspend fun isSquadFull(squadId: String): Boolean
+
+    suspend fun acceptInviteToSquad(inviterId: String)
+
+    suspend fun declineInviteToSquad(inviterId: String)
+
+    suspend fun initKickVote(user_id: String)
+
+    suspend fun kickVote(userId: String, myVote: Vote)
+
 //    suspend fun registerCallbackOnUserInventoryUpdate(callback: (UserInventoryData) -> Unit)
 }

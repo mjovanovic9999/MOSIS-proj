@@ -61,6 +61,7 @@ object AppSingletonModule {
             SetUserId(preferenceRepository),
             GetUserId(preferenceRepository),
             GetSquadId(preferenceRepository),
+            GetUserSquadIdFlow(preferenceRepository),
         )
     }
 

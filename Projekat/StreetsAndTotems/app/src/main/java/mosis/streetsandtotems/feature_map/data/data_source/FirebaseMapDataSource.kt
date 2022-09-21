@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.yield
 import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.core.FireStoreConstants.EASY_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVENTORY
@@ -250,32 +251,21 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                 !(it == null || it == "")
             }
 
+    private suspend fun getSquadUserIds(squadId: String): List<String> {
+        val list = mutableListOf<String>()
+        for (item in db.collection(SQUADS_COLLECTION).document(squadId).get().await()
+            .get(FIELD_USERS) as List<*>)
+            if (item is String)
+                list.add(item)
+        return list
+    }
+
     suspend fun isSquadFull(squadId: String): Boolean =
         (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
             .get(FIELD_USERS) as List<*>).size == MAX_SQUAD_MEMBERS_COUNT
 
 
-    suspend fun acceptInviteToSquad(inviterId: String, inviteeId: String) {
-        getInviteIdOrNull(inviterId, inviteeId)?.let { docId ->
-            db.runTransaction {
-
-                val inviterSquadId = it.get(
-                    db.collection(PROFILE_DATA_COLLECTION).document(inviterId)
-                ).getString(FIELD_SQUAD_ID)
-
-                if (inviterSquadId == null || inviterSquadId == "") {
-                    createSquad(it, inviterId, inviteeId)
-                } else {
-                    addUserToSquadAndUpdateUser(it, inviterSquadId, inviteeId)
-                }
-
-                it.delete(db.collection(SQUAD_INVITES_COLLECTION).document(docId))
-
-            }.await()
-        }
-    }
-
-    suspend fun removeFromSquad(userId: String) {
+    private suspend fun removeFromSquad(userId: String) {
         db.runTransaction { transaction ->
             val docRefProfile = db.collection(PROFILE_DATA_COLLECTION).document(userId)
             val squadId = transaction.get(docRefProfile).getString(FIELD_SQUAD_ID)
@@ -307,10 +297,31 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         }.await()
     }
 
-    suspend fun declineInviteToSquad(inviterId: String, inviteeId: String) =
+    suspend fun acceptInviteToSquad(inviterId: String, inviteeId: String) {
+        getInviteIdOrNull(inviterId, inviteeId)?.let { docId ->
+            db.runTransaction {
+
+                val inviterSquadId = it.get(
+                    db.collection(PROFILE_DATA_COLLECTION).document(inviterId)
+                ).getString(FIELD_SQUAD_ID)
+
+                if (inviterSquadId == null || inviterSquadId == "") {
+                    createSquad(it, inviterId, inviteeId)
+                } else {
+                    addUserToSquadAndUpdateUser(it, inviterSquadId, inviteeId)
+                }
+
+                it.delete(db.collection(SQUAD_INVITES_COLLECTION).document(docId))
+
+            }.await()
+        }
+    }
+
+    suspend fun declineInviteToSquad(inviterId: String, inviteeId: String) {
         getInviteIdOrNull(inviterId, inviteeId)?.let {
             db.collection(SQUAD_INVITES_COLLECTION).document(it).delete()
         }
+    }
 
     private suspend fun getInviteIdOrNull(inviterId: String, inviteeId: String): String? =
         db.collection(SQUAD_INVITES_COLLECTION)
@@ -319,20 +330,37 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             .get().await().firstOrNull()?.id
 
 
-    suspend fun initKickVote(kickVote: KickVoteData) {//userid je odma glasao za No i ostali unanswewre
-        val list = db.collection(SQUADS_COLLECTION).document(kickVote.squad_id ?: "").get().await()
-            .get(FIELD_USERS) as List<*>
+    suspend fun initKickVote(
+        myId: String,
+        squad_id: String,
+        user_id: String,
+    ) {
+        val list = getSquadUserIds(squad_id)
 
         if (list.size <= 2) {
-            removeFromSquad(kickVote.user_id ?: "")
-
+            removeFromSquad(user_id)
         } else {
             if (db.collection(KICK_VOTE_COLLECTION)
-                    .whereEqualTo(FIELD_SQUAD_ID, kickVote.squad_id)
-                    .whereEqualTo(FIELD_USER_ID, kickVote.user_id)
+                    .whereEqualTo(FIELD_SQUAD_ID, squad_id)
+                    .whereEqualTo(FIELD_USER_ID, user_id)
                     .get().await().firstOrNull() == null
-            )
-                db.collection(KICK_VOTE_COLLECTION).document().set(kickVote)
+            ) {
+                val votes = mutableMapOf<String, Vote>()
+                list.forEach {
+                    votes[it] = when (it) {
+                        user_id -> Vote.No
+                        myId -> Vote.Yes
+                        else -> Vote.Unanswered
+                    }
+                }
+                db.collection(KICK_VOTE_COLLECTION).document().set(
+                    KickVoteData(
+                        squad_id = squad_id,
+                        user_id = user_id,
+                        votes = votes
+                    )
+                )
+            }
         }
     }//treba se pretplate ostali
 
@@ -374,8 +402,6 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                             ).await()
                         }
                     }
-
-
                 }
         }
 

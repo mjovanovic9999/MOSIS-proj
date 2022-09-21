@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.core
 
+import mosis.streetsandtotems.feature_map.domain.model.SquadData
 import kotlin.math.PI
 
 
@@ -272,6 +273,8 @@ object MessageConstants {
         "In order to use Streets And Totems in background, background location permission has to be granted!"
     const val CORRECT_ANSWER = "Your answer is correct!"
     const val INCORRECT_ANSWER = "Your answer is incorrect!"
+    const val SQUAD_INVITE = "Squad invite"
+    const val SQUAD_INVITE_QUESTION = " invited you to join squad."
 }
 
 object TitleConstants {
