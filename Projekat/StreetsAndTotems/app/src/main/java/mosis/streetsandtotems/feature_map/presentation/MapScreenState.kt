@@ -47,10 +47,11 @@ data class MapScreenState(
 
     val claimTotemDialog: Boolean,
 
-    val userNameForSquadInteraction: String,
 
     val inviteDialogOpen: Boolean,
-    val inviterId: String?,
+    val voteDialogOpen: Boolean,
+    val interactionUserId: String,
+    val interactionUserName: String,
 
     )
 

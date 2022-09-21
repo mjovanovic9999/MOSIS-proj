@@ -125,9 +125,12 @@ fun PlayerDialog(
                 )
             }
         },
-        confirmButtonText = if (isSquadMember) ButtonConstants.KICK else ButtonConstants.INVITE_TO_SQUAD,
+        confirmButtonText = if (isSquadMember) ButtonConstants.START_KICK else ButtonConstants.INVITE_TO_SQUAD,
         confirmButtonMatchParentWidth = true,
-        onConfirmButtonClick = { if (isSquadMember) onKickFromSquad() else onInviteToSquad() },
+        onConfirmButtonClick = {
+            if (isSquadMember) onKickFromSquad() else onInviteToSquad()
+            onDismissRequest()
+        },
         dismissButtonText = ButtonConstants.TRADE,
         dismissButtonVisible = tradeEnabled,
         dismissButtonMatchParentWidth = true,

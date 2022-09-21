@@ -5,6 +5,7 @@ import com.google.firebase.Timestamp
 import mosis.streetsandtotems.core.PointsConversion
 import mosis.streetsandtotems.core.PointsConversion.HOURS_TO_POINTS_CONVERSION
 import mosis.streetsandtotems.core.ProtectionLevelConstants
+import mosis.streetsandtotems.core.domain.model.PrivacySettings
 import mosis.streetsandtotems.core.presentation.components.IconType
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.ProtectionLevel
@@ -71,3 +72,22 @@ fun calculateTotemTimePoints(lastVisited: Timestamp?): Int =
     if (lastVisited != null)
         ((Timestamp.now().seconds - lastVisited.seconds) / 3600 * HOURS_TO_POINTS_CONVERSION).toInt()
     else 0
+
+fun shouldEnableNumber(
+    settings: PrivacySettings?,
+    mySquadId: String,
+    selectedPlayerSquadId: String?,
+    phone_number: String?,
+): Boolean =
+    if (phone_number == null)
+        false
+    else
+        when (settings) {
+            PrivacySettings.NoOne -> false
+            PrivacySettings.OnlySquadMembers -> isSquadMember(mySquadId, selectedPlayerSquadId)
+            PrivacySettings.Everyone -> true
+            null -> false
+        }
+
+fun isSquadMember(mySquadId: String, selectedPlayerSquadId: String?): Boolean =
+    mySquadId != "" && selectedPlayerSquadId == mySquadId

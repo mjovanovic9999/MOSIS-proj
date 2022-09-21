@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.core
 
-import mosis.streetsandtotems.feature_map.domain.model.SquadData
 import kotlin.math.PI
 
 
@@ -130,13 +129,15 @@ object ButtonConstants {
     const val DIALOG_BACKGROUND_PERMISSION_CONFIRM_BUTTON = "Grant"
     const val DIALOG_BACKGROUND_PERMISSION_DISMISS_BUTTON = "Don't grant"
     const val SHOW_ON_MAP = "Show on map"
-    const val KICK = "Start kick voting"
+    const val START_KICK = "Start kick voting"
     const val INVITE_TO_SQUAD = "Invite to squad"
     const val TRADE = "Invite to trade"
     const val YES = "Yes"
     const val NO = "No"
     const val ACCEPT = "Accept"
     const val DECLINE = "Decline"
+    const val KICK = "Kick"
+    const val NO_KICK = "Don't kick"
     const val DISMISS = "Dismiss"
     const val SUBMIT_ANSWER = "Submit answer"
     const val CLAIM_TOTEM = "Claim totem"
@@ -275,6 +276,10 @@ object MessageConstants {
     const val INCORRECT_ANSWER = "Your answer is incorrect!"
     const val SQUAD_INVITE = "Squad invite"
     const val SQUAD_INVITE_QUESTION = " invited you to join squad."
+    const val SQUAD_KICK = "Kicking from squad"
+    const val SQUAD_KICK_QUESTION1 = "Kick user "
+    const val SQUAD_KICK_QUESTION2 = " from squad?"
+
 }
 
 object TitleConstants {

@@ -6,8 +6,13 @@ import android.net.Uri
 import com.ramcosta.composedestinations.annotation.Destination
 import mosis.streetsandtotems.core.ButtonConstants.ACCEPT
 import mosis.streetsandtotems.core.ButtonConstants.DECLINE
+import mosis.streetsandtotems.core.ButtonConstants.KICK
+import mosis.streetsandtotems.core.ButtonConstants.NO_KICK
 import mosis.streetsandtotems.core.MessageConstants.SQUAD_INVITE
 import mosis.streetsandtotems.core.MessageConstants.SQUAD_INVITE_QUESTION
+import mosis.streetsandtotems.core.MessageConstants.SQUAD_KICK
+import mosis.streetsandtotems.core.MessageConstants.SQUAD_KICK_QUESTION1
+import mosis.streetsandtotems.core.MessageConstants.SQUAD_KICK_QUESTION2
 import mosis.streetsandtotems.core.presentation.components.ConfirmationDialogType
 import mosis.streetsandtotems.core.presentation.components.CustomConfirmationDialog
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
@@ -16,7 +21,9 @@ import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import mosis.streetsandtotems.feature_map.presentation.components.*
 import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.*
+import mosis.streetsandtotems.feature_map.presentation.util.isSquadMember
 import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
+import mosis.streetsandtotems.feature_map.presentation.util.shouldEnableNumber
 
 @MainNavGraph(start = true)
 @Destination
@@ -48,13 +55,24 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
 //fale fje za interakciju
         isOpen = state.playerDialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.ClosePlayerDialog) },
-        isSquadMember = state.selectedPlayer.squad_id == state.mySquadId,
+        isSquadMember = isSquadMember(state.mySquadId, state.selectedPlayer.squad_id),
         tradeEnabled = isTradePossible(
             state.playerLocation,
             state.selectedPlayer.l
         ),
-        callsAllowed = true,//state.selectedPlayer.call_privacy_level,
-        messagingAllowed = true,//state.selectedPlayer.messaging_privacy_level,
+        callsAllowed = shouldEnableNumber(
+            state.selectedPlayer.call_privacy_level,
+            state.mySquadId,
+            state.selectedPlayer.squad_id,
+            state.selectedPlayer.phone_number
+        ),
+        messagingAllowed =
+        shouldEnableNumber(
+            state.selectedPlayer.messaging_privacy_level,
+            state.mySquadId,
+            state.selectedPlayer.squad_id,
+            state.selectedPlayer.phone_number
+        ),
         phoneNumber = state.selectedPlayer.phone_number,
         firstName = state.selectedPlayer.first_name,
         lastName = state.selectedPlayer.last_name,
@@ -147,13 +165,34 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         type = ConfirmationDialogType.Confirm,
         isOpen = state.inviteDialogOpen,
         title = SQUAD_INVITE,
-        text = state.userNameForSquadInteraction + SQUAD_INVITE_QUESTION,
-        onConfirmButtonClick = { mapViewModel.onEvent(MapViewModelEvents.AcceptSquadInvite) },
-        onDismissButtonClick = { mapViewModel.onEvent(MapViewModelEvents.DeclineSquadInvite) },
+        text = state.interactionUserName + SQUAD_INVITE_QUESTION,
+        onConfirmButtonClick = {
+            mapViewModel.onEvent(MapViewModelEvents.AcceptSquadInvite)
+            mapViewModel.onEvent(MapViewModelEvents.CloseInviteToSquadDialog)
+        },
+        onDismissButtonClick = {
+            mapViewModel.onEvent(MapViewModelEvents.DeclineSquadInvite)
+            mapViewModel.onEvent(MapViewModelEvents.CloseInviteToSquadDialog)
+        },
         confirmButtonText = ACCEPT,
         dismissButtonText = DECLINE,
-        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseInviteToSquadDialog) }
     )
 
+    CustomConfirmationDialog(
+        type = ConfirmationDialogType.Confirm,
+        isOpen = state.voteDialogOpen,
+        title = SQUAD_KICK,
+        text = SQUAD_KICK_QUESTION1 + state.interactionUserName + SQUAD_KICK_QUESTION2,
+        onConfirmButtonClick = {
+            mapViewModel.onEvent(MapViewModelEvents.KickAnswerYesInvite)
+            mapViewModel.onEvent(MapViewModelEvents.CloseVoteDialog)
+        },
+        onDismissButtonClick = {
+            mapViewModel.onEvent(MapViewModelEvents.KickAnswerNoInvite)
+            mapViewModel.onEvent(MapViewModelEvents.CloseVoteDialog)
+        },
+        confirmButtonText = KICK,
+        dismissButtonText = NO_KICK,
+    )
 
 }

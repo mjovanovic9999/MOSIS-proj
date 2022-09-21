@@ -48,4 +48,8 @@ sealed class MapViewModelEvents {
     object DeclineSquadInvite : MapViewModelEvents()
     object InviteToSquad : MapViewModelEvents()
     object InitKickFromSquad : MapViewModelEvents()
+    object ShowVoteDialog : MapViewModelEvents()
+    object CloseVoteDialog : MapViewModelEvents()
+    object KickAnswerYesInvite : MapViewModelEvents()
+    object KickAnswerNoInvite : MapViewModelEvents()
 }
