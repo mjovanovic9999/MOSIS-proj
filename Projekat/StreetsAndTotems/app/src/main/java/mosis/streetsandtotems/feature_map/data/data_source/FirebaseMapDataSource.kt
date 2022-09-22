@@ -451,7 +451,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         }
     }
 
-    
+
 //endregion
 }
 

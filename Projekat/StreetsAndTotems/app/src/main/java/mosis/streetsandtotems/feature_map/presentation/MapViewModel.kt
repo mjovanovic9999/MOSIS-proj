@@ -287,8 +287,17 @@ class MapViewModel @Inject constructor(
             )//treba li ovamo market home
             is LocationServiceMapScreenEvents.KickVote -> {
                 when (event.kickAction.type) {
-                    KickActionType.VoteStarted -> Log.d("tag", "KICK VOTE STARTED")
-                    KickActionType.VoteEnded -> Log.d("tag", "KICK VOTE ENDED")
+                    KickActionType.VoteStarted -> {
+                        _mapScreenState.value = mapScreenState.value.copy(
+                            interactionUserId = event.kickAction.kickVoteData.user_id ?: "",
+                            interactionUserName = playersHashMap[event.kickAction.kickVoteData.user_id]?.user_name
+                                ?: ""
+                        )
+                        showVotedHandler()
+                    }
+                    KickActionType.VoteEnded -> {
+                        showVotedHandler()
+                    }
                 }
             }
             is LocationServiceMapScreenEvents.SquadInvite -> {
@@ -461,10 +470,11 @@ class MapViewModel @Inject constructor(
 
 
     private fun registerOnMapStateChangeListener() {
-        var pinLocation = mapScreenState.value.playerLocation//GeoPoint(INIT_SCROLL_LAT, INIT_SCROLL_LNG)
+        var pinLocation =
+            mapScreenState.value.playerLocation//GeoPoint(INIT_SCROLL_LAT, INIT_SCROLL_LNG)
         var scale = _mapState.scale
 
-        viewModelScope.launch   {
+        viewModelScope.launch {
             if (mapScreenState.value.followMe) {
                 changeStateDetectScroll(false)
 
@@ -538,7 +548,11 @@ class MapViewModel @Inject constructor(
     }
 
     private fun initMyLocationPinAndRegisterMove() {
-        val offset =convertGeoPointNullToOffsets(mapScreenState.value.playerLocation,mapDimensions,mapDimensions,)
+        val offset = convertGeoPointNullToOffsets(
+            mapScreenState.value.playerLocation,
+            mapDimensions,
+            mapDimensions,
+        )
         _mapState.addLazyLoader(LAZY_LOADER_ID)
         _mapState.addMarker(
             MY_PIN,
