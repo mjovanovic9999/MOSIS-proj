@@ -161,7 +161,7 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.InitKickFromSquad -> initKickFromSquadHandler()
             MapViewModelEvents.InviteToSquad -> inviteToSquadHandler()
             MapViewModelEvents.CloseVoteDialog -> closeVoteHandler()
-            MapViewModelEvents.ShowVoteDialog -> showVotedHandler()
+            MapViewModelEvents.ShowVoteDialog -> showVoteHandler()
             MapViewModelEvents.KickAnswerNoInvite -> kickAnswerHandler(false)
             MapViewModelEvents.KickAnswerYesInvite -> kickAnswerHandler(true)
         }
@@ -293,10 +293,11 @@ class MapViewModel @Inject constructor(
                             interactionUserName = playersHashMap[event.kickAction.kickVoteData.user_id]?.user_name
                                 ?: ""
                         )
-                        showVotedHandler()
+                        showVoteHandler()
+                        Log.d("tag","Dfdfdfdfdfdfdfdfdfd")
                     }
                     KickActionType.VoteEnded -> {
-                        showVotedHandler()
+                        closeVoteHandler()
                     }
                 }
             }
@@ -834,7 +835,7 @@ class MapViewModel @Inject constructor(
         _mapScreenState.value = _mapScreenState.value.copy(inviteDialogOpen = false)
     }
 
-    private fun showVotedHandler() {
+    private fun showVoteHandler() {
         _mapScreenState.value =
             _mapScreenState.value.copy(voteDialogOpen = true)
     }
