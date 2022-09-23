@@ -294,7 +294,6 @@ class MapViewModel @Inject constructor(
                                 ?: ""
                         )
                         showVoteHandler()
-                        Log.d("tag","Dfdfdfdfdfdfdfdfdfd")
                     }
                     KickActionType.VoteEnded -> {
                         closeVoteHandler()
@@ -360,13 +359,14 @@ class MapViewModel @Inject constructor(
                 }
                 is ProfileData -> {
                     if (dataType.is_online == true) {
+                        Log.d("tag", mapScreenState.value.myId + dataType.squad_id)
                         playersHashMap[it] = dataType
                         composable = {
                             CustomPinImage(
                                 imageUri = if (dataType.image_uri == null) Uri.EMPTY else Uri.parse(
                                     dataType.image_uri
                                 ),
-                                true//userData.squad_id != null && "MYSQUADID" != null && userData.squad_id == "MYSQUADID"
+                                isSquadMember(mapScreenState.value.mySquadId, dataType.squad_id)
                             )
                         }
                     }
@@ -416,6 +416,12 @@ class MapViewModel @Inject constructor(
                     if (dataType.is_online == true) {
                         if (playersHashMap.containsKey(it)) {
                             oldData = playersHashMap.put(it, dataType)
+//                            if((oldData as ProfileData).squad_id!=dataType.squad_id)
+//                            {//mzd brisanje starog pina
+//
+//
+//                                addPinHash(dataType)
+//                            }
                         } else addPinHash(dataType)
                     } else removePinHash(dataType)
 
@@ -472,7 +478,7 @@ class MapViewModel @Inject constructor(
 
     private fun registerOnMapStateChangeListener() {
         var pinLocation =
-            mapScreenState.value.playerLocation//GeoPoint(INIT_SCROLL_LAT, INIT_SCROLL_LNG)
+            mapScreenState.value.playerLocation
         var scale = _mapState.scale
 
         viewModelScope.launch {
@@ -679,7 +685,7 @@ class MapViewModel @Inject constructor(
                 )
             } else if (mapScreenState.value.market.id == id) {
                 showMarketDialogHandler()
-            } else if (mapScreenState.value.home.id == "IAcU1GbsmLZNo3ujPgp8") {
+            } else if (mapScreenState.value.home.id == id) {
                 showHomeDialogHandler()
             }
         }
@@ -854,8 +860,8 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             mapViewModelRepository.addCustomPin(
                 l = mapScreenState.value.customPinDialog.l,
-                visible_to = "AAAAAAAAAAAAA",//squad id||auth id
-                placed_by = "BBBBBBBBBBB",//moj auth id
+                visible_to = mapScreenState.value.mySquadId,
+                placed_by = mapScreenState.value.myId,
                 text = mapScreenState.value.customPinDialog.text.value,
             )
         }
@@ -867,8 +873,8 @@ class MapViewModel @Inject constructor(
             mapScreenState.value.customPinDialog.id?.let {
                 mapViewModelRepository.updateCustomPin(
                     id = it,
-                    visible_to = "AAAAAAAAAAAAA",//,
-                    placed_by = "BBBBBBBBBBB",//moj auth id
+                    visible_to = mapScreenState.value.mySquadId,
+                    placed_by = mapScreenState.value.myId,
                     text = mapScreenState.value.customPinDialog.text.value,
                 )
             }
@@ -886,10 +892,10 @@ class MapViewModel @Inject constructor(
 
 
     private fun addHomeHandler() {
-        viewModelScope.launch {
-            mapViewModelRepository.addHome(
-                GeoPoint(43.313198, 21.906673)
-            )
+        mapScreenState.value.home.l?.let {
+            viewModelScope.launch {
+                mapViewModelRepository.addHome(it)
+            }
         }
     }
 

@@ -89,8 +89,7 @@ fun MainScreen(
                 squadId = state.currentUserData.squad_id ?: "",
                 phoneNumber = state.currentUserData.phone_number ?: "",
                 email = state.currentUserData.email ?: "",
-                onLeaveSquad = {}
-            )
+                onLeaveSquad = { viewModel.onEvent(MainScreenViewModelEvents.LeaveSquad) })
         }
     }, content = {
         DrawerScreen(navController = navController,

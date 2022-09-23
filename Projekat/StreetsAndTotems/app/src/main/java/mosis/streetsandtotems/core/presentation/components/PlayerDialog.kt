@@ -39,6 +39,7 @@ fun PlayerDialog(
     image: Uri? = null,
     onInviteToSquad: () -> Unit,
     onKickFromSquad: () -> Unit,
+    isUserInSquad: Boolean,
 ) {
     val context = LocalContext.current
     CustomDialog(
@@ -131,6 +132,7 @@ fun PlayerDialog(
             if (isSquadMember) onKickFromSquad() else onInviteToSquad()
             onDismissRequest()
         },
+        confirmButtonEnabled = if (isSquadMember) true else !isUserInSquad,
         dismissButtonText = ButtonConstants.TRADE,
         dismissButtonVisible = tradeEnabled,
         dismissButtonMatchParentWidth = true,

@@ -52,7 +52,7 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
     )
 
     PlayerDialog(
-//fale fje za interakciju
+//fale fje za interakciju trade i to
         isOpen = state.playerDialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.ClosePlayerDialog) },
         isSquadMember = isSquadMember(state.mySquadId, state.selectedPlayer.squad_id),
@@ -80,6 +80,7 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         image = if (state.selectedPlayer.image_uri == null) Uri.EMPTY else Uri.parse(state.selectedPlayer.image_uri),
         onInviteToSquad = { mapViewModel.onEvent(MapViewModelEvents.InviteToSquad) },
         onKickFromSquad = { mapViewModel.onEvent(MapViewModelEvents.InitKickFromSquad) },
+        isUserInSquad = state.selectedPlayer.squad_id != null && state.selectedPlayer.squad_id != "",
     )
 
     CustomFilterDialog(

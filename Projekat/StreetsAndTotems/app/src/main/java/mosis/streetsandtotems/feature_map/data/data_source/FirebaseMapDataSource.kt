@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
@@ -237,12 +238,13 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     //check da l je user vec u squad i da l sam ga vec pozvao
     suspend fun initInviteToSquad(inviterId: String, inviteeId: String) {//treb se i pretplati
-        db.collection(SQUAD_INVITES_COLLECTION).document().set(
-            mapOf(
-                FIELD_INVITER_ID to inviterId,
-                FIELD_INVITEE_ID to inviteeId,
-            )
-        ).await()
+        if (getInviteIdOrNull(inviterId, inviteeId) == null)
+            db.collection(SQUAD_INVITES_COLLECTION).document().set(
+                mapOf(
+                    FIELD_INVITER_ID to inviterId,
+                    FIELD_INVITEE_ID to inviteeId,
+                )
+            ).await()
     }
 
     suspend fun isUserInSquad(inviteeId: String) =
@@ -414,41 +416,52 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             .get().await().documents.toList()
         //.toObjects(KickVoteData::class.java)
 
-        val squadNum = (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
-            .get(FIELD_USERS) as List<*>).size
+        val squadNumNull = db.collection(SQUADS_COLLECTION).document(squadId).get().await()
 
-        for (itemDoc in kicksList) {
-            val item = itemDoc.toObject(KickVoteData::class.java)
-            if (item != null) {
-                val newMap = item.votes?.toMutableMap() ?: mutableMapOf()
-                newMap.remove(userId)
-                var voteYes = 0
-                var voteNo = 0
-                for (vote in newMap.values) {
-                    when (vote) {
-                        Vote.Unanswered -> {}
-                        Vote.No -> voteNo++
-                        Vote.Yes -> voteYes++
+
+        val users = squadNumNull.get(FIELD_USERS)
+        if (users != null) {
+            val squadNum = (users as List<*>).size
+            for (itemDoc in kicksList) {
+                val item = itemDoc.toObject(KickVoteData::class.java)
+                if (item != null) {
+                    val newMap = item.votes?.toMutableMap() ?: mutableMapOf()
+                    newMap.remove(userId)
+                    var voteYes = 0
+                    var voteNo = 0
+                    for (vote in newMap.values) {
+                        when (vote) {
+                            Vote.Unanswered -> {}
+                            Vote.No -> voteNo++
+                            Vote.Yes -> voteYes++
+                        }
                     }
-                }
 
-                (squadNum / 2).let { votesHalf ->
-                    if (votesHalf <= voteYes) {//kick
-                        removeFromSquad(userId)
-                        db.collection(KICK_VOTE_COLLECTION).document().delete().await()
-                        reevaluateVoteAfterKick(userId, squadId)
-                        //promeniti listu na kickvote kad se neko izbaci
-                    } else if (votesHalf <= voteNo) {
-                        db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete().await()
+                    (squadNum / 2).let { votesHalf ->
+                        if (votesHalf <= voteYes) {//kick
+                            removeFromSquad(userId)
+                            db.collection(KICK_VOTE_COLLECTION).document().delete().await()
+                            reevaluateVoteAfterKick(userId, squadId)
+                            //promeniti listu na kickvote kad se neko izbaci
+                        } else if (votesHalf <= voteNo) {
+                            db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete()
+                                .await()
 
-                    } else {
-                        db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).set(
-                            item.copy(votes = newMap)
-                        ).await()
+                        } else {
+                            db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).set(
+                                item.copy(votes = newMap)
+                            ).await()
+                        }
                     }
                 }
             }
         }
+
+    }
+
+    suspend fun leaveSquad(myId: String, squadId: String) {
+        removeFromSquad(myId)
+        reevaluateVoteAfterKick(myId, squadId)
     }
 
 

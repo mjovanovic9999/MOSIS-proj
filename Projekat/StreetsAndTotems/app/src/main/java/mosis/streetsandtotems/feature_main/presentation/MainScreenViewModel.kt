@@ -56,21 +56,20 @@ class MainScreenViewModel @Inject constructor(
     private val locationServiceMainScreenEventFlow: SharedFlowWrapper<LocationServiceMainScreenEvents>
 ) : ViewModel() {
     private val _mainScreenEventFlow = MutableSharedFlow<MainScreenEvents>()
-    private val _mainScreenState =
-        mutableStateOf(
-            MainScreenState(
-                mainScreenEventFlow = _mainScreenEventFlow,
-                locationEnabled = true,
-                userSettings = UserSettings(
-                    runInBackground = false,
-                    showNotifications = false,
-                    callPrivacyLevel = PrivacySettings.NoOne,
-                    smsPrivacyLevel = PrivacySettings.NoOne,
-                ),
-                drawerState = DrawerState(DrawerValue.Closed),
-                currentUserData = ProfileData()
-            )
+    private val _mainScreenState = mutableStateOf(
+        MainScreenState(
+            mainScreenEventFlow = _mainScreenEventFlow,
+            locationEnabled = true,
+            userSettings = UserSettings(
+                runInBackground = false,
+                showNotifications = false,
+                callPrivacyLevel = PrivacySettings.NoOne,
+                smsPrivacyLevel = PrivacySettings.NoOne,
+            ),
+            drawerState = DrawerState(DrawerValue.Closed),
+            currentUserData = ProfileData()
         )
+    )
     val mainScreenState: State<MainScreenState> = _mainScreenState
 
     init {
@@ -91,10 +90,9 @@ class MainScreenViewModel @Inject constructor(
             locationServiceMainScreenEventFlow.flow.collect {
                 when (it) {
                     is LocationServiceMainScreenEvents.CurrentUserProfileDataChanged -> {
-                        _mainScreenState.value =
-                            _mainScreenState.value.copy(
-                                currentUserData = it.newUserData
-                            )
+                        _mainScreenState.value = _mainScreenState.value.copy(
+                            currentUserData = it.newUserData
+                        )
 
                         preferenceUseCases.setSquadId(it.newUserData.squad_id ?: "")
                     }
@@ -116,7 +114,13 @@ class MainScreenViewModel @Inject constructor(
             )
             MainScreenViewModelEvents.ToggleRunInBackground -> onToggleRunInBackground()
             MainScreenViewModelEvents.ToggleNotifications -> onToggleNotifications()
-            MainScreenViewModelEvents.LeaveSquad -> TODO()
+            MainScreenViewModelEvents.LeaveSquad -> onLeaveSquadHandler()
+        }
+    }
+
+    private fun onLeaveSquadHandler() {
+        viewModelScope.launch {
+            mainUseCases.leaveSquad()
         }
     }
 
@@ -177,17 +181,14 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private fun onResumeHandler() {
-        val locationRequest = LocationRequest.create()
-            .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
-            .setWaitForAccurateLocation(true)
-            .setInterval(MapConstants.PREFERRED_INTERVAL)
-            .setSmallestDisplacement(MapConstants.MAP_PRECISION_METERS)
+        val locationRequest =
+            LocationRequest.create().setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+                .setWaitForAccurateLocation(true).setInterval(MapConstants.PREFERRED_INTERVAL)
+                .setSmallestDisplacement(MapConstants.MAP_PRECISION_METERS)
 
         val locationSettingsRequest =
-            LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest)
-                .setAlwaysShow(true)
-                .build()
+            LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+                .setAlwaysShow(true).build()
 
         viewModelScope.launch {
             try {
@@ -200,8 +201,7 @@ class MainScreenViewModel @Inject constructor(
         }
 
         application.registerReceiver(
-            locationBroadcastReceiver,
-            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
+            locationBroadcastReceiver, IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION)
         )
 
         if (!LocationService.isServiceStarted) {
@@ -209,8 +209,7 @@ class MainScreenViewModel @Inject constructor(
 
             application.startForegroundService(
                 Intent(
-                    application,
-                    LocationService::class.java
+                    application, LocationService::class.java
                 )
             )
 
@@ -227,8 +226,7 @@ class MainScreenViewModel @Inject constructor(
 
     private fun onSignOutHandler() {
         viewModelScope.launch {
-            handleResponse(
-                responseFlow = authUseCases.signOut(),
+            handleResponse(responseFlow = authUseCases.signOut(),
                 showLoaderFlow = showLoaderFlow,
                 snackbarFlow = snackbarSettingsFlow,
                 successMessage = MessageConstants.SIGNED_OUT,
@@ -238,8 +236,7 @@ class MainScreenViewModel @Inject constructor(
                         _mainScreenEventFlow.emit(MainScreenEvents.SignOutSuccessful)
                         application.stopService(Intent(application, LocationService::class.java))
                     }
-                }
-            )
+                })
         }
     }
 }

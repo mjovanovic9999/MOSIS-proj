@@ -132,6 +132,7 @@ class MapViewModelRepositoryImpl(
         )
     }
 
+
 //    override suspend fun registerCallbackOnUserInventoryUpdate(userId: String): UserInventoryData? {
 //        return try {
 //            firebaseMapDataSource.getUserInventory(userId)

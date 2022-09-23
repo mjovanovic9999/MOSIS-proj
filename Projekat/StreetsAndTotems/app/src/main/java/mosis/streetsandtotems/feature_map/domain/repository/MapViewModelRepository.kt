@@ -53,5 +53,7 @@ interface MapViewModelRepository {
 
     suspend fun kickVote(userId: String, myVote: Vote)
 
+
+
 //    suspend fun registerCallbackOnUserInventoryUpdate(callback: (UserInventoryData) -> Unit)
 }

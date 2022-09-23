@@ -62,11 +62,9 @@ fun DrawerContent(
     val isConfirmDialogOpen = remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier
-            .clickable(
-                indication = null,
-                interactionSource = MutableInteractionSource()
-            ) { focusManager.clearFocus() },
+        modifier = modifier.clickable(
+            indication = null, interactionSource = MutableInteractionSource()
+        ) { focusManager.clearFocus() },
         verticalArrangement = Arrangement.spacedBy(MaterialTheme.sizes.drawer_spacing)
     ) {
         Row(
@@ -104,9 +102,7 @@ fun DrawerContent(
                                 )
                             )
                         )
-                    },
-                    buttonType = CustomButtonType.Text,
-                    text = DrawerConstants.PROFILE
+                    }, buttonType = CustomButtonType.Text, text = DrawerConstants.PROFILE
                 )
             }
             Column(
@@ -147,12 +143,10 @@ fun DrawerContent(
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)
         )
-        DrawerSwitchItem(
-            text = DrawerConstants.NOTIFICATIONS,
+        DrawerSwitchItem(text = DrawerConstants.NOTIFICATIONS,
             switchState = showNotifications,
             onCheckedChangeHandler = { onShowNotificationsChange() })
-        DrawerSwitchItem(
-            text = DrawerConstants.RUN_IN_BACKGROUND,
+        DrawerSwitchItem(text = DrawerConstants.RUN_IN_BACKGROUND,
             switchState = runInBackground,
             onCheckedChangeHandler = { onRunInBackgroundChange() })
         Divider(
@@ -191,29 +185,26 @@ fun DrawerContent(
             iconContentDescription = ImageContentDescriptionConstants.LEADERBOARD
         )
         Box(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomEnd,
         ) {
             Column(
-                verticalArrangement = Arrangement.SpaceEvenly,
-                horizontalAlignment = Alignment.End
+                verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.End
             ) {
-                if (squadId != "")
-                    CustomButton(
-                        clickHandler = { isConfirmDialogOpen.value = true },
-                        text = DrawerConstants.LEAVE_SQUAD,
-                        buttonType = CustomButtonType.Text,
-                        icon = Icons.Outlined.GroupRemove,
-                        iconPosition = IconPosition.End,
-                        iconSize = MaterialTheme.sizes.icon,
-                        textStyle = MaterialTheme.typography.titleMedium.plus(
-                            TextStyle(
-                                fontWeight = FontWeight.Bold
-                            )
-                        ),
-                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                    )
+                if (squadId != "") CustomButton(
+                    clickHandler = { isConfirmDialogOpen.value = true },
+                    text = DrawerConstants.LEAVE_SQUAD,
+                    buttonType = CustomButtonType.Text,
+                    icon = Icons.Outlined.GroupRemove,
+                    iconPosition = IconPosition.End,
+                    iconSize = MaterialTheme.sizes.icon,
+                    textStyle = MaterialTheme.typography.titleMedium.plus(
+                        TextStyle(
+                            fontWeight = FontWeight.Bold
+                        )
+                    ),
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                )
                 CustomButton(
                     clickHandler = { onSignOut() },
                     text = DrawerConstants.SIGN_OUT,
@@ -232,12 +223,14 @@ fun DrawerContent(
         }
     }
 
-    CustomConfirmationDialog(
-        type = ConfirmationDialogType.Confirm,
+    CustomConfirmationDialog(type = ConfirmationDialogType.Confirm,
         isOpen = isConfirmDialogOpen.value,
         title = TitleConstants.LEAVE_SQUAD,
         text = ConfirmationDialogTextConstants.LEAVE_SQUAD,
-        onConfirmButtonClick = { /*TODO*/ },
+        onConfirmButtonClick = {
+            onLeaveSquad()
+            isConfirmDialogOpen.value = false
+        },
         onDismissButtonClick = { isConfirmDialogOpen.value = false },
         onDismissRequest = { isConfirmDialogOpen.value = false })
 }

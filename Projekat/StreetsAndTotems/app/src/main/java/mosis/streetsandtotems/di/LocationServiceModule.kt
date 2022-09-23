@@ -63,7 +63,7 @@ object LocationServiceModule {
                 mapServiceRepository, locationServiceMapScreenEventsFlow
             ),
             RegisterCallbackOnKickVote(
-                mapServiceRepository, locationServiceMapScreenEventsFlow
+                preferenceRepository, mapServiceRepository, locationServiceMapScreenEventsFlow
             ),
         ),
         RemoveCallbacks(mapServiceRepository),
@@ -72,7 +72,7 @@ object LocationServiceModule {
             mapServiceRepository, locationServiceMapScreenEventsFlow
         ),
         RegisterCallbackOnKickVote(
-            mapServiceRepository, locationServiceMapScreenEventsFlow
+            preferenceRepository, mapServiceRepository, locationServiceMapScreenEventsFlow
         ),
         RemoveCallbackOnKickVote(mapServiceRepository),
         RemoveCallbackOnSquadInvite(mapServiceRepository)
