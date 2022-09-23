@@ -12,4 +12,6 @@ data class AuthUseCases(
     val isUserAlreadyLoggedIn: IsUserAlreadyLoggedIn,
     val isUserEmailVerified: IsUserEmailVerified,
     val oneTapSignUpWithGoogle: OneTapSignUpWithGoogle,
+    val updatePassword: UpdatePassword,
+    val updateUserProfile: UpdateUserProfile
 )

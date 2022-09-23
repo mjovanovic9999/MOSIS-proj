@@ -151,7 +151,7 @@ object FormFieldNamesConstants {
     const val LAST_NAME = "lastName"
     const val PHONE_NUMBER = "phoneNumber"
     const val REPEAT_PASSWORD = "repeatPassword"
-    const val CURRENT_PASSWORD = "currentPassword"
+    const val REPEAT_NEW_PASSWORD = "repeatNewPassword"
     const val NEW_PASSWORD = "newPassword"
     const val IMAGE_PATH = "imagePath"
     const val USER_NAME = "userName"
@@ -226,6 +226,8 @@ object HandleResponseConstants {
 }
 
 object MessageConstants {
+    const val PASSWORD_UPDATE_ERROR = "An error occurred while updating password! Please try again!"
+    const val PASSWORD_UPDATE_SUCCESSFUL = "Password updated successfully!"
     const val NO_USER_ACCOUNT_WITH_THIS_EMAIL = "Account with provided email doesn't exist!"
     const val RECOVERY_EMAIL_SENT = "Recovery email sent!"
     const val PASSWORD_RESET = "Enter email address for sending recovery email!"
@@ -314,10 +316,10 @@ object FormFieldConstants {
     const val LAST_NAME = "Last name"
     const val PHONE_NUMBER = "Phone number"
     const val REPEAT_PASSWORD = "Repeat password"
+    const val REPEAT_NEW_PASSWORD = "Repeat new password"
     const val PROFILE_PHOTO = "Add a profile photo"
     const val CHANGE_PHOTO = "Click again to change the photo"
     const val NEW_PASSWORD = "New password"
-    const val CURRENT_PASSWORD = "Current password"
     const val AMOUNT = "Amount"
     const val DEFAULT_AMOUNT = "1"
     const val USER_NAME = "Username"

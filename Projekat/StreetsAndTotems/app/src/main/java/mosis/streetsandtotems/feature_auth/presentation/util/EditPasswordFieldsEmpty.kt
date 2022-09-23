@@ -12,7 +12,7 @@ data class EditPasswordFieldsEmpty(
             FormFieldNamesConstants.NEW_PASSWORD -> {
                 newPassword = empty
             }
-            FormFieldNamesConstants.REPEAT_PASSWORD -> {
+            FormFieldNamesConstants.REPEAT_NEW_PASSWORD -> {
                 repeatNewPassword = empty
             }
         }

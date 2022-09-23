@@ -8,7 +8,8 @@ data class ProfileFieldsEmpty(
     var lastName: Boolean = false,
     var phoneNumber: Boolean = false,
     var email: Boolean = false,
-    var imagePath: Boolean = false
+    var imagePath: Boolean = false,
+    var userName: Boolean = false
 ) : FieldsEmpty {
     override fun setFieldEmpty(name: String, empty: Boolean) {
         when (name) {
@@ -27,11 +28,14 @@ data class ProfileFieldsEmpty(
             FormFieldNamesConstants.IMAGE_PATH -> {
                 email = empty
             }
+            FormFieldNamesConstants.USER_NAME -> {
+                userName = empty
+            }
         }
     }
 
     override fun anyFieldIsEmpty(): Boolean {
-        return firstName || lastName || phoneNumber || email || imagePath
+        return firstName || lastName || phoneNumber || email || imagePath || userName
     }
 
 }

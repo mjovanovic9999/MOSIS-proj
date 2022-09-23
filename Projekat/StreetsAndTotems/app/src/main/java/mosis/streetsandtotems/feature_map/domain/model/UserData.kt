@@ -1,8 +1,10 @@
 package mosis.streetsandtotems.feature_map.domain.model
 
 import android.net.Uri
+import com.google.firebase.firestore.Exclude
 
 data class UserData(
+    @get:Exclude
     val id: String? = null,
     val user_name: String? = null,
     val first_name: String? = null,

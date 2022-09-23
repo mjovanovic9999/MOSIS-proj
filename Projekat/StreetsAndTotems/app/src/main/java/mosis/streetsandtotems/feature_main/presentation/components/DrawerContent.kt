@@ -100,7 +100,8 @@ fun DrawerContent(
                                     lastName = lastName,
                                     phoneNumber = phoneNumber,
                                     email = email,
-                                    imagePath = imagePath
+                                    imagePath = imagePath,
+                                    userName = username
                                 )
                             )
                         )

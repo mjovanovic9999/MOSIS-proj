@@ -9,6 +9,7 @@ data class ProfileFields(
     val lastName: String,
     val phoneNumber: String,
     val email: String,
-    val imagePath: String
+    val imagePath: String,
+    val userName: String
 ) : Parcelable
 
