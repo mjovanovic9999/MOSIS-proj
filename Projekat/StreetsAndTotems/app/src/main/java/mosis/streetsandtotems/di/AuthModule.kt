@@ -84,6 +84,8 @@ object AuthModule {
         isUserAlreadyLoggedIn = IsUserAlreadyLoggedIn(repository = authRepository),
         isUserEmailVerified = IsUserEmailVerified(repository = authRepository),
         oneTapSignUpWithGoogle = OneTapSignUpWithGoogle(repository = authRepository),
+        updatePassword = UpdatePassword(repository = authRepository),
+        updateUserProfile = UpdateUserProfile(repository = authRepository)
     )
 
     @Provides

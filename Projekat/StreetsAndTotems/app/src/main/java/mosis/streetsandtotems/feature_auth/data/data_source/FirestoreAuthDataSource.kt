@@ -5,22 +5,26 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import mosis.streetsandtotems.core.BackpackConstants
 import mosis.streetsandtotems.core.FireStoreConstants
+import mosis.streetsandtotems.feature_auth.presentation.util.ProfileFields
 import mosis.streetsandtotems.feature_leaderboards.domain.model.LeaderboardUserData
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.ProfileData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 
 class FirestoreAuthDataSource(private val db: FirebaseFirestore) {
-    //    suspend fun getUserData(userId: String): UserData? {
-//        val userSnapshot =
-//            db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION).document(userId).get()
-//                .await()
-//
-//        return userSnapshot.toObject(UserData::class.java)?.copy(
-//            id = userId,
-//            image = Uri.parse(userSnapshot.getField(FireStoreConstants.IMAGE_URI_FIELD))
-//        )
-//    }
+    fun updateUserProfile(userId: String, profileFields: ProfileFields): Task<Void> {
+        return db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION).document(userId).update(
+            mapOf(
+                FireStoreConstants.USER_NAME_FIELD to profileFields.userName,
+                FireStoreConstants.FIRST_NAME_FIELD to profileFields.firstName,
+                FireStoreConstants.LAST_NAME_FIELD to profileFields.lastName,
+                FireStoreConstants.EMAIL_FIELD to profileFields.email,
+                FireStoreConstants.PHONE_NUMBER_FIELD to profileFields.phoneNumber,
+                FireStoreConstants.IMAGE_URI_FIELD to profileFields.imagePath
+            )
+        )
+    }
+
     fun getUsersWithEmail(email: String): Task<QuerySnapshot> {
         return db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION)
             .whereEqualTo(FireStoreConstants.EMAIL_FIELD, email).get()

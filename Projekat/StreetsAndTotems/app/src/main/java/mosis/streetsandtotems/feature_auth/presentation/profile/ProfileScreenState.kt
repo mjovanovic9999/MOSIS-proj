@@ -8,5 +8,6 @@ data class ProfileScreenState(
     val formState: FormState<ProfileFields>,
     val passwordDialogFormState: FormState<EditPasswordFields>,
     val editMode: Boolean,
-    val editPasswordDialogOpen: Boolean
+    val editPasswordDialogOpen: Boolean,
+    val showEditPasswordButton: Boolean
 )

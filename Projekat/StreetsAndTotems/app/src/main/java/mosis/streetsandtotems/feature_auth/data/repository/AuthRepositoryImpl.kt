@@ -262,17 +262,32 @@ class AuthRepositoryImpl @Inject constructor(
         return authDataSource.getCurrentUser()?.isEmailVerified ?: false
     }
 
-    override suspend fun updateUserProfile(newProfileData: ProfileFields): Flow<Response<Nothing>> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun updateUserProfile(newProfileData: ProfileFields): Flow<Response<Nothing>> =
+        flow {
+            try {
+                emit(Response.Loading)
+                firestoreAuthDataSource.updateUserProfile(
+                    authDataSource.getCurrentUser()!!.uid, newProfileData
+                ).await()
+                emit(Response.Success())
+            } catch (e: Exception) {
+                emit(Response.Error())
+            }
+        }
 
     override suspend fun updateUserPassword(newPassword: String): Flow<Response<Nothing>> = flow {
         try {
             emit(Response.Loading)
             authDataSource.getCurrentUser()?.updatePassword(newPassword)?.await()
             emit(Response.Success())
+        } catch (e: FirebaseAuthException) {
+            emit(
+                Response.Error(
+                    message = FirebaseAuthConstants.AUTH_ERRORS[e.errorCode],
+                )
+            )
         } catch (e: Exception) {
-            emit(Response.Error())
+            emit(Response.Error(MessageConstants.PASSWORD_UPDATE_ERROR))
         }
     }
 

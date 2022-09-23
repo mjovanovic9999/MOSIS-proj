@@ -1,13 +1,13 @@
 package mosis.streetsandtotems.feature_auth.presentation.profile
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -38,18 +38,14 @@ fun ProfileScreen(
     }
 
     CustomPage(
+        scrollable = true,
         titleText = if (state.editMode) TitleConstants.EDIT_PROFILE else TitleConstants.PROFILE,
+        contentVerticalArrangement = Arrangement.SpaceBetween,
         content = {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(MaterialTheme.sizes.profile_screen_spacing)
-            ) {
-                Form(state.formState, spacing = MaterialTheme.sizes.none)
-            }
+            Form(state.formState, spacing = MaterialTheme.sizes.none, asColumn = false)
             if (state.editMode) {
                 CustomButton(
-                    clickHandler = { /*TODO*/ },
+                    clickHandler = { viewModel.onEvent(ProfileViewModelEvents.ChangeProfileData) },
                     buttonType = CustomButtonType.Outlined,
                     text = ButtonConstants.SAVE,
                     matchParentWidth = true,
@@ -72,7 +68,7 @@ fun ProfileScreen(
                         matchParentWidth = true,
                         textStyle = MaterialTheme.typography.titleMedium
                     )
-                    CustomButton(
+                    if (state.showEditPasswordButton) CustomButton(
                         clickHandler = { viewModel.onEvent(ProfileViewModelEvents.ShowEditPasswordDialog) },
                         buttonType = CustomButtonType.Outlined,
                         text = ButtonConstants.CHANGE_PASSWORD,
@@ -82,11 +78,9 @@ fun ProfileScreen(
                 }
             }
         },
-        contentVerticalArrangement = Arrangement.SpaceBetween
     )
-    EditPasswordDialog(
-        isOpen = state.editPasswordDialogOpen,
+    if (state.showEditPasswordButton) EditPasswordDialog(isOpen = state.editPasswordDialogOpen,
         onDismissRequest = { viewModel.onEvent(ProfileViewModelEvents.HideEditPasswordDialog) },
-        editPasswordFormState = state.passwordDialogFormState
-    )
+        editPasswordFormState = state.passwordDialogFormState,
+        onPasswordSaveClick = { viewModel.onEvent(ProfileViewModelEvents.UpdatePassword) })
 }

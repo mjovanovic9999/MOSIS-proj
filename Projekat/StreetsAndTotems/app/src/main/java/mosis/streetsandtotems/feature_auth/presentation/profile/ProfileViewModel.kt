@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.feature_auth.presentation.profile
 
-import android.util.Log
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
@@ -8,6 +7,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -17,14 +17,22 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.dsc.form_builder.Validators
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.*
+import mosis.streetsandtotems.core.data.data_source.AuthProvider
+import mosis.streetsandtotems.core.domain.model.SnackbarSettings
+import mosis.streetsandtotems.core.domain.use_case.PreferenceUseCases
+import mosis.streetsandtotems.core.domain.util.handleResponse
 import mosis.streetsandtotems.core.domain.validators.validatePhoneNumber
 import mosis.streetsandtotems.core.presentation.components.CustomTextFieldType
 import mosis.streetsandtotems.core.presentation.components.form.formfields.ImageSelectFormField
 import mosis.streetsandtotems.core.presentation.components.form.formfields.TextFormField
 import mosis.streetsandtotems.core.presentation.states.FormState
+import mosis.streetsandtotems.feature_auth.domain.use_case.AuthUseCases
 import mosis.streetsandtotems.feature_auth.presentation.util.EditPasswordFields
 import mosis.streetsandtotems.feature_auth.presentation.util.EditPasswordFieldsEmpty
 import mosis.streetsandtotems.feature_auth.presentation.util.ProfileFields
@@ -32,72 +40,105 @@ import mosis.streetsandtotems.feature_auth.presentation.util.ProfileFieldsEmpty
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor() : ViewModel() {
-    private val _profileScreenState = mutableStateOf(
-        ProfileScreenState(
-            editMode = false, formState = createFormState(
-                ProfileFields(
-                    firstName = "", lastName = "", phoneNumber = "", email = "", imagePath = ""
-                ), editMode = false
-            ), editPasswordDialogOpen = false, passwordDialogFormState = FormState(
-                listOf(
-                    TextFormField(
-                        initial = "",
-                        name = FormFieldNamesConstants.NEW_PASSWORD,
-                        validators = listOf(
-                            Validators.Required(MessageConstants.NEW_PASSWORD_REQUIRED),
-                            Validators.Min(8, MessageConstants.PASSWORD_LENGTH)
-                        ),
-                        label = FormFieldConstants.NEW_PASSWORD,
-                        placeholder = FormFieldConstants.NEW_PASSWORD,
-                        textFieldType = CustomTextFieldType.Outlined,
-                        singleLine = true,
-                        clearable = true,
-                        visualTransformation = { text ->
-                            TransformedText(
-                                AnnotatedString(VisualTransformationConstants.PASSWORD.repeat(text.length)),
-                                OffsetMapping.Identity
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next, keyboardType = KeyboardType.Password
-                        ),
-                    ), TextFormField(
-                        initial = "",
-                        name = FormFieldNamesConstants.REPEAT_PASSWORD,
-                        validators = listOf(
-                            Validators.Custom(
-                                MessageConstants.PASSWORDS_DO_NOT_MATCH, ::validateRepeatedPassword
+class ProfileViewModel @Inject constructor(
+    private val authUseCases: AuthUseCases,
+    private val preferenceUseCases: PreferenceUseCases,
+    private val snackbarFlow: MutableStateFlow<SnackbarSettings?>,
+    private val showLoaderFlow: MutableStateFlow<Boolean>
+) : ViewModel() {
+    private val _profileScreenState: MutableState<ProfileScreenState>
+    private var _showEditPasswordButton = false
+    val profileScreenState: State<ProfileScreenState>
+
+    init {
+        viewModelScope.launch {
+            _showEditPasswordButton =
+                preferenceUseCases.getAuthProvider() == AuthProvider.EmailAndPassword
+        }
+
+        _profileScreenState = mutableStateOf(
+            ProfileScreenState(
+                editMode = false,
+                formState = createFormState(
+                    ProfileFields(
+                        firstName = "",
+                        lastName = "",
+                        phoneNumber = "",
+                        email = "",
+                        imagePath = "",
+                        userName = ""
+                    ), editMode = false
+                ),
+                editPasswordDialogOpen = false,
+                showEditPasswordButton = _showEditPasswordButton,
+                passwordDialogFormState = FormState(
+                    listOf(
+                        TextFormField(
+                            initial = "",
+                            name = FormFieldNamesConstants.NEW_PASSWORD,
+                            validators = listOf(
+                                Validators.Required(MessageConstants.NEW_PASSWORD_REQUIRED),
+                                Validators.Min(8, MessageConstants.PASSWORD_LENGTH)
                             ),
-                            Validators.Min(
-                                FormFieldLengthConstants.PASSWORD, MessageConstants.PASSWORD_LENGTH
+                            label = FormFieldConstants.NEW_PASSWORD,
+                            placeholder = FormFieldConstants.NEW_PASSWORD,
+                            textFieldType = CustomTextFieldType.Outlined,
+                            singleLine = true,
+                            clearable = true,
+                            visualTransformation = { text ->
+                                TransformedText(
+                                    AnnotatedString(
+                                        VisualTransformationConstants.PASSWORD.repeat(
+                                            text.length
+                                        )
+                                    ), OffsetMapping.Identity
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Next, keyboardType = KeyboardType.Password
                             ),
-                            Validators.Required(MessageConstants.REPEAT_PASSWORD_REQUIRED),
-                        ),
-                        label = FormFieldConstants.REPEAT_PASSWORD,
-                        placeholder = FormFieldConstants.REPEAT_PASSWORD,
-                        textFieldType = CustomTextFieldType.Outlined,
-                        singleLine = true,
-                        clearable = true,
-                        visualTransformation = { text ->
-                            TransformedText(
-                                AnnotatedString(VisualTransformationConstants.PASSWORD.repeat(text.length)),
-                                OffsetMapping.Identity
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Done, keyboardType = KeyboardType.Password
-                        ),
-                        keyboardActions = KeyboardActions(onDone = { }),
-                    )
-                ), EditPasswordFields::class, EditPasswordFieldsEmpty()
+                        ), TextFormField(
+                            initial = "",
+                            name = FormFieldNamesConstants.REPEAT_NEW_PASSWORD,
+                            validators = listOf(
+                                Validators.Custom(
+                                    MessageConstants.PASSWORDS_DO_NOT_MATCH,
+                                    ::validateRepeatedPassword
+                                ),
+                                Validators.Min(
+                                    FormFieldLengthConstants.PASSWORD,
+                                    MessageConstants.PASSWORD_LENGTH
+                                ),
+                                Validators.Required(MessageConstants.REPEAT_PASSWORD_REQUIRED),
+                            ),
+                            label = FormFieldConstants.REPEAT_NEW_PASSWORD,
+                            placeholder = FormFieldConstants.REPEAT_NEW_PASSWORD,
+                            textFieldType = CustomTextFieldType.Outlined,
+                            singleLine = true,
+                            clearable = true,
+                            visualTransformation = { text ->
+                                TransformedText(
+                                    AnnotatedString(
+                                        VisualTransformationConstants.PASSWORD.repeat(
+                                            text.length
+                                        )
+                                    ), OffsetMapping.Identity
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Done, keyboardType = KeyboardType.Password
+                            ),
+                            keyboardActions = KeyboardActions(onDone = { onUpdatePasswordHandler() }),
+                        )
+                    ), EditPasswordFields::class, EditPasswordFieldsEmpty()
+                )
             )
         )
-    )
-    val profileScreenState: State<ProfileScreenState> = _profileScreenState
+        profileScreenState = _profileScreenState
+    }
 
     private var lastFieldValues = ProfileFields(
-        firstName = "", lastName = "", phoneNumber = "", email = "", imagePath = ""
+        firstName = "", lastName = "", phoneNumber = "", email = "", imagePath = "", userName = ""
     )
 
     private fun validateRepeatedPassword(repeatedPassword: Any): Boolean {
@@ -109,134 +150,142 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
         initialFormFields: ProfileFields, editMode: Boolean
     ): FormState<ProfileFields> {
         return FormState(
-            buildList {
-                add(
-                    ImageSelectFormField(
-                        initial = initialFormFields.imagePath,
-                        name = FormFieldNamesConstants.IMAGE_PATH,
-                        validators = listOf(Validators.Required(MessageConstants.IMAGE_REQUIRED)),
-                        editable = editMode,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f)
+            listOf(
+                ImageSelectFormField(
+                    initial = initialFormFields.imagePath,
+                    name = FormFieldNamesConstants.IMAGE_PATH,
+                    validators = listOf(Validators.Required(MessageConstants.IMAGE_REQUIRED)),
+                    editable = editMode,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                ), TextFormField(
+                    initial = initialFormFields.firstName,
+                    name = FormFieldNamesConstants.FIRST_NAME,
+                    textFieldType = CustomTextFieldType.Outlined,
+                    validators = if (editMode) listOf(
+                        Validators.Required(
+                            MessageConstants.FIRST_NAME_REQUIRED
+                        )
+                    ) else emptyList(),
+                    label = FormFieldConstants.FIRST_NAME,
+                    placeholder = FormFieldConstants.FIRST_NAME,
+                    clearable = editMode,
+                    readOnly = !editMode,
+                    enabled = editMode,
+                    keyboardOptions = if (editMode) KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    ) else KeyboardOptions(),
+                    colors = {
+                        if (editMode) TextFieldDefaults.outlinedTextFieldColors() else TextFieldDefaults.outlinedTextFieldColors(
+                            disabledBorderColor = MaterialTheme.colorScheme.background,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    showErrorMessage = editMode,
+                ), TextFormField(
+                    initial = initialFormFields.lastName,
+                    name = FormFieldNamesConstants.LAST_NAME,
+                    textFieldType = CustomTextFieldType.Outlined,
+                    validators = if (editMode) listOf(
+                        Validators.Required(
+                            MessageConstants.LAST_NAME_REQUIRED
+                        )
+                    ) else emptyList(),
+                    label = FormFieldConstants.LAST_NAME,
+                    placeholder = FormFieldConstants.LAST_NAME,
+                    singleLine = true,
+                    clearable = editMode,
+                    readOnly = !editMode,
+                    enabled = editMode,
+                    keyboardOptions = if (editMode) KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    ) else KeyboardOptions(),
+                    colors = {
+                        if (editMode) TextFieldDefaults.outlinedTextFieldColors() else TextFieldDefaults.outlinedTextFieldColors(
+                            disabledBorderColor = MaterialTheme.colorScheme.background,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    showErrorMessage = editMode,
+                ), TextFormField(
+                    initial = initialFormFields.phoneNumber,
+                    name = FormFieldNamesConstants.PHONE_NUMBER,
+                    textFieldType = CustomTextFieldType.Outlined,
+                    validators = if (editMode) listOf(
+                        Validators.Custom(
+                            MessageConstants.INVALID_PHONE_NUMBER, ::validatePhoneNumber
+                        ), Validators.Required(MessageConstants.PHONE_NUMBER_REQUIRED)
+                    ) else emptyList(),
+                    label = FormFieldConstants.PHONE_NUMBER,
+                    placeholder = FormFieldConstants.PHONE_NUMBER,
+                    singleLine = true,
+                    clearable = editMode,
+                    readOnly = !editMode,
+                    enabled = editMode,
+                    keyboardOptions = if (editMode) KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    ) else KeyboardOptions(),
+                    colors = {
+                        if (editMode) TextFieldDefaults.outlinedTextFieldColors() else TextFieldDefaults.outlinedTextFieldColors(
+                            disabledBorderColor = MaterialTheme.colorScheme.background,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    showErrorMessage = editMode,
+                ), TextFormField(
+                    initial = initialFormFields.userName,
+                    name = FormFieldNamesConstants.USER_NAME,
+                    textFieldType = CustomTextFieldType.Outlined,
+                    validators = if (editMode) listOf(Validators.Required(MessageConstants.USER_NAME_REQUIRED)) else emptyList(),
+                    label = FormFieldConstants.USER_NAME,
+                    placeholder = FormFieldConstants.USER_NAME,
+                    singleLine = true,
+                    clearable = editMode,
+                    readOnly = !editMode,
+                    enabled = editMode,
+                    keyboardOptions = if (editMode) KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    ) else KeyboardOptions(),
+                    colors = {
+                        if (editMode) TextFieldDefaults.outlinedTextFieldColors() else TextFieldDefaults.outlinedTextFieldColors(
+                            disabledBorderColor = MaterialTheme.colorScheme.background,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    showErrorMessage = editMode,
+                ), TextFormField(
+                    initial = initialFormFields.email,
+                    name = FormFieldNamesConstants.EMAIL,
+                    textFieldType = CustomTextFieldType.Outlined,
+                    validators = if (editMode) listOf(
+                        Validators.Email(MessageConstants.INVALID_EMAIL),
+                        Validators.Required(MessageConstants.EMAIL_REQUIRED)
                     )
+                    else emptyList(),
+                    label = FormFieldConstants.EMAIL,
+                    placeholder = FormFieldConstants.EMAIL,
+                    singleLine = true,
+                    clearable = if (_showEditPasswordButton) editMode else false,
+                    readOnly = if (_showEditPasswordButton) !editMode else true,
+                    enabled = if (_showEditPasswordButton) editMode else false,
+                    keyboardOptions = if (editMode) KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ) else KeyboardOptions(),
+                    colors = {
+                        if (editMode && _showEditPasswordButton) TextFieldDefaults.outlinedTextFieldColors() else TextFieldDefaults.outlinedTextFieldColors(
+                            disabledBorderColor = MaterialTheme.colorScheme.background,
+                            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    showErrorMessage = editMode,
                 )
-                add(
-                    TextFormField(
-                        initial = initialFormFields.firstName,
-                        name = FormFieldNamesConstants.FIRST_NAME,
-                        textFieldType = CustomTextFieldType.Outlined,
-                        validators = if (editMode) listOf(
-                            Validators.Required(
-                                MessageConstants.FIRST_NAME_REQUIRED
-                            )
-                        ) else emptyList(),
-                        label = FormFieldConstants.FIRST_NAME,
-                        placeholder = FormFieldConstants.FIRST_NAME,
-                        clearable = editMode,
-                        readOnly = !editMode,
-                        enabled = editMode,
-                        keyboardOptions = if (editMode) KeyboardOptions(
-                            imeAction = ImeAction.Next
-                        ) else KeyboardOptions(),
-                        colors = {
-                            if (editMode) TextFieldDefaults.outlinedTextFieldColors() else TextFieldDefaults.outlinedTextFieldColors(
-                                disabledBorderColor = MaterialTheme.colorScheme.background,
-                                disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        },
-                        showErrorMessage = editMode,
-                    )
-                )
-                add(
-                    TextFormField(
-                        initial = initialFormFields.lastName,
-                        name = FormFieldNamesConstants.LAST_NAME,
-                        textFieldType = CustomTextFieldType.Outlined,
-                        validators = if (editMode) listOf(
-                            Validators.Required(
-                                MessageConstants.LAST_NAME_REQUIRED
-                            )
-                        ) else emptyList(),
-                        label = FormFieldConstants.LAST_NAME,
-                        placeholder = FormFieldConstants.LAST_NAME,
-                        singleLine = true,
-                        clearable = editMode,
-                        readOnly = !editMode,
-                        enabled = editMode,
-                        keyboardOptions = if (editMode) KeyboardOptions(
-                            imeAction = ImeAction.Next
-                        ) else KeyboardOptions(),
-                        colors = {
-                            if (editMode) TextFieldDefaults.outlinedTextFieldColors() else TextFieldDefaults.outlinedTextFieldColors(
-                                disabledBorderColor = MaterialTheme.colorScheme.background,
-                                disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        },
-                        showErrorMessage = editMode,
-                    )
-                )
-                add(
-                    TextFormField(
-                        initial = initialFormFields.phoneNumber,
-                        name = FormFieldNamesConstants.PHONE_NUMBER,
-                        textFieldType = CustomTextFieldType.Outlined,
-                        validators = if (editMode) listOf(
-                            Validators.Custom(
-                                MessageConstants.INVALID_PHONE_NUMBER, ::validatePhoneNumber
-                            ), Validators.Required(MessageConstants.PHONE_NUMBER_REQUIRED)
-                        ) else emptyList(),
-                        label = FormFieldConstants.PHONE_NUMBER,
-                        placeholder = FormFieldConstants.PHONE_NUMBER,
-                        singleLine = true,
-                        clearable = editMode,
-                        readOnly = !editMode,
-                        enabled = editMode,
-                        keyboardOptions = if (editMode) KeyboardOptions(
-                            imeAction = ImeAction.Next
-                        ) else KeyboardOptions(),
-                        colors = {
-                            if (editMode) TextFieldDefaults.outlinedTextFieldColors() else TextFieldDefaults.outlinedTextFieldColors(
-                                disabledBorderColor = MaterialTheme.colorScheme.background,
-                                disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        },
-                        showErrorMessage = editMode,
-                    )
-                )
-                add(
-                    TextFormField(
-                        initial = initialFormFields.email,
-                        name = FormFieldNamesConstants.EMAIL,
-                        textFieldType = CustomTextFieldType.Outlined,
-                        validators = if (editMode) listOf(
-                            Validators.Custom(
-                                MessageConstants.INVALID_EMAIL, ::validatePhoneNumber
-                            ), Validators.Required(MessageConstants.EMAIL_REQUIRED)
-                        ) else emptyList(),
-                        label = FormFieldConstants.EMAIL,
-                        placeholder = FormFieldConstants.EMAIL,
-                        singleLine = true,
-                        clearable = editMode,
-                        readOnly = !editMode,
-                        enabled = editMode,
-                        keyboardOptions = if (editMode) KeyboardOptions(
-                            imeAction = ImeAction.Done
-                        ) else KeyboardOptions(),
-                        colors = {
-                            if (editMode) TextFieldDefaults.outlinedTextFieldColors() else TextFieldDefaults.outlinedTextFieldColors(
-                                disabledBorderColor = MaterialTheme.colorScheme.background,
-                                disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        },
-                        showErrorMessage = editMode,
-                    )
-                )
-            }, ProfileFields::class, ProfileFieldsEmpty()
+            ), ProfileFields::class, ProfileFieldsEmpty()
         )
     }
 
@@ -246,11 +295,39 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
             ProfileViewModelEvents.ChangeMode -> onChangeModeHandler()
             ProfileViewModelEvents.HideEditPasswordDialog -> onHideEditPasswordDialogHandler()
             ProfileViewModelEvents.ShowEditPasswordDialog -> onShowEditPasswordDialogHandler()
+            ProfileViewModelEvents.UpdatePassword -> onUpdatePasswordHandler()
+            is ProfileViewModelEvents.ChangeProfileData -> onChangeProfileDataHandler()
+        }
+    }
+
+    private fun onChangeProfileDataHandler() {
+        viewModelScope.launch {
+            val profileFields = _profileScreenState.value.formState.getDataWithValidation()
+            profileFields?.let {
+                handleResponse(
+                    authUseCases.updateUserProfile(it), showLoaderFlow, snackbarFlow
+                )
+            }
+        }
+    }
+
+    private fun onUpdatePasswordHandler() {
+        val editPasswordFields =
+            _profileScreenState.value.passwordDialogFormState.getDataWithValidation()
+        editPasswordFields?.let {
+            viewModelScope.launch {
+                handleResponse(
+                    authUseCases.updatePassword(it.newPassword),
+                    showLoaderFlow,
+                    snackbarFlow,
+                    successMessage = MessageConstants.PASSWORD_UPDATE_SUCCESSFUL
+                )
+            }
+            onHideEditPasswordDialogHandler()
         }
     }
 
     private fun onInitializeFormFields(currentUserFields: ProfileFields) {
-        Log.d("tag", currentUserFields.imagePath)
         _profileScreenState.value = _profileScreenState.value.copy(
             formState = createFormState(
                 currentUserFields, editMode = false
@@ -261,7 +338,6 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
     private fun onChangeModeHandler() {
         val editMode = _profileScreenState.value.editMode
         if (!editMode) lastFieldValues = _profileScreenState.value.formState.getData()
-        Log.d("tag", lastFieldValues.imagePath)
         _profileScreenState.value = _profileScreenState.value.copy(
             editMode = !editMode,
             formState = createFormState(lastFieldValues, !editMode),

@@ -16,6 +16,7 @@ import mosis.streetsandtotems.feature_auth.presentation.util.EditPasswordFields
 fun EditPasswordDialog(
     isOpen: Boolean,
     onDismissRequest: () -> Unit,
+    onPasswordSaveClick: () -> Unit,
     editPasswordFormState: FormState<EditPasswordFields>
 ) {
     CustomDialog(
@@ -33,6 +34,7 @@ fun EditPasswordDialog(
         },
         clickable = true,
         confirmButtonText = ButtonConstants.SAVE,
+        onConfirmButtonClick = onPasswordSaveClick,
         confirmButtonEnabled = editPasswordFormState.isFormFilled.value,
         dismissButtonText = ButtonConstants.CANCEL,
         onDismissButtonClick = onDismissRequest
