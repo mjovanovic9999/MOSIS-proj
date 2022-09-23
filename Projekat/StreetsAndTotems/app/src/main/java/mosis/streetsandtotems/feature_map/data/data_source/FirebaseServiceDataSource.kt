@@ -30,7 +30,11 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
             .whereNotEqualTo(FireStoreConstants.FIELD_USER_ID, currentUser.uid)
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
-                    e, snapshots, kickVoteStartedCallback, null, kickVoteEndedCallback
+                    e,
+                    snapshots,
+                    kickVoteStartedCallback,
+                    { Log.d("tagic", it.toString()) },
+                    kickVoteEndedCallback
                 )
             }
     }

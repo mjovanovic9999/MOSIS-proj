@@ -92,7 +92,7 @@ class LocationService : Service() {
         )
 
         serviceScope.launch {
-            locationServiceControlEventsFlow.flow.collectLatest {
+            locationServiceControlEventsFlow.flow.collect {
                 when (it) {
                     LocationServiceControlEvents.RegisterCallbacks -> locationServiceUseCases.registerCallbacks()
                     LocationServiceControlEvents.RemoveCallbacks -> locationServiceUseCases.removeCallbacks()

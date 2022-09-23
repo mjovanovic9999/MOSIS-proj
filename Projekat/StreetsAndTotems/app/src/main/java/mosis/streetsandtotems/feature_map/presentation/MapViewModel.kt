@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.R
@@ -54,6 +55,7 @@ import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
 import mosis.streetsandtotems.feature_map.presentation.util.*
 import mosis.streetsandtotems.services.LocationService
+import mosis.streetsandtotems.services.LocationServiceControlEvents
 import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
@@ -72,6 +74,7 @@ class MapViewModel @Inject constructor(
     private val showLoader: MutableStateFlow<Boolean>,
     private val preferenceUseCases: PreferenceUseCases,
     private val snackbarSettingsFlow: MutableStateFlow<SnackbarSettings?>,
+   // private val locationServiceControlEventsFlow: MutableSharedFlow<LocationServiceControlEvents>,
 ) : ViewModel() {
     private val _mapScreenState: MutableState<MapScreenState>
     private val _mapState: MapState
@@ -259,6 +262,10 @@ class MapViewModel @Inject constructor(
                 _mapScreenState.value = _mapScreenState.value.copy(
                     mySquadId = it
                 )
+//                if (it == "") {
+//                    locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RegisterSquadInviteCallback)
+//                    locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveKickVoteCallback)
+//                }
             }
         }
     }
@@ -418,8 +425,6 @@ class MapViewModel @Inject constructor(
                             oldData = playersHashMap.put(it, dataType)
 //                            if((oldData as ProfileData).squad_id!=dataType.squad_id)
 //                            {//mzd brisanje starog pina
-//
-//
 //                                addPinHash(dataType)
 //                            }
                         } else addPinHash(dataType)
@@ -1049,6 +1054,8 @@ class MapViewModel @Inject constructor(
             if (it != "")
                 viewModelScope.launch {
                     mapViewModelRepository.acceptInviteToSquad(it)
+//                    locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveSquadInviteCallback)
+                    //locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RegisterKickVoteCallback)
                 }
         }
     }

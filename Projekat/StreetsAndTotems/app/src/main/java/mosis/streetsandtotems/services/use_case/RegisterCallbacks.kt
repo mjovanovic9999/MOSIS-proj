@@ -43,9 +43,9 @@ class RegisterCallbacks(
         initHomesFlow()
         initUserInventoryFlow()
         initMarketFlow()
-        if (preferenceRepository.getSquadId() == "")
-            registerCallbackOnSquadInvite()
-        else registerCallbackOnKickVote()
+//        if (preferenceRepository.getSquadId() == "")
+//            registerCallbackOnSquadInvite()
+//        else registerCallbackOnKickVote()
     }
 
     private fun initCurrentUserFlow() {

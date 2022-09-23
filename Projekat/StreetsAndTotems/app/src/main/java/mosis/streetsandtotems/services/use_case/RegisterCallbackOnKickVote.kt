@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.services.use_case
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,6 +21,8 @@ class RegisterCallbackOnKickVote(
         val userId = preferenceRepository.getUserId()
         mapServiceRepository.registerCallbackOnKickVoteDataUpdate(kickVoteStartedCallback = {
             CoroutineScope(Dispatchers.Default).launch {
+                Log.d("tag", it.toString())
+
                 if (it.votes?.get(userId) == Vote.Unanswered)
                     locationServiceMapScreenEventsFlow.emit(
                         LocationServiceMapScreenEvents.KickVote(

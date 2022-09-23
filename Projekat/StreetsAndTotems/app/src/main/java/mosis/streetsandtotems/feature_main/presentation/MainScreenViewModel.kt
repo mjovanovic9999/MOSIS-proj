@@ -95,6 +95,17 @@ class MainScreenViewModel @Inject constructor(
                         )
 
                         preferenceUseCases.setSquadId(it.newUserData.squad_id ?: "")
+
+                        if(it.newUserData.squad_id == ""){
+                            locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveSquadInviteCallback)
+                            locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RegisterSquadInviteCallback)
+                            locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveKickVoteCallback)
+                        }
+                        else
+                        {
+                            locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RegisterKickVoteCallback)
+                            locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveSquadInviteCallback)
+                        }
                     }
                 }
             }
@@ -121,6 +132,8 @@ class MainScreenViewModel @Inject constructor(
     private fun onLeaveSquadHandler() {
         viewModelScope.launch {
             mainUseCases.leaveSquad()
+            locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RegisterSquadInviteCallback)
+            locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveKickVoteCallback)
         }
     }
 
