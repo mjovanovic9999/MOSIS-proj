@@ -418,10 +418,12 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
         val squadNumNull = db.collection(SQUADS_COLLECTION).document(squadId).get().await()
 
+        Log.d("taggg","reevalll")
 
         val users = squadNumNull.get(FIELD_USERS)
         if (users != null) {
             val squadNum = (users as List<*>).size
+            Log.d("taggg",squadNum.toString())
             for (itemDoc in kicksList) {
                 val item = itemDoc.toObject(KickVoteData::class.java)
                 if (item != null) {
@@ -440,9 +442,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                     (squadNum / 2).let { votesHalf ->
                         if (votesHalf <= voteYes) {//kick
                             removeFromSquad(userId)
-                            db.collection(KICK_VOTE_COLLECTION).document().delete().await()
+                            db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete().await()
                             reevaluateVoteAfterKick(userId, squadId)
-                            //promeniti listu na kickvote kad se neko izbaci
                         } else if (votesHalf <= voteNo) {
                             db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete()
                                 .await()

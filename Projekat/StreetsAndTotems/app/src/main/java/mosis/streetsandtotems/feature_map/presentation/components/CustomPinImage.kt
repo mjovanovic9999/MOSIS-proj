@@ -6,25 +6,44 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.skydoves.landscapist.glide.GlideImage
 import mosis.streetsandtotems.R
+import mosis.streetsandtotems.feature_map.domain.model.ProfileData
+import mosis.streetsandtotems.feature_map.presentation.util.isSquadMember
 
 @Composable
-fun CustomPinImage(imageUri: Uri, isMyFriend: Boolean) {
+fun CustomPinImage(
+    mySquadId: String,
+    selectedPlayerSquadId: ProfileData,
+) {
     Box {
         GlideImage(
-            imageModel = imageUri,
+            imageModel = if (selectedPlayerSquadId.image_uri == null)
+                Uri.EMPTY
+            else
+                Uri.parse(selectedPlayerSquadId.image_uri),
             modifier = Modifier
                 .height(32.dp)
                 .width(32.dp)
                 .offset(3.dp, 3.dp)
         )
         Image(
-            painter = painterResource(if (isMyFriend) R.drawable.pin_friend else R.drawable.pin_other_player),
+            painter = painterResource(
+                if (isSquadMember(
+                        mySquadId,
+                        selectedPlayerSquadId.squad_id
+                    )
+                )
+                    R.drawable.pin_friend
+                else
+                    R.drawable.pin_other_player
+            ),
             contentDescription = null,
             modifier = Modifier.height(48.dp),
         )

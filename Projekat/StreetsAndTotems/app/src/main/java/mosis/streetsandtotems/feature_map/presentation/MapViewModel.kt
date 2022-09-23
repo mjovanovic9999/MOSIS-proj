@@ -6,10 +6,7 @@ import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -74,7 +71,6 @@ class MapViewModel @Inject constructor(
     private val showLoader: MutableStateFlow<Boolean>,
     private val preferenceUseCases: PreferenceUseCases,
     private val snackbarSettingsFlow: MutableStateFlow<SnackbarSettings?>,
-   // private val locationServiceControlEventsFlow: MutableSharedFlow<LocationServiceControlEvents>,
 ) : ViewModel() {
     private val _mapScreenState: MutableState<MapScreenState>
     private val _mapState: MapState
@@ -82,7 +78,7 @@ class MapViewModel @Inject constructor(
     private val filterTotems = MutableStateFlow(false)
     private val filterResources = MutableStateFlow(false)
     private val resourcesHashMap = mutableMapOf<String, ResourceData>()
-    private val playersHashMap = mutableMapOf<String, ProfileData>()
+    private val playersHashMap = mutableStateMapOf<String, ProfileData>()
     private val totemsHashMap = mutableMapOf<String, TotemData>()
     private val customPinsHashMap = mutableMapOf<String, CustomPinData>()
 
@@ -262,10 +258,6 @@ class MapViewModel @Inject constructor(
                 _mapScreenState.value = _mapScreenState.value.copy(
                     mySquadId = it
                 )
-//                if (it == "") {
-//                    locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RegisterSquadInviteCallback)
-//                    locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveKickVoteCallback)
-//                }
             }
         }
     }
@@ -366,14 +358,11 @@ class MapViewModel @Inject constructor(
                 }
                 is ProfileData -> {
                     if (dataType.is_online == true) {
-                        Log.d("tag", mapScreenState.value.myId + dataType.squad_id)
                         playersHashMap[it] = dataType
                         composable = {
                             CustomPinImage(
-                                imageUri = if (dataType.image_uri == null) Uri.EMPTY else Uri.parse(
-                                    dataType.image_uri
-                                ),
-                                isSquadMember(mapScreenState.value.mySquadId, dataType.squad_id)
+                                mapScreenState.value.mySquadId,
+                                playersHashMap[it]!!
                             )
                         }
                     }
@@ -1054,8 +1043,6 @@ class MapViewModel @Inject constructor(
             if (it != "")
                 viewModelScope.launch {
                     mapViewModelRepository.acceptInviteToSquad(it)
-//                    locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveSquadInviteCallback)
-                    //locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RegisterKickVoteCallback)
                 }
         }
     }
