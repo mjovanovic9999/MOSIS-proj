@@ -33,7 +33,7 @@ fun CustomPinDialog(
     dialogText: MutableState<String>,
     isNewPin: Boolean,//promena na dugmici
     isSquadMember: Boolean,
-    placedBy: String?,
+    playerName: String?,
     addCustomPinFB: () -> Unit,
     updateCustomPin: () -> Unit,
     deleteCustomPin: () -> Unit,
@@ -48,10 +48,11 @@ fun CustomPinDialog(
                 Text(
                     text =
                     if (isNewPin)
-                        if (isSquadMember) CUSTOM_NEW_PIN_DIALOG_SQUAD else CUSTOM_NEW_PIN_DIALOG_SOLO
+                        if (isSquadMember) CUSTOM_NEW_PIN_DIALOG_SQUAD
+                        else CUSTOM_NEW_PIN_DIALOG_SOLO
                     else
                         if (isSquadMember)
-                            CUSTOM_PIN_DIALOG_SQUAD_PLACED_BY + (placedBy ?: "")
+                            CUSTOM_PIN_DIALOG_SQUAD_PLACED_BY + (playerName ?: "")
                         else CUSTOM_PIN_DIALOG_SOLO_PLACED_BY,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,

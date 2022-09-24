@@ -6,6 +6,7 @@ import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FireStoreConstants
+import mosis.streetsandtotems.core.FireStoreConstants.CUSTOM_PINS_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.EASY_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVENTORY
 import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVITEE_ID
@@ -25,6 +26,7 @@ import mosis.streetsandtotems.core.FireStoreConstants.PROFILE_DATA_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.RIDDLE_COUNT_VALUE
 import mosis.streetsandtotems.core.FireStoreConstants.SQUADS_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.SQUAD_INVITES_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.USER_NAME_FIELD
 import mosis.streetsandtotems.core.PointsConversion.MAX_SQUAD_MEMBERS_COUNT
 import mosis.streetsandtotems.core.PointsConversion.SQUAD_MEMBERS_POINTS_COEFFICIENT
 import mosis.streetsandtotems.feature_map.domain.model.*
@@ -37,12 +39,17 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         placed_by: String,
         text: String,
     ) {
-        db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION).add(
+        val playerName =
+            db.collection(PROFILE_DATA_COLLECTION).document(placed_by).get().await()
+                .getString(USER_NAME_FIELD)
+
+        db.collection(CUSTOM_PINS_COLLECTION).add(
             mapOf(
                 L to l,
                 "text" to text,
                 "placed_by" to placed_by,
                 "visible_to" to visible_to,
+                "player_name" to playerName,
             )
         ).await()
     }
@@ -55,7 +62,12 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     ) {
         val data: MutableMap<String, Any> = mutableMapOf()
         if (visible_to != null) data["placed_by"] = placed_by as Any
-        if (placed_by != null) data["placed_by"] = placed_by as Any
+        if (placed_by != null) {
+            data["placed_by"] = placed_by as Any
+            data["player_name"] =
+                db.collection(PROFILE_DATA_COLLECTION).document(placed_by).get().await()
+                    .getString(USER_NAME_FIELD) as Any
+        }
         if (text != null) data["text"] = text as Any
 
         if (data.isNotEmpty()) db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION).document(id)
@@ -211,11 +223,11 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         )
     }
 
-    private fun createSquad(
+    private fun createSquadAndReturnSquadId(
         transaction: Transaction,
         inviterId: String,
         inviteeId: String
-    ) {
+    ): String {
         val newSquadId = db.collection(SQUADS_COLLECTION).document().id
         transaction.set(
             db.collection(SQUADS_COLLECTION).document(newSquadId),
@@ -232,6 +244,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             FIELD_SQUAD_ID,
             newSquadId
         )
+        return newSquadId
     }
 
     //check da l je user vec u squad i da l sam ga vec pozvao
@@ -292,28 +305,65 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                 }
 
                 transaction.update(docRefProfile, FIELD_SQUAD_ID, "")
-
             }
         }.await()
+        handleMyPinsOnSquadRemove(userId)
+    }
+
+    private suspend fun handleMyPinsOnSquadJoin(
+        userId: String,
+        squadId: String
+    ) {
+        val myPins = db.collection(CUSTOM_PINS_COLLECTION).whereEqualTo("placed_by", userId).get()
+            .await().documents.toList()
+        for (pinSnapshot in myPins) {
+            val pinId = pinSnapshot.id
+            db.collection(CUSTOM_PINS_COLLECTION).document(pinId).update(
+                "visible_to",
+                squadId,
+            )
+        }
+    }
+
+    private suspend fun handleMyPinsOnSquadRemove(userId: String) {
+        val myPins = db.collection(CUSTOM_PINS_COLLECTION).whereEqualTo("placed_by", userId).get()
+            .await().documents.toList()
+        for (pinSnapshot in myPins) {
+            val pinId = pinSnapshot.id
+            db.collection(CUSTOM_PINS_COLLECTION).document(pinId).update(
+                "visible_to",
+                ""
+            )
+        }
     }
 
     suspend fun acceptInviteToSquad(inviterId: String, inviteeId: String) {
+        var squadId: String? = null
+        var inviterSquadId: String? = null
         getInviteIdOrNull(inviterId, inviteeId)?.let { docId ->
             db.runTransaction {
 
-                val inviterSquadId = it.get(
+                inviterSquadId = it.get(
                     db.collection(PROFILE_DATA_COLLECTION).document(inviterId)
                 ).getString(FIELD_SQUAD_ID)
 
                 if (inviterSquadId == null || inviterSquadId == "") {
-                    createSquad(it, inviterId, inviteeId)
+                    squadId = createSquadAndReturnSquadId(it, inviterId, inviteeId)
+
                 } else {
-                    addUserToSquadAndUpdateUser(it, inviterSquadId, inviteeId)
+                    addUserToSquadAndUpdateUser(it, inviterSquadId!!, inviteeId)
                 }
 
                 it.delete(db.collection(SQUAD_INVITES_COLLECTION).document(docId))
 
             }.await()
+            if (inviterSquadId == null && squadId != null) {
+                handleMyPinsOnSquadJoin(inviteeId, squadId!!)
+                handleMyPinsOnSquadJoin(inviterId, squadId!!)
+            } else {
+                handleMyPinsOnSquadJoin(inviteeId, inviterSquadId!!)
+            }
+
         }
     }
 
@@ -460,7 +510,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         removeFromSquad(myId)
         reevaluateVoteAfterKick(myId, squadId)
     }
-    
+
 //endregion
 }
 
