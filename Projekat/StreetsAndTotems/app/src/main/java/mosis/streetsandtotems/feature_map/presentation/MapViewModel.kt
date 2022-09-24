@@ -1,8 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
-import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.SnackbarDuration
@@ -17,7 +15,6 @@ import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.R
@@ -52,7 +49,6 @@ import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
 import mosis.streetsandtotems.feature_map.presentation.util.*
 import mosis.streetsandtotems.services.LocationService
-import mosis.streetsandtotems.services.LocationServiceControlEvents
 import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
@@ -163,8 +159,29 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.ShowVoteDialog -> showVoteHandler()
             MapViewModelEvents.KickAnswerNoInvite -> kickAnswerHandler(false)
             MapViewModelEvents.KickAnswerYesInvite -> kickAnswerHandler(true)
+            MapViewModelEvents.HideSearchDialog -> onHideSearchDialogHandler()
+            MapViewModelEvents.ShowSearchDialog -> onShowSearchDialogHandler()
+            is MapViewModelEvents.SearchResources -> onSearchResourcesHandler()
+            is MapViewModelEvents.SearchUsers -> onSearchUsersHandler(event.username, event.radius)
         }
     }
+
+    private fun onSearchUsersHandler(username: String, distance: Double) {
+
+    }
+
+    private fun onSearchResourcesHandler() {
+
+    }
+
+    private fun onHideSearchDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(searchDialogOpen = false)
+    }
+
+    private fun onShowSearchDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(searchDialogOpen = true)
+    }
+
 
     private fun getInitMapState(lastKnownLocation: GeoPoint?): MutableState<MapScreenState> {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
@@ -237,6 +254,7 @@ class MapViewModel @Inject constructor(
             interactionUserName = "",
             interactionUserId = "",
             voteDialogOpen = false,
+            searchDialogOpen = false,
         )
         )
     }
@@ -302,8 +320,7 @@ class MapViewModel @Inject constructor(
             is LocationServiceMapScreenEvents.SquadInvite -> {
                 _mapScreenState.value = _mapScreenState.value.copy(
                     interactionUserId = event.squadInvite.inviter_id ?: "",
-                    interactionUserName =
-                    mapScreenState.value.playersHashMap[event.squadInvite.inviter_id]?.user_name
+                    interactionUserName = mapScreenState.value.playersHashMap[event.squadInvite.inviter_id]?.user_name
                         ?: ""
                 )
                 showInviteToSquadHandler()
@@ -361,8 +378,7 @@ class MapViewModel @Inject constructor(
                         playersHashMap[it] = dataType
                         composable = {
                             CustomPinImage(
-                                mapScreenState.value.mySquadId,
-                                playersHashMap[it]!!
+                                mapScreenState.value.mySquadId, playersHashMap[it]
                             )
                         }
                     }
@@ -471,8 +487,7 @@ class MapViewModel @Inject constructor(
 
 
     private fun registerOnMapStateChangeListener() {
-        var pinLocation =
-            mapScreenState.value.playerLocation
+        var pinLocation = mapScreenState.value.playerLocation
         var scale = _mapState.scale
 
         viewModelScope.launch {
@@ -836,8 +851,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun showVoteHandler() {
-        _mapScreenState.value =
-            _mapScreenState.value.copy(voteDialogOpen = true)
+        _mapScreenState.value = _mapScreenState.value.copy(voteDialogOpen = true)
     }
 
     private fun closeVoteHandler() {
@@ -1031,19 +1045,17 @@ class MapViewModel @Inject constructor(
 
     private fun declineSquadInviteHandler() {
         _mapScreenState.value.interactionUserId.let {
-            if (it != "")
-                viewModelScope.launch {
-                    mapViewModelRepository.declineInviteToSquad(it)
-                }
+            if (it != "") viewModelScope.launch {
+                mapViewModelRepository.declineInviteToSquad(it)
+            }
         }
     }
 
     private fun acceptSquadInviteHandler() {
         _mapScreenState.value.interactionUserId.let {
-            if (it != "")
-                viewModelScope.launch {
-                    mapViewModelRepository.acceptInviteToSquad(it)
-                }
+            if (it != "") viewModelScope.launch {
+                mapViewModelRepository.acceptInviteToSquad(it)
+            }
         }
     }
 
@@ -1066,10 +1078,9 @@ class MapViewModel @Inject constructor(
 
     private fun kickAnswerHandler(kick: Boolean) {
         _mapScreenState.value.interactionUserId.let {
-            if (it != "")
-                viewModelScope.launch {
-                    mapViewModelRepository.kickVote(it, if (kick) Vote.Yes else Vote.No)
-                }
+            if (it != "") viewModelScope.launch {
+                mapViewModelRepository.kickVote(it, if (kick) Vote.Yes else Vote.No)
+            }
         }
     }
 }

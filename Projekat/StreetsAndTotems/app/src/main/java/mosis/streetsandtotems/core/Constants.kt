@@ -94,7 +94,17 @@ object ConversionConstants {
     const val BASE64_IMAGE_PREFIX = "data:image/png;base64,"
 }
 
+object SearchConstants {
+    const val USERS = "Players"
+    const val RESOURCES = "Resources"
+    val selectList = listOf(
+        ItemsConstants.BRICK, ItemsConstants.WOOD, ItemsConstants.EMERALD, ItemsConstants.STONE
+    )
+    const val DISTANCE = "Search radius in km"
+}
+
 object ButtonConstants {
+    const val SEARCH = "Search"
     const val RECOVERY_EMAIL = "Send recovery email"
     const val RESEND_EMAIL = "Send new verification email"
     const val GO_TO_SIGN_IN = "Go to sign in screen"
@@ -285,6 +295,7 @@ object MessageConstants {
 }
 
 object TitleConstants {
+    const val SEARCH = "Search"
     const val PASSWORD_RESET = "Reset password"
     const val EMAIL_VERIFICATION = "Email verification"
     const val SIGN_UP = "Sign up"

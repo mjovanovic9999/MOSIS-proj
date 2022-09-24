@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,6 +22,7 @@ fun MapFABs(
     locateMe: () -> Unit,
     followMe: Boolean,
     showFilterDialog: () -> Unit,
+    showSearchDialog: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         CustomFAB(
@@ -29,31 +32,37 @@ fun MapFABs(
                 .padding(MaterialTheme.sizes.fab_padding)
                 .align(Alignment.TopStart)
         )
-        CustomFAB(
-            imageVector = ImageVector.vectorResource(id = R.drawable.layers),
-            onClick = {
-                showFilterDialog()
-            },
-            modifier = Modifier
-                .padding(MaterialTheme.sizes.fab_padding)
-                .align(Alignment.TopEnd)
-        )
         Column(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
+            modifier = Modifier.align(Alignment.TopEnd)
         ) {
-            if (!followMe) {
-                CustomFAB(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.locate_me),
-                    onClick = { locateMe() },
-                    modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
-                )
-            } else {
-                CustomFAB(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.located_me),
-                    modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
-                )
-            }
+            CustomFAB(
+                imageVector = ImageVector.vectorResource(id = R.drawable.layers), onClick = {
+                    showFilterDialog()
+                }, modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
+            )
+
+            CustomFAB(
+                imageVector = Icons.Outlined.Search,
+                modifier = Modifier.padding(MaterialTheme.sizes.fab_padding),
+                onClick = showSearchDialog
+            )
         }
+        if (!followMe) {
+            CustomFAB(
+                imageVector = ImageVector.vectorResource(id = R.drawable.locate_me),
+                onClick = { locateMe() },
+                modifier = Modifier
+                    .padding(MaterialTheme.sizes.fab_padding)
+                    .align(Alignment.BottomEnd)
+            )
+        } else {
+            CustomFAB(
+                imageVector = ImageVector.vectorResource(id = R.drawable.located_me),
+                modifier = Modifier
+                    .padding(MaterialTheme.sizes.fab_padding)
+                    .align(Alignment.BottomEnd)
+            )
+        }
+
     }
 }

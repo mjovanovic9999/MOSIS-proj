@@ -43,7 +43,6 @@ class MapServiceRepositoryImpl(
         kickVoteEndedCallback: (kickVote: KickVoteData) -> Unit
     ) {
         val squadId = preferencesDataStore.getUserSquadId()
-        Log.d("tagic", "hjhhjh"+squadId)
 
         if (squadId != "") auth.currentUser?.let {
             onKickVoteListenerRegistration =

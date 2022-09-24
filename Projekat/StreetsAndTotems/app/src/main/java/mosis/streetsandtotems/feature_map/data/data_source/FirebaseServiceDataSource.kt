@@ -12,9 +12,6 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
     private val userGeoFirestore =
         GeoFirestore(db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION))
 
-    private val userGeoQuery =
-        GeoFirestore(db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION))
-
     fun updateUserLocation(user: FirebaseUser, newLocation: GeoPoint) {
         userGeoFirestore.setLocation(user.uid, newLocation)
     }
@@ -30,11 +27,7 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
             .whereNotEqualTo(FireStoreConstants.FIELD_USER_ID, currentUser.uid)
             .addSnapshotListener { snapshots, e ->
                 collectionSnapshotListenerCallback(
-                    e,
-                    snapshots,
-                    kickVoteStartedCallback,
-                    { Log.d("tagic", it.toString()) },
-                    kickVoteEndedCallback
+                    e, snapshots, kickVoteStartedCallback, null, kickVoteEndedCallback
                 )
             }
     }

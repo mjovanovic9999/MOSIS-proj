@@ -1,9 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
 
-import mosis.streetsandtotems.feature_map.domain.model.InventoryData
-import mosis.streetsandtotems.feature_map.domain.model.MarketItem
-import mosis.streetsandtotems.feature_map.domain.model.TotemData
-import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
+import mosis.streetsandtotems.feature_map.domain.model.*
 
 sealed class MapViewModelEvents {
     object ShowFilterDialog : MapViewModelEvents()
@@ -52,4 +49,8 @@ sealed class MapViewModelEvents {
     object CloseVoteDialog : MapViewModelEvents()
     object KickAnswerYesInvite : MapViewModelEvents()
     object KickAnswerNoInvite : MapViewModelEvents()
+    object ShowSearchDialog : MapViewModelEvents()
+    object HideSearchDialog : MapViewModelEvents()
+    data class SearchUsers(val username: String, val radius: Double) : MapViewModelEvents()
+    data class SearchResources(val type: ResourceType, val radius: Double) : MapViewModelEvents()
 }
