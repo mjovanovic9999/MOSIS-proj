@@ -8,4 +8,5 @@ data class CustomPinData(
     val visible_to: String? = null,
     val placed_by: String? = null,
     val text: String? = null,
+    val player_name: String? = null,
 ) : Data

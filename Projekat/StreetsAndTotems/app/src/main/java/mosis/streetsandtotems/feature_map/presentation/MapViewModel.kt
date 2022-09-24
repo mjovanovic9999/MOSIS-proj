@@ -1,6 +1,7 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.SnackbarDuration
@@ -79,8 +80,8 @@ class MapViewModel @Inject constructor(
     private val filterMarket = MutableStateFlow(false)
     private val resourcesHashMap = mutableMapOf<String, ResourceData>()
     private val playersHashMap = mutableStateMapOf<String, ProfileData>()
-    private val totemsHashMap = mutableMapOf<String, TotemData>()
-    private val customPinsHashMap = mutableMapOf<String, CustomPinData>()
+    private val totemsHashMap = mutableStateMapOf<String, TotemData>()
+    private val customPinsHashMap = mutableStateMapOf<String, CustomPinData>()
 
     val mapScreenState: State<MapScreenState>
 
@@ -227,7 +228,9 @@ class MapViewModel @Inject constructor(
                 id = null,
                 l = GeoPoint(0.0, 0.0),
                 text = mutableStateOf(""),
-                placedBy = null
+                placedBy = null,
+                visible_to = null,
+                player_name = null,
             ),
             playerDialogOpen = false,
             filterDialogOpen = false,
@@ -374,7 +377,14 @@ class MapViewModel @Inject constructor(
                 }
                 is CustomPinData -> {
                     customPinsHashMap[it] = dataType
-                    composable = { CustomPin(resourceId = R.drawable.pin_custom) }
+                    if (mapScreenState.value.myId == dataType.placed_by
+                        || isSquadMember(
+                            mapScreenState.value.mySquadId,
+                            dataType.visible_to
+                        )
+                    ) {
+                        composable = { CustomPin(resourceId = R.drawable.pin_custom) }
+                    }
                 }
                 is ResourceData -> {
                     resourcesHashMap[it] = dataType
@@ -400,11 +410,14 @@ class MapViewModel @Inject constructor(
                 is ProfileData -> {
                     if (dataType.is_online == true) {
                         playersHashMap[it] = dataType
-                        composable = {
-                            CustomPinImage(
-                                mapScreenState.value.mySquadId, playersHashMap[it]!!
-                            )
-                        }
+                        if (playersHashMap[it] != null)
+                            composable = {
+                                playersHashMap[it]?.let { it1 ->
+                                    CustomPinImage(
+                                        mapScreenState.value.mySquadId, it1
+                                    )
+                                }
+                            }
                     }
                 }
                 is MarketData -> {
@@ -440,7 +453,13 @@ class MapViewModel @Inject constructor(
                     _mapScreenState.value = _mapScreenState.value.copy(home = dataType)
                 }
                 is CustomPinData -> {
-                    oldData = customPinsHashMap.put(it, dataType)
+                    if (mapScreenState.value.myId == dataType.placed_by ||
+                        isSquadMember(mapScreenState.value.myId, dataType.visible_to)
+                    ) {
+                        if (customPinsHashMap.containsKey(it)) {
+                            oldData = customPinsHashMap.put(it, dataType)
+                        } else addPinHash(dataType)
+                    } else removePinHash(dataType)
                 }
                 is ResourceData -> {
                     oldData = resourcesHashMap.put(it, dataType)
@@ -452,10 +471,6 @@ class MapViewModel @Inject constructor(
                     if (dataType.is_online == true) {
                         if (playersHashMap.containsKey(it)) {
                             oldData = playersHashMap.put(it, dataType)
-//                            if((oldData as ProfileData).squad_id!=dataType.squad_id)
-//                            {//mzd brisanje starog pina
-//                                addPinHash(dataType)
-//                            }
                         } else addPinHash(dataType)
                     } else removePinHash(dataType)
 
@@ -735,7 +750,9 @@ class MapViewModel @Inject constructor(
                     l = customPin.l,
                     id = customPin.id,
                     placedBy = customPin.placed_by,
-                    customPin.text
+                    text = customPin.text,
+                    visibleTo = customPin.visible_to,
+                    player_name = customPin.player_name
                 )
             } else if (mapScreenState.value.market.id == id) {
                 showMarketDialogHandler()
@@ -751,7 +768,9 @@ class MapViewModel @Inject constructor(
                 showCustomPinDialogHandler(
                     convertOffsetsToGeoPoint(
                         x, y, mapDimensions, mapDimensions
-                    )
+                    ),
+//                    placedBy = mapScreenState.value.myId,
+                    visibleTo = mapScreenState.value.mySquadId,
                 )
             }
         }
@@ -760,7 +779,12 @@ class MapViewModel @Inject constructor(
     //region handlers
 
     private fun showCustomPinDialogHandler(
-        l: GeoPoint?, id: String? = null, placedBy: String? = null, text: String? = null
+        l: GeoPoint?,
+        id: String? = null,
+        placedBy: String? = null,
+        text: String? = null,
+        visibleTo: String? = null,
+        player_name: String? = null,
     ) {
         _mapScreenState.value = _mapScreenState.value.copy(
             customPinDialog = _mapScreenState.value.customPinDialog.copy(
@@ -769,6 +793,8 @@ class MapViewModel @Inject constructor(
                 l = l!!,
                 placedBy = placedBy,
                 text = mutableStateOf(text ?: ""),
+                visible_to = visibleTo,
+                player_name = player_name,
             )
         )
     }
@@ -781,6 +807,8 @@ class MapViewModel @Inject constructor(
                 id = null,
                 text = mutableStateOf(""),
                 placedBy = null,
+                visible_to = null,
+                player_name = null,
             )
         )
     }

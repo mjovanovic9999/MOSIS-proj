@@ -97,6 +97,10 @@ fun BackpackScreen(backpackViewModel: BackpackViewModel) {
                 )
             )
         },
+        isDropEnabled = false,
+//        takeAmount.value != ""
+//                && takeAmount.value.toInt() > 0
+//                && backpackItemCount >= takeAmount.value.toInt()
     )
 
 }

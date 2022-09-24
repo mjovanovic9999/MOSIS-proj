@@ -66,4 +66,6 @@ data class SelectedCustomPinDialog(
     val placedBy: String?,
     val l: GeoPoint,
     val text: MutableState<String>,
+    val visible_to: String?,
+    val player_name: String?,
 )

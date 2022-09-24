@@ -43,11 +43,12 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseCustomPinDialog) },
         dialogText = state.customPinDialog.text,
         isNewPin = state.customPinDialog.id == null,
-        isSquadMember = true,////////////////////////////squad_id!=null
-        placedBy = state.customPinDialog.placedBy,
+        isSquadMember = isSquadMember(state.mySquadId, state.customPinDialog.visible_to),
+        playerName = state.customPinDialog.player_name,
         addCustomPinFB = { mapViewModel.onEvent(MapViewModelEvents.AddCustomPin) },
         updateCustomPin = { mapViewModel.onEvent(MapViewModelEvents.UpdateCustomPin) },
-        deleteCustomPin = { mapViewModel.onEvent(MapViewModelEvents.RemoveCustomPin) })
+        deleteCustomPin = { mapViewModel.onEvent(MapViewModelEvents.RemoveCustomPin) },
+    )
 
     PlayerDialog(
 //fale fje za interakciju trade i to

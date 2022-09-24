@@ -26,6 +26,7 @@ fun DropItemDialog(
     state: DropItemDialogState, onDismissRequest: () -> Unit,
     onDrop: () -> Unit,
     onPlaceTotem: (() -> Unit)? = null,
+    isDropEnabled: Boolean,
 ) {
     val dropAmount = remember { mutableStateOf(FormFieldConstants.DEFAULT_AMOUNT) }
 
@@ -53,7 +54,7 @@ fun DropItemDialog(
                     text = ButtonConstants.DROP,
                     buttonType = CustomButtonType.Outlined,
                     textStyle = MaterialTheme.typography.titleMedium,
-                    enabled = dropAmount.value != ""
+                    enabled = isDropEnabled && dropAmount.value != ""
                 )
                 CustomTextField(
                     modifier = Modifier
