@@ -61,7 +61,7 @@ fun PlayerDialog(
                             .align(Alignment.CenterStart),
                     ) {
                         Text(
-                            text = (firstName ?: " ").first() + "" + (lastName ?: " ").first(),
+                            text = (firstName ?: " ").first() + " " + (lastName ?: " ").first(),
                             modifier = Modifier.align(Alignment.Center),
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )

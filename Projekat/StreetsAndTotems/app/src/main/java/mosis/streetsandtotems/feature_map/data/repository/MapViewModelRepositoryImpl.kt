@@ -71,6 +71,7 @@ class MapViewModelRepositoryImpl(
         firebaseMapDataSource.updateHome(homeId, l = l)
     }
 
+
     override suspend fun updateTotem(totemId: String, newTotem: TotemData) {
         firebaseMapDataSource.updateTotem(totemId, newTotem)
     }

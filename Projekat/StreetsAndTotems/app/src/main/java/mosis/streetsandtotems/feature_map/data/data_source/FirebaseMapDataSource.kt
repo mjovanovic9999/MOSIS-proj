@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
-import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -389,12 +388,9 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
         val squadNumNull = db.collection(SQUADS_COLLECTION).document(squadId).get().await()
 
-        Log.d("taggg", "reevalll")
-
         val users = squadNumNull.get(FIELD_USERS)
         if (users != null) {
             val squadNum = (users as List<*>).size
-            Log.d("taggg", squadNum.toString())
             for (itemDoc in kicksList) {
                 val item = itemDoc.toObject(KickVoteData::class.java)
                 if (item != null) {
@@ -436,8 +432,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         removeFromSquad(myId)
         reevaluateVoteAfterKick(myId, squadId)
     }
-
-
+    
 //endregion
 
     private val userGeoFirestore = GeoFirestore(db.collection(PROFILE_DATA_COLLECTION))

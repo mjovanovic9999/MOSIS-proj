@@ -16,79 +16,87 @@ import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGrap
 import mosis.streetsandtotems.feature_backpack.presentation.components.DropItemDialog
 import mosis.streetsandtotems.feature_backpack.presentation.components.FABWithBadge
 import mosis.streetsandtotems.feature_backpack.presentation.components.ItemRow
+import mosis.streetsandtotems.feature_map.domain.model.ResourceType
 import mosis.streetsandtotems.ui.theme.sizes
 
 @MainNavGraph
 @Destination
 @Composable
-fun BackpackScreen(viewModel: BackpackViewModel) {
-    CustomPage(
-        titleText = TitleConstants.BACKPACK,
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(MaterialTheme.sizes.default_aspect_ratio),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                ItemRow(
-                    firstItemImageVector = ImageVector.vectorResource(id = R.drawable.emerald),
-                    secondItemImageVector = ImageVector.vectorResource(id = R.drawable.wood),
-                    onFirstItemClick = {
-                        viewModel.openDropItemDialog(
-                            5,
-                            IconType.ResourceType.Emerald
-                        )
-                    },
-                    onSecondItemClick = {
-                        viewModel.openDropItemDialog(
-                            5,
-                            IconType.ResourceType.Wood
-                        )
-                    },
-                    firstItemBadgeText = "5",
-                    secondItemBadgeText = "10",
-                    firstItemContentDescription = ImageContentDescriptionConstants.EMERALD,
-                    secondItemContentDescription = ImageContentDescriptionConstants.WOOD
-                )
-                ItemRow(
-                    firstItemImageVector = ImageVector.vectorResource(id = R.drawable.stone),
-                    secondItemImageVector = ImageVector.vectorResource(id = R.drawable.brick),
-                    onFirstItemClick = {
-                        viewModel.openDropItemDialog(
-                            5,
-                            IconType.ResourceType.Stone
-                        )
-                    },
-                    onSecondItemClick = {
-                        viewModel.openDropItemDialog(
-                            5,
-                            IconType.ResourceType.Brick
-                        )
-                    },
-                    firstItemBadgeText = "5",
-                    secondItemBadgeText = "10",
-                    firstItemContentDescription = ImageContentDescriptionConstants.STONE,
-                    secondItemContentDescription = ImageContentDescriptionConstants.BRICKS
-                )
-            }
-            FABWithBadge(
-                modifier = Modifier.fillMaxWidth(MaterialTheme.sizes.backpack_totem_fab_weight),
-                fabImageVector = ImageVector.vectorResource(id = R.drawable.tiki),
-                onFabClick = { viewModel.openDropItemDialog(5, dropTotem = true) },
-                fabShowAsImage = true,
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                maxBadgeWidth = MaterialTheme.sizes.backpack_tiki_badge_size,
-                badgeText = "3",
-                iconModifier = Modifier.fillMaxSize(),
-                contentDescription = ImageContentDescriptionConstants.TOTEM
+fun BackpackScreen(backpackViewModel: BackpackViewModel) {
+    val state = backpackViewModel.backpackScreenState.value
+
+    CustomPage(titleText = TitleConstants.BACKPACK, content = {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(MaterialTheme.sizes.default_aspect_ratio),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            ItemRow(
+                firstItemImageVector = ImageVector.vectorResource(id = R.drawable.emerald),
+                secondItemImageVector = ImageVector.vectorResource(id = R.drawable.wood),
+                onFirstItemClick = {
+                    backpackViewModel.openDropItemDialog(
+                        state.useInventoryData.inventory?.emerald ?: 0,
+                        IconType.ResourceType.Emerald
+                    )
+                },
+                onSecondItemClick = {
+                    backpackViewModel.openDropItemDialog(
+                        state.useInventoryData.inventory?.wood ?: 0, IconType.ResourceType.Wood
+                    )
+                },
+                firstItemBadgeText = (state.useInventoryData.inventory?.emerald ?: 0).toString(),
+                secondItemBadgeText = (state.useInventoryData.inventory?.wood ?: 0).toString(),
+                firstItemContentDescription = ImageContentDescriptionConstants.EMERALD,
+                secondItemContentDescription = ImageContentDescriptionConstants.WOOD
             )
-        })
+            ItemRow(
+                firstItemImageVector = ImageVector.vectorResource(id = R.drawable.stone),
+                secondItemImageVector = ImageVector.vectorResource(id = R.drawable.brick),
+                onFirstItemClick = {
+                    backpackViewModel.openDropItemDialog(
+                        state.useInventoryData.inventory?.stone ?: 0, IconType.ResourceType.Stone
+                    )
+                },
+                onSecondItemClick = {
+                    backpackViewModel.openDropItemDialog(
+                        state.useInventoryData.inventory?.brick ?: 0, IconType.ResourceType.Brick
+                    )
+                },
+                firstItemBadgeText = (state.useInventoryData.inventory?.stone ?: 0).toString(),
+                secondItemBadgeText = (state.useInventoryData.inventory?.brick ?: 0).toString(),
+                firstItemContentDescription = ImageContentDescriptionConstants.STONE,
+                secondItemContentDescription = ImageContentDescriptionConstants.BRICKS
+            )
+        }
+        FABWithBadge(
+            modifier = Modifier.fillMaxWidth(MaterialTheme.sizes.backpack_totem_fab_weight),
+            fabImageVector = ImageVector.vectorResource(id = R.drawable.tiki),
+            onFabClick = {
+                backpackViewModel.openDropItemDialog(
+                    state.useInventoryData.inventory?.totem ?: 0, dropTotem = true
+                )
+            },
+            fabShowAsImage = true,
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            maxBadgeWidth = MaterialTheme.sizes.backpack_tiki_badge_size,
+            badgeText = (state.useInventoryData.inventory?.totem ?: 0).toString(),
+            iconModifier = Modifier.fillMaxSize(),
+            contentDescription = ImageContentDescriptionConstants.TOTEM
+        )
+    })
 
     DropItemDialog(
-        state = viewModel.dropItemDialogOpen.value,
-        onDismissRequest = { viewModel.closeDropItemDialog() },
-        onDrop = {},
+        state = state.dropItemDialogState,
+        onDismissRequest = { backpackViewModel.closeDropItemDialog() },
+        onDrop = {
+            backpackViewModel.onEvent(
+                BackpackViewModelEvents.DropResource(
+                    1, ResourceType.Brick
+                )
+            )
+        },
     )
 
 }

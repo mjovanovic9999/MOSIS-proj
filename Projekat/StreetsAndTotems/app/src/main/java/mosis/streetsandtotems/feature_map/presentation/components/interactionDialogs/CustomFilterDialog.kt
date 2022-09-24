@@ -8,9 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 import mosis.streetsandtotems.core.ButtonConstants
-import mosis.streetsandtotems.core.PinConstants.FRIENDS
+import mosis.streetsandtotems.core.PinConstants.MARKET
+import mosis.streetsandtotems.core.PinConstants.PINS
+import mosis.streetsandtotems.core.PinConstants.PLAYERS
 import mosis.streetsandtotems.core.PinConstants.RESOURCES
 import mosis.streetsandtotems.core.PinConstants.TOTEMS
+import mosis.streetsandtotems.core.PinConstants.VISIBLE_PINS
 import mosis.streetsandtotems.core.presentation.components.CustomDialog
 import mosis.streetsandtotems.feature_map.presentation.components.CustomFilterChip
 
@@ -22,15 +25,19 @@ fun CustomFilterDialog(
     updateFilterResources: () -> Unit,
     updateFilterPlayers: () -> Unit,
     updateFilterTotems: () -> Unit,
+    updateFilterCustomPins: () -> Unit,
+    updateFilterMarket: () -> Unit,
     filterResourceState: Boolean,
     filterFriendsState: Boolean,
     filterTotemsState: Boolean,
+    filterCustomPinsState: Boolean,
+    filterMarketState: Boolean,
 ) {
     CustomDialog(
         modifier = Modifier.fillMaxWidth(),
         isOpen = isOpen,
         title = {
-            Text("Visible pins")
+            Text(VISIBLE_PINS)
         },
         text = {
             LazyRow(
@@ -47,7 +54,7 @@ fun CustomFilterDialog(
                     CustomFilterChip(
                         !filterFriendsState,
                         { updateFilterPlayers() },
-                        FRIENDS
+                        PLAYERS
                     )
                 }
                 item {
@@ -55,6 +62,20 @@ fun CustomFilterDialog(
                         !filterTotemsState,
                         { updateFilterTotems() },
                         TOTEMS
+                    )
+                }
+                item {
+                    CustomFilterChip(
+                        !filterCustomPinsState,
+                        { updateFilterCustomPins() },
+                        PINS
+                    )
+                }
+                item {
+                    CustomFilterChip(
+                        !filterMarketState,
+                        { updateFilterMarket() },
+                        MARKET
                     )
                 }
             }
