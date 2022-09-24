@@ -178,15 +178,14 @@ object PinConstants {
     const val MY_PIN = "MY_PIN"
     const val MY_PIN_Z_INDEX = 0.5f
 
-    const val MARKET = "MARKET"
     const val HOME = "HOME"
-    const val HOME_DISCOVERY = "HOME_DISCOVERY"
     const val RESOURCES = "RESOURCES"
-    const val FRIENDS = "FRIENDS"
+    const val PLAYERS = "PLAYERS"
     const val TOTEMS = "TOTEMS"
-    const val CUSTOM = "CUSTOM"
-    const val OTHER_PLAYER = "OTHER_PLAYER"
-    const val OTHER_HOME = "OTHER_HOME"
+    const val PINS = "PINS"
+    const val MARKET = "MARKET"
+
+    const val VISIBLE_PINS = "Visible pins"
 
 
 }

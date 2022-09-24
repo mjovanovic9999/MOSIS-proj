@@ -11,6 +11,7 @@ import com.google.firebase.storage.ktx.storage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.scopes.ServiceScoped
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
@@ -22,6 +23,7 @@ import mosis.streetsandtotems.core.domain.repository.UserOnlineStatusRepository
 import mosis.streetsandtotems.core.domain.use_case.*
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.di.util.SharedFlowWrapper
+import mosis.streetsandtotems.services.LocationServiceCommonEvents
 import mosis.streetsandtotems.services.LocationServiceControlEvents
 import mosis.streetsandtotems.services.LocationServiceMainScreenEvents
 import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
@@ -129,4 +131,14 @@ object AppSingletonModule {
     @Singleton
     fun provideLocationServiceMainScreenEventsFlow(locationServiceMainScreenEventsMutableFlow: MutableSharedFlow<LocationServiceMainScreenEvents>): SharedFlowWrapper<LocationServiceMainScreenEvents> =
         SharedFlowWrapper(locationServiceMainScreenEventsMutableFlow)
+
+    @Provides
+    @Singleton
+    fun provideLocationServiceCommonEventsMutableFlow(): MutableSharedFlow<LocationServiceCommonEvents> =
+        MutableSharedFlow(replay = 1)
+
+    @Provides
+    @Singleton
+    fun provideLocationServiceCommonEventsFlow(locationServiceCommonEventsMutableFlow: MutableSharedFlow<LocationServiceCommonEvents>): SharedFlowWrapper<LocationServiceCommonEvents> =
+        SharedFlowWrapper(locationServiceCommonEventsMutableFlow)
 }

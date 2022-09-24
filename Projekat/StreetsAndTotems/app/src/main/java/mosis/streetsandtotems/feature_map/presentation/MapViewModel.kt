@@ -1,8 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
-import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.SnackbarDuration
@@ -17,7 +15,6 @@ import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.R
@@ -52,7 +49,7 @@ import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
 import mosis.streetsandtotems.feature_map.presentation.util.*
 import mosis.streetsandtotems.services.LocationService
-import mosis.streetsandtotems.services.LocationServiceControlEvents
+import mosis.streetsandtotems.services.LocationServiceCommonEvents
 import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
@@ -68,6 +65,7 @@ class MapViewModel @Inject constructor(
     private val appContext: Application,
     private val mapViewModelRepository: MapViewModelRepository,
     private val locationServiceMapScreenEvents: SharedFlowWrapper<LocationServiceMapScreenEvents>,
+    private val locationServiceCommonEvents: SharedFlowWrapper<LocationServiceCommonEvents>,
     private val showLoader: MutableStateFlow<Boolean>,
     private val preferenceUseCases: PreferenceUseCases,
     private val snackbarSettingsFlow: MutableStateFlow<SnackbarSettings?>,
@@ -77,6 +75,8 @@ class MapViewModel @Inject constructor(
     private val filterPlayers = MutableStateFlow(false)
     private val filterTotems = MutableStateFlow(false)
     private val filterResources = MutableStateFlow(false)
+    private val filterCustomPins = MutableStateFlow(false)
+    private val filterMarket = MutableStateFlow(false)
     private val resourcesHashMap = mutableMapOf<String, ResourceData>()
     private val playersHashMap = mutableStateMapOf<String, ProfileData>()
     private val totemsHashMap = mutableMapOf<String, TotemData>()
@@ -112,6 +112,8 @@ class MapViewModel @Inject constructor(
 
         registerOnLocationService()
 
+        registerOnLocationServiceCommonEvents()
+
         registerGetMyIDs()
     }
 
@@ -128,8 +130,10 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.ClosePlayerDialog -> closePlayerDialogHandler()
             MapViewModelEvents.ResetFilters -> resetFiltersHandler()
             MapViewModelEvents.UpdateFilterFriends -> updateFilterFriendsHandler()
-            MapViewModelEvents.UpdateFilterResource -> updateFilterResourcesHandler()
+            MapViewModelEvents.UpdateFilterResources -> updateFilterResourcesHandler()
             MapViewModelEvents.UpdateFilterTotems -> updateFilterTotemsHandler()
+            MapViewModelEvents.UpdateFilterMarket -> updateFilterMarketHandler()
+            MapViewModelEvents.UpdateFilterCustomPins -> updateFilterCustomPinsHandler()
             MapViewModelEvents.AddHome -> addHomeHandler()
             MapViewModelEvents.RemoveHome -> removeHomeHandler()
             MapViewModelEvents.ShowResourceDialog -> showResourceDialogHandler()
@@ -211,6 +215,8 @@ class MapViewModel @Inject constructor(
             filterPlayers = filterPlayers.value,
             filterTotems = filterTotems.value,
             filterResources = filterResources.value,
+            filterCustomPins = filterCustomPins.value,
+            filterMarket = filterMarket.value,
             resourcesHashMap = resourcesHashMap,
             playersHashMap = playersHashMap,
             totemsHashMap = totemsHashMap,
@@ -249,6 +255,14 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    private fun registerOnLocationServiceCommonEvents() {
+        viewModelScope.launch {
+            locationServiceCommonEvents.flow.collect {
+                onLocationServiceCommonEvent(it)
+            }
+        }
+    }
+
     private fun registerGetMyIDs() {
         viewModelScope.launch {
             _mapScreenState.value = _mapScreenState.value.copy(
@@ -259,6 +273,14 @@ class MapViewModel @Inject constructor(
                     mySquadId = it
                 )
             }
+        }
+    }
+
+    private fun onLocationServiceCommonEvent(event: LocationServiceCommonEvents) {
+        when (event) {
+            is LocationServiceCommonEvents.UserInventoryChanged -> onUserInventoryChangedHandler(
+                event.newInventory
+            )
         }
     }
 
@@ -281,9 +303,7 @@ class MapViewModel @Inject constructor(
 
             }
             is LocationServiceMapScreenEvents.PinDataChanged<*> -> handlePinAction(event.pinAction)
-            is LocationServiceMapScreenEvents.UserInventoryChanged -> onUserInventoryChangedHandler(
-                event.newInventory
-            )//treba li ovamo market home
+            //treba li ovamo market home
             is LocationServiceMapScreenEvents.KickVote -> {
                 when (event.kickAction.type) {
                     KickActionType.VoteStarted -> {
@@ -302,8 +322,7 @@ class MapViewModel @Inject constructor(
             is LocationServiceMapScreenEvents.SquadInvite -> {
                 _mapScreenState.value = _mapScreenState.value.copy(
                     interactionUserId = event.squadInvite.inviter_id ?: "",
-                    interactionUserName =
-                    mapScreenState.value.playersHashMap[event.squadInvite.inviter_id]?.user_name
+                    interactionUserName = mapScreenState.value.playersHashMap[event.squadInvite.inviter_id]?.user_name
                         ?: ""
                 )
                 showInviteToSquadHandler()
@@ -361,8 +380,7 @@ class MapViewModel @Inject constructor(
                         playersHashMap[it] = dataType
                         composable = {
                             CustomPinImage(
-                                mapScreenState.value.mySquadId,
-                                playersHashMap[it]!!
+                                mapScreenState.value.mySquadId, playersHashMap[it]!!
                             )
                         }
                     }
@@ -471,8 +489,7 @@ class MapViewModel @Inject constructor(
 
 
     private fun registerOnMapStateChangeListener() {
-        var pinLocation =
-            mapScreenState.value.playerLocation
+        var pinLocation = mapScreenState.value.playerLocation
         var scale = _mapState.scale
 
         viewModelScope.launch {
@@ -544,6 +561,27 @@ class MapViewModel @Inject constructor(
                         addPinHash(totem)
                     }
                 }
+            }
+        }
+        viewModelScope.launch {
+            filterCustomPins.collect { shouldFilter ->
+                mapScreenState.value.customPinsHashMap.values.forEach { pin ->
+                    if (shouldFilter) {
+                        pin.id?.let { removePin(it) }
+                    } else {
+                        addPinHash(pin)
+                    }
+                }
+            }
+        }
+        viewModelScope.launch {
+            filterMarket.collect { shouldFilter ->
+                if (shouldFilter) {
+                    mapScreenState.value.market.id?.let { removePin(it) }
+                } else {
+                    addPinHash(mapScreenState.value.market)
+                }
+
             }
         }
     }
@@ -770,7 +808,22 @@ class MapViewModel @Inject constructor(
             filterTotems.emit(!filterTotems.value)
             _mapScreenState.value =
                 _mapScreenState.value.copy(filterTotems = !_mapScreenState.value.filterTotems)
+        }
+    }
 
+    private fun updateFilterCustomPinsHandler() {
+        viewModelScope.launch {
+            filterCustomPins.emit(!filterCustomPins.value)
+            _mapScreenState.value =
+                _mapScreenState.value.copy(filterCustomPins = !_mapScreenState.value.filterCustomPins)
+        }
+    }
+
+    private fun updateFilterMarketHandler() {
+        viewModelScope.launch {
+            filterMarket.emit(!filterMarket.value)
+            _mapScreenState.value =
+                _mapScreenState.value.copy(filterMarket = !_mapScreenState.value.filterMarket)
         }
     }
 
@@ -779,10 +832,14 @@ class MapViewModel @Inject constructor(
             filterResources.emit(false)
             filterTotems.emit(false)
             filterPlayers.emit(false)
+            filterCustomPins.emit(false)
+            filterMarket.emit(false)
             _mapScreenState.value = _mapScreenState.value.copy(
                 filterResources = false,
                 filterPlayers = false,
                 filterTotems = false,
+                filterCustomPins = false,
+                filterMarket = false,
             )
         }
     }
@@ -836,8 +893,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun showVoteHandler() {
-        _mapScreenState.value =
-            _mapScreenState.value.copy(voteDialogOpen = true)
+        _mapScreenState.value = _mapScreenState.value.copy(voteDialogOpen = true)
     }
 
     private fun closeVoteHandler() {
@@ -1029,21 +1085,26 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    private fun sharePlayerTotemsWithSquad() {
+    }
+
+    private fun unShareTotemsWithSquad() {
+
+    }
+
     private fun declineSquadInviteHandler() {
         _mapScreenState.value.interactionUserId.let {
-            if (it != "")
-                viewModelScope.launch {
-                    mapViewModelRepository.declineInviteToSquad(it)
-                }
+            if (it != "") viewModelScope.launch {
+                mapViewModelRepository.declineInviteToSquad(it)
+            }
         }
     }
 
     private fun acceptSquadInviteHandler() {
         _mapScreenState.value.interactionUserId.let {
-            if (it != "")
-                viewModelScope.launch {
-                    mapViewModelRepository.acceptInviteToSquad(it)
-                }
+            if (it != "") viewModelScope.launch {
+                mapViewModelRepository.acceptInviteToSquad(it)
+            }
         }
     }
 
@@ -1066,10 +1127,9 @@ class MapViewModel @Inject constructor(
 
     private fun kickAnswerHandler(kick: Boolean) {
         _mapScreenState.value.interactionUserId.let {
-            if (it != "")
-                viewModelScope.launch {
-                    mapViewModelRepository.kickVote(it, if (kick) Vote.Yes else Vote.No)
-                }
+            if (it != "") viewModelScope.launch {
+                mapViewModelRepository.kickVote(it, if (kick) Vote.Yes else Vote.No)
+            }
         }
     }
 }

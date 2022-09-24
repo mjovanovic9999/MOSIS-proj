@@ -4,8 +4,6 @@ import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.feature_map.domain.model.*
 
 sealed class LocationServiceMapScreenEvents {
-    data class UserInventoryChanged(val newInventory: UserInventoryData) :
-        LocationServiceMapScreenEvents()
 
     data class PlayerMapScreenLocationChanged(val newLocation: GeoPoint) :
         LocationServiceMapScreenEvents()

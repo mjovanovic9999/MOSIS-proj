@@ -1,21 +1,22 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
-import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Transaction
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.yield
 import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.core.FireStoreConstants.EASY_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVENTORY
 import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVITEE_ID
 import mosis.streetsandtotems.core.FireStoreConstants.FIELD_INVITER_ID
 import mosis.streetsandtotems.core.FireStoreConstants.FIELD_SQUAD_ID
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_USERS
+import mosis.streetsandtotems.core.FireStoreConstants.FIELD_USER_ID
 import mosis.streetsandtotems.core.FireStoreConstants.HARD_RIDDLES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.ITEM_COUNT
 import mosis.streetsandtotems.core.FireStoreConstants.KICK_VOTE_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.L
 import mosis.streetsandtotems.core.FireStoreConstants.LEADERBOARD_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.MARKET_DOCUMENT_ID
 import mosis.streetsandtotems.core.FireStoreConstants.MEDIUM_RIDDLES_COLLECTION
@@ -24,9 +25,6 @@ import mosis.streetsandtotems.core.FireStoreConstants.PROFILE_DATA_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.RIDDLE_COUNT_VALUE
 import mosis.streetsandtotems.core.FireStoreConstants.SQUADS_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.SQUAD_INVITES_COLLECTION
-import mosis.streetsandtotems.core.FireStoreConstants.FIELD_USERS
-import mosis.streetsandtotems.core.FireStoreConstants.FIELD_USER_ID
-import mosis.streetsandtotems.core.FireStoreConstants.L
 import mosis.streetsandtotems.core.PointsConversion.MAX_SQUAD_MEMBERS_COUNT
 import mosis.streetsandtotems.core.PointsConversion.SQUAD_MEMBERS_POINTS_COEFFICIENT
 import mosis.streetsandtotems.feature_map.domain.model.*
@@ -418,12 +416,9 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
         val squadNumNull = db.collection(SQUADS_COLLECTION).document(squadId).get().await()
 
-        Log.d("taggg","reevalll")
-
         val users = squadNumNull.get(FIELD_USERS)
         if (users != null) {
             val squadNum = (users as List<*>).size
-            Log.d("taggg",squadNum.toString())
             for (itemDoc in kicksList) {
                 val item = itemDoc.toObject(KickVoteData::class.java)
                 if (item != null) {
@@ -442,7 +437,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                     (squadNum / 2).let { votesHalf ->
                         if (votesHalf <= voteYes) {//kick
                             removeFromSquad(userId)
-                            db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete().await()
+                            db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete()
+                                .await()
                             reevaluateVoteAfterKick(userId, squadId)
                         } else if (votesHalf <= voteNo) {
                             db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete()
@@ -464,8 +460,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         removeFromSquad(myId)
         reevaluateVoteAfterKick(myId, squadId)
     }
-
-
+    
 //endregion
 }
 

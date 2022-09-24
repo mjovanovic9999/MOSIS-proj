@@ -87,15 +87,19 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         isOpen = state.filterDialogOpen,
         onConfirmButtonClick = { mapViewModel.onEvent(MapViewModelEvents.CloseFilterDialog) },
         onDismissRequest = {
-            mapViewModel.onEvent(MapViewModelEvents.CloseFilterDialog)
             mapViewModel.onEvent(MapViewModelEvents.ResetFilters)
+            mapViewModel.onEvent(MapViewModelEvents.CloseFilterDialog)
         },
-        updateFilterResources = { mapViewModel.onEvent(MapViewModelEvents.UpdateFilterResource) },
+        updateFilterResources = { mapViewModel.onEvent(MapViewModelEvents.UpdateFilterResources) },
         updateFilterPlayers = { mapViewModel.onEvent(MapViewModelEvents.UpdateFilterFriends) },
         updateFilterTotems = { mapViewModel.onEvent(MapViewModelEvents.UpdateFilterTotems) },
+        updateFilterCustomPins = { mapViewModel.onEvent(MapViewModelEvents.UpdateFilterCustomPins) },
+        updateFilterMarket = { mapViewModel.onEvent(MapViewModelEvents.UpdateFilterMarket) },
         filterResourceState = mapViewModel.mapScreenState.value.filterResources,
         filterFriendsState = mapViewModel.mapScreenState.value.filterPlayers,
         filterTotemsState = mapViewModel.mapScreenState.value.filterTotems,
+        filterCustomPinsState = mapViewModel.mapScreenState.value.filterCustomPins,
+        filterMarketState = mapViewModel.mapScreenState.value.filterMarket,
     )
 
     CustomResourceDialog(

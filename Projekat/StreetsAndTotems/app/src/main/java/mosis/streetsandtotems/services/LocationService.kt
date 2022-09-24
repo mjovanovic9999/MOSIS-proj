@@ -51,6 +51,7 @@ class LocationService : Service() {
     @Inject
     lateinit var locationServiceUseCases: LocationServiceUseCases
 
+
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
 

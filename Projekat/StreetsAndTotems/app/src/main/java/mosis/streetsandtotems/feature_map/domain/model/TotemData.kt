@@ -14,6 +14,7 @@ data class TotemData(
     val last_visited: Timestamp? = null,
     val bonus_points: Int? = null,
     val protection_points: Int? = 0,
+    val visible_to: String? = null, //"" ili squad
 ) : Data
 
 

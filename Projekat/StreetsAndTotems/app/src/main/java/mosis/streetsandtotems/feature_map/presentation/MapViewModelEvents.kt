@@ -1,9 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
 
-import mosis.streetsandtotems.feature_map.domain.model.InventoryData
-import mosis.streetsandtotems.feature_map.domain.model.MarketItem
-import mosis.streetsandtotems.feature_map.domain.model.TotemData
-import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
+import mosis.streetsandtotems.feature_map.domain.model.*
 
 sealed class MapViewModelEvents {
     object ShowFilterDialog : MapViewModelEvents()
@@ -18,7 +15,9 @@ sealed class MapViewModelEvents {
     object ResetFilters : MapViewModelEvents()
     object UpdateFilterTotems : MapViewModelEvents()
     object UpdateFilterFriends : MapViewModelEvents()
-    object UpdateFilterResource : MapViewModelEvents()
+    object UpdateFilterResources : MapViewModelEvents()
+    object UpdateFilterCustomPins : MapViewModelEvents()
+    object UpdateFilterMarket : MapViewModelEvents()
     object AddHome : MapViewModelEvents()
     object RemoveHome : MapViewModelEvents()
     object ShowResourceDialog : MapViewModelEvents()

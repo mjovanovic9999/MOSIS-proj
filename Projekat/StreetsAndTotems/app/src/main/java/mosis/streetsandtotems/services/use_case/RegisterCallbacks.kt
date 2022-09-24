@@ -9,16 +9,15 @@ import mosis.streetsandtotems.core.domain.repository.PreferenceRepository
 import mosis.streetsandtotems.feature_map.domain.model.PinAction
 import mosis.streetsandtotems.feature_map.domain.model.PinActionType
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
+import mosis.streetsandtotems.services.LocationServiceCommonEvents
 import mosis.streetsandtotems.services.LocationServiceMainScreenEvents
 import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 
 class RegisterCallbacks(
-    private val preferenceRepository: PreferenceRepository,
     private val mapServiceRepository: MapServiceRepository,
     private val locationServiceMapScreenEventsFlow: MutableSharedFlow<LocationServiceMapScreenEvents>,
     private val locationServiceMainScreenEventsFlow: MutableSharedFlow<LocationServiceMainScreenEvents>,
-    private val registerCallbackOnSquadInvite: RegisterCallbackOnSquadInvite,
-    private val registerCallbackOnKickVote: RegisterCallbackOnKickVote
+    private val locationServiceCommonEventsFlow: MutableSharedFlow<LocationServiceCommonEvents>
 ) {
     suspend operator fun invoke() = registerCallbacks()
 
@@ -34,7 +33,13 @@ class RegisterCallbacks(
         }
     }
 
-    private suspend fun registerCallbacks() {
+    private fun emitLocationServiceCommonEvent(event: LocationServiceCommonEvents){
+        CoroutineScope(Dispatchers.Default).launch {
+            locationServiceCommonEventsFlow.emit(event)
+        }
+    }
+
+    private fun registerCallbacks() {
         initCurrentUserFlow()
         initUserPinsFlow()
         initResourcesFlow()
@@ -43,9 +48,6 @@ class RegisterCallbacks(
         initHomesFlow()
         initUserInventoryFlow()
         initMarketFlow()
-//        if (preferenceRepository.getSquadId() == "")
-//            registerCallbackOnSquadInvite()
-//        else registerCallbackOnKickVote()
     }
 
     private fun initCurrentUserFlow() {
@@ -201,7 +203,7 @@ class RegisterCallbacks(
     private fun initUserInventoryFlow() {
         mapServiceRepository.registerCallbackOnUserInventoryUpdate {
             Log.d("d", it.toString())
-            emitLocationServiceMapScreenEvent(LocationServiceMapScreenEvents.UserInventoryChanged(it))
+            emitLocationServiceCommonEvent(LocationServiceCommonEvents.UserInventoryChanged(it))
         }
     }
 

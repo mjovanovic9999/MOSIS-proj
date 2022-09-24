@@ -11,9 +11,12 @@ data class MapScreenState(
     val filterDialogOpen: Boolean,
     val followMe: Boolean,
     val detectScroll: Boolean,
+
     val filterResources: Boolean,
     val filterPlayers: Boolean,
     val filterTotems: Boolean,
+    val filterCustomPins: Boolean,
+    val filterMarket: Boolean,
 
     val myId: String,
     val mySquadId: String,
@@ -22,7 +25,6 @@ data class MapScreenState(
     val playersHashMap: Map<String, ProfileData>,
     val totemsHashMap: Map<String, TotemData>,
     val customPinsHashMap: Map<String, CustomPinData>,
-
 
     val playerLocation: GeoPoint,
     val playerInventory: UserInventoryData,
