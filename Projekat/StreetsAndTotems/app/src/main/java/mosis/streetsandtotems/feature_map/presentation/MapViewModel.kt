@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -355,13 +356,16 @@ class MapViewModel @Inject constructor(
                 }
                 is CustomPinData -> {
                     customPinsHashMap[it] = dataType
-                    if (mapScreenState.value.myId == dataType.placed_by
-                        || isSquadMember(
-                            mapScreenState.value.mySquadId,
-                            dataType.visible_to
-                        )
-                    ) {
-                        composable = { CustomPin(resourceId = R.drawable.pin_custom) }
+                    composable = {
+                        if (mapScreenState.value.myId == dataType.placed_by
+                            || isSquadMember(
+                                mapScreenState.value.mySquadId,
+                                customPinsHashMap[it]?.visible_to
+                            )
+                        ) {
+                            Text(dataType.visible_to.toString())
+                            CustomPin(resourceId = R.drawable.pin_custom)
+                        }
                     }
                 }
                 is ResourceData -> {
@@ -426,13 +430,15 @@ class MapViewModel @Inject constructor(
         dataType.id?.let {
             var oldData: Data? = null
             when (dataType) {
-                is HomeData -> {
+                is HomeData -> {//treba se specificno handluje sliko ko pins
                     oldData = _mapScreenState.value.home
                     _mapScreenState.value = _mapScreenState.value.copy(home = dataType)
                 }
                 is CustomPinData -> {
-                    if (mapScreenState.value.myId == dataType.placed_by ||
-                        isSquadMember(mapScreenState.value.myId, dataType.visible_to)
+                    if (mapScreenState.value.myId == dataType.placed_by || isSquadMember(
+                            mapScreenState.value.mySquadId,
+                            dataType.visible_to
+                        )
                     ) {
                         if (customPinsHashMap.containsKey(it)) {
                             oldData = customPinsHashMap.put(it, dataType)
@@ -754,7 +760,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    //region handlers
+//region handlers
 
     private fun showCustomPinDialogHandler(
         l: GeoPoint?,
@@ -931,7 +937,7 @@ class MapViewModel @Inject constructor(
 //endregion
 
 
-    //region firebase functions
+//region firebase functions
 
 
     private fun addCustomPinFBHandler() {

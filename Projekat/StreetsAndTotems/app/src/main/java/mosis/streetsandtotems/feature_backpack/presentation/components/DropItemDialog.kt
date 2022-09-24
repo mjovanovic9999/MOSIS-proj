@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import mosis.streetsandtotems.core.ButtonConstants
+import mosis.streetsandtotems.core.ButtonConstants.PLACE
 import mosis.streetsandtotems.core.FormFieldConstants
-import mosis.streetsandtotems.core.ItemsConstants
 import mosis.streetsandtotems.core.TitleConstants.ITEMS_LEFT
 import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.feature_backpack.presentation.DropItemDialogState
@@ -23,9 +23,9 @@ import mosis.streetsandtotems.ui.theme.sizes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropItemDialog(
-    state: DropItemDialogState, onDismissRequest: () -> Unit,
-    onDrop: () -> Unit,
-    onPlaceTotem: (() -> Unit)? = null,
+    state: DropItemDialogState,
+    onDismissRequest: () -> Unit,
+    onDrop: (dropItemCount: Int, type: IconType.ResourceType?) -> Unit,
     isDropEnabled: Boolean,
 ) {
     val dropAmount = remember { mutableStateOf(FormFieldConstants.DEFAULT_AMOUNT) }
@@ -37,50 +37,58 @@ fun DropItemDialog(
         onDismissRequest = onDismissRequest,
         title = {
             CustomDialogTitle(
-                isTotem = state.dropTotem,
+                isTotem = state.itemType==null,
                 resourceType = state.itemType,
-                countMessage = state.itemCount?.toString() + ITEMS_LEFT,
+                countMessage = state.itemCount.toString() + ITEMS_LEFT,
                 needTotemAdditionalText = false,
             )
         },
         text = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                CustomButton(
-                    clickHandler = onDrop,
-                    text = ButtonConstants.DROP,
-                    buttonType = CustomButtonType.Outlined,
-                    textStyle = MaterialTheme.typography.titleMedium,
-                    enabled = isDropEnabled && dropAmount.value != ""
-                )
-                CustomTextField(
-                    modifier = Modifier
-                        .height(MaterialTheme.sizes.drop_item_dialog_amount_text_field_height)
-                        .padding(start = MaterialTheme.sizes.drop_item_dialog_spacer),
-                    value = dropAmount.value,
-                    onValueChange = {
-                        if (state.itemCount != null && it != "") {
-                            if (state.itemCount >= it.toInt()) dropAmount.value = it
-                        } else dropAmount.value = it
-                    },
-                    placeholder = FormFieldConstants.AMOUNT,
-                    label = FormFieldConstants.AMOUNT,
-                    textFieldType = CustomTextFieldType.Outlined,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
-                )
+            if (state.itemType!=null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    CustomButton(
+                        clickHandler = {
+                            onDrop(
+                                dropAmount.value.toInt(),
+                                state.itemType,
+                            )
+                        },
+                        text = ButtonConstants.DROP,
+                        buttonType = CustomButtonType.Outlined,
+                        textStyle = MaterialTheme.typography.titleMedium,
+                        enabled = isDropEnabled && dropAmount.value != ""
+                    )
+
+                    CustomTextField(
+                        modifier = Modifier
+                            .height(MaterialTheme.sizes.drop_item_dialog_amount_text_field_height)
+                            .padding(start = MaterialTheme.sizes.drop_item_dialog_spacer),
+                        value = dropAmount.value,
+                        onValueChange = {
+                            if (it != "") {
+                                if (state.itemCount >= it.toInt()) dropAmount.value = it
+                            } else dropAmount.value = it
+                        },
+                        placeholder = FormFieldConstants.AMOUNT,
+                        label = FormFieldConstants.AMOUNT,
+                        textFieldType = CustomTextFieldType.Outlined,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
+                    )
+                }
             }
         },
         buttonType = CustomButtonType.Outlined,
         confirmButtonMatchParentWidth = true,
-        confirmButtonText = ButtonConstants.PLACE,
-        confirmButtonVisible = state.dropTotem,
+        confirmButtonVisible = state.itemType==null,
+        confirmButtonText = PLACE,
+        onConfirmButtonClick = { onDrop(1, null) },
         dismissButtonVisible = false,
         clickable = true,
-        onConfirmButtonClick = onPlaceTotem ?: {}
     )
 }
 

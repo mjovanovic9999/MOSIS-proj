@@ -21,6 +21,7 @@ class FirebaseBackpackDataSource(private val db: FirebaseFirestore) {
         ).await()
     }
 
+
     suspend fun placeTotem(myId: String, l: GeoPoint, mySquadId: String) {
         val currentTime = Timestamp.now()
         db.collection(FireStoreConstants.TOTEMS_COLLECTION).document().set(

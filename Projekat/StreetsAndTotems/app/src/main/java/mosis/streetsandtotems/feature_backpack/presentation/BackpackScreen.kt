@@ -90,14 +90,14 @@ fun BackpackScreen(backpackViewModel: BackpackViewModel) {
     DropItemDialog(
         state = state.dropItemDialogState,
         onDismissRequest = { backpackViewModel.closeDropItemDialog() },
-        onDrop = {
+        onDrop = { dropItemCount: Int, type: IconType.ResourceType? ->
             backpackViewModel.onEvent(
                 BackpackViewModelEvents.DropResource(
-                    1, ResourceType.Brick
+                    dropItemCount, type
                 )
             )
         },
-        isDropEnabled = false,
+        isDropEnabled = true,//zasto ovo ovako???
 //        takeAmount.value != ""
 //                && takeAmount.value.toInt() > 0
 //                && backpackItemCount >= takeAmount.value.toInt()
