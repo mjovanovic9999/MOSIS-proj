@@ -32,8 +32,7 @@ fun CustomSearchDialog(
         mutableStateOf("0")
     }
 
-    CustomDialog(
-        isOpen = isOpen,
+    CustomDialog(isOpen = isOpen,
         title = {
             Text(
                 text = TitleConstants.SEARCH,
@@ -55,25 +54,6 @@ fun CustomSearchDialog(
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-
-                    when (selectedTabIndex.value) {
-                        0 -> {
-                            UsersSearch(onUsersSearch = {
-                                onUsersSearch(
-                                    it, distance.value.toDouble()
-                                )
-                            })
-                        }
-                        1 -> {
-                            ResourcesSearch(onResourcesSearch = {
-                                onResourcesSearch(
-                                    ResourceType.valueOf(
-                                        it
-                                    ), distance.value.toDouble()
-                                )
-                            })
-                        }
-                    }
                     CustomTextField(
                         value = distance.value,
                         onValueChange = { distance.value = it },
@@ -84,6 +64,27 @@ fun CustomSearchDialog(
                         textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
                         singleLine = true
                     )
+                    when (selectedTabIndex.value) {
+                        0 -> {
+                            UsersSearch(onUsersSearch = {
+                                onUsersSearch(
+                                    it, distance.value.toDouble()
+                                )
+                                onDismissRequest()
+                            })
+                        }
+                        1 -> {
+                            ResourcesSearch(onResourcesSearch = {
+                                onResourcesSearch(
+                                    ResourceType.valueOf(
+                                        it
+                                    ), distance.value.toDouble()
+                                )
+                                onDismissRequest()
+                            })
+                        }
+                    }
+
                 }
             }
         },

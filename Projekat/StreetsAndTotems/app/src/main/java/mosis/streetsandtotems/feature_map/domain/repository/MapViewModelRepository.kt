@@ -53,6 +53,20 @@ interface MapViewModelRepository {
 
     suspend fun kickVote(userId: String, myVote: Vote)
 
+    suspend fun searchUsersInRadius(
+        username: String,
+        radius: Double,
+        userLocation: GeoPoint,
+        onSearchCompleted: (List<UserData>) -> Unit,
+        onSearchFailed: () -> Unit
+    )
 
+    fun searchResourceInRadius(
+        type: ResourceType,
+        radius: Double,
+        userLocation: GeoPoint,
+        onSearchCompleted: (List<ResourceData>) -> Unit,
+        onSearchFailed: () -> Unit
+    )
 //    suspend fun registerCallbackOnUserInventoryUpdate(callback: (UserInventoryData) -> Unit)
 }

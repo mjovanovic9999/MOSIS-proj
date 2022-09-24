@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_map.data.repository
 
+import android.util.Log
 import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
@@ -45,17 +46,14 @@ class MapViewModelRepositoryImpl(
     }
 
     override suspend fun updateResource(resourceId: String, newCount: Int) {
-        if (newCount <= 0)
-            firebaseMapDataSource.deleteResource(resourceId)
-        else
-            firebaseMapDataSource.updateResource(resourceId, newCount)
+        if (newCount <= 0) firebaseMapDataSource.deleteResource(resourceId)
+        else firebaseMapDataSource.updateResource(resourceId, newCount)
 
     }
 
     override suspend fun updateUserInventory(newUserInventoryData: UserInventoryData) {
         firebaseMapDataSource.updateUserInventory(
-            preferenceDataSource.getUserId(),
-            newUserInventoryData
+            preferenceDataSource.getUserId(), newUserInventoryData
         )
     }
 
@@ -98,15 +96,13 @@ class MapViewModelRepositoryImpl(
 
     override suspend fun acceptInviteToSquad(inviterId: String) {
         return firebaseMapDataSource.acceptInviteToSquad(
-            inviterId,
-            preferenceDataSource.getUserId()
+            inviterId, preferenceDataSource.getUserId()
         )
     }
 
     override suspend fun declineInviteToSquad(inviterId: String) {
         firebaseMapDataSource.declineInviteToSquad(
-            inviterId,
-            preferenceDataSource.getUserId()
+            inviterId, preferenceDataSource.getUserId()
         )
     }
 
@@ -126,12 +122,48 @@ class MapViewModelRepositoryImpl(
 
     override suspend fun kickVote(userId: String, myVote: Vote) {
         firebaseMapDataSource.kickVote(
-            preferenceDataSource.getUserId(),
-            preferenceDataSource.getUserSquadId(),
-            userId,
-            myVote
+            preferenceDataSource.getUserId(), preferenceDataSource.getUserSquadId(), userId, myVote
         )
     }
+
+    override suspend fun searchUsersInRadius(
+        username: String,
+        radius: Double,
+        userLocation: GeoPoint,
+        onSearchCompleted: (List<UserData>) -> Unit,
+        onSearchFailed: () -> Unit
+    ) {
+        val userId = preferenceDataSource.getUserId()
+        val users = mutableListOf<UserData>()
+        firebaseMapDataSource.searchUsersInRadius(userLocation, radius, onSearchCompleteCallback = {
+            it?.forEach() { userSnapshot ->
+                val user = userSnapshot.toObject(UserData::class.java)?.copy(id = userSnapshot.id)
+                if (user != null && user.user_name?.contains(username) == true && user.id != userId) users.add(
+                    user
+                )
+            }
+            onSearchCompleted(users)
+        }, onSearchFailedCallback = onSearchFailed)
+    }
+
+    override fun searchResourceInRadius(
+        type: ResourceType,
+        radius: Double,
+        userLocation: GeoPoint,
+        onSearchCompleted: (List<ResourceData>) -> Unit,
+        onSearchFailed: () -> Unit
+    ) {
+        val resources = mutableListOf<ResourceData>()
+        firebaseMapDataSource.searchResourcesInRadius(userLocation, radius, {
+            it?.forEach { resourceSnapshot ->
+                val resource = resourceSnapshot.toObject(ResourceData::class.java)
+                Log.d("tagic", resource.toString())
+                if (resource != null && resource.type == type) resources.add(resource)
+            }
+            onSearchCompleted(resources)
+        }, onSearchFailed)
+    }
+}
 
 
 //    override suspend fun registerCallbackOnUserInventoryUpdate(userId: String): UserInventoryData? {
@@ -142,4 +174,4 @@ class MapViewModelRepositoryImpl(
 //            null
 //        }
 //    }
-}
+

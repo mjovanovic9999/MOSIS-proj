@@ -235,6 +235,7 @@ object HandleResponseConstants {
 }
 
 object MessageConstants {
+    const val SEARCH_FAILED = "Search failed, please try again!"
     const val PASSWORD_UPDATE_ERROR = "An error occurred while updating password! Please try again!"
     const val PASSWORD_UPDATE_SUCCESSFUL = "Password updated successfully!"
     const val NO_USER_ACCOUNT_WITH_THIS_EMAIL = "Account with provided email doesn't exist!"

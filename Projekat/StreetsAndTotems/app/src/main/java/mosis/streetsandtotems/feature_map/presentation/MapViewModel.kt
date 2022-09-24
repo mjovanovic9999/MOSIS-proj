@@ -31,6 +31,7 @@ import mosis.streetsandtotems.core.MapConstants.TILE_KEY
 import mosis.streetsandtotems.core.MapConstants.TILE_URL_512
 import mosis.streetsandtotems.core.MapConstants.TITLE_SIZE
 import mosis.streetsandtotems.core.MapConstants.WORKER_COUNT
+import mosis.streetsandtotems.core.MessageConstants
 import mosis.streetsandtotems.core.MessageConstants.CORRECT_ANSWER
 import mosis.streetsandtotems.core.MessageConstants.INCORRECT_ANSWER
 import mosis.streetsandtotems.core.PinConstants.LAZY_LOADER_ID
@@ -46,6 +47,7 @@ import mosis.streetsandtotems.core.presentation.components.SnackbarType
 import mosis.streetsandtotems.di.util.SharedFlowWrapper
 import mosis.streetsandtotems.feature_map.domain.model.*
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
+import mosis.streetsandtotems.feature_map.domain.use_case.MapUseCases
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
 import mosis.streetsandtotems.feature_map.presentation.util.*
@@ -70,6 +72,7 @@ class MapViewModel @Inject constructor(
     private val showLoader: MutableStateFlow<Boolean>,
     private val preferenceUseCases: PreferenceUseCases,
     private val snackbarSettingsFlow: MutableStateFlow<SnackbarSettings?>,
+    private val mapUseCases: MapUseCases,
 ) : ViewModel() {
     private val _mapScreenState: MutableState<MapScreenState>
     private val _mapState: MapState
@@ -170,17 +173,56 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.KickAnswerYesInvite -> kickAnswerHandler(true)
             MapViewModelEvents.HideSearchDialog -> onHideSearchDialogHandler()
             MapViewModelEvents.ShowSearchDialog -> onShowSearchDialogHandler()
-            is MapViewModelEvents.SearchResources -> onSearchResourcesHandler()
+            is MapViewModelEvents.SearchResources -> onSearchResourcesHandler(
+                event.type, event.radius
+            )
             is MapViewModelEvents.SearchUsers -> onSearchUsersHandler(event.username, event.radius)
         }
     }
 
     private fun onSearchUsersHandler(username: String, distance: Double) {
-
+        viewModelScope.launch {
+            showLoader.emit(true)
+            mapUseCases.searchUsers(username,
+                distance,
+                LocationService.lastKnownLocation!!,
+                onSearchCompleted = {
+                    viewModelScope.launch {
+                        showLoader.emit(false)
+                        Log.d("tagic", it.toString())
+                    }
+                },
+                onSearchFailed = {
+                    handleSearchFail()
+                })
+        }
     }
 
-    private fun onSearchResourcesHandler() {
+    private fun onSearchResourcesHandler(type: ResourceType, radius: Double) {
+        viewModelScope.launch {
+            showLoader.emit(true)
+            mapUseCases.searchResources(type, radius, LocationService.lastKnownLocation!!, {
+                viewModelScope.launch {
+                    showLoader.emit(false)
+                    Log.d("tagic", it.toString())
+                }
+            }, { handleSearchFail() })
+        }
+    }
 
+    private fun handleSearchFail() {
+        viewModelScope.launch {
+            showLoader.emit(false)
+            snackbarSettingsFlow.emit(
+                SnackbarSettings(
+                    message = MessageConstants.SEARCH_FAILED,
+                    duration = SnackbarDuration.Short,
+                    snackbarType = SnackbarType.Info,
+                    snackbarId = snackbarSettingsFlow.value?.snackbarId?.plus(other = HandleResponseConstants.ID_ADDITION_FACTOR)
+                        ?: HandleResponseConstants.DEFAULT_ID
+                )
+            )
+        }
     }
 
     private fun onHideSearchDialogHandler() {
@@ -377,10 +419,8 @@ class MapViewModel @Inject constructor(
                 }
                 is CustomPinData -> {
                     customPinsHashMap[it] = dataType
-                    if (mapScreenState.value.myId == dataType.placed_by
-                        || isSquadMember(
-                            mapScreenState.value.mySquadId,
-                            dataType.visible_to
+                    if (mapScreenState.value.myId == dataType.placed_by || isSquadMember(
+                            mapScreenState.value.mySquadId, dataType.visible_to
                         )
                     ) {
                         composable = { CustomPin(resourceId = R.drawable.pin_custom) }
@@ -410,14 +450,13 @@ class MapViewModel @Inject constructor(
                 is ProfileData -> {
                     if (dataType.is_online == true) {
                         playersHashMap[it] = dataType
-                        if (playersHashMap[it] != null)
-                            composable = {
-                                playersHashMap[it]?.let { it1 ->
-                                    CustomPinImage(
-                                        mapScreenState.value.mySquadId, it1
-                                    )
-                                }
+                        if (playersHashMap[it] != null) composable = {
+                            playersHashMap[it]?.let { it1 ->
+                                CustomPinImage(
+                                    mapScreenState.value.mySquadId, it1
+                                )
                             }
+                        }
                     }
                 }
                 is MarketData -> {
@@ -453,8 +492,9 @@ class MapViewModel @Inject constructor(
                     _mapScreenState.value = _mapScreenState.value.copy(home = dataType)
                 }
                 is CustomPinData -> {
-                    if (mapScreenState.value.myId == dataType.placed_by ||
-                        isSquadMember(mapScreenState.value.myId, dataType.visible_to)
+                    if (mapScreenState.value.myId == dataType.placed_by || isSquadMember(
+                            mapScreenState.value.myId, dataType.visible_to
+                        )
                     ) {
                         if (customPinsHashMap.containsKey(it)) {
                             oldData = customPinsHashMap.put(it, dataType)
@@ -776,7 +816,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    //region handlers
+//region handlers
 
     private fun showCustomPinDialogHandler(
         l: GeoPoint?,
@@ -953,7 +993,7 @@ class MapViewModel @Inject constructor(
 //endregion
 
 
-    //region firebase functions
+//region firebase functions
 
 
     private fun addCustomPinFBHandler() {

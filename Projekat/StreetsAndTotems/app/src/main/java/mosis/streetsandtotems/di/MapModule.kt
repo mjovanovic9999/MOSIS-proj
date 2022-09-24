@@ -10,6 +10,9 @@ import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
 import mosis.streetsandtotems.feature_map.data.repository.MapViewModelRepositoryImpl
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
+import mosis.streetsandtotems.feature_map.domain.use_case.MapUseCases
+import mosis.streetsandtotems.feature_map.domain.use_case.SearchResources
+import mosis.streetsandtotems.feature_map.domain.use_case.SearchUsers
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -22,11 +25,16 @@ object MapModule {
     @Provides
     @ViewModelScoped
     fun provideMapViewModelRepository(
-        preferenceDataSource: PreferencesDataStore,
-        firebaseMapDataSource: FirebaseMapDataSource
-    ): MapViewModelRepository =
-        MapViewModelRepositoryImpl(
-            preferenceDataSource = preferenceDataSource,
-            firebaseMapDataSource = firebaseMapDataSource
+        preferenceDataSource: PreferencesDataStore, firebaseMapDataSource: FirebaseMapDataSource
+    ): MapViewModelRepository = MapViewModelRepositoryImpl(
+        preferenceDataSource = preferenceDataSource, firebaseMapDataSource = firebaseMapDataSource
+    )
+
+    @Provides
+    @ViewModelScoped
+    fun provideMapUseCases(mapViewModelRepository: MapViewModelRepository): MapUseCases =
+        MapUseCases(
+            searchUsers = SearchUsers(mapViewModelRepository),
+            searchResources = SearchResources(mapViewModelRepository)
         )
 }
