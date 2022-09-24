@@ -12,8 +12,6 @@ import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_LNG
 import mosis.streetsandtotems.core.presentation.components.IconType
 import mosis.streetsandtotems.di.util.SharedFlowWrapper
 import mosis.streetsandtotems.feature_backpack.domain.repository.BackpackRepository
-import mosis.streetsandtotems.feature_map.domain.model.InventoryData
-import mosis.streetsandtotems.feature_map.domain.model.ResourceType
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import mosis.streetsandtotems.services.LocationService
 import mosis.streetsandtotems.services.LocationServiceCommonEvents
@@ -27,6 +25,17 @@ class BackpackViewModel @Inject constructor(
     private val _backpackScreenState =
         mutableStateOf(BackpackScreenState(UserInventoryData(), DropItemDialogState(false)))
     val backpackScreenState: State<BackpackScreenState> = _backpackScreenState
+
+    fun onEvent(event: BackpackViewModelEvents) {
+        when (event) {
+            is BackpackViewModelEvents.DropResource -> dropResource(
+                event.dropItemCount,
+                event.type,
+            )
+            BackpackViewModelEvents.PlaceTotem -> placeTotem()
+        }
+    }
+
 
     init {
         viewModelScope.launch {
@@ -55,7 +64,6 @@ class BackpackViewModel @Inject constructor(
                 open = true,
                 itemType = resourceType,
                 itemCount = itemCount,
-                dropTotem = dropTotem,
             )
         )
     }
@@ -65,18 +73,11 @@ class BackpackViewModel @Inject constructor(
             dropItemDialogState = DropItemDialogState(
                 open = false,
                 itemType = null,
-                itemCount = null,
-                dropTotem = false,
+                itemCount = 0,
             )
         )
     }
 
-    fun onEvent(event: BackpackViewModelEvents) {
-        when (event) {
-            is BackpackViewModelEvents.DropResource -> dropResource(event.itemCount, event.type)
-            BackpackViewModelEvents.PlaceTotem -> placeTotem()
-        }
-    }
 
     private fun placeTotem() {
         viewModelScope.launch {
@@ -88,13 +89,13 @@ class BackpackViewModel @Inject constructor(
         }
     }
 
-    private fun dropResource(itemCount: Int, type: ResourceType) {
+    private fun dropResource(dropItemCount: Int, type: IconType.ResourceType?) {
         viewModelScope.launch {
-            backpackRepository.dropResource(
-                l = LocationService.lastKnownLocation ?: GeoPoint(INIT_SCROLL_LAT, INIT_SCROLL_LNG),
-                itemCount = itemCount,
-                type = type,
-            )
+//            backpackRepository.dropResource(
+//                l = LocationService.lastKnownLocation ?: GeoPoint(INIT_SCROLL_LAT, INIT_SCROLL_LNG),
+//                itemCount = itemCount,
+//                type = type,
+//            )
         }
     }
 }

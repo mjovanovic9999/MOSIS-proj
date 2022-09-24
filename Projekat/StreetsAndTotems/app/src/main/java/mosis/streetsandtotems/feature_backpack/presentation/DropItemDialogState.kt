@@ -4,8 +4,7 @@ import mosis.streetsandtotems.core.presentation.components.IconType
 
 
 data class DropItemDialogState(
-    val open: Boolean,
+    val open: Boolean=false,
     val itemType: IconType.ResourceType? = null,
-    val itemCount: Int? = null,
-    val dropTotem: Boolean = false,
+    val itemCount: Int = 0,
 )

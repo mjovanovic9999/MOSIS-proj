@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_map.data.data_source
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -233,10 +234,10 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         return newSquadId
     }
 
-    //check da l je user vec u squad i da l sam ga vec pozvao
-    suspend fun initInviteToSquad(inviterId: String, inviteeId: String) {//treb se i pretplati
-        if (getInviteIdOrNull(inviterId, inviteeId) == null) db.collection(SQUAD_INVITES_COLLECTION)
-            .document().set(
+    suspend fun initInviteToSquad(inviterId: String, inviteeId: String) {
+        if (getInviteIdOrNull(inviterId, inviteeId) == null)
+            db.collection(SQUAD_INVITES_COLLECTION).document().set(
+
                 mapOf(
                     FIELD_INVITER_ID to inviterId,
                     FIELD_INVITEE_ID to inviteeId,
@@ -263,6 +264,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
 
     private suspend fun removeFromSquad(userId: String) {
+        var otherUserId: String? = null
         db.runTransaction { transaction ->
             val docRefProfile = db.collection(PROFILE_DATA_COLLECTION).document(userId)
             val squadId = transaction.get(docRefProfile).getString(FIELD_SQUAD_ID)
@@ -283,13 +285,16 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                             FIELD_SQUAD_ID,
                             ""
                         )
-                    } else transaction.update(docRefSquads, FIELD_USERS, list)
+                        otherUserId = list[0]
+                    } else
+                        transaction.update(docRefSquads, FIELD_USERS, list)
                 }
 
                 transaction.update(docRefProfile, FIELD_SQUAD_ID, "")
             }
         }.await()
         handleMyPinsOnSquadRemove(userId)
+        otherUserId?.let { handleMyPinsOnSquadRemove(it) }
     }
 
     private suspend fun handleMyPinsOnSquadJoin(
@@ -298,8 +303,11 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     ) {
         val myPins = db.collection(CUSTOM_PINS_COLLECTION).whereEqualTo("placed_by", userId).get()
             .await().documents.toList()
+        Log.d("ttag", myPins.size.toString() + "join")
+
         for (pinSnapshot in myPins) {
             val pinId = pinSnapshot.id
+            Log.d("ttag", pinId + "join")
             db.collection(CUSTOM_PINS_COLLECTION).document(pinId).update(
                 "visible_to",
                 squadId,
@@ -310,6 +318,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     private suspend fun handleMyPinsOnSquadRemove(userId: String) {
         val myPins = db.collection(CUSTOM_PINS_COLLECTION).whereEqualTo("placed_by", userId).get()
             .await().documents.toList()
+
         for (pinSnapshot in myPins) {
             val pinId = pinSnapshot.id
             db.collection(CUSTOM_PINS_COLLECTION).document(pinId).update(
@@ -339,7 +348,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                 it.delete(db.collection(SQUAD_INVITES_COLLECTION).document(docId))
 
             }.await()
-            if (inviterSquadId == null && squadId != null) {
+            if (squadId != null) {
                 handleMyPinsOnSquadJoin(inviteeId, squadId!!)
                 handleMyPinsOnSquadJoin(inviterId, squadId!!)
             } else {
