@@ -169,8 +169,29 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.ShowVoteDialog -> showVoteHandler()
             MapViewModelEvents.KickAnswerNoInvite -> kickAnswerHandler(false)
             MapViewModelEvents.KickAnswerYesInvite -> kickAnswerHandler(true)
+            MapViewModelEvents.HideSearchDialog -> onHideSearchDialogHandler()
+            MapViewModelEvents.ShowSearchDialog -> onShowSearchDialogHandler()
+            is MapViewModelEvents.SearchResources -> onSearchResourcesHandler()
+            is MapViewModelEvents.SearchUsers -> onSearchUsersHandler(event.username, event.radius)
         }
     }
+
+    private fun onSearchUsersHandler(username: String, distance: Double) {
+
+    }
+
+    private fun onSearchResourcesHandler() {
+
+    }
+
+    private fun onHideSearchDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(searchDialogOpen = false)
+    }
+
+    private fun onShowSearchDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(searchDialogOpen = true)
+    }
+
 
     private fun getInitMapState(lastKnownLocation: GeoPoint?): MutableState<MapScreenState> {
         val tileStreamProvider = TileStreamProvider { row, col, zoomLvl ->
@@ -247,6 +268,7 @@ class MapViewModel @Inject constructor(
             interactionUserName = "",
             interactionUserId = "",
             voteDialogOpen = false,
+            searchDialogOpen = false,
         )
         )
     }

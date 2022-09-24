@@ -55,7 +55,9 @@ data class MapScreenState(
     val interactionUserId: String,
     val interactionUserName: String,
 
-    )
+    val searchDialogOpen: Boolean
+
+)
 
 
 data class SelectedCustomPinDialog(

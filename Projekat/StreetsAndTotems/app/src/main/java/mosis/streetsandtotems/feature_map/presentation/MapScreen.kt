@@ -1,8 +1,7 @@
 package mosis.streetsandtotems.feature_map.presentation
 
-import androidx.compose.runtime.Composable
-
 import android.net.Uri
+import androidx.compose.runtime.Composable
 import com.ramcosta.composedestinations.annotation.Destination
 import mosis.streetsandtotems.core.ButtonConstants.ACCEPT
 import mosis.streetsandtotems.core.ButtonConstants.DECLINE
@@ -19,7 +18,9 @@ import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
-import mosis.streetsandtotems.feature_map.presentation.components.*
+import mosis.streetsandtotems.feature_map.presentation.components.CustomPinDialog
+import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
+import mosis.streetsandtotems.feature_map.presentation.components.MapFABs
 import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.*
 import mosis.streetsandtotems.feature_map.presentation.util.isSquadMember
 import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
@@ -32,15 +33,13 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
     val state = mapViewModel.mapScreenState.value
 
     MapComponent(mapState = state.mapState.value)
-    MapFABs(
-        openDrawer,
+    MapFABs(openDrawer,
         locateMe = { mapViewModel.onEvent(MapViewModelEvents.FollowMe) },
         followMe = state.followMe,
         showFilterDialog = { mapViewModel.onEvent(MapViewModelEvents.ShowFilterDialog) },
-    )
+        showSearchDialog = { mapViewModel.onEvent(MapViewModelEvents.ShowSearchDialog) })
 
-    CustomPinDialog(
-        isOpen = state.customPinDialog.dialogOpen,
+    CustomPinDialog(isOpen = state.customPinDialog.dialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseCustomPinDialog) },
         dialogText = state.customPinDialog.text,
         isNewPin = state.customPinDialog.id == null,
@@ -57,8 +56,7 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.ClosePlayerDialog) },
         isSquadMember = isSquadMember(state.mySquadId, state.selectedPlayer.squad_id),
         tradeEnabled = isTradePossible(
-            state.playerLocation,
-            state.selectedPlayer.l
+            state.playerLocation, state.selectedPlayer.l
         ),
         callsAllowed = shouldEnableNumber(
             state.selectedPlayer.call_privacy_level,
@@ -66,8 +64,7 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
             state.selectedPlayer.squad_id,
             state.selectedPlayer.phone_number
         ),
-        messagingAllowed =
-        shouldEnableNumber(
+        messagingAllowed = shouldEnableNumber(
             state.selectedPlayer.messaging_privacy_level,
             state.mySquadId,
             state.selectedPlayer.squad_id,
@@ -109,8 +106,7 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
             mapViewModel.onEvent(
                 MapViewModelEvents.UpdateInventory(
                     UserInventoryData(
-                        inventory = newInventory,
-                        empty_spaces = newEmptySpacesCount
+                        inventory = newInventory, empty_spaces = newEmptySpacesCount
                     ),
                 )
             )
@@ -140,16 +136,14 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         updateHomeItems = { mapViewModel.onEvent(MapViewModelEvents.UpdateHome(it)) },
     )
 
-    CustomTotemDialog(
-        isOpen = state.totemDialogOpen,
+    CustomTotemDialog(isOpen = state.totemDialogOpen,
         userInventoryData = state.playerInventory,
         updateUserInventoryData = { mapViewModel.onEvent(MapViewModelEvents.UpdateInventory(it)) },
         updateTotem = { mapViewModel.onEvent(MapViewModelEvents.UpdateTotem(it)) },
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseTotemDialog) },
         currentTotem = state.selectedTotem,
         onHarvestTotemPoints = { mapViewModel.onEvent(MapViewModelEvents.HarvestTotemPoints) },
-        onPickUpTotem = { mapViewModel.onEvent(MapViewModelEvents.ClaimTotem) }
-    )
+        onPickUpTotem = { mapViewModel.onEvent(MapViewModelEvents.ClaimTotem) })
 
     CustomRiddleDialog(
         isOpen = state.riddleDialogOpen,
@@ -200,4 +194,20 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         dismissButtonText = NO_KICK,
     )
 
+    CustomSearchDialog(isOpen = state.searchDialogOpen,
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.HideSearchDialog) },
+        onUsersSearch = { username, distance ->
+            mapViewModel.onEvent(
+                MapViewModelEvents.SearchUsers(
+                    username, distance
+                )
+            )
+        },
+        onResourcesSearch = { type, distance ->
+            mapViewModel.onEvent(
+                MapViewModelEvents.SearchResources(
+                    type, distance
+                )
+            )
+        })
 }

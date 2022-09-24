@@ -57,6 +57,7 @@ fun CustomSelect(
                     DropdownMenuItem(
                         text = { Text(text = it) },
                         onClick = {
+                            Log.d("tagic", it)
                             selectedText.value = it
                             expanded.value = false
                             focusManager.clearFocus()

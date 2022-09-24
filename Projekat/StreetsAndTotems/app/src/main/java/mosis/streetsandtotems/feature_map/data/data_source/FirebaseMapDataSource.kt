@@ -2,6 +2,7 @@ package mosis.streetsandtotems.feature_map.data.data_source
 
 import android.util.Log
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Transaction
@@ -31,6 +32,8 @@ import mosis.streetsandtotems.core.FireStoreConstants.USER_NAME_FIELD
 import mosis.streetsandtotems.core.PointsConversion.MAX_SQUAD_MEMBERS_COUNT
 import mosis.streetsandtotems.core.PointsConversion.SQUAD_MEMBERS_POINTS_COEFFICIENT
 import mosis.streetsandtotems.feature_map.domain.model.*
+import org.imperiumlabs.geofirestore.GeoFirestore
+import org.imperiumlabs.geofirestore.extension.getAtLocation
 import kotlin.random.Random
 
 class FirebaseMapDataSource(private val db: FirebaseFirestore) {
@@ -162,16 +165,11 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             ProtectionLevel.RiddleProtectionLevel.High -> HARD_RIDDLES_COLLECTION
         }
 
-        val count = db.collection(collection).document(ITEM_COUNT).get().await()
-            .getLong(RIDDLE_COUNT_VALUE)
-        val riddles =
-            db.collection(collection)
-                .whereEqualTo(
-                    ORDER_NUMBER,
-                    Random.nextInt(0, count?.toInt() ?: 10)
-                )
-                .get()
-                .await().toObjects(RiddleData::class.java)
+        val count =
+            db.collection(collection).document(ITEM_COUNT).get().await().getLong(RIDDLE_COUNT_VALUE)
+        val riddles = db.collection(collection).whereEqualTo(
+            ORDER_NUMBER, Random.nextInt(0, count?.toInt() ?: 10)
+        ).get().await().toObjects(RiddleData::class.java)
 
         return riddles[0]
     }
@@ -185,32 +183,26 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     suspend fun updateSquadLeaderboard(squadId: String, addSquadLeaderboardPoints: Int) {
-        val ids =
-            db.collection(SQUADS_COLLECTION).document("ScrImM23lmrLjRL0oMiz"/*squadId*/)
-                .get()///////////////////
-                .await().get(FIELD_USERS) as List<*>
+        val ids = db.collection(SQUADS_COLLECTION).document("ScrImM23lmrLjRL0oMiz"/*squadId*/)
+            .get()///////////////////
+            .await().get(FIELD_USERS) as List<*>
         for (item in ids) {
-            if (item is String)
-                updateLeaderboard(
-                    item,
-                    (addSquadLeaderboardPoints * SQUAD_MEMBERS_POINTS_COEFFICIENT).toInt()
-                )
+            if (item is String) updateLeaderboard(
+                item, (addSquadLeaderboardPoints * SQUAD_MEMBERS_POINTS_COEFFICIENT).toInt()
+            )
         }
     }
 
     //region squad interaction
 
     private fun addUserToSquadAndUpdateUser(
-        transaction: Transaction,
-        squadId: String,
-        inviteeId: String
+        transaction: Transaction, squadId: String, inviteeId: String
     ) {
         val docRef = db.collection(SQUADS_COLLECTION).document(squadId)
 
         val list = mutableListOf<String>()
         for (item in transaction.get(docRef).get(FIELD_USERS) as List<*>) {
-            if (item is String)
-                list.add(item)
+            if (item is String) list.add(item)
         }
         if (list.isNotEmpty()) {
             list.add(inviteeId)
@@ -218,9 +210,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         }
 
         transaction.update(
-            db.collection(PROFILE_DATA_COLLECTION).document(inviteeId),
-            FIELD_SQUAD_ID,
-            squadId
+            db.collection(PROFILE_DATA_COLLECTION).document(inviteeId), FIELD_SQUAD_ID, squadId
         )
     }
 
@@ -236,14 +226,10 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         )
 
         transaction.update(
-            db.collection(PROFILE_DATA_COLLECTION).document(inviterId),
-            FIELD_SQUAD_ID,
-            newSquadId
+            db.collection(PROFILE_DATA_COLLECTION).document(inviterId), FIELD_SQUAD_ID, newSquadId
         )
         transaction.update(
-            db.collection(PROFILE_DATA_COLLECTION).document(inviteeId),
-            FIELD_SQUAD_ID,
-            newSquadId
+            db.collection(PROFILE_DATA_COLLECTION).document(inviteeId), FIELD_SQUAD_ID, newSquadId
         )
         return newSquadId
     }
@@ -251,6 +237,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     suspend fun initInviteToSquad(inviterId: String, inviteeId: String) {
         if (getInviteIdOrNull(inviterId, inviteeId) == null)
             db.collection(SQUAD_INVITES_COLLECTION).document().set(
+
                 mapOf(
                     FIELD_INVITER_ID to inviterId,
                     FIELD_INVITEE_ID to inviteeId,
@@ -267,9 +254,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     private suspend fun getSquadUserIds(squadId: String): List<String> {
         val list = mutableListOf<String>()
         for (item in db.collection(SQUADS_COLLECTION).document(squadId).get().await()
-            .get(FIELD_USERS) as List<*>)
-            if (item is String)
-                list.add(item)
+            .get(FIELD_USERS) as List<*>) if (item is String) list.add(item)
         return list
     }
 
@@ -289,8 +274,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
                 val list = mutableListOf<String>()
                 for (item in transaction.get(docRefSquads).get(FIELD_USERS) as List<*>) {
-                    if (item is String)
-                        list.add(item)
+                    if (item is String) list.add(item)
                 }
                 if (list.isNotEmpty()) {
                     list.remove(userId)
@@ -381,10 +365,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     private suspend fun getInviteIdOrNull(inviterId: String, inviteeId: String): String? =
-        db.collection(SQUAD_INVITES_COLLECTION)
-            .whereEqualTo(FIELD_INVITER_ID, inviterId)
-            .whereEqualTo(FIELD_INVITEE_ID, inviteeId)
-            .get().await().firstOrNull()?.id
+        db.collection(SQUAD_INVITES_COLLECTION).whereEqualTo(FIELD_INVITER_ID, inviterId)
+            .whereEqualTo(FIELD_INVITEE_ID, inviteeId).get().await().firstOrNull()?.id
 
 
     suspend fun initKickVote(
@@ -397,10 +379,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         if (list.size <= 2) {
             removeFromSquad(user_id)
         } else {
-            if (db.collection(KICK_VOTE_COLLECTION)
-                    .whereEqualTo(FIELD_SQUAD_ID, squad_id)
-                    .whereEqualTo(FIELD_USER_ID, user_id)
-                    .get().await().firstOrNull() == null
+            if (db.collection(KICK_VOTE_COLLECTION).whereEqualTo(FIELD_SQUAD_ID, squad_id)
+                    .whereEqualTo(FIELD_USER_ID, user_id).get().await().firstOrNull() == null
             ) {
                 val votes = mutableMapOf<String, Vote>()
                 list.forEach {
@@ -412,9 +392,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                 }
                 db.collection(KICK_VOTE_COLLECTION).document().set(
                     KickVoteData(
-                        squad_id = squad_id,
-                        user_id = user_id,
-                        votes = votes
+                        squad_id = squad_id, user_id = user_id, votes = votes
                     )
                 )
             }
@@ -425,10 +403,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         val squadNum = (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
             .get(FIELD_USERS) as List<*>).size
 
-        val id = db.collection(KICK_VOTE_COLLECTION)
-            .whereEqualTo(FIELD_SQUAD_ID, squadId)
-            .whereEqualTo(FIELD_USER_ID, userId)
-            .get().await().firstOrNull()?.id
+        val id = db.collection(KICK_VOTE_COLLECTION).whereEqualTo(FIELD_SQUAD_ID, squadId)
+            .whereEqualTo(FIELD_USER_ID, userId).get().await().firstOrNull()?.id
 
         if (id != null) {
             db.collection(KICK_VOTE_COLLECTION).document(id).get().await()
@@ -466,9 +442,9 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     private suspend fun reevaluateVoteAfterKick(userId: String, squadId: String) {
-        val kicksList = db.collection(KICK_VOTE_COLLECTION)
-            .whereEqualTo(FIELD_SQUAD_ID, squadId)
-            .get().await().documents.toList()
+        val kicksList =
+            db.collection(KICK_VOTE_COLLECTION).whereEqualTo(FIELD_SQUAD_ID, squadId).get()
+                .await().documents.toList()
         //.toObjects(KickVoteData::class.java)
 
         val squadNumNull = db.collection(SQUADS_COLLECTION).document(squadId).get().await()
@@ -519,5 +495,53 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
 //endregion
+
+    private val userGeoFirestore = GeoFirestore(db.collection(PROFILE_DATA_COLLECTION))
+    private val resourcesGeoFirestore =
+        GeoFirestore(db.collection(FireStoreConstants.RESOURCES_COLLECTION))
+
+    private fun searchHandler(
+        geoFirestore: GeoFirestore,
+        onSearchCompleteCallback: (List<DocumentSnapshot>?) -> Unit,
+        onSearchFailedCallback: () -> Unit,
+        userLocation: GeoPoint,
+        radius: Double,
+    ) {
+        geoFirestore.getAtLocation(userLocation, radius) { docs, ex ->
+            if (ex != null) {
+                onSearchFailedCallback()
+                return@getAtLocation
+            } else {
+                onSearchCompleteCallback(docs)
+            }
+        }
+    }
+
+    fun searchUsersInRadius(
+        userLocation: GeoPoint,
+        radius: Double,
+        onSearchCompleteCallback: (List<DocumentSnapshot>?) -> Unit,
+        onSearchFailedCallback: () -> Unit
+    ) {
+        searchHandler(
+            userGeoFirestore, onSearchCompleteCallback, onSearchFailedCallback, userLocation, radius
+        )
+    }
+
+
+    fun searchResourcesInRadius(
+        userLocation: GeoPoint,
+        radius: Double,
+        onSearchCompleteCallback: (List<DocumentSnapshot>?) -> Unit,
+        onSearchFailedCallback: () -> Unit
+    ) {
+        searchHandler(
+            resourcesGeoFirestore,
+            onSearchCompleteCallback,
+            onSearchFailedCallback,
+            userLocation,
+            radius
+        )
+    }
 }
 

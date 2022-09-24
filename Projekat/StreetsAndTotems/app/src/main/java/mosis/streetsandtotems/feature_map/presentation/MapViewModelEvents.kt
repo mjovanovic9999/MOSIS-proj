@@ -51,4 +51,8 @@ sealed class MapViewModelEvents {
     object CloseVoteDialog : MapViewModelEvents()
     object KickAnswerYesInvite : MapViewModelEvents()
     object KickAnswerNoInvite : MapViewModelEvents()
+    object ShowSearchDialog : MapViewModelEvents()
+    object HideSearchDialog : MapViewModelEvents()
+    data class SearchUsers(val username: String, val radius: Double) : MapViewModelEvents()
+    data class SearchResources(val type: ResourceType, val radius: Double) : MapViewModelEvents()
 }

@@ -20,11 +20,11 @@ import mosis.streetsandtotems.feature_map.presentation.util.isSquadMember
 @Composable
 fun CustomPinImage(
     mySquadId: String,
-    selectedPlayerSquadId: ProfileData,
+    selectedPlayerSquadId: ProfileData?,
 ) {
     Box {
         GlideImage(
-            imageModel = if (selectedPlayerSquadId.image_uri == null)
+            imageModel = if (selectedPlayerSquadId?.image_uri == null)
                 Uri.EMPTY
             else
                 Uri.parse(selectedPlayerSquadId.image_uri),
@@ -37,7 +37,7 @@ fun CustomPinImage(
             painter = painterResource(
                 if (isSquadMember(
                         mySquadId,
-                        selectedPlayerSquadId.squad_id
+                        selectedPlayerSquadId?.squad_id
                     )
                 )
                     R.drawable.pin_friend
