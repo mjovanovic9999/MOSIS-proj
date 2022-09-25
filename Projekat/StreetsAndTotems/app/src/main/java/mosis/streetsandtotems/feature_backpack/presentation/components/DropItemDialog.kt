@@ -59,7 +59,7 @@ fun DropItemDialog(
                         text = ButtonConstants.DROP,
                         buttonType = CustomButtonType.Outlined,
                         textStyle = MaterialTheme.typography.titleMedium,
-                        enabled = dropAmount.value != "" && state.itemCount > 0 && dropAmount.value.toInt() <= state.itemCount
+                        enabled = dropAmount.value != "" && state.itemCount > 0 && dropAmount.value.toInt() <= state.itemCount && dropAmount.value.toInt() > 0,
                     )
 
                     CustomTextField(

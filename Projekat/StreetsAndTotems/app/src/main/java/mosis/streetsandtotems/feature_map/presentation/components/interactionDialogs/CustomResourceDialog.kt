@@ -1,7 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -9,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import mosis.streetsandtotems.core.ButtonConstants
@@ -53,7 +51,7 @@ fun CustomResourceDialog(
                 isTotem = false,
                 resourceType = convertResourceTypeToIconType(resourceType),
                 countMessage = itemsLeft.toString() + ITEMS_LEFT,
-                backpackSpaceMessage = emptySpaces.toString() + BACKPACK_EMPTY_SPACES_LEFT,
+                customMessage = emptySpaces.toString() + BACKPACK_EMPTY_SPACES_LEFT,
                 needTotemAdditionalText = false,
             )
         },

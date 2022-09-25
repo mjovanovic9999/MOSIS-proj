@@ -61,7 +61,7 @@ fun PlayerDialog(
                             .align(Alignment.CenterStart),
                     ) {
                         Text(
-                            text = (firstName ?: " ").first() + " " + (lastName ?: " ").first(),
+                            text = (firstName ?: " ").first() + "" + (lastName ?: " ").first(),
                             modifier = Modifier.align(Alignment.Center),
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -134,8 +134,9 @@ fun PlayerDialog(
         },
         confirmButtonEnabled = if (isSquadMember) true else !isUserInSquad,
         dismissButtonText = ButtonConstants.TRADE,
-        dismissButtonVisible = tradeEnabled,
-        dismissButtonMatchParentWidth = true,
+        dismissButtonVisible = false,//tradeEnabled,
+        dismissButtonEnabled = true,
+        dismissButtonMatchParentWidth = !true,
         buttonType = CustomButtonType.Outlined,
     )
 }

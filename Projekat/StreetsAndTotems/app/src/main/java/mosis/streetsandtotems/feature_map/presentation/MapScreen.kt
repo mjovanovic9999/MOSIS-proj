@@ -12,9 +12,7 @@ import mosis.streetsandtotems.core.MessageConstants.SQUAD_INVITE_QUESTION
 import mosis.streetsandtotems.core.MessageConstants.SQUAD_KICK
 import mosis.streetsandtotems.core.MessageConstants.SQUAD_KICK_QUESTION1
 import mosis.streetsandtotems.core.MessageConstants.SQUAD_KICK_QUESTION2
-import mosis.streetsandtotems.core.presentation.components.ConfirmationDialogType
-import mosis.streetsandtotems.core.presentation.components.CustomConfirmationDialog
-import mosis.streetsandtotems.core.presentation.components.PlayerDialog
+import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
@@ -23,7 +21,7 @@ import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
 import mosis.streetsandtotems.feature_map.presentation.components.MapFABs
 import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.*
 import mosis.streetsandtotems.feature_map.presentation.util.isSquadMember
-import mosis.streetsandtotems.feature_map.presentation.util.isTradePossible
+import mosis.streetsandtotems.feature_map.presentation.util.isInteractionPossible
 import mosis.streetsandtotems.feature_map.presentation.util.shouldEnableNumber
 
 @MainNavGraph(start = true)
@@ -56,8 +54,8 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         isOpen = state.playerDialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.ClosePlayerDialog) },
         isSquadMember = isSquadMember(state.mySquadId, state.selectedPlayer.squad_id),
-        tradeEnabled = isTradePossible(
-            state.playerLocation, state.selectedPlayer.l
+        tradeEnabled = isInteractionPossible(
+            state.myLocation, state.selectedPlayer.l
         ),
         callsAllowed = shouldEnableNumber(
             state.selectedPlayer.call_privacy_level,
@@ -115,15 +113,15 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         },
         resourceType = mapViewModel.mapScreenState.value.selectedResource.type,
         itemsLeft = mapViewModel.mapScreenState.value.selectedResource.remaining,
-        emptySpaces = state.playerInventory.empty_spaces,
-        oldInventoryData = state.playerInventory.inventory ?: InventoryData(),
+        emptySpaces = state.myInventory.empty_spaces,
+        oldInventoryData = state.myInventory.inventory ?: InventoryData(),
     )
 
     CustomMarketDialog(
         isOpen = state.marketDialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseMarketDialog) },
         items = state.market.items,
-        userInventoryData = state.playerInventory,
+        userInventoryData = state.myInventory,
         updateUserInventoryData = { mapViewModel.onEvent(MapViewModelEvents.UpdateInventory(it)) },
         updateMarketItems = { mapViewModel.onEvent(MapViewModelEvents.UpdateMarket(it)) },
     )
@@ -132,13 +130,13 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         isOpen = state.homeDialogOpen,
         inventoryData = state.home.inventory,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseHomeDialog) },
-        userInventoryData = state.playerInventory,
+        userInventoryData = state.myInventory,
         updateUserInventoryData = { mapViewModel.onEvent(MapViewModelEvents.UpdateInventory(it)) },
         updateHomeItems = { mapViewModel.onEvent(MapViewModelEvents.UpdateHome(it)) },
     )
 
     CustomTotemDialog(isOpen = state.totemDialogOpen,
-        userInventoryData = state.playerInventory,
+        userInventoryData = state.myInventory,
         updateUserInventoryData = { mapViewModel.onEvent(MapViewModelEvents.UpdateInventory(it)) },
         updateTotem = { mapViewModel.onEvent(MapViewModelEvents.UpdateTotem(it)) },
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseTotemDialog) },
@@ -158,7 +156,7 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         isOpen = state.claimTotemDialog,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseClaimTotemDialog) },
         onClaim = { mapViewModel.onEvent(MapViewModelEvents.ClaimTotem) },
-        backpackHasEmptySpace = state.playerInventory.empty_spaces != 0,
+        backpackHasEmptySpace = state.myInventory.empty_spaces != 0,
     )
 
     CustomConfirmationDialog(
@@ -210,6 +208,7 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
                     type, distance
                 )
             )
+            mapViewModel.onEvent(MapViewModelEvents.ResetFilters)
         })
 
     CustomSearchResultDialog(
@@ -217,4 +216,12 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.HideSearchResultDialog) },
         searchResults = state.searchResultDialogItems
     )
+
+    CustomFarItemDialog(
+        farItemDialogOpen = state.farItemDialogOpen,
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseFarItemDialogHandler) },
+        itemName = state.farIconName,
+        farResourceIconId = state.farItemIconId,
+    )
+
 }

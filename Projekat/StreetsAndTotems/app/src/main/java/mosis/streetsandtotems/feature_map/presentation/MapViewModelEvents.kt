@@ -56,4 +56,5 @@ sealed class MapViewModelEvents {
     data class SearchUsers(val username: String, val radius: Double) : MapViewModelEvents()
     data class SearchResources(val type: ResourceType, val radius: Double) : MapViewModelEvents()
     object HideSearchResultDialog : MapViewModelEvents()
+    object CloseFarItemDialogHandler : MapViewModelEvents()
 }

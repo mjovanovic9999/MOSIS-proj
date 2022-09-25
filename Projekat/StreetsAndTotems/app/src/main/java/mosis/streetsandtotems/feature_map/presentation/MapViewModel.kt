@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -20,6 +19,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.HandleResponseConstants
+import mosis.streetsandtotems.core.ItemsConstants
+import mosis.streetsandtotems.core.ItemsConstants.TOTEM
 import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_LAT
 import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_LNG
 import mosis.streetsandtotems.core.MapConstants.INIT_SCROLL_X
@@ -179,6 +180,7 @@ class MapViewModel @Inject constructor(
             )
             is MapViewModelEvents.SearchUsers -> onSearchUsersHandler(event.username, event.radius)
             MapViewModelEvents.HideSearchResultDialog -> onHideSearchResultDialog()
+            MapViewModelEvents.CloseFarItemDialogHandler -> closeFarItemDialogHandler()
         }
     }
 
@@ -279,20 +281,21 @@ class MapViewModel @Inject constructor(
             }
         }
 
-        return mutableStateOf(MapScreenState(mapState = mutableStateOf(MapState(
-            levelCount = LEVEL_COUNT,
-            fullWidth = mapDimensions,
-            fullHeight = mapDimensions,
-            workerCount = WORKER_COUNT,
-            tileSize = TITLE_SIZE
-        ) {
-            scroll(INIT_SCROLL_X, INIT_SCROLL_Y)
-        }.apply {
-            addLayer(tileStreamProvider)
-            enableRotation()
-            maxScale = MAX_SCALE
-            minimumScaleMode = Fill
-        }),
+        return mutableStateOf(MapScreenState(
+            mapState = mutableStateOf(MapState(
+                levelCount = LEVEL_COUNT,
+                fullWidth = mapDimensions,
+                fullHeight = mapDimensions,
+                workerCount = WORKER_COUNT,
+                tileSize = TITLE_SIZE
+            ) {
+                scroll(INIT_SCROLL_X, INIT_SCROLL_Y)
+            }.apply {
+                addLayer(tileStreamProvider)
+                enableRotation()
+                maxScale = MAX_SCALE
+                minimumScaleMode = Fill
+            }),
             customPinDialog = SelectedCustomPinDialog(
                 dialogOpen = false,
                 id = null,
@@ -316,12 +319,12 @@ class MapViewModel @Inject constructor(
             totemsHashMap = totemsHashMap,
             customPinsHashMap = customPinsHashMap,
             selectedPlayer = ProfileData(),
-            playerLocation = lastKnownLocation ?: GeoPoint(
+            myLocation = lastKnownLocation ?: GeoPoint(
                 INIT_SCROLL_LAT, INIT_SCROLL_LNG
             ),
             resourceDialogOpen = false,
             selectedResource = ResourceData(),
-            playerInventory = UserInventoryData(),
+            myInventory = UserInventoryData(),
             market = MarketData(),
             marketDialogOpen = false,
             home = HomeData(),
@@ -339,7 +342,10 @@ class MapViewModel @Inject constructor(
             voteDialogOpen = false,
             searchDialogOpen = false,
             searchResultDialogOpen = false,
-            searchResultDialogItems = emptyList()
+            searchResultDialogItems = emptyList(),
+            farItemDialogOpen = false,
+            farItemIconId = null,
+            farIconName = "",
         )
         )
     }
@@ -390,6 +396,10 @@ class MapViewModel @Inject constructor(
                 }
                 movePinAtLatLng(MY_PIN, event.newLocation.latitude, event.newLocation.longitude)
 
+                _mapScreenState.value = mapScreenState.value.copy(
+                    myLocation = GeoPoint(event.newLocation.latitude, event.newLocation.longitude)
+                )
+
                 if (mapScreenState.value.followMe) {
                     changeStateDetectScroll(false)
 
@@ -428,7 +438,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun onUserInventoryChangedHandler(newInventory: UserInventoryData) {
-        _mapScreenState.value = _mapScreenState.value.copy(playerInventory = newInventory)
+        _mapScreenState.value = _mapScreenState.value.copy(myInventory = newInventory)
     }
 
     private fun <T : Data> handlePinAction(pinAction: PinAction<T>) {
@@ -613,7 +623,7 @@ class MapViewModel @Inject constructor(
 
 
     private fun registerOnMapStateChangeListener() {
-        var pinLocation = mapScreenState.value.playerLocation
+        var pinLocation = mapScreenState.value.myLocation
         var scale = _mapState.scale
 
         viewModelScope.launch {
@@ -712,7 +722,7 @@ class MapViewModel @Inject constructor(
 
     private fun initMyLocationPinAndRegisterMove() {
         val offset = convertGeoPointNullToOffsets(
-            mapScreenState.value.playerLocation,
+            mapScreenState.value.myLocation,
             mapDimensions,
             mapDimensions,
         )
@@ -908,7 +918,44 @@ class MapViewModel @Inject constructor(
     }
 
     private fun showResourceDialogHandler() {
-        _mapScreenState.value = _mapScreenState.value.copy(resourceDialogOpen = true)
+        if (isInteractionPossible(
+                mapScreenState.value.myLocation,
+                mapScreenState.value.selectedResource.l,
+            )
+        ) {
+            _mapScreenState.value = _mapScreenState.value.copy(resourceDialogOpen = true)
+        } else {
+            val iconName: String
+            val iconId: Int
+            when (mapScreenState.value.selectedResource.type) {
+                ResourceType.Wood -> {
+                    iconName = ItemsConstants.WOOD
+                    iconId = R.drawable.wood
+                }
+                ResourceType.Brick -> {
+                    iconName = ItemsConstants.BRICK
+                    iconId = R.drawable.brick
+                }
+                ResourceType.Stone -> {
+                    iconName = ItemsConstants.STONE
+                    iconId = R.drawable.stone
+                }
+                ResourceType.Emerald -> {
+                    iconName = ItemsConstants.EMERALD
+                    iconId = R.drawable.emerald
+                }
+                null -> {
+                    iconName = ""
+                    iconId = R.drawable.home
+                }
+            }
+            _mapScreenState.value = _mapScreenState.value.copy(
+                farItemDialogOpen = true,
+                farItemIconId = iconId,
+                farIconName = iconName,
+            )
+
+        }
     }
 
     private fun closeResourceDialogHandler() {
@@ -981,7 +1028,19 @@ class MapViewModel @Inject constructor(
     }
 
     private fun showMarketDialogHandler() {
-        _mapScreenState.value = _mapScreenState.value.copy(marketDialogOpen = true)
+        if (isInteractionPossible(
+                mapScreenState.value.myLocation,
+                mapScreenState.value.market.l,
+            )
+        ) {
+            _mapScreenState.value = _mapScreenState.value.copy(marketDialogOpen = true)
+        } else {
+            _mapScreenState.value = _mapScreenState.value.copy(
+                farItemDialogOpen = true,
+                farItemIconId = R.drawable.marketplace,
+                farIconName = "Market",
+            )
+        }
     }
 
     private fun closeMarketDialogHandler() {
@@ -989,7 +1048,19 @@ class MapViewModel @Inject constructor(
     }
 
     private fun showHomeDialogHandler() {
-        _mapScreenState.value = _mapScreenState.value.copy(homeDialogOpen = true)
+        if (isInteractionPossible(
+                mapScreenState.value.myLocation,
+                mapScreenState.value.home.l,
+            )
+        ) {
+            _mapScreenState.value = _mapScreenState.value.copy(homeDialogOpen = true)
+        } else {
+            _mapScreenState.value = _mapScreenState.value.copy(
+                farItemDialogOpen = true,
+                farItemIconId = R.drawable.home,
+                farIconName = "Home",
+            )
+        }
     }
 
     private fun closeHomeDialogHandler() {
@@ -997,7 +1068,19 @@ class MapViewModel @Inject constructor(
     }
 
     private fun showTotemDialogHandler() {
-        _mapScreenState.value = _mapScreenState.value.copy(totemDialogOpen = true)
+        if (isInteractionPossible(
+                mapScreenState.value.myLocation,
+                mapScreenState.value.selectedTotem.l,
+            )
+        ) {
+            _mapScreenState.value = _mapScreenState.value.copy(totemDialogOpen = true)
+        } else {
+            _mapScreenState.value = _mapScreenState.value.copy(
+                farItemDialogOpen = true,
+                farItemIconId = null,
+                farIconName = TOTEM,
+            )
+        }
     }
 
     private fun closeTotemDialogHandler() {
@@ -1034,6 +1117,10 @@ class MapViewModel @Inject constructor(
 
     private fun closeVoteHandler() {
         _mapScreenState.value = _mapScreenState.value.copy(voteDialogOpen = false)
+    }
+
+    private fun closeFarItemDialogHandler() {
+        _mapScreenState.value = _mapScreenState.value.copy(farItemDialogOpen = false)
     }
 
 //endregion
@@ -1084,8 +1171,6 @@ class MapViewModel @Inject constructor(
             }
         }
     }
-
-    private fun updateHomeHandler() {}
 
     private fun removeHomeHandler() {
         viewModelScope.launch {
@@ -1188,9 +1273,9 @@ class MapViewModel @Inject constructor(
             viewModelScope.launch {
                 mapViewModelRepository.updateUserInventory(
                     UserInventoryData(
-                        empty_spaces = (mapScreenState.value.playerInventory.empty_spaces ?: 1) - 1,
-                        inventory = mapScreenState.value.playerInventory.inventory?.copy(
-                            totem = (mapScreenState.value.playerInventory.inventory?.totem ?: 0) + 1
+                        empty_spaces = (mapScreenState.value.myInventory.empty_spaces ?: 1) - 1,
+                        inventory = mapScreenState.value.myInventory.inventory?.copy(
+                            totem = (mapScreenState.value.myInventory.inventory?.totem ?: 0) + 1
                         )
                     )
                 )

@@ -141,7 +141,11 @@ class MapViewModelRepositoryImpl(
             it?.forEach() { userSnapshot ->
                 val user =
                     userSnapshot.toObject(ProfileData::class.java)?.copy(id = userSnapshot.id)
-                if (user != null && user.user_name?.contains(username) == true && user.id != userId && user.is_online == true) users.add(
+                if (user != null && user.user_name?.contains(
+                        username,
+                        ignoreCase = true
+                    ) == true && user.id != userId && user.is_online == true
+                ) users.add(
                     PlayerSearchResultItem(user, onResultItemClick)
                 )
             }
@@ -155,14 +159,15 @@ class MapViewModelRepositoryImpl(
         userLocation: GeoPoint,
         onSearchCompleted: (List<ResourceSearchResultItem>) -> Unit,
         onSearchFailed: () -> Unit,
-        onResultItemClick: (ResourceData) -> Unit
+        onResultItemClick: (ResourceData) -> Unit,
     ) {
         val resources = mutableListOf<ResourceSearchResultItem>()
         firebaseMapDataSource.searchResourcesInRadius(userLocation, radius, {
             it?.forEach { resourceSnapshot ->
-                val resource = resourceSnapshot.toObject(ResourceData::class.java)?.copy(id = resourceSnapshot.id)
+                val resource = resourceSnapshot.toObject(ResourceData::class.java)
+                    ?.copy(id = resourceSnapshot.id)
                 if (resource != null && resource.type == type) resources.add(
-                    ResourceSearchResultItem(resource, onResultItemClick)
+                    ResourceSearchResultItem(resource, onResultItemClick, userLocation)
                 )
             }
             onSearchCompleted(resources)

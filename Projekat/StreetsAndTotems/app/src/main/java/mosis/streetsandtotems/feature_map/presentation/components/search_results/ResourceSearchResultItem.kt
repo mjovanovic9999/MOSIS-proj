@@ -15,15 +15,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.SearchConstants
+import mosis.streetsandtotems.core.SearchConstants.DISTANCE_UNIT
+import mosis.streetsandtotems.core.SearchConstants.NULL_GEOPOINT
 import mosis.streetsandtotems.core.presentation.components.CustomLazyColumnItem
 import mosis.streetsandtotems.feature_map.domain.model.ResourceData
 import mosis.streetsandtotems.feature_map.domain.model.ResourceType
+import mosis.streetsandtotems.feature_map.presentation.util.distanceBetweenGeoPoints
 import mosis.streetsandtotems.ui.theme.sizes
 
 class ResourceSearchResultItem(
-    private val resourceData: ResourceData, private val onClick: (ResourceData) -> Unit
+    private val resourceData: ResourceData,
+    private val onClick: (ResourceData) -> Unit,
+    private val myLocation: GeoPoint,
 ) : SearchResultItem {
     @Composable
     override fun getLazyColumnItem() {
@@ -75,12 +81,19 @@ class ResourceSearchResultItem(
                     modifier = Modifier.weight(0.35f)
                 ) {
                     Text(
-                        text = SearchConstants.LEFT,
+                        text = SearchConstants.ITEM_DISTANCE,
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                     Text(
-                        text = resourceData.remaining.toString(),
+                        text =
+                        if (null == resourceData.l)
+                            NULL_GEOPOINT
+                        else
+                            (distanceBetweenGeoPoints(
+                                myLocation,
+                                resourceData.l
+                            ) + 0.5f).toInt().toString() + DISTANCE_UNIT,
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )

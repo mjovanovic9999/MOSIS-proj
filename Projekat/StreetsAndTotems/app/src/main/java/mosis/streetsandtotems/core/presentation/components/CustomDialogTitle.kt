@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
 import mosis.streetsandtotems.core.ItemsConstants
+import mosis.streetsandtotems.core.PinConstants.HOME
 import mosis.streetsandtotems.core.PointsConversion
 import mosis.streetsandtotems.ui.theme.sizes
 
@@ -39,7 +40,7 @@ fun CustomDialogTitle(
     isTotem: Boolean = false,
     resourceType: IconType? = null,
     countMessage: String? = null,
-    backpackSpaceMessage: String? = null,
+    customMessage: String? = null,
     needTotemAdditionalText: Boolean,
 ) {
     Row(
@@ -94,7 +95,7 @@ fun CustomDialogTitle(
                     IconType.ResourceType.Wood -> ItemsConstants.WOOD + if (needTotemAdditionalText) IconType.ResourceType.Wood.additionalText else ""
                     IconType.ResourceType.Stone -> ItemsConstants.STONE + if (needTotemAdditionalText) IconType.ResourceType.Stone.additionalText else ""
                     IconType.ResourceType.Brick -> ItemsConstants.BRICK + if (needTotemAdditionalText) IconType.ResourceType.Brick.additionalText else ""
-                    IconType.OtherType.Home -> TODO()
+                    IconType.OtherType.Home -> HOME
                 },
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -109,9 +110,9 @@ fun CustomDialogTitle(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
-                if (backpackSpaceMessage != null)
+                if (customMessage != null)
                     Text(
-                        text = backpackSpaceMessage,
+                        text = customMessage,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.End,

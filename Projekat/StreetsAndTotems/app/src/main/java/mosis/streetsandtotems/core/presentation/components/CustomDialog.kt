@@ -69,5 +69,6 @@ fun CustomDialog(
                         contentPadding = ButtonDefaults.ContentPadding,
                         enabled = dismissButtonEnabled
                     )
-            })
+            }
+        )
 }

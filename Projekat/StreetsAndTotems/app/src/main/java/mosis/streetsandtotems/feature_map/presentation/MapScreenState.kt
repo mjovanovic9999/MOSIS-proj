@@ -27,8 +27,8 @@ data class MapScreenState(
     val totemsHashMap: Map<String, TotemData>,
     val customPinsHashMap: Map<String, CustomPinData>,
 
-    val playerLocation: GeoPoint,
-    val playerInventory: UserInventoryData,
+    val myLocation: GeoPoint,
+    val myInventory: UserInventoryData,
 
     val playerDialogOpen: Boolean,
     val selectedPlayer: ProfileData,
@@ -59,7 +59,11 @@ data class MapScreenState(
     val searchDialogOpen: Boolean,
 
     val searchResultDialogOpen: Boolean,
-    val searchResultDialogItems: List<SearchResultItem>
+    val searchResultDialogItems: List<SearchResultItem>,
+
+    val farItemDialogOpen: Boolean,
+    val farItemIconId: Int?,
+    val farIconName: String,
 )
 
 

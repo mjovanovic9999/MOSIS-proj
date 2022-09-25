@@ -298,7 +298,7 @@ private fun ItemMarket(
                 isTotem = false,
                 resourceType = convertResourceTypeToIconType(resourceType),
                 countMessage = itemsLeft.toString() + TitleConstants.ITEMS_LEFT,
-                backpackSpaceMessage = "$PRICE $exchangeCurrency ${exchangeResourceType}s",
+                customMessage = "$PRICE $exchangeCurrency ${exchangeResourceType}s",
                 needTotemAdditionalText = false,
             )
         },

@@ -5,7 +5,7 @@ import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.core.MapConstants.DEGREES_TO_RADIANS_COEFFICIENT
 import mosis.streetsandtotems.core.MapConstants.LEVEL_COUNT
 import mosis.streetsandtotems.core.MapConstants.MAP_PRECISION_METERS
-import mosis.streetsandtotems.core.MapConstants.MAXIMUM_TRADE_DISTANCE_IN_METERS
+import mosis.streetsandtotems.core.MapConstants.MAXIMUM_INTERACTION_DISTANCE_IN_METERS
 import mosis.streetsandtotems.core.MapConstants.RADIANS_TO_DEGREES_COEFFICIENT
 import mosis.streetsandtotems.core.MapConstants.TITLE_SIZE
 import kotlin.math.*
@@ -106,9 +106,9 @@ fun distanceBetweenGeoPoints(
     return result[0]
 }
 
-fun isTradePossible(myLocation: GeoPoint?, otherPlayerLocation: GeoPoint?): Boolean =
-    if (myLocation != null && otherPlayerLocation != null)
+fun isInteractionPossible(myLocation: GeoPoint, otherPlayerLocation: GeoPoint?): Boolean =
+    if (otherPlayerLocation != null)
         distanceBetweenGeoPoints(
             GeoPoint(myLocation.latitude, myLocation.longitude), otherPlayerLocation
-        ) <= MAXIMUM_TRADE_DISTANCE_IN_METERS
+        ) <= MAXIMUM_INTERACTION_DISTANCE_IN_METERS
     else false

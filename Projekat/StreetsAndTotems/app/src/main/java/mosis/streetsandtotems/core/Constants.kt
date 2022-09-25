@@ -113,7 +113,9 @@ object SearchConstants {
     const val DISTANCE = "Search radius in km"
     const val RADIUS_EMPTY = "*Leave empty for searching whole world"
     const val TYPE = "Type: "
-    const val LEFT = "Left:"
+    const val ITEM_DISTANCE = "Distance:"
+    const val NULL_GEOPOINT = "unknown"
+    const val DISTANCE_UNIT = " m"
 }
 
 object ButtonConstants {
@@ -230,7 +232,7 @@ object MapConstants {
     const val TILE_KEY = "njA6yIfsMq23cZHLTop1"
     const val MAP_PRECISION_METERS = 2f
     const val MAXIMUM_IGNORE_ACCURACY_METERS = 2000f
-    const val MAXIMUM_TRADE_DISTANCE_IN_METERS = 20f
+    const val MAXIMUM_INTERACTION_DISTANCE_IN_METERS = 35f
     const val PREFERRED_INTERVAL = 4000L
 }
 
@@ -305,7 +307,7 @@ object MessageConstants {
     const val SQUAD_KICK = "Kicking from squad"
     const val SQUAD_KICK_QUESTION1 = "Kick user "
     const val SQUAD_KICK_QUESTION2 = " from squad?"
-
+    const val GET_CLOSER = "Get closer for more info!"
 }
 
 object TitleConstants {

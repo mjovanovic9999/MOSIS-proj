@@ -159,11 +159,11 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     suspend fun updateTotem(totemId: String, newTotem: TotemData) {
-        db.collection(FireStoreConstants.TOTEMS_COLLECTION).document(totemId).set(newTotem).await()
+        db.collection(TOTEMS_COLLECTION).document(totemId).set(newTotem).await()
     }
 
     suspend fun deleteTotem(totemId: String) {
-        db.collection(FireStoreConstants.TOTEMS_COLLECTION).document(totemId).delete().await()
+        db.collection(TOTEMS_COLLECTION).document(totemId).delete().await()
     }
 
     suspend fun getRiddle(protectionLevel: ProtectionLevel.RiddleProtectionLevel): RiddleData? {
@@ -192,7 +192,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     suspend fun updateSquadLeaderboard(squadId: String, addSquadLeaderboardPoints: Int) {
         val ids = db.collection(SQUADS_COLLECTION).document(squadId)
-            .get()///////////////////
+            .get()
             .await().get(FIELD_USERS) as List<*>
         for (item in ids) {
             if (item is String) updateLeaderboard(
@@ -470,7 +470,6 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                             removeFromSquad(userId)
                             db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
                             reevaluateVoteAfterKick(userId, squadId)
-                            //promeniti listu na kickvote kad se neko izbaci
                         } else if (votesHalf <= voteNo) {
                             db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
 
