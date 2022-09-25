@@ -34,6 +34,9 @@ object FireStoreConstants {
     const val FIELD_BRICK = "brick"
     const val FIELD_TOTEM = "totem"
 
+    const val FIELD_PLACED_BY = "placed_by"
+    const val FIELD_VISIBLE_TO = "visible_to"
+
     const val EASY_RIDDLES_COLLECTION = "easy_riddles"
     const val MEDIUM_RIDDLES_COLLECTION = "medium_riddles"
     const val HARD_RIDDLES_COLLECTION = "hard_riddles"
