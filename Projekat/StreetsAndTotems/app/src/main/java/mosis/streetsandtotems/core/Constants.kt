@@ -101,6 +101,9 @@ object SearchConstants {
         ItemsConstants.BRICK, ItemsConstants.WOOD, ItemsConstants.EMERALD, ItemsConstants.STONE
     )
     const val DISTANCE = "Search radius in km"
+    const val RADIUS_EMPTY = "*Leave empty for searching whole world"
+    const val TYPE = "Type: "
+    const val LEFT = "Left:"
 }
 
 object ButtonConstants {
@@ -235,6 +238,7 @@ object HandleResponseConstants {
 }
 
 object MessageConstants {
+    const val NO_RESULTS = "No results"
     const val SEARCH_FAILED = "Search failed, please try again!"
     const val PASSWORD_UPDATE_ERROR = "An error occurred while updating password! Please try again!"
     const val PASSWORD_UPDATE_SUCCESSFUL = "Password updated successfully!"
@@ -295,6 +299,7 @@ object MessageConstants {
 }
 
 object TitleConstants {
+    const val SEARCH_RESULTS = "Search results"
     const val SEARCH = "Search"
     const val PASSWORD_RESET = "Reset password"
     const val EMAIL_VERIFICATION = "Email verification"

@@ -8,14 +8,14 @@ import mosis.streetsandtotems.feature_map.domain.model.ResourceType
 
 class BackpackRepositoryImpl(
     private val preferenceDataSource: PreferencesDataStore,
-    private val firebaseBackpackRepository: FirebaseBackpackDataSource,
+    private val firebaseBackpackDataSource: FirebaseBackpackDataSource,
 ) : BackpackRepository {
     override suspend fun dropResource(l: GeoPoint, itemCount: Int, type: ResourceType) {
-        firebaseBackpackRepository.dropResource(l, itemCount, type)
+        firebaseBackpackDataSource.dropResource(l, itemCount, type)
     }
 
     override suspend fun placeTotem(l: GeoPoint) {
-        firebaseBackpackRepository.placeTotem(
+        firebaseBackpackDataSource.placeTotem(
             preferenceDataSource.getUserId(),
             l,
             preferenceDataSource.getUserSquadId()

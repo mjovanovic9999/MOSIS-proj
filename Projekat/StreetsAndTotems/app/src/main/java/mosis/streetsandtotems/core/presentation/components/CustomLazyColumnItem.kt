@@ -10,10 +10,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import mosis.streetsandtotems.ui.theme.sizes
 
 @Composable
-fun CustomLazyColumnItem(onButtonClick: () -> Unit, content: @Composable RowScope.() -> Unit) {
+fun CustomLazyColumnItem(
+    onButtonClick: () -> Unit,
+    buttonIcon: ImageVector = Icons.Filled.MoreVert,
+    content: @Composable RowScope.() -> Unit,
+) {
     Box(modifier = Modifier.padding(bottom = MaterialTheme.sizes.lazy_column_spacing)) {
         Row(
             modifier = Modifier
@@ -21,14 +26,13 @@ fun CustomLazyColumnItem(onButtonClick: () -> Unit, content: @Composable RowScop
                 .background(
                     MaterialTheme.colorScheme.secondaryContainer,
                     RoundedCornerShape(MaterialTheme.sizes.default_shape_corner)
-                ),
-            verticalAlignment = Alignment.CenterVertically
+                ), verticalAlignment = Alignment.CenterVertically
         ) {
             content()
 
             CustomIconButton(
                 clickHandler = onButtonClick,
-                icon = Icons.Filled.MoreVert,
+                icon = buttonIcon,
                 buttonModifier = Modifier.weight(MaterialTheme.sizes.lazy_column_button_weight),
                 colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.onSecondaryContainer)
             )

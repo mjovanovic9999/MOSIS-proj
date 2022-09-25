@@ -3,6 +3,7 @@ package mosis.streetsandtotems.feature_map.presentation
 import androidx.compose.runtime.MutableState
 import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.feature_map.domain.model.*
+import mosis.streetsandtotems.feature_map.presentation.components.search_results.SearchResultItem
 import ovh.plrapps.mapcompose.ui.state.MapState
 
 data class MapScreenState(
@@ -55,8 +56,10 @@ data class MapScreenState(
     val interactionUserId: String,
     val interactionUserName: String,
 
-    val searchDialogOpen: Boolean
+    val searchDialogOpen: Boolean,
 
+    val searchResultDialogOpen: Boolean,
+    val searchResultDialogItems: List<SearchResultItem>
 )
 
 

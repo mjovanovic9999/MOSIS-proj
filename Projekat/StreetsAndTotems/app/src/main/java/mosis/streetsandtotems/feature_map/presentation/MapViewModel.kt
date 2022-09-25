@@ -1,7 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.SnackbarDuration
@@ -51,6 +50,7 @@ import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelReposito
 import mosis.streetsandtotems.feature_map.domain.use_case.MapUseCases
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPin
 import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
+import mosis.streetsandtotems.feature_map.presentation.components.search_results.SearchResultItem
 import mosis.streetsandtotems.feature_map.presentation.util.*
 import mosis.streetsandtotems.services.LocationService
 import mosis.streetsandtotems.services.LocationServiceCommonEvents
@@ -178,7 +178,20 @@ class MapViewModel @Inject constructor(
                 event.type, event.radius
             )
             is MapViewModelEvents.SearchUsers -> onSearchUsersHandler(event.username, event.radius)
+            MapViewModelEvents.HideSearchResultDialog -> onHideSearchResultDialog()
         }
+    }
+
+    private fun showSearchResultDialog(searchResultItems: List<SearchResultItem>) {
+        _mapScreenState.value = _mapScreenState.value.copy(
+            searchResultDialogOpen = true, searchResultDialogItems = searchResultItems
+        )
+    }
+
+    private fun onHideSearchResultDialog() {
+        _mapScreenState.value = _mapScreenState.value.copy(
+            searchResultDialogOpen = false, searchResultDialogItems = emptyList()
+        )
     }
 
     private fun onSearchUsersHandler(username: String, distance: Double) {
@@ -190,11 +203,19 @@ class MapViewModel @Inject constructor(
                 onSearchCompleted = {
                     viewModelScope.launch {
                         showLoader.emit(false)
-                        Log.d("tagic", it.toString())
+                        showSearchResultDialog(it)
                     }
                 },
                 onSearchFailed = {
                     handleSearchFail()
+                },
+                onResultItemClick = {
+                    it.id?.let { id ->
+                        centerOnPin(id)
+                        _mapScreenState.value = _mapScreenState.value.copy(selectedPlayer = it)
+                        onHideSearchResultDialog()
+                        showPlayerDialogHandler()
+                    }
                 })
         }
     }
@@ -205,9 +226,16 @@ class MapViewModel @Inject constructor(
             mapUseCases.searchResources(type, radius, LocationService.lastKnownLocation!!, {
                 viewModelScope.launch {
                     showLoader.emit(false)
-                    Log.d("tagic", it.toString())
+                    showSearchResultDialog(it)
                 }
-            }, { handleSearchFail() })
+            }, { handleSearchFail() }, {
+                it.id?.let { id ->
+                    centerOnPin(id)
+                    _mapScreenState.value = _mapScreenState.value.copy(selectedResource = it)
+                    onHideSearchResultDialog()
+                    showResourceDialogHandler()
+                }
+            })
         }
     }
 
@@ -251,21 +279,20 @@ class MapViewModel @Inject constructor(
             }
         }
 
-        return mutableStateOf(MapScreenState(
-            mapState = mutableStateOf(MapState(
-                levelCount = LEVEL_COUNT,
-                fullWidth = mapDimensions,
-                fullHeight = mapDimensions,
-                workerCount = WORKER_COUNT,
-                tileSize = TITLE_SIZE
-            ) {
-                scroll(INIT_SCROLL_X, INIT_SCROLL_Y)
-            }.apply {
-                addLayer(tileStreamProvider)
-                enableRotation()
-                maxScale = MAX_SCALE
-                minimumScaleMode = Fill
-            }),
+        return mutableStateOf(MapScreenState(mapState = mutableStateOf(MapState(
+            levelCount = LEVEL_COUNT,
+            fullWidth = mapDimensions,
+            fullHeight = mapDimensions,
+            workerCount = WORKER_COUNT,
+            tileSize = TITLE_SIZE
+        ) {
+            scroll(INIT_SCROLL_X, INIT_SCROLL_Y)
+        }.apply {
+            addLayer(tileStreamProvider)
+            enableRotation()
+            maxScale = MAX_SCALE
+            minimumScaleMode = Fill
+        }),
             customPinDialog = SelectedCustomPinDialog(
                 dialogOpen = false,
                 id = null,
@@ -311,6 +338,8 @@ class MapViewModel @Inject constructor(
             interactionUserId = "",
             voteDialogOpen = false,
             searchDialogOpen = false,
+            searchResultDialogOpen = false,
+            searchResultDialogItems = emptyList()
         )
         )
     }
@@ -421,10 +450,8 @@ class MapViewModel @Inject constructor(
                 is CustomPinData -> {
                     customPinsHashMap[it] = dataType
                     composable = {
-                        if (mapScreenState.value.myId == dataType.placed_by
-                            || isSquadMember(
-                                mapScreenState.value.mySquadId,
-                                customPinsHashMap[it]?.visible_to
+                        if (mapScreenState.value.myId == dataType.placed_by || isSquadMember(
+                                mapScreenState.value.mySquadId, customPinsHashMap[it]?.visible_to
                             )
                         ) {
                             Text(dataType.visible_to.toString())
@@ -499,8 +526,7 @@ class MapViewModel @Inject constructor(
                 }
                 is CustomPinData -> {
                     if (mapScreenState.value.myId == dataType.placed_by || isSquadMember(
-                            mapScreenState.value.mySquadId,
-                            dataType.visible_to
+                            mapScreenState.value.mySquadId, dataType.visible_to
                         )
                     ) {
                         if (customPinsHashMap.containsKey(it)) {

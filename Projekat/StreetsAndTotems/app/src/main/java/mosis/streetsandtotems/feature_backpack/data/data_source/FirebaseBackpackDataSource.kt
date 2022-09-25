@@ -8,10 +8,14 @@ import mosis.streetsandtotems.core.FireStoreConstants
 import mosis.streetsandtotems.feature_map.domain.model.ResourceData
 import mosis.streetsandtotems.feature_map.domain.model.ResourceType
 import mosis.streetsandtotems.feature_map.domain.model.TotemData
+import org.imperiumlabs.geofirestore.GeoFirestore
 
 class FirebaseBackpackDataSource(private val db: FirebaseFirestore) {
 
     suspend fun dropResource(l: GeoPoint, itemCount: Int, type: ResourceType) {
+        val resourceGeoFirestore =
+            GeoFirestore(db.collection(FireStoreConstants.RESOURCES_COLLECTION))
+
         db.collection(FireStoreConstants.RESOURCES_COLLECTION).document().set(
             ResourceData(
                 l = l,

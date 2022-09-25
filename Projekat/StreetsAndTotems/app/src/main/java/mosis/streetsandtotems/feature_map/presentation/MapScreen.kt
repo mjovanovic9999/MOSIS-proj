@@ -39,7 +39,8 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         showFilterDialog = { mapViewModel.onEvent(MapViewModelEvents.ShowFilterDialog) },
         showSearchDialog = { mapViewModel.onEvent(MapViewModelEvents.ShowSearchDialog) })
 
-    CustomPinDialog(isOpen = state.customPinDialog.dialogOpen,
+    CustomPinDialog(
+        isOpen = state.customPinDialog.dialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseCustomPinDialog) },
         dialogText = state.customPinDialog.text,
         isNewPin = state.customPinDialog.id == null,
@@ -210,4 +211,10 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
                 )
             )
         })
+
+    CustomSearchResultDialog(
+        isOpen = state.searchResultDialogOpen,
+        onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.HideSearchResultDialog) },
+        searchResults = state.searchResultDialogItems
+    )
 }

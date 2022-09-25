@@ -2,6 +2,8 @@ package mosis.streetsandtotems.feature_map.domain.repository
 
 import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.feature_map.domain.model.*
+import mosis.streetsandtotems.feature_map.presentation.components.search_results.PlayerSearchResultItem
+import mosis.streetsandtotems.feature_map.presentation.components.search_results.ResourceSearchResultItem
 
 interface MapViewModelRepository {
     suspend fun addCustomPin(l: GeoPoint, visible_to: String, placed_by: String, text: String)
@@ -57,16 +59,18 @@ interface MapViewModelRepository {
         username: String,
         radius: Double,
         userLocation: GeoPoint,
-        onSearchCompleted: (List<UserData>) -> Unit,
-        onSearchFailed: () -> Unit
+        onSearchCompleted: (List<PlayerSearchResultItem>) -> Unit,
+        onSearchFailed: () -> Unit,
+        onResultItemClick: (ProfileData) -> Unit
     )
 
     fun searchResourceInRadius(
         type: ResourceType,
         radius: Double,
         userLocation: GeoPoint,
-        onSearchCompleted: (List<ResourceData>) -> Unit,
-        onSearchFailed: () -> Unit
+        onSearchCompleted: (List<ResourceSearchResultItem>) -> Unit,
+        onSearchFailed: () -> Unit,
+        onResultItemClick: (ResourceData) -> Unit
     )
 //    suspend fun registerCallbackOnUserInventoryUpdate(callback: (UserInventoryData) -> Unit)
 }

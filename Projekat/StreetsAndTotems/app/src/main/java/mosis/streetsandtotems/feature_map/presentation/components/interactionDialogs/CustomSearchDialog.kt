@@ -29,7 +29,7 @@ fun CustomSearchDialog(
 ) {
     val selectedTabIndex = remember { mutableStateOf(0) }
     val distance = remember {
-        mutableStateOf("0")
+        mutableStateOf("")
     }
 
     CustomDialog(isOpen = isOpen,
@@ -54,21 +54,30 @@ fun CustomSearchDialog(
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                    CustomTextField(
-                        value = distance.value,
-                        onValueChange = { distance.value = it },
-                        placeholder = SearchConstants.DISTANCE,
-                        label = SearchConstants.DISTANCE,
-                        textFieldType = CustomTextFieldType.Outlined,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                        singleLine = true
-                    )
+                    Column() {
+                        CustomTextField(
+                            value = distance.value,
+                            onValueChange = { distance.value = it },
+                            placeholder = SearchConstants.DISTANCE,
+                            label = SearchConstants.DISTANCE,
+                            textFieldType = CustomTextFieldType.Outlined,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                            singleLine = true
+                        )
+                        Text(
+                            text = SearchConstants.RADIUS_EMPTY,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     when (selectedTabIndex.value) {
                         0 -> {
                             UsersSearch(onUsersSearch = {
                                 onUsersSearch(
-                                    it, distance.value.toDouble()
+                                    it, distance.value.toDoubleOrNull() ?: .0
                                 )
                                 onDismissRequest()
                             })
@@ -78,7 +87,7 @@ fun CustomSearchDialog(
                                 onResourcesSearch(
                                     ResourceType.valueOf(
                                         it
-                                    ), distance.value.toDouble()
+                                    ), distance.value.toDoubleOrNull() ?: .0
                                 )
                                 onDismissRequest()
                             })
@@ -112,7 +121,9 @@ private fun UsersSearch(onUsersSearch: (String) -> Unit) {
         clickHandler = { onUsersSearch(value.value) },
         enabled = value.value != "",
         text = ButtonConstants.SEARCH,
-        matchParentWidth = true
+        matchParentWidth = true,
+        buttonType = CustomButtonType.Outlined,
+        textStyle = MaterialTheme.typography.titleMedium,
     )
 }
 
@@ -134,7 +145,9 @@ private fun ResourcesSearch(onResourcesSearch: (String) -> Unit) {
         clickHandler = { selectedIndex.value?.let { onResourcesSearch(SearchConstants.selectList[it]) } },
         text = ButtonConstants.SEARCH,
         matchParentWidth = true,
-        enabled = selectedIndex.value != null
+        enabled = selectedIndex.value != null,
+        buttonType = CustomButtonType.Outlined,
+        textStyle = MaterialTheme.typography.titleMedium,
     )
 
 }

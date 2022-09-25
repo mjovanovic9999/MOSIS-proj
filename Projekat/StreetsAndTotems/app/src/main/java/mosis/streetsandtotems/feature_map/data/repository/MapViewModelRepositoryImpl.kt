@@ -1,11 +1,12 @@
 package mosis.streetsandtotems.feature_map.data.repository
 
-import android.util.Log
 import com.google.firebase.firestore.GeoPoint
 import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
 import mosis.streetsandtotems.feature_map.domain.model.*
 import mosis.streetsandtotems.feature_map.domain.repository.MapViewModelRepository
+import mosis.streetsandtotems.feature_map.presentation.components.search_results.PlayerSearchResultItem
+import mosis.streetsandtotems.feature_map.presentation.components.search_results.ResourceSearchResultItem
 
 class MapViewModelRepositoryImpl(
     private val preferenceDataSource: PreferencesDataStore,
@@ -130,16 +131,18 @@ class MapViewModelRepositoryImpl(
         username: String,
         radius: Double,
         userLocation: GeoPoint,
-        onSearchCompleted: (List<UserData>) -> Unit,
-        onSearchFailed: () -> Unit
+        onSearchCompleted: (List<PlayerSearchResultItem>) -> Unit,
+        onSearchFailed: () -> Unit,
+        onResultItemClick: (ProfileData) -> Unit
     ) {
         val userId = preferenceDataSource.getUserId()
-        val users = mutableListOf<UserData>()
+        val users = mutableListOf<PlayerSearchResultItem>()
         firebaseMapDataSource.searchUsersInRadius(userLocation, radius, onSearchCompleteCallback = {
             it?.forEach() { userSnapshot ->
-                val user = userSnapshot.toObject(UserData::class.java)?.copy(id = userSnapshot.id)
-                if (user != null && user.user_name?.contains(username) == true && user.id != userId) users.add(
-                    user
+                val user =
+                    userSnapshot.toObject(ProfileData::class.java)?.copy(id = userSnapshot.id)
+                if (user != null && user.user_name?.contains(username) == true && user.id != userId && user.is_online == true) users.add(
+                    PlayerSearchResultItem(user, onResultItemClick)
                 )
             }
             onSearchCompleted(users)
@@ -150,15 +153,17 @@ class MapViewModelRepositoryImpl(
         type: ResourceType,
         radius: Double,
         userLocation: GeoPoint,
-        onSearchCompleted: (List<ResourceData>) -> Unit,
-        onSearchFailed: () -> Unit
+        onSearchCompleted: (List<ResourceSearchResultItem>) -> Unit,
+        onSearchFailed: () -> Unit,
+        onResultItemClick: (ResourceData) -> Unit
     ) {
-        val resources = mutableListOf<ResourceData>()
+        val resources = mutableListOf<ResourceSearchResultItem>()
         firebaseMapDataSource.searchResourcesInRadius(userLocation, radius, {
             it?.forEach { resourceSnapshot ->
-                val resource = resourceSnapshot.toObject(ResourceData::class.java)
-                Log.d("tagic", resource.toString())
-                if (resource != null && resource.type == type) resources.add(resource)
+                val resource = resourceSnapshot.toObject(ResourceData::class.java)?.copy(id = resourceSnapshot.id)
+                if (resource != null && resource.type == type) resources.add(
+                    ResourceSearchResultItem(resource, onResultItemClick)
+                )
             }
             onSearchCompleted(resources)
         }, onSearchFailed)

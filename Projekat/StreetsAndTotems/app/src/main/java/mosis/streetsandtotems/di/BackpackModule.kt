@@ -10,7 +10,6 @@ import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.feature_backpack.data.data_source.FirebaseBackpackDataSource
 import mosis.streetsandtotems.feature_backpack.data.repository.BackpackRepositoryImpl
 import mosis.streetsandtotems.feature_backpack.domain.repository.BackpackRepository
-import mosis.streetsandtotems.feature_map.data.data_source.FirebaseMapDataSource
 
 
 @Module
@@ -26,9 +25,8 @@ object BackpackModule {
     fun provideBackpackViewModelRepository(
         preferenceDataSource: PreferencesDataStore,
         firebaseBackpackDataSource: FirebaseBackpackDataSource
-    ): BackpackRepository =
-        BackpackRepositoryImpl(
-            preferenceDataSource = preferenceDataSource,
-            firebaseBackpackRepository = firebaseBackpackDataSource
-        )
+    ): BackpackRepository = BackpackRepositoryImpl(
+        preferenceDataSource = preferenceDataSource,
+        firebaseBackpackDataSource = firebaseBackpackDataSource
+    )
 }
