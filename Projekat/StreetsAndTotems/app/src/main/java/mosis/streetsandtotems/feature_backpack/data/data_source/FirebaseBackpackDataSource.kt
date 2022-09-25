@@ -9,6 +9,7 @@ import mosis.streetsandtotems.core.presentation.components.IconType
 import mosis.streetsandtotems.feature_map.domain.model.*
 import mosis.streetsandtotems.feature_map.presentation.util.convertIconResourceTypeToResourceType
 import mosis.streetsandtotems.feature_map.presentation.util.updateOneInventoryData
+import org.imperiumlabs.geofirestore.GeoFirestore
 
 class FirebaseBackpackDataSource(private val db: FirebaseFirestore) {
 
@@ -21,11 +22,16 @@ class FirebaseBackpackDataSource(private val db: FirebaseFirestore) {
         mySquadId: String,
     ) {
         if (type == null) {//totem
+            val totemReference = db.collection(FireStoreConstants.TOTEMS_COLLECTION).document()
+
+            val totemGeoFirestore =
+                GeoFirestore(db.collection(FireStoreConstants.TOTEMS_COLLECTION))
+
             db.runBatch {
                 val time = Timestamp.now()
+
                 it.set(
-                    db.collection(FireStoreConstants.TOTEMS_COLLECTION).document(),
-                    TotemData(
+                    totemReference, TotemData(
                         l = l,
                         placed_by = myId,
                         placing_time = time,
@@ -46,12 +52,18 @@ class FirebaseBackpackDataSource(private val db: FirebaseFirestore) {
                 )
             }.await()
 
+            totemGeoFirestore.setLocation(totemReference.id, l)
         } else {
+            val resourceReference =
+                db.collection(FireStoreConstants.RESOURCES_COLLECTION).document()
+
+            val resourceGeoFirestore =
+                GeoFirestore(db.collection(FireStoreConstants.RESOURCES_COLLECTION))
+
             val resourceType = convertIconResourceTypeToResourceType(type)
             db.runBatch {
                 it.set(
-                    db.collection(FireStoreConstants.RESOURCES_COLLECTION).document(),
-                    ResourceData(
+                    resourceReference, ResourceData(
                         l = l,
                         remaining = itemCount,
                         type = resourceType,
@@ -75,6 +87,8 @@ class FirebaseBackpackDataSource(private val db: FirebaseFirestore) {
                     )
                 )
             }.await()
+
+            resourceGeoFirestore.setLocation(resourceReference.id, l)
         }
     }
 }
