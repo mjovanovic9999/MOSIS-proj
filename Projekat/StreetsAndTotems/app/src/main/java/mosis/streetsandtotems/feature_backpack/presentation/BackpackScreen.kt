@@ -75,7 +75,7 @@ fun BackpackScreen(backpackViewModel: BackpackViewModel) {
             fabImageVector = ImageVector.vectorResource(id = R.drawable.tiki),
             onFabClick = {
                 backpackViewModel.openDropItemDialog(
-                    state.useInventoryData.inventory?.totem ?: 0, dropTotem = true
+                    state.useInventoryData.inventory?.totem ?: 0
                 )
             },
             fabShowAsImage = true,
@@ -97,10 +97,6 @@ fun BackpackScreen(backpackViewModel: BackpackViewModel) {
                 )
             )
         },
-        isDropEnabled = true,//zasto ovo ovako???
-//        takeAmount.value != ""
-//                && takeAmount.value.toInt() > 0
-//                && backpackItemCount >= takeAmount.value.toInt()
     )
 
 }
