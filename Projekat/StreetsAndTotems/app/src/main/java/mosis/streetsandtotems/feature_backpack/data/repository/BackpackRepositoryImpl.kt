@@ -17,7 +17,7 @@ class BackpackRepositoryImpl(
         type: IconType.ResourceType?,
         oldInventory: UserInventoryData,
     ) {
-        firebaseBackpackRepository.dropItem(
+        firebaseBackpackDataSource.dropItem(
             l,
             itemCount,
             type,
