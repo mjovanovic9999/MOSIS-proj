@@ -32,7 +32,6 @@ class BackpackViewModel @Inject constructor(
                 event.dropItemCount,
                 event.type,
             )
-            BackpackViewModelEvents.PlaceTotem -> placeTotem()
         }
     }
 
@@ -57,7 +56,6 @@ class BackpackViewModel @Inject constructor(
     fun openDropItemDialog(
         itemCount: Int,
         resourceType: IconType.ResourceType? = null,
-        dropTotem: Boolean = false,
     ) {
         _backpackScreenState.value = _backpackScreenState.value.copy(
             dropItemDialogState = DropItemDialogState(
@@ -79,23 +77,16 @@ class BackpackViewModel @Inject constructor(
     }
 
 
-    private fun placeTotem() {
-        viewModelScope.launch {
-            backpackRepository.placeTotem(
-                LocationService.lastKnownLocation ?: GeoPoint(
-                    INIT_SCROLL_LAT, INIT_SCROLL_LNG
-                )
-            )
-        }
-    }
-
     private fun dropResource(dropItemCount: Int, type: IconType.ResourceType?) {
         viewModelScope.launch {
-//            backpackRepository.dropResource(
-//                l = LocationService.lastKnownLocation ?: GeoPoint(INIT_SCROLL_LAT, INIT_SCROLL_LNG),
-//                itemCount = itemCount,
-//                type = type,
-//            )
+            backpackRepository.dropItem(
+                l = LocationService.lastKnownLocation ?: GeoPoint(INIT_SCROLL_LAT, INIT_SCROLL_LNG),
+                itemCount = dropItemCount,
+                type = type,
+                oldInventory = backpackScreenState.value.useInventoryData,
+            )
+            closeDropItemDialog()
         }
+
     }
 }

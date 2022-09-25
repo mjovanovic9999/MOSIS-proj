@@ -5,40 +5,76 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.tasks.await
 import mosis.streetsandtotems.core.FireStoreConstants
-import mosis.streetsandtotems.feature_map.domain.model.ResourceData
-import mosis.streetsandtotems.feature_map.domain.model.ResourceType
-import mosis.streetsandtotems.feature_map.domain.model.TotemData
-import org.imperiumlabs.geofirestore.GeoFirestore
+import mosis.streetsandtotems.core.presentation.components.IconType
+import mosis.streetsandtotems.feature_map.domain.model.*
+import mosis.streetsandtotems.feature_map.presentation.util.convertIconResourceTypeToResourceType
+import mosis.streetsandtotems.feature_map.presentation.util.updateOneInventoryData
 
 class FirebaseBackpackDataSource(private val db: FirebaseFirestore) {
 
-    suspend fun dropResource(l: GeoPoint, itemCount: Int, type: ResourceType) {
-        val resourceGeoFirestore =
-            GeoFirestore(db.collection(FireStoreConstants.RESOURCES_COLLECTION))
+    suspend fun dropItem(
+        l: GeoPoint,
+        itemCount: Int,
+        type: IconType.ResourceType?,
+        oldInventoryData: UserInventoryData,
+        myId: String,
+        mySquadId: String,
+    ) {
+        if (type == null) {//totem
+            db.runBatch {
+                val time = Timestamp.now()
+                it.set(
+                    db.collection(FireStoreConstants.TOTEMS_COLLECTION).document(),
+                    TotemData(
+                        l = l,
+                        placed_by = myId,
+                        placing_time = time,
+                        last_visited = time,
+                        bonus_points = 0,
+                        protection_points = 0,
+                        visible_to = mySquadId,
+                    )
+                )
+                it.set(
+                    db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION).document(myId),
+                    oldInventoryData.copy(
+                        empty_spaces = (oldInventoryData.empty_spaces ?: 0) + itemCount,
+                        inventory = oldInventoryData.inventory?.copy(
+                            totem = (oldInventoryData.inventory.totem ?: 0) - itemCount,
+                        )
+                    )
+                )
+            }.await()
 
-        db.collection(FireStoreConstants.RESOURCES_COLLECTION).document().set(
-            ResourceData(
-                l = l,
-                remaining = itemCount,
-                type = type,
-            )
-        ).await()
+        } else {
+            val resourceType = convertIconResourceTypeToResourceType(type)
+            db.runBatch {
+                it.set(
+                    db.collection(FireStoreConstants.RESOURCES_COLLECTION).document(),
+                    ResourceData(
+                        l = l,
+                        remaining = itemCount,
+                        type = resourceType,
+                    )
+                )
+                val newInventoryCount = when (resourceType) {
+                    ResourceType.Wood -> oldInventoryData.inventory?.wood ?: 0
+                    ResourceType.Brick -> oldInventoryData.inventory?.brick ?: 0
+                    ResourceType.Stone -> oldInventoryData.inventory?.stone ?: 0
+                    ResourceType.Emerald -> oldInventoryData.inventory?.emerald ?: 0
+                } - itemCount
+                it.set(
+                    db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION).document(myId),
+                    oldInventoryData.copy(
+                        empty_spaces = (oldInventoryData.empty_spaces ?: 0) + itemCount,
+                        inventory = updateOneInventoryData(
+                            oldInventoryData.inventory ?: InventoryData(0, 0, 0, 0, 0),
+                            newInventoryCount,
+                            resourceType
+                        )
+                    )
+                )
+            }.await()
+        }
     }
-
-
-    suspend fun placeTotem(myId: String, l: GeoPoint, mySquadId: String) {
-        val currentTime = Timestamp.now()
-        db.collection(FireStoreConstants.TOTEMS_COLLECTION).document().set(
-            TotemData(
-                bonus_points = 0,
-                l = l,
-                last_visited = currentTime,
-                placed_by = myId,
-                placing_time = currentTime,
-                protection_points = 0,
-                visible_to = mySquadId,
-            )
-        ).await()
-    }
-
 }

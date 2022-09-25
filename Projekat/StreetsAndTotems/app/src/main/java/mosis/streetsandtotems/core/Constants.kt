@@ -27,6 +27,16 @@ object FireStoreConstants {
     const val SQUAD_ID_FIELD = "squad_id"
     const val IS_ONLINE_FIELD = "is_online"
 
+    const val EMPTY_SPACES = "empty_spaces"
+    const val FIELD_WOOD = "wood"
+    const val FIELD_EMERALD = "emerald"
+    const val FIELD_STONE = "stone"
+    const val FIELD_BRICK = "brick"
+    const val FIELD_TOTEM = "totem"
+
+    const val FIELD_PLACED_BY = "placed_by"
+    const val FIELD_VISIBLE_TO = "visible_to"
+
     const val EASY_RIDDLES_COLLECTION = "easy_riddles"
     const val MEDIUM_RIDDLES_COLLECTION = "medium_riddles"
     const val HARD_RIDDLES_COLLECTION = "hard_riddles"

@@ -454,7 +454,6 @@ class MapViewModel @Inject constructor(
                                 mapScreenState.value.mySquadId, customPinsHashMap[it]?.visible_to
                             )
                         ) {
-                            Text(dataType.visible_to.toString())
                             CustomPin(resourceId = R.drawable.pin_custom)
                         }
                     }
@@ -475,9 +474,16 @@ class MapViewModel @Inject constructor(
                 }
                 is TotemData -> {
                     totemsHashMap[it] = dataType
-//da bi prikazalo svi totemi
-//                    if (dataType.placed_by != null && ((mapScreenState.value.mySquadId != null && dataType.placed_by == mapScreenState.value.mySquadId) || dataType.placed_by == mapScreenState.value.myId)) {
-                    composable = { CustomPin(resourceId = R.drawable.pin_tiki) }
+                    composable = {
+                        if (mapScreenState.value.myId == dataType.placed_by
+                            || isSquadMember(
+                                mapScreenState.value.mySquadId,
+                                totemsHashMap[it]?.visible_to
+                            )
+                        ) {
+                            CustomPin(resourceId = R.drawable.pin_tiki)
+                        }
+                    }
 //                    }
                 }
                 is ProfileData -> {
@@ -520,7 +526,7 @@ class MapViewModel @Inject constructor(
         dataType.id?.let {
             var oldData: Data? = null
             when (dataType) {
-                is HomeData -> {//treba se specificno handluje sliko ko pins
+                is HomeData -> {//treba se specificno handluje slicno ko pins
                     oldData = _mapScreenState.value.home
                     _mapScreenState.value = _mapScreenState.value.copy(home = dataType)
                 }
@@ -538,7 +544,15 @@ class MapViewModel @Inject constructor(
                     oldData = resourcesHashMap.put(it, dataType)
                 }
                 is TotemData -> {
-                    oldData = totemsHashMap.put(it, dataType)
+                    if (mapScreenState.value.myId == dataType.placed_by || isSquadMember(
+                            mapScreenState.value.mySquadId,
+                            dataType.visible_to
+                        )
+                    ) {
+                        if (totemsHashMap.containsKey(it)) {
+                            oldData = totemsHashMap.put(it, dataType)
+                        } else addPinHash(dataType)
+                    } else removePinHash(dataType)
                 }
                 is ProfileData -> {
                     if (dataType.is_online == true) {
@@ -715,7 +729,7 @@ class MapViewModel @Inject constructor(
             },
             clipShape = null,
             relativeOffset = Offset(-.5f, -.5f),
-            renderingStrategy = RenderingStrategy.LazyLoading("0"),
+            renderingStrategy = RenderingStrategy.LazyLoading(LAZY_LOADER_ID),
             clickable = false,
             zIndex = MY_PIN_Z_INDEX,
         )
@@ -835,14 +849,13 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun registerAddCustomPin() {//kako set to handluje?????????? u bazu
+    private fun registerAddCustomPin() {
         viewModelScope.launch {
             _mapState.onLongPress { x, y ->
                 showCustomPinDialogHandler(
                     convertOffsetsToGeoPoint(
                         x, y, mapDimensions, mapDimensions
                     ),
-//                    placedBy = mapScreenState.value.myId,
                     visibleTo = mapScreenState.value.mySquadId,
                 )
             }
@@ -1208,12 +1221,6 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun sharePlayerTotemsWithSquad() {
-    }
-
-    private fun unShareTotemsWithSquad() {
-
-    }
 
     private fun declineSquadInviteHandler() {
         _mapScreenState.value.interactionUserId.let {

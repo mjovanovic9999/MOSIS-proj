@@ -5,7 +5,6 @@ import mosis.streetsandtotems.feature_map.domain.model.ResourceType
 import mosis.streetsandtotems.feature_map.presentation.MapViewModelEvents
 
 sealed class BackpackViewModelEvents {
-    object PlaceTotem : BackpackViewModelEvents()
     data class DropResource(
         val dropItemCount: Int,
         val type: IconType.ResourceType?,

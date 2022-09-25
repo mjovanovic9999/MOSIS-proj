@@ -22,6 +22,13 @@ fun convertResourceTypeToIconType(resourceType: ResourceType?): IconType = when 
     null -> IconType.OtherType.Home
 }
 
+fun convertIconResourceTypeToResourceType(iconType: IconType.ResourceType): ResourceType =
+    when (iconType) {
+        IconType.ResourceType.Brick -> ResourceType.Brick
+        IconType.ResourceType.Emerald -> ResourceType.Emerald
+        IconType.ResourceType.Stone -> ResourceType.Stone
+        IconType.ResourceType.Wood -> ResourceType.Wood
+    }
 
 fun getCountResourceTypeFromInventory(
     inventoryData: InventoryData, resourceType: ResourceType?

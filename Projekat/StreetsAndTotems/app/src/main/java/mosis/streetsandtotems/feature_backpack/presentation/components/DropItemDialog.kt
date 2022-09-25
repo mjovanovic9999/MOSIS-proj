@@ -18,17 +18,16 @@ import mosis.streetsandtotems.core.FormFieldConstants
 import mosis.streetsandtotems.core.TitleConstants.ITEMS_LEFT
 import mosis.streetsandtotems.core.presentation.components.*
 import mosis.streetsandtotems.feature_backpack.presentation.DropItemDialogState
+import mosis.streetsandtotems.feature_map.presentation.util.removeLeadingZerosIfAny
 import mosis.streetsandtotems.ui.theme.sizes
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropItemDialog(
     state: DropItemDialogState,
     onDismissRequest: () -> Unit,
     onDrop: (dropItemCount: Int, type: IconType.ResourceType?) -> Unit,
-    isDropEnabled: Boolean,
 ) {
-    val dropAmount = remember { mutableStateOf(FormFieldConstants.DEFAULT_AMOUNT) }
+    val dropAmount = mutableStateOf(FormFieldConstants.DEFAULT_AMOUNT)
 
     CustomDialog(
         isOpen = state.open,
@@ -37,14 +36,14 @@ fun DropItemDialog(
         onDismissRequest = onDismissRequest,
         title = {
             CustomDialogTitle(
-                isTotem = state.itemType==null,
+                isTotem = state.itemType == null,
                 resourceType = state.itemType,
                 countMessage = state.itemCount.toString() + ITEMS_LEFT,
                 needTotemAdditionalText = false,
             )
         },
         text = {
-            if (state.itemType!=null) {
+            if (state.itemType != null) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -60,7 +59,7 @@ fun DropItemDialog(
                         text = ButtonConstants.DROP,
                         buttonType = CustomButtonType.Outlined,
                         textStyle = MaterialTheme.typography.titleMedium,
-                        enabled = isDropEnabled && dropAmount.value != ""
+                        enabled = dropAmount.value != "" && state.itemCount > 0 && dropAmount.value.toInt() <= state.itemCount
                     )
 
                     CustomTextField(
@@ -70,7 +69,9 @@ fun DropItemDialog(
                         value = dropAmount.value,
                         onValueChange = {
                             if (it != "") {
-                                if (state.itemCount >= it.toInt()) dropAmount.value = it
+                                if (state.itemCount >= it.toInt()) {
+                                    dropAmount.value = removeLeadingZerosIfAny(it)
+                                }
                             } else dropAmount.value = it
                         },
                         placeholder = FormFieldConstants.AMOUNT,
@@ -84,8 +85,9 @@ fun DropItemDialog(
         },
         buttonType = CustomButtonType.Outlined,
         confirmButtonMatchParentWidth = true,
-        confirmButtonVisible = state.itemType==null,
+        confirmButtonVisible = state.itemType == null,
         confirmButtonText = PLACE,
+        confirmButtonEnabled = state.itemCount > 0,
         onConfirmButtonClick = { onDrop(1, null) },
         dismissButtonVisible = false,
         clickable = true,
