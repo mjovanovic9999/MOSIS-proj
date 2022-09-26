@@ -40,6 +40,7 @@ fun PlayerDialog(
     onInviteToSquad: (() -> Unit)? = null,
     onKickFromSquad: (() -> Unit)? = null,
     isUserInSquad: Boolean = false,
+    shouldEnableSquadInvite: Boolean = false,
     inviteButtonVisible: Boolean = true,
 ) {
     val context = LocalContext.current
@@ -125,10 +126,10 @@ fun PlayerDialog(
             }
         },
         confirmButtonVisible = inviteButtonVisible,
-        confirmButtonText = if (isSquadMember) ButtonConstants.START_KICK else ButtonConstants.INVITE_TO_SQUAD,
+        confirmButtonText = if (isMySquadMember) ButtonConstants.START_KICK else ButtonConstants.INVITE_TO_SQUAD,
         confirmButtonMatchParentWidth = true,
         onConfirmButtonClick = {
-            if (isSquadMember) onKickFromSquad?.invoke() else onInviteToSquad?.invoke()
+            if (isMySquadMember) onKickFromSquad?.invoke() else onInviteToSquad?.invoke()
             onDismissRequest()
         },
         confirmButtonEnabled = if (isMySquadMember) true else shouldEnableSquadInvite,
