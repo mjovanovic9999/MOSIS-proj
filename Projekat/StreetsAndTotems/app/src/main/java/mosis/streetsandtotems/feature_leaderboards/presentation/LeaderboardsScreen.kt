@@ -23,13 +23,14 @@ import mosis.streetsandtotems.core.presentation.components.CustomPage
 import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.utils.drawVerticalScrollbar
 import mosis.streetsandtotems.feature_leaderboards.presentation.components.LeaderboardsItem
+import mosis.streetsandtotems.feature_map.presentation.util.shouldEnableNumber
 import mosis.streetsandtotems.ui.theme.sizes
 
 @RootNavGraph
 @Destination
 @Composable
 fun LeaderboardsScreen(
-    viewModel: LeaderboardsViewModel, destinationsNavigator: DestinationsNavigator
+    viewModel: LeaderboardsViewModel, destinationsNavigator: DestinationsNavigator,
 ) {
     val state = viewModel.leaderboardState.value
     val scrollState = rememberLazyListState()
@@ -82,17 +83,18 @@ fun LeaderboardsScreen(
         firstName = state.playerDialogData.first_name,
         userName = state.playerDialogData.user_name,
         image = if (state.playerDialogData.image_uri == null) Uri.EMPTY else Uri.parse(state.playerDialogData.image_uri),
-//        callsAllowed = shouldEnableNumber(
-//            state.playerDialogData.call_privacy_level,
-//            state.mySquadId,
-//            state.playerDialogData.squad_id,
-//            state.playerDialogData.phone_number
-//        ),
-//        messagingAllowed = shouldEnableNumber(
-//            state.playerDialogData.messaging_privacy_level,
-//            state.mySquadId,
-//            state.playerDialogData.squad_id,
-//            state.playerDialogData.phone_number
-//        ),
+        callsAllowed = shouldEnableNumber(
+            state.playerDialogData.call_privacy_level,
+            state.mySquadId,
+            state.playerDialogData.squad_id,
+            state.playerDialogData.phone_number
+        ) && state.playerDialogData.is_online == true,
+        messagingAllowed = shouldEnableNumber(
+            state.playerDialogData.messaging_privacy_level,
+            state.mySquadId,
+            state.playerDialogData.squad_id,
+            state.playerDialogData.phone_number
+        ) && state.playerDialogData.is_online == true,
+        isPlayerMe = state.myId == state.playerDialogData.id,
     )
 }

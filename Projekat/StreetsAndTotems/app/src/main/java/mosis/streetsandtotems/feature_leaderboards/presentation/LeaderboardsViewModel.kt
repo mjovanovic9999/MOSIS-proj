@@ -1,5 +1,6 @@
 package mosis.streetsandtotems.feature_leaderboards.presentation
 
+import android.util.Log
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -9,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mosis.streetsandtotems.core.HandleResponseConstants
+import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.core.domain.model.Response
 import mosis.streetsandtotems.core.domain.model.SnackbarSettings
 import mosis.streetsandtotems.core.presentation.components.SnackbarType
@@ -21,13 +23,16 @@ class LeaderboardsViewModel @Inject constructor(
     private val leaderboardScreenEventsFlow: SharedFlowWrapper<LeaderboardScreenEvents>,
     private val leaderboardUseCases: LeaderboardUseCases,
     private val showLoaderFlow: MutableStateFlow<Boolean>,
-    private val snackbarFlow: MutableStateFlow<SnackbarSettings?>
+    private val snackbarFlow: MutableStateFlow<SnackbarSettings?>,
+    private val preferencesDataStore: PreferencesDataStore,
 ) : ViewModel() {
     private val _leaderboardState = mutableStateOf(
         LeaderboardsState(
-            emptyList(), playerDialogOpen = false, null
+            emptyList(), playerDialogOpen = false, null,
+            mySquadId = "", myId = "",
         ),
-    )
+
+        )
 
 
     init {
@@ -58,6 +63,19 @@ class LeaderboardsViewModel @Inject constructor(
                     }
                 }
             }
+        }
+        viewModelScope.launch {
+            preferencesDataStore.getUserSquadIdFlow().collect {
+                _leaderboardState.value = _leaderboardState.value.copy(
+                    mySquadId = it,
+                )
+            }
+        }
+        viewModelScope.launch {
+            _leaderboardState.value = _leaderboardState.value.copy(
+                myId = preferencesDataStore.getUserId(),
+            )
+            Log.d("id", _leaderboardState.value.myId)
         }
     }
 

@@ -18,7 +18,8 @@ class MapViewModelRepositoryImpl(
         placed_by: String,
         text: String,
     ) {
-        firebaseMapDataSource.addCustomPin(l, visible_to, placed_by, text)
+//        firebaseMapDataSource.addCustomPin(l, visible_to, placed_by, text)
+        firebaseMapDataSource.addHome("iDCJdVbuHUYcpBl6rBNGdBaNKXs1", l)//to delete
     }
 
     override suspend fun updateCustomPin(
@@ -78,8 +79,8 @@ class MapViewModelRepositoryImpl(
         return firebaseMapDataSource.getRiddle(protectionLevel)
     }
 
-    override suspend fun updateLeaderboard(userId: String, newLeaderboardPoints: Int) {
-        return firebaseMapDataSource.updateLeaderboard(userId, newLeaderboardPoints)
+    override suspend fun updateLeaderboard(userId: String, addLeaderboardPoints: Int) {
+        return firebaseMapDataSource.updateLeaderboard(userId, addLeaderboardPoints)
     }
 
     override suspend fun updateSquadLeaderboard(squadId: String, addSquadLeaderboardPoints: Int) {

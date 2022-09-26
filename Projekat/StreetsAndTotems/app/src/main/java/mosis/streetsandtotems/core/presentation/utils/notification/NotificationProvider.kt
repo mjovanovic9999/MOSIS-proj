@@ -83,7 +83,6 @@ class NotificationProvider @Inject constructor(private val context: Context) {
 
     fun cancelNotifyNearbyPass() {
         notificationManager.cancel(NOTIFY_NEARBY_PASS_ID)
-
     }
 
     private fun makeVibrate() {

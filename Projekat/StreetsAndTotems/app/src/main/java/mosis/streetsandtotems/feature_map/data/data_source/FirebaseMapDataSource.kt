@@ -24,6 +24,7 @@ import mosis.streetsandtotems.core.FireStoreConstants.FIELD_USER_ID
 import mosis.streetsandtotems.core.FireStoreConstants.FIELD_VISIBLE_TO
 import mosis.streetsandtotems.core.FireStoreConstants.FIELD_WOOD
 import mosis.streetsandtotems.core.FireStoreConstants.HARD_RIDDLES_COLLECTION
+import mosis.streetsandtotems.core.FireStoreConstants.HOMES_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.ITEM_COUNT
 import mosis.streetsandtotems.core.FireStoreConstants.KICK_VOTE_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.L
@@ -103,7 +104,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         }
     }
 
-    suspend fun addHome(myId: String, l: GeoPoint) {
+    suspend fun addHome(myId: String, l: GeoPoint?) {
         try {
             db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId).set(
                 mapOf(
@@ -282,6 +283,41 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     //region squad interaction
+
+    private suspend fun onAcceptInviteMergeHouse(myId: String, joinedSquadId: String) {
+        db.runTransaction { transaction ->
+            val homesCollectionRef = db.collection(HOMES_COLLECTION)
+
+            val myOldHomeDocRef = homesCollectionRef.document(myId)
+            val myOldHome = transaction.get(myOldHomeDocRef).toObject(HomeData::class.java)
+
+            transaction.get(homesCollectionRef.document(joinedSquadId))
+                .toObject(HomeData::class.java)?.let { squadHome ->
+                    homesCollectionRef.document(joinedSquadId).set(
+                        squadHome.copy(
+                            inventory = squadHome.inventory?.copy(
+                                emerald = (squadHome.inventory.emerald
+                                    ?: 0) + (myOldHome?.inventory?.emerald
+                                    ?: 0),
+                                stone = (squadHome.inventory.stone
+                                    ?: 0) + (myOldHome?.inventory?.stone
+                                    ?: 0),
+                                brick = (squadHome.inventory.brick
+                                    ?: 0) + (myOldHome?.inventory?.brick
+                                    ?: 0),
+                                wood = (squadHome.inventory.wood
+                                    ?: 0) + (myOldHome?.inventory?.wood
+                                    ?: 0),
+                                totem = (squadHome.inventory.totem
+                                    ?: 0) + (myOldHome?.inventory?.totem
+                                    ?: 0)
+                            )
+                        )
+                    )
+                    transaction.delete(myOldHomeDocRef)
+                }
+        }.await()
+    }
 
     private fun addUserToSquadAndUpdateUser(
         transaction: Transaction, squadId: String, inviteeId: String
@@ -525,9 +561,13 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                     handleMyPinsOnSquadJoin(inviterId, squadId!!)
                     handleMyTotemsOnSquadJoin(inviteeId, squadId!!)
                     handleMyTotemsOnSquadJoin(inviterId, squadId!!)
+                    addHome(squadId!!, null)
+                    onAcceptInviteMergeHouse(inviteeId, squadId!!)
+                    onAcceptInviteMergeHouse(inviterId, squadId!!)
                 } else {
                     handleMyPinsOnSquadJoin(inviteeId, inviterSquadId!!)
-                    handleMyTotemsOnSquadJoin(inviteeId, squadId!!)
+                    handleMyTotemsOnSquadJoin(inviteeId, inviterSquadId!!)
+                    onAcceptInviteMergeHouse(inviteeId, inviterSquadId!!)
                 }
 
             }
@@ -694,7 +734,6 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     //endregion
-/////////////nema await????????
 
     //region search
     private val userGeoFirestore = GeoFirestore(db.collection(PROFILE_DATA_COLLECTION))

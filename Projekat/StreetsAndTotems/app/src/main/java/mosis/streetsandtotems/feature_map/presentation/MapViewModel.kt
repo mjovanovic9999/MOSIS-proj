@@ -41,6 +41,7 @@ import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_COLOR_OPACITY
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_RADIUS
 import mosis.streetsandtotems.core.PinConstants.MY_PIN_Z_INDEX
+import mosis.streetsandtotems.core.PointsConversion
 import mosis.streetsandtotems.core.PointsConversion.TOTEM_BONUS_POINTS_INCORRECT_ANSWER
 import mosis.streetsandtotems.core.domain.model.SnackbarSettings
 import mosis.streetsandtotems.core.domain.use_case.PreferenceUseCases
@@ -140,7 +141,7 @@ class MapViewModel @Inject constructor(
             MapViewModelEvents.UpdateFilterTotems -> updateFilterTotemsHandler()
             MapViewModelEvents.UpdateFilterMarket -> updateFilterMarketHandler()
             MapViewModelEvents.UpdateFilterCustomPins -> updateFilterCustomPinsHandler()
-            MapViewModelEvents.AddHome -> addHomeHandler()
+            MapViewModelEvents.AddHome -> addHomeOnCurrentLocationHandler()
             MapViewModelEvents.RemoveHome -> removeHomeHandler()
             MapViewModelEvents.ShowResourceDialog -> showResourceDialogHandler()
             MapViewModelEvents.CloseResourceDialog -> closeResourceDialogHandler()
@@ -454,6 +455,13 @@ class MapViewModel @Inject constructor(
             var composable: @Composable() (() -> Unit)? = null
             when (dataType) {
                 is HomeData -> {
+                   /*///mozda ovako da se handluje
+                   *  if (mapScreenState.value.myId == totemsHashMap[it]?.placed_by
+                            || isPlayerMySquadMember(
+                                mapScreenState.value.mySquadId,
+                                totemsHashMap[it]?.visible_to
+                            )
+                        ) */
                     _mapScreenState.value = _mapScreenState.value.copy(home = dataType)
                     composable = { CustomPin(resourceId = R.drawable.pin_home) }
                 }
@@ -485,13 +493,19 @@ class MapViewModel @Inject constructor(
                 is TotemData -> {
                     totemsHashMap[it] = dataType
                     composable = {
-                        if (mapScreenState.value.myId == dataType.placed_by
+                        if (mapScreenState.value.myId == totemsHashMap[it]?.placed_by
                             || isPlayerMySquadMember(
                                 mapScreenState.value.mySquadId,
                                 totemsHashMap[it]?.visible_to
                             )
                         ) {
                             CustomPin(resourceId = R.drawable.pin_tiki)
+                        } else if (isInteractionPossible(
+                                mapScreenState.value.myLocation,
+                                totemsHashMap[it]?.l,
+                            )
+                        ) {
+                            CustomPin(resourceId = R.drawable.pin_tiki_other)
                         }
                     }
 //                    }
@@ -557,6 +571,9 @@ class MapViewModel @Inject constructor(
                     if (mapScreenState.value.myId == dataType.placed_by || isPlayerMySquadMember(
                             mapScreenState.value.mySquadId,
                             dataType.visible_to
+                        ) || isInteractionPossible(
+                            mapScreenState.value.myLocation,
+                            dataType.l,
                         )
                     ) {
                         if (totemsHashMap.containsKey(it)) {
@@ -598,7 +615,6 @@ class MapViewModel @Inject constructor(
             when (dataType) {
                 is HomeData -> {
                     _mapScreenState.value = mapScreenState.value.copy(home = HomeData())
-                    customPinsHashMap.remove(it)
                 }
                 is CustomPinData -> {
                     customPinsHashMap.remove(it)
@@ -613,8 +629,7 @@ class MapViewModel @Inject constructor(
                     playersHashMap.remove(it)
                 }
                 is MarketData -> {
-                    _mapScreenState.value = mapScreenState.value.copy(home = HomeData())
-                    customPinsHashMap.remove(it)
+                    _mapScreenState.value = mapScreenState.value.copy(market = MarketData())
                 }
             }
             removePin(it)
@@ -831,15 +846,17 @@ class MapViewModel @Inject constructor(
                 _mapScreenState.value = _mapScreenState.value.copy(
                     selectedTotem = totem
                 )
-//                if (totem.placed_by != null && ((mapScreenState.value.mySquadId != null && totem.placed_by == mapScreenState.value.mySquadId) || totem.placed_by == mapScreenState.value.myId)) {
-                showTotemDialogHandler()
-//                } else {//enemy totoem
-//                    if (totem.protection_points == null || totem.protection_points < PointsConversion.LOW)
-//                showClaimTotemHandler()
-//                    else {
-//                getRiddle(getProtectionLevelFromPointsNoUnprotected(totem.protection_points!!))//bez !!
-//                    }
-//                }
+                if (mapScreenState.value.myId == totem.placed_by
+                    || isPlayerMySquadMember(mapScreenState.value.mySquadId, totem.visible_to)
+                ) {
+                    showTotemDialogHandler()
+                } else {//enemy totoem
+                    if (totem.protection_points == null || totem.protection_points < PointsConversion.LOW)
+                        showClaimTotemHandler()
+                    else {
+                        getRiddle(getProtectionLevelFromPointsNoUnprotected(totem.protection_points))
+                    }
+                }
 
             } else if (mapScreenState.value.customPinsHashMap.containsKey(id)) {
                 val customPin = mapScreenState.value.customPinsHashMap[id]!!
@@ -1164,11 +1181,9 @@ class MapViewModel @Inject constructor(
     }
 
 
-    private fun addHomeHandler() {
-        mapScreenState.value.home.l?.let {
-            viewModelScope.launch {
-                mapViewModelRepository.addHome(it)
-            }
+    private fun addHomeOnCurrentLocationHandler() {
+        viewModelScope.launch {
+            mapViewModelRepository.addHome(mapScreenState.value.myLocation)
         }
     }
 
