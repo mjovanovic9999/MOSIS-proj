@@ -28,7 +28,7 @@ import mosis.streetsandtotems.ui.theme.sizes
 fun PlayerDialog(
     isOpen: Boolean,
     onDismissRequest: () -> Unit,
-    isSquadMember: Boolean = false,
+    isMySquadMember: Boolean = false,
     tradeEnabled: Boolean = false,
     callsAllowed: Boolean? = false,
     messagingAllowed: Boolean? = false,
@@ -131,7 +131,7 @@ fun PlayerDialog(
             if (isSquadMember) onKickFromSquad?.invoke() else onInviteToSquad?.invoke()
             onDismissRequest()
         },
-        confirmButtonEnabled = if (isSquadMember) true else !isUserInSquad,
+        confirmButtonEnabled = if (isMySquadMember) true else shouldEnableSquadInvite,
         dismissButtonText = ButtonConstants.TRADE,
         dismissButtonVisible = false,//tradeEnabled,
         dismissButtonEnabled = true,

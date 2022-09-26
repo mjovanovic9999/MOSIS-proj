@@ -28,28 +28,23 @@ class MapViewModelRepositoryImpl(
         text: String?,
     ) {
         firebaseMapDataSource.updateCustomPin(id, visible_to, placed_by, text)
-
     }
 
     override suspend fun deleteCustomPin(id: String) {
         firebaseMapDataSource.deleteCustomPin(id)
-
     }
 
     override suspend fun addHome(l: GeoPoint) {
         firebaseMapDataSource.addHome(preferenceDataSource.getUserId(), l)
-
     }
 
     override suspend fun deleteHome() {
         firebaseMapDataSource.deleteHome(preferenceDataSource.getUserId())
-
     }
 
     override suspend fun updateResource(resourceId: String, newCount: Int) {
         if (newCount <= 0) firebaseMapDataSource.deleteResource(resourceId)
         else firebaseMapDataSource.updateResource(resourceId, newCount)
-
     }
 
     override suspend fun updateUserInventory(newUserInventoryData: UserInventoryData) {

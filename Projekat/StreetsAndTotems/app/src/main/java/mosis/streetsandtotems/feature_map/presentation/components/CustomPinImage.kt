@@ -6,16 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.skydoves.landscapist.glide.GlideImage
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.feature_map.domain.model.ProfileData
-import mosis.streetsandtotems.feature_map.presentation.util.isSquadMember
+import mosis.streetsandtotems.feature_map.presentation.util.isPlayerMySquadMember
 
 @Composable
 fun CustomPinImage(
@@ -35,7 +33,7 @@ fun CustomPinImage(
         )
         Image(
             painter = painterResource(
-                if (isSquadMember(
+                if (isPlayerMySquadMember(
                         mySquadId,
                         selectedPlayerSquadId?.squad_id
                     )

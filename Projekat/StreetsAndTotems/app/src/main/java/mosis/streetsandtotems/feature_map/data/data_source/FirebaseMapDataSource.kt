@@ -51,19 +51,23 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         placed_by: String,
         text: String,
     ) {
-        val playerName =
-            db.collection(PROFILE_DATA_COLLECTION).document(placed_by).get().await()
-                .getString(USER_NAME_FIELD)
+        try {
+            val playerName =
+                db.collection(PROFILE_DATA_COLLECTION).document(placed_by).get().await()
+                    .getString(USER_NAME_FIELD)
 
-        db.collection(CUSTOM_PINS_COLLECTION).add(
-            mapOf(
-                L to l,
-                "text" to text,
-                FIELD_PLACED_BY to placed_by,
-                FIELD_VISIBLE_TO to visible_to,
-                "player_name" to playerName,
-            )
-        ).await()
+            db.collection(CUSTOM_PINS_COLLECTION).add(
+                mapOf(
+                    L to l,
+                    "text" to text,
+                    FIELD_PLACED_BY to placed_by,
+                    FIELD_VISIBLE_TO to visible_to,
+                    "player_name" to playerName,
+                )
+            ).await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun updateCustomPin(
@@ -72,132 +76,208 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         placed_by: String?,
         text: String?,
     ) {
-        val data: MutableMap<String, Any> = mutableMapOf()
-        if (visible_to != null) data[FIELD_PLACED_BY] = placed_by as Any
-        if (placed_by != null) {
-            data[FIELD_PLACED_BY] = placed_by as Any
-            data["player_name"] =
-                db.collection(PROFILE_DATA_COLLECTION).document(placed_by).get().await()
-                    .getString(USER_NAME_FIELD) as Any
-        }
-        if (text != null) data["text"] = text as Any
+        try {
+            val data: MutableMap<String, Any> = mutableMapOf()
+            if (visible_to != null) data[FIELD_PLACED_BY] = placed_by as Any
+            if (placed_by != null) {
+                data[FIELD_PLACED_BY] = placed_by as Any
+                data["player_name"] =
+                    db.collection(PROFILE_DATA_COLLECTION).document(placed_by).get().await()
+                        .getString(USER_NAME_FIELD) as Any
+            }
+            if (text != null) data["text"] = text as Any
 
-        if (data.isNotEmpty()) db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION).document(id)
-            .update(data).await()
+            if (data.isNotEmpty()) db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION)
+                .document(id)
+                .update(data).await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun deleteCustomPin(id: String) {
-        db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION).document(id).delete().await()
+        try {
+            db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION).document(id).delete().await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun addHome(myId: String, l: GeoPoint) {
-        db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId).set(
-            mapOf(
-                L to l,
-                FIELD_INVENTORY to mapOf(
-                    FIELD_WOOD to 0,
-                    FIELD_BRICK to 0,
-                    FIELD_EMERALD to 0,
-                    FIELD_STONE to 0,
-                    FIELD_TOTEM to 0,
-                ),
-            )
-        ).await()
+        try {
+            db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId).set(
+                mapOf(
+                    L to l,
+                    FIELD_INVENTORY to mapOf(
+                        FIELD_WOOD to 0,
+                        FIELD_BRICK to 0,
+                        FIELD_EMERALD to 0,
+                        FIELD_STONE to 0,
+                        FIELD_TOTEM to 0,
+                    ),
+                )
+            ).await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun updateHome(
         homeId: String, newInventoryData: InventoryData? = null, l: GeoPoint? = null
     ) {
-        val data: MutableMap<String, Any> = mutableMapOf()
-        if (newInventoryData != null) data[FIELD_INVENTORY] = newInventoryData
-        if (l != null) data[L] = l
+        try {
+            val data: MutableMap<String, Any> = mutableMapOf()
+            if (newInventoryData != null) data[FIELD_INVENTORY] = newInventoryData
+            if (l != null) data[L] = l
 
-        if (data.isNotEmpty()) db.collection(FireStoreConstants.HOMES_COLLECTION).document(homeId)
-            .update(data).await()
+            if (data.isNotEmpty()) db.collection(FireStoreConstants.HOMES_COLLECTION)
+                .document(homeId)
+                .update(data).await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun deleteHome(myId: String) {
-        db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId).delete().await()
-
+        try {
+            db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId).delete().await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun updateResource(resourceId: String, remaining: Int) {
-        db.collection(FireStoreConstants.RESOURCES_COLLECTION).document(resourceId).update(
-            mapOf("remaining" to remaining)
-        ).await()
+        try {
+            db.collection(FireStoreConstants.RESOURCES_COLLECTION).document(resourceId).update(
+                mapOf("remaining" to remaining)
+            ).await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun deleteResource(resourceId: String) {
-        db.collection(FireStoreConstants.RESOURCES_COLLECTION).document(resourceId).delete().await()
+        try {
+            db.collection(FireStoreConstants.RESOURCES_COLLECTION).document(resourceId).delete()
+                .await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun getUserInventory(userId: String): UserInventoryData? {
-        return db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION).document(userId).get()
-            .await().toObject(UserInventoryData::class.java)
+        return try {
+            db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION).document(userId)
+                .get()
+                .await().toObject(UserInventoryData::class.java)
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+            null
+        }
     }
 
     suspend fun updateUserInventory(
         myId: String, newUserInventoryData: UserInventoryData
     ) {
-        db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION).document(myId)
-            .set(newUserInventoryData).await()
+        try {
+            db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION).document(myId)
+                .set(newUserInventoryData).await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
-    fun updateUserOnlineStatus(isOnline: Boolean, userId: String): Task<Void> {
-        return db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION).document(userId)
-            .update(FireStoreConstants.IS_ONLINE_FIELD, isOnline)
+    fun updateUserOnlineStatus(isOnline: Boolean, userId: String): Task<Void>? {//////////dodat ?
+        return try {
+            db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION).document(userId)
+                .update(FireStoreConstants.IS_ONLINE_FIELD, isOnline)
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+            null
+        }
     }
 
     suspend fun getUserData(userId: String): UserData? {
-        return db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION).document(userId).get()
-            .await().toObject(UserData::class.java)
+        return try {
+            db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION).document(userId).get()
+                .await().toObject(UserData::class.java)
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+            null
+        }
     }
 
     suspend fun updateMarket(newMarket: Map<String, MarketItem>) {
-        db.collection(FireStoreConstants.MARKET_COLLECTION).document(MARKET_DOCUMENT_ID)
-            .update(mapOf("items" to newMarket)).await()
+        try {
+            db.collection(FireStoreConstants.MARKET_COLLECTION).document(MARKET_DOCUMENT_ID)
+                .update(mapOf("items" to newMarket)).await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun updateTotem(totemId: String, newTotem: TotemData) {
-        db.collection(TOTEMS_COLLECTION).document(totemId).set(newTotem).await()
+        try {
+            db.collection(TOTEMS_COLLECTION).document(totemId).set(newTotem).await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun deleteTotem(totemId: String) {
-        db.collection(TOTEMS_COLLECTION).document(totemId).delete().await()
+        try {
+            db.collection(TOTEMS_COLLECTION).document(totemId).delete().await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun getRiddle(protectionLevel: ProtectionLevel.RiddleProtectionLevel): RiddleData? {
-        val collection = when (protectionLevel) {
-            ProtectionLevel.RiddleProtectionLevel.Low -> EASY_RIDDLES_COLLECTION
-            ProtectionLevel.RiddleProtectionLevel.Medium -> MEDIUM_RIDDLES_COLLECTION
-            ProtectionLevel.RiddleProtectionLevel.High -> HARD_RIDDLES_COLLECTION
+        try {
+            val collection = when (protectionLevel) {
+                ProtectionLevel.RiddleProtectionLevel.Low -> EASY_RIDDLES_COLLECTION
+                ProtectionLevel.RiddleProtectionLevel.Medium -> MEDIUM_RIDDLES_COLLECTION
+                ProtectionLevel.RiddleProtectionLevel.High -> HARD_RIDDLES_COLLECTION
+            }
+
+            val count =
+                db.collection(collection).document(ITEM_COUNT).get().await()
+                    .getLong(RIDDLE_COUNT_VALUE)
+            val riddles = db.collection(collection).whereEqualTo(
+                ORDER_NUMBER, Random.nextInt(0, count?.toInt() ?: 10)
+            ).get().await().toObjects(RiddleData::class.java)
+
+            return riddles[0]
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+            return null
         }
-
-        val count =
-            db.collection(collection).document(ITEM_COUNT).get().await().getLong(RIDDLE_COUNT_VALUE)
-        val riddles = db.collection(collection).whereEqualTo(
-            ORDER_NUMBER, Random.nextInt(0, count?.toInt() ?: 10)
-        ).get().await().toObjects(RiddleData::class.java)
-
-        return riddles[0]
     }
 
     suspend fun updateLeaderboard(userId: String, addLeaderboardPoints: Int) {
-        db.runTransaction {
-            val docRef = db.collection(LEADERBOARD_COLLECTION).document(userId)
-            val points = it.get(docRef).getLong("points")
-            it.update(docRef, "points", (points ?: 0) + addLeaderboardPoints)
-        }.await()
+        try {
+            db.runTransaction {
+                val docRef = db.collection(LEADERBOARD_COLLECTION).document(userId)
+                val points = it.get(docRef).getLong("points")
+                it.update(docRef, "points", (points ?: 0) + addLeaderboardPoints)
+            }.await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     suspend fun updateSquadLeaderboard(squadId: String, addSquadLeaderboardPoints: Int) {
-        val ids = db.collection(SQUADS_COLLECTION).document(squadId)
-            .get()
-            .await().get(FIELD_USERS) as List<*>
-        for (item in ids) {
-            if (item is String) updateLeaderboard(
-                item, (addSquadLeaderboardPoints * SQUAD_MEMBERS_POINTS_COEFFICIENT).toInt()
-            )
+        try {
+            val ids = db.collection(SQUADS_COLLECTION).document(squadId)
+                .get()
+                .await().get(FIELD_USERS) as List<*>
+            for (item in ids) {
+                if (item is String) updateLeaderboard(
+                    item, (addSquadLeaderboardPoints * SQUAD_MEMBERS_POINTS_COEFFICIENT).toInt()
+                )
+            }
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
         }
     }
 
@@ -206,106 +286,140 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     private fun addUserToSquadAndUpdateUser(
         transaction: Transaction, squadId: String, inviteeId: String
     ) {
-        val docRef = db.collection(SQUADS_COLLECTION).document(squadId)
+        try {
+            val docRef = db.collection(SQUADS_COLLECTION).document(squadId)
 
-        val list = mutableListOf<String>()
-        for (item in transaction.get(docRef).get(FIELD_USERS) as List<*>) {
-            if (item is String) list.add(item)
-        }
-        if (list.isNotEmpty()) {
-            list.add(inviteeId)
-            transaction.update(docRef, FIELD_USERS, list)
-        }
+            val list = mutableListOf<String>()
+            for (item in transaction.get(docRef).get(FIELD_USERS) as List<*>) {
+                if (item is String) list.add(item)
+            }
+            if (list.isNotEmpty()) {
+                list.add(inviteeId)
+                transaction.update(docRef, FIELD_USERS, list)
+            }
 
-        transaction.update(
-            db.collection(PROFILE_DATA_COLLECTION).document(inviteeId), FIELD_SQUAD_ID, squadId
-        )
+            transaction.update(
+                db.collection(PROFILE_DATA_COLLECTION).document(inviteeId), FIELD_SQUAD_ID, squadId
+            )
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     private fun createSquadAndReturnSquadId(
         transaction: Transaction,
         inviterId: String,
         inviteeId: String
-    ): String {
-        val newSquadId = db.collection(SQUADS_COLLECTION).document().id
-        transaction.set(
-            db.collection(SQUADS_COLLECTION).document(newSquadId),
-            mapOf(FIELD_USERS to listOf(inviterId, inviteeId))
-        )
+    ): String? {
+        try {
+            val newSquadId = db.collection(SQUADS_COLLECTION).document().id
+            transaction.set(
+                db.collection(SQUADS_COLLECTION).document(newSquadId),
+                mapOf(FIELD_USERS to listOf(inviterId, inviteeId))
+            )
 
-        transaction.update(
-            db.collection(PROFILE_DATA_COLLECTION).document(inviterId), FIELD_SQUAD_ID, newSquadId
-        )
-        transaction.update(
-            db.collection(PROFILE_DATA_COLLECTION).document(inviteeId), FIELD_SQUAD_ID, newSquadId
-        )
-        return newSquadId
+            transaction.update(
+                db.collection(PROFILE_DATA_COLLECTION).document(inviterId),
+                FIELD_SQUAD_ID,
+                newSquadId
+            )
+            transaction.update(
+                db.collection(PROFILE_DATA_COLLECTION).document(inviteeId),
+                FIELD_SQUAD_ID,
+                newSquadId
+            )
+            return newSquadId
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+            return null
+        }
     }
 
     suspend fun initInviteToSquad(inviterId: String, inviteeId: String) {
-        if (getInviteIdOrNull(inviterId, inviteeId) == null)
-            db.collection(SQUAD_INVITES_COLLECTION).document().set(
-
-                mapOf(
-                    FIELD_INVITER_ID to inviterId,
-                    FIELD_INVITEE_ID to inviteeId,
-                )
-            ).await()
+        try {
+            if (getInviteIdOrNull(inviterId, inviteeId) == null)
+                db.collection(SQUAD_INVITES_COLLECTION).document().set(
+                    mapOf(
+                        FIELD_INVITER_ID to inviterId,
+                        FIELD_INVITEE_ID to inviteeId,
+                    )
+                ).await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
-    suspend fun isUserInSquad(inviteeId: String) =
+    suspend fun isUserInSquad(inviteeId: String): Boolean = try {
         db.collection(PROFILE_DATA_COLLECTION).document(inviteeId).get().await()
             .getString(FIELD_SQUAD_ID).let {
                 !(it == null || it == "")
             }
-
-    private suspend fun getSquadUserIds(squadId: String): List<String> {
-        val list = mutableListOf<String>()
-        for (item in db.collection(SQUADS_COLLECTION).document(squadId).get().await()
-            .get(FIELD_USERS) as List<*>) if (item is String) list.add(item)
-        return list
+    } catch (e: Exception) {
+        Log.d("tag", e.message.toString())
+        true
     }
 
-    suspend fun isSquadFull(squadId: String): Boolean =
+
+    private suspend fun getSquadUserIds(squadId: String): List<String> {
+        return try {
+            val list = mutableListOf<String>()
+            for (item in db.collection(SQUADS_COLLECTION).document(squadId).get().await()
+                .get(FIELD_USERS) as List<*>) if (item is String) list.add(item)
+            list
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+            listOf()
+        }
+    }
+
+    suspend fun isSquadFull(squadId: String): Boolean = try {
         (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
             .get(FIELD_USERS) as List<*>).size == MAX_SQUAD_MEMBERS_COUNT
+    } catch (e: Exception) {
+        Log.d("tag", e.message.toString())
+        true
+    }
 
 
     private suspend fun removeFromSquad(userId: String) {
-        var otherUserId: String? = null
-        db.runTransaction { transaction ->
-            val docRefProfile = db.collection(PROFILE_DATA_COLLECTION).document(userId)
-            val squadId = transaction.get(docRefProfile).getString(FIELD_SQUAD_ID)
+        try {
+            var otherUserId: String? = null
+            db.runTransaction { transaction ->
+                val docRefProfile = db.collection(PROFILE_DATA_COLLECTION).document(userId)
+                val squadId = transaction.get(docRefProfile).getString(FIELD_SQUAD_ID)
 
-            if (squadId != null && squadId != "") {
-                val docRefSquads = db.collection(SQUADS_COLLECTION).document(squadId)
+                if (squadId != null && squadId != "") {
+                    val docRefSquads = db.collection(SQUADS_COLLECTION).document(squadId)
 
-                val list = mutableListOf<String>()
-                for (item in transaction.get(docRefSquads).get(FIELD_USERS) as List<*>) {
-                    if (item is String) list.add(item)
+                    val list = mutableListOf<String>()
+                    for (item in transaction.get(docRefSquads).get(FIELD_USERS) as List<*>) {
+                        if (item is String) list.add(item)
+                    }
+                    if (list.isNotEmpty()) {
+                        list.remove(userId)
+                        if (list.size == 1) {
+                            transaction.delete(docRefSquads)
+                            transaction.update(
+                                db.collection(PROFILE_DATA_COLLECTION).document(list[0]),
+                                FIELD_SQUAD_ID,
+                                ""
+                            )
+                            otherUserId = list[0]
+                        } else
+                            transaction.update(docRefSquads, FIELD_USERS, list)
+                    }
+
+                    transaction.update(docRefProfile, FIELD_SQUAD_ID, "")
                 }
-                if (list.isNotEmpty()) {
-                    list.remove(userId)
-                    if (list.size == 1) {
-                        transaction.delete(docRefSquads)
-                        transaction.update(
-                            db.collection(PROFILE_DATA_COLLECTION).document(list[0]),
-                            FIELD_SQUAD_ID,
-                            ""
-                        )
-                        otherUserId = list[0]
-                    } else
-                        transaction.update(docRefSquads, FIELD_USERS, list)
-                }
-
-                transaction.update(docRefProfile, FIELD_SQUAD_ID, "")
+            }.await()
+            handleMyPinsOnSquadRemove(userId)
+            handleMyTotemsOnSquadRemove(userId)
+            otherUserId?.let {
+                handleMyPinsOnSquadRemove(it)
+                handleMyTotemsOnSquadRemove(it)
             }
-        }.await()
-        handleMyPinsOnSquadRemove(userId)
-        handleMyTotemsOnSquadRemove(userId)
-        otherUserId?.let {
-            handleMyPinsOnSquadRemove(it)
-            handleMyTotemsOnSquadRemove(it)
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
         }
     }
 
@@ -313,29 +427,37 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         userId: String,
         squadId: String
     ) {
-        for (pinSnapshot in
-        db.collection(CUSTOM_PINS_COLLECTION)
-            .whereEqualTo(FIELD_PLACED_BY, userId)
-            .get()
-            .await().documents.toList()
-        ) {
-            db.collection(CUSTOM_PINS_COLLECTION).document(pinSnapshot.id).update(
-                FIELD_VISIBLE_TO,
-                squadId,
-            )
+        try {
+            for (pinSnapshot in
+            db.collection(CUSTOM_PINS_COLLECTION)
+                .whereEqualTo(FIELD_PLACED_BY, userId)
+                .get()
+                .await().documents.toList()
+            ) {
+                db.collection(CUSTOM_PINS_COLLECTION).document(pinSnapshot.id).update(
+                    FIELD_VISIBLE_TO,
+                    squadId,
+                )
+            }
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
         }
     }
 
     private suspend fun handleMyPinsOnSquadRemove(userId: String) {
-        for (pinSnapshot in
-        db.collection(CUSTOM_PINS_COLLECTION)
-            .whereEqualTo(FIELD_PLACED_BY, userId).get()
-            .await().documents.toList()
-        ) {
-            db.collection(CUSTOM_PINS_COLLECTION).document(pinSnapshot.id).update(
-                FIELD_VISIBLE_TO,
-                ""
-            )
+        try {
+            for (pinSnapshot in
+            db.collection(CUSTOM_PINS_COLLECTION)
+                .whereEqualTo(FIELD_PLACED_BY, userId).get()
+                .await().documents.toList()
+            ) {
+                db.collection(CUSTOM_PINS_COLLECTION).document(pinSnapshot.id).update(
+                    FIELD_VISIBLE_TO,
+                    ""
+                )
+            }
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
         }
     }
 
@@ -343,201 +465,238 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         userId: String,
         squadId: String
     ) {
-        for (totemSnapshot in
-        db.collection(TOTEMS_COLLECTION)
-            .whereEqualTo(FIELD_PLACED_BY, userId)
-            .get()
-            .await().documents.toList()
-        ) {
-            db.collection(CUSTOM_PINS_COLLECTION).document(totemSnapshot.id).update(
-                FIELD_VISIBLE_TO,
-                squadId,
-            )
+        try {
+            for (totemSnapshot in
+            db.collection(TOTEMS_COLLECTION)
+                .whereEqualTo(FIELD_PLACED_BY, userId)
+                .get()
+                .await().documents.toList()
+            ) {
+                db.collection(CUSTOM_PINS_COLLECTION).document(totemSnapshot.id).update(
+                    FIELD_VISIBLE_TO,
+                    squadId,
+                )
+            }
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
         }
     }
 
     private suspend fun handleMyTotemsOnSquadRemove(userId: String) {
-        for (totemSnapshot in
-        db.collection(TOTEMS_COLLECTION)
-            .whereEqualTo(FIELD_PLACED_BY, userId).get()
-            .await().documents.toList()
-        ) {
-            db.collection(CUSTOM_PINS_COLLECTION).document(totemSnapshot.id).update(
-                FIELD_VISIBLE_TO,
-                ""
-            )
+        try {
+            for (totemSnapshot in
+            db.collection(TOTEMS_COLLECTION)
+                .whereEqualTo(FIELD_PLACED_BY, userId).get()
+                .await().documents.toList()
+            ) {
+                db.collection(CUSTOM_PINS_COLLECTION).document(totemSnapshot.id).update(
+                    FIELD_VISIBLE_TO,
+                    ""
+                )
+            }
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
         }
     }
 
     suspend fun acceptInviteToSquad(inviterId: String, inviteeId: String) {
-        var squadId: String? = null
-        var inviterSquadId: String? = null
-        getInviteIdOrNull(inviterId, inviteeId)?.let { docId ->
-            db.runTransaction {
+        try {
+            var squadId: String? = null
+            var inviterSquadId: String? = null
+            getInviteIdOrNull(inviterId, inviteeId)?.let { docId ->
+                db.runTransaction {
 
-                inviterSquadId = it.get(
-                    db.collection(PROFILE_DATA_COLLECTION).document(inviterId)
-                ).getString(FIELD_SQUAD_ID)
+                    inviterSquadId = it.get(
+                        db.collection(PROFILE_DATA_COLLECTION).document(inviterId)
+                    ).getString(FIELD_SQUAD_ID)
 
-                if (inviterSquadId == null || inviterSquadId == "") {
-                    squadId = createSquadAndReturnSquadId(it, inviterId, inviteeId)
+                    if (inviterSquadId == null || inviterSquadId == "") {
+                        squadId = createSquadAndReturnSquadId(it, inviterId, inviteeId)
 
+                    } else {
+                        addUserToSquadAndUpdateUser(it, inviterSquadId!!, inviteeId)
+                    }
+
+                    it.delete(db.collection(SQUAD_INVITES_COLLECTION).document(docId))
+
+                }.await()
+                if (squadId != null) {
+                    handleMyPinsOnSquadJoin(inviteeId, squadId!!)
+                    handleMyPinsOnSquadJoin(inviterId, squadId!!)
+                    handleMyTotemsOnSquadJoin(inviteeId, squadId!!)
+                    handleMyTotemsOnSquadJoin(inviterId, squadId!!)
                 } else {
-                    addUserToSquadAndUpdateUser(it, inviterSquadId!!, inviteeId)
+                    handleMyPinsOnSquadJoin(inviteeId, inviterSquadId!!)
+                    handleMyTotemsOnSquadJoin(inviteeId, squadId!!)
                 }
 
-                it.delete(db.collection(SQUAD_INVITES_COLLECTION).document(docId))
-
-            }.await()
-            if (squadId != null) {
-                handleMyPinsOnSquadJoin(inviteeId, squadId!!)
-                handleMyPinsOnSquadJoin(inviterId, squadId!!)
-                handleMyTotemsOnSquadJoin(inviteeId, squadId!!)
-                handleMyTotemsOnSquadJoin(inviterId, squadId!!)
-            } else {
-                handleMyPinsOnSquadJoin(inviteeId, inviterSquadId!!)
-                handleMyTotemsOnSquadJoin(inviteeId, squadId!!)
             }
-
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
         }
     }
 
     suspend fun declineInviteToSquad(inviterId: String, inviteeId: String) {
-        getInviteIdOrNull(inviterId, inviteeId)?.let {
-            db.collection(SQUAD_INVITES_COLLECTION).document(it).delete()
+        try {
+            getInviteIdOrNull(inviterId, inviteeId)?.let {
+                db.collection(SQUAD_INVITES_COLLECTION).document(it).delete()
+            }
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
         }
     }
 
-    private suspend fun getInviteIdOrNull(inviterId: String, inviteeId: String): String? =
+    private suspend fun getInviteIdOrNull(inviterId: String, inviteeId: String): String? = try {
         db.collection(SQUAD_INVITES_COLLECTION).whereEqualTo(FIELD_INVITER_ID, inviterId)
             .whereEqualTo(FIELD_INVITEE_ID, inviteeId).get().await().firstOrNull()?.id
-
+    } catch (e: Exception) {
+        Log.d("tag", e.message.toString())
+        null
+    }
 
     suspend fun initKickVote(
         myId: String,
         squad_id: String,
         user_id: String,
     ) {
-        val list = getSquadUserIds(squad_id)
+        try {
+            val list = getSquadUserIds(squad_id)
 
-        if (list.size <= 2) {
-            removeFromSquad(user_id)
-        } else {
-            if (db.collection(KICK_VOTE_COLLECTION).whereEqualTo(FIELD_SQUAD_ID, squad_id)
-                    .whereEqualTo(FIELD_USER_ID, user_id).get().await().firstOrNull() == null
-            ) {
-                val votes = mutableMapOf<String, Vote>()
-                list.forEach {
-                    votes[it] = when (it) {
-                        user_id -> Vote.No
-                        myId -> Vote.Yes
-                        else -> Vote.Unanswered
+            if (list.size <= 2) {
+                removeFromSquad(user_id)
+            } else {
+                if (db.collection(KICK_VOTE_COLLECTION).whereEqualTo(FIELD_SQUAD_ID, squad_id)
+                        .whereEqualTo(FIELD_USER_ID, user_id).get().await().firstOrNull() == null
+                ) {
+                    val votes = mutableMapOf<String, Vote>()
+                    list.forEach {
+                        votes[it] = when (it) {
+                            user_id -> Vote.No
+                            myId -> Vote.Yes
+                            else -> Vote.Unanswered
+                        }
                     }
-                }
-                db.collection(KICK_VOTE_COLLECTION).document().set(
-                    KickVoteData(
-                        squad_id = squad_id, user_id = user_id, votes = votes
+                    db.collection(KICK_VOTE_COLLECTION).document().set(
+                        KickVoteData(
+                            squad_id = squad_id, user_id = user_id, votes = votes
+                        )
                     )
-                )
+                }
             }
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
         }
-    }//treba se pretplate ostali
+    }
 
     suspend fun kickVote(myId: String, squadId: String, userId: String, myVote: Vote) {
-        val squadNum = (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
-            .get(FIELD_USERS) as List<*>).size
+        try {
+            val squadNum = (db.collection(SQUADS_COLLECTION).document(squadId).get().await()
+                .get(FIELD_USERS) as List<*>).size
 
-        val id = db.collection(KICK_VOTE_COLLECTION).whereEqualTo(FIELD_SQUAD_ID, squadId)
-            .whereEqualTo(FIELD_USER_ID, userId).get().await().firstOrNull()?.id
+            val id = db.collection(KICK_VOTE_COLLECTION).whereEqualTo(FIELD_SQUAD_ID, squadId)
+                .whereEqualTo(FIELD_USER_ID, userId).get().await().firstOrNull()?.id
 
-        if (id != null) {
-            db.collection(KICK_VOTE_COLLECTION).document(id).get().await()
-                .toObject(KickVoteData::class.java)?.let {
-                    val newMap = it.votes?.toMutableMap() ?: mutableMapOf()
-                    newMap[myId] = myVote
-                    var voteYes = 0
-                    var voteNo = 0
-                    for (vote in newMap.values) {
-                        when (vote) {
-                            Vote.Unanswered -> {}
-                            Vote.No -> voteNo++
-                            Vote.Yes -> voteYes++
+            if (id != null) {
+                db.collection(KICK_VOTE_COLLECTION).document(id).get().await()
+                    .toObject(KickVoteData::class.java)?.let {
+                        val newMap = it.votes?.toMutableMap() ?: mutableMapOf()
+                        newMap[myId] = myVote
+                        var voteYes = 0
+                        var voteNo = 0
+                        for (vote in newMap.values) {
+                            when (vote) {
+                                Vote.Unanswered -> {}
+                                Vote.No -> voteNo++
+                                Vote.Yes -> voteYes++
+                            }
+                        }
+
+                        ((squadNum + 1) / 2).let { votesHalf ->
+                            if (votesHalf <= voteYes) {//kick
+                                removeFromSquad(userId)
+                                db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
+                                reevaluateVoteAfterKick(userId, squadId)
+                            } else if (votesHalf <= voteNo) {
+                                db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
+
+                            } else {
+                                db.collection(KICK_VOTE_COLLECTION).document(id).set(
+                                    it.copy(votes = newMap)
+                                ).await()
+                            }
                         }
                     }
-
-                    ((squadNum + 1) / 2).let { votesHalf ->
-                        if (votesHalf <= voteYes) {//kick
-                            removeFromSquad(userId)
-                            db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
-                            reevaluateVoteAfterKick(userId, squadId)
-                        } else if (votesHalf <= voteNo) {
-                            db.collection(KICK_VOTE_COLLECTION).document(id).delete().await()
-
-                        } else {
-                            db.collection(KICK_VOTE_COLLECTION).document(id).set(
-                                it.copy(votes = newMap)
-                            ).await()
-                        }
-                    }
-                }
+            }
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
         }
 
     }
 
     private suspend fun reevaluateVoteAfterKick(userId: String, squadId: String) {
-        val kicksList =
-            db.collection(KICK_VOTE_COLLECTION).whereEqualTo(FIELD_SQUAD_ID, squadId).get()
-                .await().documents.toList()
+        try {
+            val kicksList =
+                db.collection(KICK_VOTE_COLLECTION).whereEqualTo(FIELD_SQUAD_ID, squadId).get()
+                    .await().documents.toList()
 
-        val squadNumNull = db.collection(SQUADS_COLLECTION).document(squadId).get().await()
+            val squadNumNull = db.collection(SQUADS_COLLECTION).document(squadId).get().await()
 
-        val users = squadNumNull.get(FIELD_USERS)
-        if (users != null) {
-            val squadNum = (users as List<*>).size
-            for (itemDoc in kicksList) {
-                val item = itemDoc.toObject(KickVoteData::class.java)
-                if (item != null) {
-                    val newMap = item.votes?.toMutableMap() ?: mutableMapOf()
-                    newMap.remove(userId)
-                    var voteYes = 0
-                    var voteNo = 0
-                    for (vote in newMap.values) {
-                        when (vote) {
-                            Vote.Unanswered -> {}
-                            Vote.No -> voteNo++
-                            Vote.Yes -> voteYes++
+            val users = squadNumNull.get(FIELD_USERS)
+            if (users != null) {
+                val squadNum = (users as List<*>).size
+                for (itemDoc in kicksList) {
+                    val item = itemDoc.toObject(KickVoteData::class.java)
+                    if (item != null) {
+                        val newMap = item.votes?.toMutableMap() ?: mutableMapOf()
+                        newMap.remove(userId)
+                        var voteYes = 0
+                        var voteNo = 0
+                        for (vote in newMap.values) {
+                            when (vote) {
+                                Vote.Unanswered -> {}
+                                Vote.No -> voteNo++
+                                Vote.Yes -> voteYes++
+                            }
                         }
-                    }
 
-                    (squadNum / 2).let { votesHalf ->
-                        if (votesHalf <= voteYes) {//kick
-                            removeFromSquad(userId)
-                            db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete()
-                                .await()
-                            reevaluateVoteAfterKick(userId, squadId)
-                        } else if (votesHalf <= voteNo) {
-                            db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete()
-                                .await()
+                        (squadNum / 2).let { votesHalf ->
+                            if (votesHalf <= voteYes) {//kick
+                                removeFromSquad(userId)
+                                db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete()
+                                    .await()
+                                reevaluateVoteAfterKick(userId, squadId)
+                            } else if (votesHalf <= voteNo) {
+                                db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).delete()
+                                    .await()
 
-                        } else {
-                            db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).set(
-                                item.copy(votes = newMap)
-                            ).await()
+                            } else {
+                                db.collection(KICK_VOTE_COLLECTION).document(itemDoc.id).set(
+                                    item.copy(votes = newMap)
+                                ).await()
+                            }
                         }
                     }
                 }
             }
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
         }
 
     }
 
     suspend fun leaveSquad(myId: String, squadId: String) {
-        removeFromSquad(myId)
-        reevaluateVoteAfterKick(myId, squadId)
+        try {
+            removeFromSquad(myId)
+            reevaluateVoteAfterKick(myId, squadId)
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
-//endregion
+    //endregion
+/////////////nema await????????
 
+    //region search
     private val userGeoFirestore = GeoFirestore(db.collection(PROFILE_DATA_COLLECTION))
     private val resourcesGeoFirestore =
         GeoFirestore(db.collection(FireStoreConstants.RESOURCES_COLLECTION))
@@ -585,5 +744,6 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             radius
         )
     }
+    //endregion
 }
 
