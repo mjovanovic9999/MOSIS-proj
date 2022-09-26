@@ -14,13 +14,13 @@ import mosis.streetsandtotems.di.util.SharedFlowWrapper
 import mosis.streetsandtotems.feature_backpack.domain.repository.BackpackRepository
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
 import mosis.streetsandtotems.services.LocationService
-import mosis.streetsandtotems.services.LocationServiceCommonEvents
+import mosis.streetsandtotems.services.LocationServiceInventoryEvents
 import javax.inject.Inject
 
 @HiltViewModel
 class BackpackViewModel @Inject constructor(
     private val backpackRepository: BackpackRepository,
-    private val locationServiceCommonEventsFlow: SharedFlowWrapper<LocationServiceCommonEvents>
+    private val locationServiceInventoryEventsFlow: SharedFlowWrapper<LocationServiceInventoryEvents>
 ) : ViewModel() {
     private val _backpackScreenState =
         mutableStateOf(BackpackScreenState(UserInventoryData(), DropItemDialogState(false)))
@@ -38,9 +38,9 @@ class BackpackViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            locationServiceCommonEventsFlow.flow.collect {
+            locationServiceInventoryEventsFlow.flow.collect {
                 when (it) {
-                    is LocationServiceCommonEvents.UserInventoryChanged -> onUserInventoryChangedHandler(
+                    is LocationServiceInventoryEvents.UserInventoryChanged -> onUserInventoryChangedHandler(
                         it.newInventory
                     )
                 }

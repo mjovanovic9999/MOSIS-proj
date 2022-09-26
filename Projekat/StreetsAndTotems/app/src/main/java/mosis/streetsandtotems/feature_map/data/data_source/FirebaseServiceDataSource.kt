@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import mosis.streetsandtotems.core.FireStoreConstants
+import mosis.streetsandtotems.core.domain.util.collectionSnapshotListenerCallback
 import mosis.streetsandtotems.feature_map.domain.model.*
 import org.imperiumlabs.geofirestore.GeoFirestore
 
@@ -193,26 +194,4 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
             }
     }
 
-    private inline fun <reified T> collectionSnapshotListenerCallback(
-        e: FirebaseFirestoreException?,
-        snapshots: QuerySnapshot?,
-        noinline documentAddedCallback: ((document: T) -> Unit)?,
-        noinline documentModifiedCallback: ((document: T) -> Unit)?,
-        noinline documentRemovedCallback: ((document: T) -> Unit)?,
-        customConversion: (document: QueryDocumentSnapshot) -> T? = { it.toObject<T>() }
-    ) {
-        if (e != null) {
-            Log.w("tag", "listen:error", e)
-            return
-        }
-
-        for (dc in snapshots!!.documentChanges) {
-            val convertedSnapshot = customConversion(dc.document)
-            if (convertedSnapshot != null) when (dc.type) {
-                DocumentChange.Type.ADDED -> documentAddedCallback?.invoke(convertedSnapshot)
-                DocumentChange.Type.MODIFIED -> documentModifiedCallback?.invoke(convertedSnapshot)
-                DocumentChange.Type.REMOVED -> documentRemovedCallback?.invoke(convertedSnapshot)
-            }
-        }
-    }
 }

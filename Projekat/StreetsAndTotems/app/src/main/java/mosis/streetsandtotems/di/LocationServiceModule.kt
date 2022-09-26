@@ -14,11 +14,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.core.domain.repository.PreferenceRepository
 import mosis.streetsandtotems.core.domain.repository.UserOnlineStatusRepository
-import mosis.streetsandtotems.di.util.SharedFlowWrapper
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseServiceDataSource
 import mosis.streetsandtotems.feature_map.data.repository.MapServiceRepositoryImpl
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
-import mosis.streetsandtotems.services.LocationServiceCommonEvents
+import mosis.streetsandtotems.services.LocationServiceInventoryEvents
 import mosis.streetsandtotems.services.LocationServiceMainScreenEvents
 import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 import mosis.streetsandtotems.services.use_case.*
@@ -54,14 +53,14 @@ object LocationServiceModule {
         userOnlineStatusRepository: UserOnlineStatusRepository,
         preferenceRepository: PreferenceRepository,
         locationServiceMainScreenEventsFlow: MutableSharedFlow<LocationServiceMainScreenEvents>,
-        locationServiceCommonEventsFlow: MutableSharedFlow<LocationServiceCommonEvents>,
+        locationServiceInventoryEventsFlow: MutableSharedFlow<LocationServiceInventoryEvents>,
     ): LocationServiceUseCases = LocationServiceUseCases(
         UpdatePlayerLocation(mapServiceRepository),
         RegisterCallbacks(
             mapServiceRepository,
             locationServiceMapScreenEventsFlow,
             locationServiceMainScreenEventsFlow,
-            locationServiceCommonEventsFlow
+            locationServiceInventoryEventsFlow
         ),
         RemoveCallbacks(mapServiceRepository),
         ChangeUserOnlineStatus(userOnlineStatusRepository, preferenceRepository),

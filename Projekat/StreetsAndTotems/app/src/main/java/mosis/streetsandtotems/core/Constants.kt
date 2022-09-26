@@ -51,6 +51,8 @@ object FireStoreConstants {
     const val FIELD_INVITEE_ID = "invitee_id"
     const val FIELD_INVENTORY = "inventory"
     const val L = "l"
+
+    const val POINTS_FIELD = "points"
 }
 
 object FirebaseErrorCodesConstants {
@@ -250,6 +252,7 @@ object HandleResponseConstants {
 }
 
 object MessageConstants {
+    const val USER_NOT_FOUND = "User not found!"
     const val NO_RESULTS = "No results"
     const val SEARCH_FAILED = "Search failed, please try again!"
     const val PASSWORD_UPDATE_ERROR = "An error occurred while updating password! Please try again!"

@@ -8,5 +8,5 @@ data class LocationServiceUseCases(
     val registerCallbackOnSquadInvite: RegisterCallbackOnSquadInvite,
     val registerCallbackOnKickVote: RegisterCallbackOnKickVote,
     val removeCallbackOnKickVote: RemoveCallbackOnKickVote,
-    val removeCallbackOnSquadInvite: RemoveCallbackOnSquadInvite
+    val removeCallbackOnSquadInvite: RemoveCallbackOnSquadInvite,
 )

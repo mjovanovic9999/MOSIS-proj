@@ -54,7 +54,7 @@ import mosis.streetsandtotems.feature_map.presentation.components.CustomPinImage
 import mosis.streetsandtotems.feature_map.presentation.components.search_results.SearchResultItem
 import mosis.streetsandtotems.feature_map.presentation.util.*
 import mosis.streetsandtotems.services.LocationService
-import mosis.streetsandtotems.services.LocationServiceCommonEvents
+import mosis.streetsandtotems.services.LocationServiceInventoryEvents
 import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 import ovh.plrapps.mapcompose.api.*
 import ovh.plrapps.mapcompose.core.TileStreamProvider
@@ -70,7 +70,7 @@ class MapViewModel @Inject constructor(
     private val appContext: Application,
     private val mapViewModelRepository: MapViewModelRepository,
     private val locationServiceMapScreenEvents: SharedFlowWrapper<LocationServiceMapScreenEvents>,
-    private val locationServiceCommonEvents: SharedFlowWrapper<LocationServiceCommonEvents>,
+    private val locationServiceInventoryEvents: SharedFlowWrapper<LocationServiceInventoryEvents>,
     private val showLoader: MutableStateFlow<Boolean>,
     private val preferenceUseCases: PreferenceUseCases,
     private val snackbarSettingsFlow: MutableStateFlow<SnackbarSettings?>,
@@ -360,7 +360,7 @@ class MapViewModel @Inject constructor(
 
     private fun registerOnLocationServiceCommonEvents() {
         viewModelScope.launch {
-            locationServiceCommonEvents.flow.collect {
+            locationServiceInventoryEvents.flow.collect {
                 onLocationServiceCommonEvent(it)
             }
         }
@@ -379,9 +379,9 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun onLocationServiceCommonEvent(event: LocationServiceCommonEvents) {
+    private fun onLocationServiceCommonEvent(event: LocationServiceInventoryEvents) {
         when (event) {
-            is LocationServiceCommonEvents.UserInventoryChanged -> onUserInventoryChangedHandler(
+            is LocationServiceInventoryEvents.UserInventoryChanged -> onUserInventoryChangedHandler(
                 event.newInventory
             )
         }

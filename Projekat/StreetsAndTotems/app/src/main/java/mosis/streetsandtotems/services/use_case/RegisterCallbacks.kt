@@ -5,11 +5,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import mosis.streetsandtotems.core.domain.repository.PreferenceRepository
 import mosis.streetsandtotems.feature_map.domain.model.PinAction
 import mosis.streetsandtotems.feature_map.domain.model.PinActionType
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
-import mosis.streetsandtotems.services.LocationServiceCommonEvents
+import mosis.streetsandtotems.services.LocationServiceInventoryEvents
 import mosis.streetsandtotems.services.LocationServiceMainScreenEvents
 import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 
@@ -17,9 +16,9 @@ class RegisterCallbacks(
     private val mapServiceRepository: MapServiceRepository,
     private val locationServiceMapScreenEventsFlow: MutableSharedFlow<LocationServiceMapScreenEvents>,
     private val locationServiceMainScreenEventsFlow: MutableSharedFlow<LocationServiceMainScreenEvents>,
-    private val locationServiceCommonEventsFlow: MutableSharedFlow<LocationServiceCommonEvents>
+    private val locationServiceInventoryEventsFlow: MutableSharedFlow<LocationServiceInventoryEvents>
 ) {
-    suspend operator fun invoke() = registerCallbacks()
+    operator fun invoke() = registerCallbacks()
 
     private fun emitLocationServiceMapScreenEvent(event: LocationServiceMapScreenEvents) {
         CoroutineScope(Dispatchers.Default).launch {
@@ -33,9 +32,9 @@ class RegisterCallbacks(
         }
     }
 
-    private fun emitLocationServiceCommonEvent(event: LocationServiceCommonEvents){
+    private fun emitLocationServiceCommonEvent(event: LocationServiceInventoryEvents) {
         CoroutineScope(Dispatchers.Default).launch {
-            locationServiceCommonEventsFlow.emit(event)
+            locationServiceInventoryEventsFlow.emit(event)
         }
     }
 
@@ -203,7 +202,7 @@ class RegisterCallbacks(
     private fun initUserInventoryFlow() {
         mapServiceRepository.registerCallbackOnUserInventoryUpdate {
             Log.d("d", it.toString())
-            emitLocationServiceCommonEvent(LocationServiceCommonEvents.UserInventoryChanged(it))
+            emitLocationServiceCommonEvent(LocationServiceInventoryEvents.UserInventoryChanged(it))
         }
     }
 

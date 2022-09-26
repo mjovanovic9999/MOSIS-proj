@@ -16,41 +16,44 @@ import mosis.streetsandtotems.ui.theme.sizes
 @Composable
 fun LeaderboardsItem(index: Int, leaderboardUser: LeaderboardUserData, onButtonClick: () -> Unit) {
     CustomLazyColumnItem(onButtonClick = onButtonClick) {
-        Text(
-            text = "$index.",
-            modifier = Modifier.weight(MaterialTheme.sizes.leaderboard_position_weight),
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSecondaryContainer
-        )
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(MaterialTheme.sizes.leaderboard_username_weight)
-        ) {
+        leaderboardUser.username?.let {
             Text(
-                text = LeaderboardItemsConstants.USERNAME,
+                text = "$index.",
+                modifier = Modifier.weight(MaterialTheme.sizes.leaderboard_position_weight),
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSecondaryContainer
             )
-            Text(
-                text = leaderboardUser.username, style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
-        }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(MaterialTheme.sizes.leaderboard_points_weight)
-        ) {
-            Text(
-                text = LeaderboardItemsConstants.POINTS,
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
-            Text(
-                text = leaderboardUser.points.toString(),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(MaterialTheme.sizes.leaderboard_username_weight)
+            ) {
+                Text(
+                    text = LeaderboardItemsConstants.USERNAME,
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+                Text(
+                    text = leaderboardUser.username,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(MaterialTheme.sizes.leaderboard_points_weight)
+            ) {
+                Text(
+                    text = LeaderboardItemsConstants.POINTS,
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+                Text(
+                    text = leaderboardUser.points.toString(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
         }
     }
 }
