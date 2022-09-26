@@ -460,7 +460,7 @@ class MapViewModel @Inject constructor(
                 is CustomPinData -> {
                     customPinsHashMap[it] = dataType
                     composable = {
-                        if (mapScreenState.value.myId == dataType.placed_by || isSquadMember(
+                        if (mapScreenState.value.myId == dataType.placed_by || isPlayerMySquadMember(
                                 mapScreenState.value.mySquadId, customPinsHashMap[it]?.visible_to
                             )
                         ) {
@@ -486,7 +486,7 @@ class MapViewModel @Inject constructor(
                     totemsHashMap[it] = dataType
                     composable = {
                         if (mapScreenState.value.myId == dataType.placed_by
-                            || isSquadMember(
+                            || isPlayerMySquadMember(
                                 mapScreenState.value.mySquadId,
                                 totemsHashMap[it]?.visible_to
                             )
@@ -541,7 +541,7 @@ class MapViewModel @Inject constructor(
                     _mapScreenState.value = _mapScreenState.value.copy(home = dataType)
                 }
                 is CustomPinData -> {
-                    if (mapScreenState.value.myId == dataType.placed_by || isSquadMember(
+                    if (mapScreenState.value.myId == dataType.placed_by || isPlayerMySquadMember(
                             mapScreenState.value.mySquadId, dataType.visible_to
                         )
                     ) {
@@ -554,7 +554,7 @@ class MapViewModel @Inject constructor(
                     oldData = resourcesHashMap.put(it, dataType)
                 }
                 is TotemData -> {
-                    if (mapScreenState.value.myId == dataType.placed_by || isSquadMember(
+                    if (mapScreenState.value.myId == dataType.placed_by || isPlayerMySquadMember(
                             mapScreenState.value.mySquadId,
                             dataType.visible_to
                         )

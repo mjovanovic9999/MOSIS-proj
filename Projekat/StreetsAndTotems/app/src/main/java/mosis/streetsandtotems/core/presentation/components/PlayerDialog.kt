@@ -28,7 +28,7 @@ import mosis.streetsandtotems.ui.theme.sizes
 fun PlayerDialog(
     isOpen: Boolean,
     onDismissRequest: () -> Unit,
-    isSquadMember: Boolean = false,
+    isMySquadMember: Boolean = false,
     tradeEnabled: Boolean = false,
     callsAllowed: Boolean? = false,
     messagingAllowed: Boolean? = false,
@@ -39,7 +39,7 @@ fun PlayerDialog(
     image: Uri? = null,
     onInviteToSquad: () -> Unit,
     onKickFromSquad: () -> Unit,
-    isUserInSquad: Boolean,
+    shouldEnableSquadInvite: Boolean,
 ) {
     val context = LocalContext.current
     CustomDialog(
@@ -126,13 +126,13 @@ fun PlayerDialog(
                 )
             }
         },
-        confirmButtonText = if (isSquadMember) ButtonConstants.START_KICK else ButtonConstants.INVITE_TO_SQUAD,
+        confirmButtonText = if (isMySquadMember) ButtonConstants.START_KICK else ButtonConstants.INVITE_TO_SQUAD,
         confirmButtonMatchParentWidth = true,
         onConfirmButtonClick = {
-            if (isSquadMember) onKickFromSquad() else onInviteToSquad()
+            if (isMySquadMember) onKickFromSquad() else onInviteToSquad()
             onDismissRequest()
         },
-        confirmButtonEnabled = if (isSquadMember) true else !isUserInSquad,
+        confirmButtonEnabled = if (isMySquadMember) true else shouldEnableSquadInvite,
         dismissButtonText = ButtonConstants.TRADE,
         dismissButtonVisible = false,//tradeEnabled,
         dismissButtonEnabled = true,

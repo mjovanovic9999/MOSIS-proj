@@ -1,6 +1,5 @@
 package mosis.streetsandtotems.feature_map.presentation.util
 
-import android.util.Log
 import com.google.firebase.Timestamp
 import mosis.streetsandtotems.core.PointsConversion
 import mosis.streetsandtotems.core.PointsConversion.HOURS_TO_POINTS_CONVERSION
@@ -10,9 +9,6 @@ import mosis.streetsandtotems.core.presentation.components.IconType
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.ProtectionLevel
 import mosis.streetsandtotems.feature_map.domain.model.ResourceType
-import java.time.Instant
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 
 fun convertResourceTypeToIconType(resourceType: ResourceType?): IconType = when (resourceType) {
     ResourceType.Brick -> IconType.ResourceType.Brick
@@ -91,10 +87,10 @@ fun shouldEnableNumber(
     else
         when (settings) {
             PrivacySettings.NoOne -> false
-            PrivacySettings.OnlySquadMembers -> isSquadMember(mySquadId, selectedPlayerSquadId)
+            PrivacySettings.OnlySquadMembers -> isPlayerMySquadMember(mySquadId, selectedPlayerSquadId)
             PrivacySettings.Everyone -> true
             null -> false
         }
 
-fun isSquadMember(mySquadId: String, selectedPlayerSquadId: String?): Boolean =
+fun isPlayerMySquadMember(mySquadId: String, selectedPlayerSquadId: String?): Boolean =
     mySquadId != "" && selectedPlayerSquadId == mySquadId

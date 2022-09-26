@@ -12,7 +12,9 @@ import mosis.streetsandtotems.core.MessageConstants.SQUAD_INVITE_QUESTION
 import mosis.streetsandtotems.core.MessageConstants.SQUAD_KICK
 import mosis.streetsandtotems.core.MessageConstants.SQUAD_KICK_QUESTION1
 import mosis.streetsandtotems.core.MessageConstants.SQUAD_KICK_QUESTION2
-import mosis.streetsandtotems.core.presentation.components.*
+import mosis.streetsandtotems.core.presentation.components.ConfirmationDialogType
+import mosis.streetsandtotems.core.presentation.components.CustomConfirmationDialog
+import mosis.streetsandtotems.core.presentation.components.PlayerDialog
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.feature_map.domain.model.InventoryData
 import mosis.streetsandtotems.feature_map.domain.model.UserInventoryData
@@ -20,8 +22,8 @@ import mosis.streetsandtotems.feature_map.presentation.components.CustomPinDialo
 import mosis.streetsandtotems.feature_map.presentation.components.MapComponent
 import mosis.streetsandtotems.feature_map.presentation.components.MapFABs
 import mosis.streetsandtotems.feature_map.presentation.components.interactionDialogs.*
-import mosis.streetsandtotems.feature_map.presentation.util.isSquadMember
 import mosis.streetsandtotems.feature_map.presentation.util.isInteractionPossible
+import mosis.streetsandtotems.feature_map.presentation.util.isPlayerMySquadMember
 import mosis.streetsandtotems.feature_map.presentation.util.shouldEnableNumber
 
 @MainNavGraph(start = true)
@@ -42,7 +44,7 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.CloseCustomPinDialog) },
         dialogText = state.customPinDialog.text,
         isNewPin = state.customPinDialog.id == null,
-        isSquadMember = isSquadMember(state.mySquadId, state.customPinDialog.visible_to),
+        isSquadMember = isPlayerMySquadMember(state.mySquadId, state.customPinDialog.visible_to),
         playerName = state.customPinDialog.player_name,
         addCustomPinFB = { mapViewModel.onEvent(MapViewModelEvents.AddCustomPin) },
         updateCustomPin = { mapViewModel.onEvent(MapViewModelEvents.UpdateCustomPin) },
@@ -53,7 +55,7 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
 //fale fje za interakciju trade i to
         isOpen = state.playerDialogOpen,
         onDismissRequest = { mapViewModel.onEvent(MapViewModelEvents.ClosePlayerDialog) },
-        isSquadMember = isSquadMember(state.mySquadId, state.selectedPlayer.squad_id),
+        isMySquadMember = isPlayerMySquadMember(state.mySquadId, state.selectedPlayer.squad_id),
         tradeEnabled = isInteractionPossible(
             state.myLocation, state.selectedPlayer.l
         ),
@@ -76,7 +78,8 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
         image = if (state.selectedPlayer.image_uri == null) Uri.EMPTY else Uri.parse(state.selectedPlayer.image_uri),
         onInviteToSquad = { mapViewModel.onEvent(MapViewModelEvents.InviteToSquad) },
         onKickFromSquad = { mapViewModel.onEvent(MapViewModelEvents.InitKickFromSquad) },
-        isUserInSquad = state.selectedPlayer.squad_id != null && state.selectedPlayer.squad_id != "",
+        shouldEnableSquadInvite = (state.selectedPlayer.squad_id == null || state.selectedPlayer.squad_id == "")
+                && isInteractionPossible(state.myLocation, state.selectedPlayer.l),
     )
 
     CustomFilterDialog(
