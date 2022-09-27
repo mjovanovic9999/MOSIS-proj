@@ -75,7 +75,6 @@ class LeaderboardsViewModel @Inject constructor(
             _leaderboardState.value = _leaderboardState.value.copy(
                 myId = preferencesDataStore.getUserId(),
             )
-            Log.d("id", _leaderboardState.value.myId)
         }
     }
 

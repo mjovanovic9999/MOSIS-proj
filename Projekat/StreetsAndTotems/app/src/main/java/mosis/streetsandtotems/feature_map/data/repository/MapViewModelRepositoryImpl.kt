@@ -36,7 +36,12 @@ class MapViewModelRepositoryImpl(
     }
 
     override suspend fun addHome(l: GeoPoint) {
-        firebaseMapDataSource.addHome(preferenceDataSource.getUserId(), l)
+        val squadId = preferenceDataSource.getUserSquadId()
+        if (squadId == "")
+            firebaseMapDataSource.addHome(preferenceDataSource.getUserId(), l)
+        else
+            firebaseMapDataSource.addHome(squadId, l)
+
     }
 
     override suspend fun deleteHome() {
