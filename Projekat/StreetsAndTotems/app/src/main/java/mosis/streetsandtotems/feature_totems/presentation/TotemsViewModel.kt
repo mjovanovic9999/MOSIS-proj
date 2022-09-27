@@ -62,6 +62,7 @@ class TotemsViewModel @Inject constructor(
         if (_totemsState.value.selectedTotem != null) {
             _totemsState.value.totems[_totemsState.value.selectedTotem!!].id?.let {
                 viewModelScope.launch {
+                    onCloseDialogHandler()
                     selectedTotemIdFlow.emit(it)
                 }
             }
