@@ -20,8 +20,6 @@ fun MapFABs(
     followMe: Boolean,
     showFilterDialog: () -> Unit,
     showSearchDialog: () -> Unit,
-//    isHomePlaced: Boolean = true,
-    onPlaceHome: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         CustomFAB(
@@ -50,37 +48,18 @@ fun MapFABs(
             horizontalAlignment = Alignment.End,
             modifier = Modifier.fillMaxSize(),
         ) {
-//            Column(
-//                modifier = Modifier.fillMaxSize(),
-//                verticalArrangement = Arrangement.Center,
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                CustomPin(resourceId = R.drawable.pin_home)
-//            }
-
-//            if (!isHomePlaced) {
-//                CustomFAB(
-//                    imageVector = ImageVector.vectorResource(id = R.drawable.home),
-//                    modifier = Modifier
-//                        .padding(MaterialTheme.sizes.fab_padding),
-////                        .align(Alignment.BottomEnd)
-//                    onClick = onPlaceHome,
-//                )
-//            }
             if (!followMe) {
                 CustomFAB(
                     imageVector = ImageVector.vectorResource(id = R.drawable.locate_me),
                     onClick = { locateMe() },
                     modifier = Modifier
                         .padding(MaterialTheme.sizes.fab_padding),
-//                        .align(Alignment.BottomEnd)
                 )
             } else {
                 CustomFAB(
                     imageVector = ImageVector.vectorResource(id = R.drawable.located_me),
                     modifier = Modifier
                         .padding(MaterialTheme.sizes.fab_padding),
-//                        .align(Alignment.BottomEnd)
                 )
             }
         }

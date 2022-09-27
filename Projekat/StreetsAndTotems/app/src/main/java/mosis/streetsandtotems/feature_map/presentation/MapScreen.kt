@@ -1,11 +1,13 @@
 package mosis.streetsandtotems.feature_map.presentation
 
 import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -51,8 +53,6 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
             followMe = state.followMe,
             showFilterDialog = { mapViewModel.onEvent(MapViewModelEvents.ShowFilterDialog) },
             showSearchDialog = { mapViewModel.onEvent(MapViewModelEvents.ShowSearchDialog) },
-//            isHomePlaced = state.home.l != null,
-            onPlaceHome = {},
         )
 
         CustomPinDialog(
@@ -243,8 +243,14 @@ fun MapScreen(openDrawer: () -> Unit, mapViewModel: MapViewModel) {
             farResourceIconId = state.farItemIconId,
         )
     } else {
-        Box(Modifier.fillMaxSize())
+        Box(
+            Modifier
+                .fillMaxSize()
+                .clickable { })
         {
+            LaunchedEffect(Unit) {
+                mapViewModel.onEvent(MapViewModelEvents.FollowMe)
+            }
             CustomFAB(
                 imageVector = ImageVector.vectorResource(id = R.drawable.home),
                 modifier = Modifier
