@@ -19,71 +19,67 @@ import mosis.streetsandtotems.core.TotemDialogConstants
 import mosis.streetsandtotems.core.presentation.components.CustomDialog
 import mosis.streetsandtotems.feature_totems.presentation.TotemsState
 import mosis.streetsandtotems.ui.theme.sizes
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+
 @Composable
-fun TotemDialog(state: TotemsState, onDismissRequest: () -> Unit) {
-    CustomDialog(
-        isOpen = state.dialogOpen,
-        onDismissRequest = onDismissRequest,
-        title = {
-            Column(
+fun TotemDialog(state: TotemsState, onDismissRequest: () -> Unit, onShowOnMap: () -> Unit) {
+    CustomDialog(isOpen = state.dialogOpen, onDismissRequest = onDismissRequest, title = {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                imageVector = ImageVector.vectorResource(id = R.drawable.tiki),
+                contentDescription = ImageContentDescriptionConstants.TOTEM,
+                modifier = Modifier.size(MaterialTheme.sizes.tiki_title_icon)
+            )
+            Text(
+                text = TitleConstants.MORE_INFORMATION,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.tiki),
-                    contentDescription = ImageContentDescriptionConstants.TOTEM,
-                    modifier = Modifier.size(MaterialTheme.sizes.tiki_title_icon)
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }, text = {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    style = MaterialTheme.typography.labelLarge,
+                    text = TotemDialogConstants.PLACING_TIME,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+
                 )
                 Text(
-                    text = TitleConstants.MORE_INFORMATION,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.labelLarge,
+                    text = TotemDialogConstants.LAST_VISIT,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-        },
-        text = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
+            Column(modifier = Modifier.padding(start = MaterialTheme.sizes.totem_dialog_text_spacing)) {
+                if (state.selectedTotem != null) {
+                    if (state.totems[state.selectedTotem].placing_time?.toDate() != null) Text(
                         style = MaterialTheme.typography.labelLarge,
-                        text = TotemDialogConstants.PLACING_TIME,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = SimpleDateFormat(TotemDialogConstants.DATE_TIME_FORMAT).format(
+                            state.totems[state.selectedTotem].placing_time?.toDate()!!
+                        )
                     )
-                    Text(
+                    if (state.totems[state.selectedTotem].last_visited?.toDate() != null) Text(
                         style = MaterialTheme.typography.labelLarge,
-                        text = TotemDialogConstants.LAST_VISIT,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = SimpleDateFormat(TotemDialogConstants.DATE_TIME_FORMAT).format(
+                            state.totems[state.selectedTotem].last_visited?.toDate()!!
+                        )
                     )
-                }
-                Column(modifier = Modifier.padding(start = MaterialTheme.sizes.totem_dialog_text_spacing)) {
-                    if (state.selectedTotem != null) {
-                        Text(
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            text = state.totems[state.selectedTotem].placingTime.format(
-                                DateTimeFormatter.ofPattern(TotemDialogConstants.DATE_TIME_FORMAT)
-                            )
-                        )
-                        Text(
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            text = state.totems[state.selectedTotem].lastVisited.format(
-                                DateTimeFormatter.ofPattern(TotemDialogConstants.DATE_TIME_FORMAT)
-                            )
-                        )
-                    }
                 }
             }
+        }
 
-        },
-        confirmButtonText = ButtonConstants.SHOW_ON_MAP
+    }, confirmButtonText = ButtonConstants.SHOW_ON_MAP, onConfirmButtonClick = onShowOnMap
     )
 }

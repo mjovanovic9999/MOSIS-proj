@@ -22,8 +22,10 @@ import mosis.streetsandtotems.core.domain.repository.UserOnlineStatusRepository
 import mosis.streetsandtotems.core.domain.use_case.*
 import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.di.util.SharedFlowWrapper
-import mosis.streetsandtotems.feature_leaderboards.presentation.LeaderboardScreenEvents
-import mosis.streetsandtotems.services.*
+import mosis.streetsandtotems.services.LocationServiceControlEvents
+import mosis.streetsandtotems.services.LocationServiceInventoryEvents
+import mosis.streetsandtotems.services.LocationServiceMainScreenEvents
+import mosis.streetsandtotems.services.LocationServiceMapScreenEvents
 import javax.inject.Singleton
 
 @Module
@@ -139,5 +141,12 @@ object AppSingletonModule {
     fun provideLocationServiceCommonEventsFlow(locationServiceInventoryEventsMutableFlow: MutableSharedFlow<LocationServiceInventoryEvents>): SharedFlowWrapper<LocationServiceInventoryEvents> =
         SharedFlowWrapper(locationServiceInventoryEventsMutableFlow)
 
+    @Provides
+    @Singleton
+    fun provideSelectedTotemIdMutableFlow(): MutableSharedFlow<String> = MutableSharedFlow()
 
+    @Provides
+    @Singleton
+    fun provideSelectedTotemIdFlow(selectedTotemIdMutableFlow: MutableSharedFlow<String>): SharedFlowWrapper<String> =
+        SharedFlowWrapper(selectedTotemIdMutableFlow)
 }

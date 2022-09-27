@@ -76,6 +76,7 @@ class MapViewModel @Inject constructor(
     private val preferenceUseCases: PreferenceUseCases,
     private val snackbarSettingsFlow: MutableStateFlow<SnackbarSettings?>,
     private val mapUseCases: MapUseCases,
+    private val selectedTotemIdFlow: SharedFlowWrapper<String>
 ) : ViewModel() {
     private val _mapScreenState: MutableState<MapScreenState>
     private val _mapState: MapState
@@ -122,6 +123,12 @@ class MapViewModel @Inject constructor(
         registerOnLocationServiceCommonEvents()
 
         registerGetMyIDs()
+
+        viewModelScope.launch {
+            selectedTotemIdFlow.flow.collect {
+                centerOnPin(it)
+            }
+        }
     }
 
     fun onEvent(event: MapViewModelEvents) {
@@ -455,13 +462,13 @@ class MapViewModel @Inject constructor(
             var composable: @Composable() (() -> Unit)? = null
             when (dataType) {
                 is HomeData -> {
-                   /*///mozda ovako da se handluje
-                   *  if (mapScreenState.value.myId == totemsHashMap[it]?.placed_by
-                            || isPlayerMySquadMember(
-                                mapScreenState.value.mySquadId,
-                                totemsHashMap[it]?.visible_to
-                            )
-                        ) */
+                    /*///mozda ovako da se handluje
+                    *  if (mapScreenState.value.myId == totemsHashMap[it]?.placed_by
+                             || isPlayerMySquadMember(
+                                 mapScreenState.value.mySquadId,
+                                 totemsHashMap[it]?.visible_to
+                             )
+                         ) */
                     _mapScreenState.value = _mapScreenState.value.copy(home = dataType)
                     composable = { CustomPin(resourceId = R.drawable.pin_home) }
                 }
@@ -493,10 +500,8 @@ class MapViewModel @Inject constructor(
                 is TotemData -> {
                     totemsHashMap[it] = dataType
                     composable = {
-                        if (mapScreenState.value.myId == totemsHashMap[it]?.placed_by
-                            || isPlayerMySquadMember(
-                                mapScreenState.value.mySquadId,
-                                totemsHashMap[it]?.visible_to
+                        if (mapScreenState.value.myId == totemsHashMap[it]?.placed_by || isPlayerMySquadMember(
+                                mapScreenState.value.mySquadId, totemsHashMap[it]?.visible_to
                             )
                         ) {
                             CustomPin(resourceId = R.drawable.pin_tiki)
@@ -569,8 +574,7 @@ class MapViewModel @Inject constructor(
                 }
                 is TotemData -> {
                     if (mapScreenState.value.myId == dataType.placed_by || isPlayerMySquadMember(
-                            mapScreenState.value.mySquadId,
-                            dataType.visible_to
+                            mapScreenState.value.mySquadId, dataType.visible_to
                         ) || isInteractionPossible(
                             mapScreenState.value.myLocation,
                             dataType.l,
@@ -846,13 +850,13 @@ class MapViewModel @Inject constructor(
                 _mapScreenState.value = _mapScreenState.value.copy(
                     selectedTotem = totem
                 )
-                if (mapScreenState.value.myId == totem.placed_by
-                    || isPlayerMySquadMember(mapScreenState.value.mySquadId, totem.visible_to)
+                if (mapScreenState.value.myId == totem.placed_by || isPlayerMySquadMember(
+                        mapScreenState.value.mySquadId, totem.visible_to
+                    )
                 ) {
                     showTotemDialogHandler()
                 } else {//enemy totoem
-                    if (totem.protection_points == null || totem.protection_points < PointsConversion.LOW)
-                        showClaimTotemHandler()
+                    if (totem.protection_points == null || totem.protection_points < PointsConversion.LOW) showClaimTotemHandler()
                     else {
                         getRiddle(getProtectionLevelFromPointsNoUnprotected(totem.protection_points))
                     }

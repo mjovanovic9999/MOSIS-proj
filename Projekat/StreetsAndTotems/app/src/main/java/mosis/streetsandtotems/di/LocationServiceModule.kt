@@ -63,7 +63,6 @@ object LocationServiceModule {
             locationServiceMapScreenEventsFlow,
             locationServiceMainScreenEventsFlow,
             locationServiceInventoryEventsFlow,
-//            LocationServiceInventoryEvents,
             preferenceRepository,
         ),
         RemoveCallbacks(mapServiceRepository),
