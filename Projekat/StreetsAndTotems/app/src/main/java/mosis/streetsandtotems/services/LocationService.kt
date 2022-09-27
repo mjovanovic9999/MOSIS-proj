@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import com.google.android.gms.location.*
 import com.google.firebase.firestore.GeoPoint
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,10 +53,6 @@ class LocationService : Service() {
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
-
-            Toast.makeText(
-                context, result.lastLocation?.accuracy.toString(), Toast.LENGTH_SHORT
-            ).show()
 
             serviceScope.launch {
                 result.lastLocation?.let {
