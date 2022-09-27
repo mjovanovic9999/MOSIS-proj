@@ -1,9 +1,6 @@
 package mosis.streetsandtotems.feature_map.presentation.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +19,9 @@ fun MapFABs(
     locateMe: () -> Unit,
     followMe: Boolean,
     showFilterDialog: () -> Unit,
-    showSearchDialog: () -> Unit
+    showSearchDialog: () -> Unit,
+//    isHomePlaced: Boolean = true,
+    onPlaceHome: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         CustomFAB(
@@ -40,28 +39,50 @@ fun MapFABs(
                     showFilterDialog()
                 }, modifier = Modifier.padding(MaterialTheme.sizes.fab_padding)
             )
-
             CustomFAB(
                 imageVector = Icons.Outlined.Search,
                 modifier = Modifier.padding(MaterialTheme.sizes.fab_padding),
-                onClick = showSearchDialog
+                onClick = showSearchDialog,
             )
         }
-        if (!followMe) {
-            CustomFAB(
-                imageVector = ImageVector.vectorResource(id = R.drawable.locate_me),
-                onClick = { locateMe() },
-                modifier = Modifier
-                    .padding(MaterialTheme.sizes.fab_padding)
-                    .align(Alignment.BottomEnd)
-            )
-        } else {
-            CustomFAB(
-                imageVector = ImageVector.vectorResource(id = R.drawable.located_me),
-                modifier = Modifier
-                    .padding(MaterialTheme.sizes.fab_padding)
-                    .align(Alignment.BottomEnd)
-            )
+        Column(
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+//            Column(
+//                modifier = Modifier.fillMaxSize(),
+//                verticalArrangement = Arrangement.Center,
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                CustomPin(resourceId = R.drawable.pin_home)
+//            }
+
+//            if (!isHomePlaced) {
+//                CustomFAB(
+//                    imageVector = ImageVector.vectorResource(id = R.drawable.home),
+//                    modifier = Modifier
+//                        .padding(MaterialTheme.sizes.fab_padding),
+////                        .align(Alignment.BottomEnd)
+//                    onClick = onPlaceHome,
+//                )
+//            }
+            if (!followMe) {
+                CustomFAB(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.locate_me),
+                    onClick = { locateMe() },
+                    modifier = Modifier
+                        .padding(MaterialTheme.sizes.fab_padding),
+//                        .align(Alignment.BottomEnd)
+                )
+            } else {
+                CustomFAB(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.located_me),
+                    modifier = Modifier
+                        .padding(MaterialTheme.sizes.fab_padding),
+//                        .align(Alignment.BottomEnd)
+                )
+            }
         }
 
     }

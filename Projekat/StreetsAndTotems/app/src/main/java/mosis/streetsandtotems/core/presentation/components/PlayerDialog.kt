@@ -29,7 +29,6 @@ fun PlayerDialog(
     isOpen: Boolean,
     onDismissRequest: () -> Unit,
     isMySquadMember: Boolean = false,
-    tradeEnabled: Boolean = false,
     callsAllowed: Boolean? = false,
     messagingAllowed: Boolean? = false,
     phoneNumber: String? = null,
@@ -39,9 +38,9 @@ fun PlayerDialog(
     image: Uri? = null,
     onInviteToSquad: (() -> Unit)? = null,
     onKickFromSquad: (() -> Unit)? = null,
-    isUserInSquad: Boolean = false,
     shouldEnableSquadInvite: Boolean = false,
     inviteButtonVisible: Boolean = true,
+    isPlayerMe: Boolean = false,
 ) {
     val context = LocalContext.current
     CustomDialog(
@@ -85,27 +84,29 @@ fun PlayerDialog(
                         style = MaterialTheme.typography.labelLarge
                     )
                 }
-                Row(
-                    modifier = Modifier.weight(MaterialTheme.sizes.profile_dialog_icon_buttons_weight),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    CustomIconButton(
-                        enabled = callsAllowed == true,
-                        clickHandler = { callNumber(context, phoneNumber) },
-                        icon = Icons.Outlined.Call,
-                        buttonModifier = Modifier.size(MaterialTheme.sizes.profile_dialog_row_height),
-                        colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                        iconModifier = Modifier.size(MaterialTheme.sizes.profile_dialog_icon_size)
-                    )
-                    CustomIconButton(
-                        enabled = messagingAllowed == true,
-                        clickHandler = { sendSms(context, phoneNumber) },
-                        icon = Icons.Outlined.Message,
-                        buttonModifier = Modifier.size(MaterialTheme.sizes.profile_dialog_row_height),
-                        colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                        iconModifier = Modifier.size(MaterialTheme.sizes.profile_dialog_icon_size)
-                    )
+                if (!isPlayerMe) {
+                    Row(
+                        modifier = Modifier.weight(MaterialTheme.sizes.profile_dialog_icon_buttons_weight),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        CustomIconButton(
+                            enabled = callsAllowed == true,
+                            clickHandler = { callNumber(context, phoneNumber) },
+                            icon = Icons.Outlined.Call,
+                            buttonModifier = Modifier.size(MaterialTheme.sizes.profile_dialog_row_height),
+                            colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                            iconModifier = Modifier.size(MaterialTheme.sizes.profile_dialog_icon_size)
+                        )
+                        CustomIconButton(
+                            enabled = messagingAllowed == true,
+                            clickHandler = { sendSms(context, phoneNumber) },
+                            icon = Icons.Outlined.Message,
+                            buttonModifier = Modifier.size(MaterialTheme.sizes.profile_dialog_row_height),
+                            colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                            iconModifier = Modifier.size(MaterialTheme.sizes.profile_dialog_icon_size)
+                        )
+                    }
                 }
             }
         },
@@ -125,7 +126,7 @@ fun PlayerDialog(
                 )
             }
         },
-        confirmButtonVisible = inviteButtonVisible,
+        confirmButtonVisible = inviteButtonVisible && if (isMySquadMember) true else shouldEnableSquadInvite,
         confirmButtonText = if (isMySquadMember) ButtonConstants.START_KICK else ButtonConstants.INVITE_TO_SQUAD,
         confirmButtonMatchParentWidth = true,
         onConfirmButtonClick = {
@@ -133,7 +134,7 @@ fun PlayerDialog(
             onDismissRequest()
         },
         confirmButtonEnabled = if (isMySquadMember) true else shouldEnableSquadInvite,
-        dismissButtonText = ButtonConstants.TRADE,
+//        dismissButtonText = ButtonConstants.TRADE,
         dismissButtonVisible = false,//tradeEnabled,
         dismissButtonEnabled = true,
         dismissButtonMatchParentWidth = false,

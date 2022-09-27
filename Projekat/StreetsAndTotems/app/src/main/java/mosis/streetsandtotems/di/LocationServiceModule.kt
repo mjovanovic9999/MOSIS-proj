@@ -62,7 +62,9 @@ object LocationServiceModule {
             mapServiceRepository,
             locationServiceMapScreenEventsFlow,
             locationServiceMainScreenEventsFlow,
-            locationServiceInventoryEventsFlow
+            locationServiceInventoryEventsFlow,
+//            LocationServiceInventoryEvents,
+            preferenceRepository,
         ),
         RemoveCallbacks(mapServiceRepository),
         ChangeUserOnlineStatus(userOnlineStatusRepository, preferenceRepository),

@@ -7,4 +7,6 @@ data class LeaderboardsState(
     val leaderboardUsers: List<LeaderboardUserData>,
     val playerDialogOpen: Boolean,
     val playerDialogData: ProfileData?,
+    val mySquadId: String,
+    val myId: String,
 )

@@ -197,7 +197,7 @@ class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
     fun registerCallbacksOnHomesUpdate(
         homeAddedCallback: (home: HomeData) -> Unit,
         homeModifiedCallback: (home: HomeData) -> Unit,
-        homeRemovedCallback: (home: HomeData) -> Unit
+        homeRemovedCallback: (home: HomeData) -> Unit,
     ): ListenerRegistration {
         return db.collection(FireStoreConstants.HOMES_COLLECTION)
             .addSnapshotListener { snapshots, e ->
