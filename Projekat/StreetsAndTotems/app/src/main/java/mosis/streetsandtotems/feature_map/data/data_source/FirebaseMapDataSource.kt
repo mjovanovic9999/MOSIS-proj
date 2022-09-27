@@ -147,6 +147,16 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         }
     }
 
+    fun deleteHomeTransaction(transaction: Transaction, myId: String) {
+        try {
+            transaction.delete(
+                db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId)
+            )
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
+    }
+
     suspend fun updateResource(resourceId: String, remaining: Int) {
         try {
             db.collection(FireStoreConstants.RESOURCES_COLLECTION).document(resourceId).update(
@@ -434,6 +444,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                     if (list.isNotEmpty()) {
                         list.remove(userId)
                         if (list.size == 1) {
+                            deleteHomeTransaction(transaction, squadId)
                             transaction.delete(docRefSquads)
                             transaction.update(
                                 db.collection(PROFILE_DATA_COLLECTION).document(list[0]),

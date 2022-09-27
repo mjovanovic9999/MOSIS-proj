@@ -18,8 +18,7 @@ class MapViewModelRepositoryImpl(
         placed_by: String,
         text: String,
     ) {
-//        firebaseMapDataSource.addCustomPin(l, visible_to, placed_by, text)
-        firebaseMapDataSource.addHome("iDCJdVbuHUYcpBl6rBNGdBaNKXs1", l)//to delete
+        firebaseMapDataSource.addCustomPin(l, visible_to, placed_by, text)
     }
 
     override suspend fun updateCustomPin(

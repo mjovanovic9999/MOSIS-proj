@@ -174,46 +174,47 @@ class RegisterCallbacks(
     }
 
     private fun initHomesFlow() {
-        mapServiceRepository.registerCallbackOnHomesUpdate(homeAddedCallback = {
-            CoroutineScope(Dispatchers.Default).launch {
-                val userId = preferenceRepository.getUserId()
-                val squadId = preferenceRepository.getSquadId()
+        mapServiceRepository.registerCallbackOnHomesUpdate(
+            homeAddedCallback = {
+                CoroutineScope(Dispatchers.Default).launch {
+                    val userId = preferenceRepository.getUserId()
+                    val squadId = preferenceRepository.getSquadId()
 
-                if (it.id == userId || it.id == squadId) locationServiceMapScreenEventsFlow.emit(
-                    LocationServiceMapScreenEvents.HomeChanged(
-                        PinAction(
-                            it, PinActionType.Added
+                    if (it.id == userId || it.id == squadId) locationServiceMapScreenEventsFlow.emit(
+                        LocationServiceMapScreenEvents.HomeChanged(
+                            PinAction(
+                                it, PinActionType.Added
+                            )
                         )
                     )
-                )
-            }
-        }, homeModifiedCallback = {
-            CoroutineScope(Dispatchers.Default).launch {
-                val userId = preferenceRepository.getUserId()
-                val squadId = preferenceRepository.getSquadId()
+                }
+            }, homeModifiedCallback = {
+                CoroutineScope(Dispatchers.Default).launch {
+                    val userId = preferenceRepository.getUserId()
+                    val squadId = preferenceRepository.getSquadId()
 
-                if (it.id == userId || it.id == squadId) locationServiceMapScreenEventsFlow.emit(
-                    LocationServiceMapScreenEvents.HomeChanged(
-                        PinAction(
-                            it, PinActionType.Modified
+                    if (it.id == userId || it.id == squadId) locationServiceMapScreenEventsFlow.emit(
+                        LocationServiceMapScreenEvents.HomeChanged(
+                            PinAction(
+                                it, PinActionType.Modified
+                            )
                         )
                     )
-                )
-            }
-        }, homeRemovedCallback = {
-            CoroutineScope(Dispatchers.Default).launch {
-                val userId = preferenceRepository.getUserId()
-                val squadId = preferenceRepository.getSquadId()
+                }
+            }, homeRemovedCallback = {
+                CoroutineScope(Dispatchers.Default).launch {
+                    val userId = preferenceRepository.getUserId()
+                    val squadId = preferenceRepository.getSquadId()
 
-                if (it.id == userId || it.id == squadId) locationServiceMapScreenEventsFlow.emit(
-                    LocationServiceMapScreenEvents.HomeChanged(
-                        PinAction(
-                            it, PinActionType.Removed
+                    if (it.id == userId || it.id == squadId) locationServiceMapScreenEventsFlow.emit(
+                        LocationServiceMapScreenEvents.HomeChanged(
+                            PinAction(
+                                it, PinActionType.Removed
+                            )
                         )
                     )
-                )
-            }
-        })
+                }
+            })
     }
 
     private fun initUserInventoryFlow() {
