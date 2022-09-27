@@ -470,7 +470,10 @@ class MapViewModel @Inject constructor(
                              )
                          ) */
                     _mapScreenState.value = _mapScreenState.value.copy(home = dataType)
-                    composable = { CustomPin(resourceId = R.drawable.pin_home) }
+                    composable = {
+
+                        if (mapScreenState.value.home.l != null) CustomPin(resourceId = R.drawable.pin_home)
+                    }
                 }
                 is CustomPinData -> {
                     customPinsHashMap[it] = dataType
@@ -487,15 +490,15 @@ class MapViewModel @Inject constructor(
                     resourcesHashMap[it] = dataType
                     composable = {
                         resourcesHashMap[it]?.let {
-                            if (it.type!=null)
-                            CustomPin(
-                                when (it.type) {
-                                    ResourceType.Wood -> R.drawable.pin_wood
-                                    ResourceType.Brick -> R.drawable.pin_brick
-                                    ResourceType.Stone -> R.drawable.pin_stone
-                                    ResourceType.Emerald -> R.drawable.pin_emerald
-                                }
-                            )
+                            if (it.type != null)
+                                CustomPin(
+                                    when (it.type) {
+                                        ResourceType.Wood -> R.drawable.pin_wood
+                                        ResourceType.Brick -> R.drawable.pin_brick
+                                        ResourceType.Stone -> R.drawable.pin_stone
+                                        ResourceType.Emerald -> R.drawable.pin_emerald
+                                    }
+                                )
                         }
                     }
                 }
