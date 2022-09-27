@@ -451,17 +451,17 @@ class MapViewModel @Inject constructor(
     }
 
     private fun addPinHash(dataType: Data) {
-        dataType.id?.let {
+        dataType.id?.let { it ->
             var composable: @Composable() (() -> Unit)? = null
             when (dataType) {
                 is HomeData -> {
-                   /*///mozda ovako da se handluje
-                   *  if (mapScreenState.value.myId == totemsHashMap[it]?.placed_by
-                            || isPlayerMySquadMember(
-                                mapScreenState.value.mySquadId,
-                                totemsHashMap[it]?.visible_to
-                            )
-                        ) */
+                    /*///mozda ovako da se handluje
+                    *  if (mapScreenState.value.myId == totemsHashMap[it]?.placed_by
+                             || isPlayerMySquadMember(
+                                 mapScreenState.value.mySquadId,
+                                 totemsHashMap[it]?.visible_to
+                             )
+                         ) */
                     _mapScreenState.value = _mapScreenState.value.copy(home = dataType)
                     composable = { CustomPin(resourceId = R.drawable.pin_home) }
                 }
@@ -479,15 +479,17 @@ class MapViewModel @Inject constructor(
                 is ResourceData -> {
                     resourcesHashMap[it] = dataType
                     composable = {
-                        CustomPin(
-                            when (dataType.type) {
-                                ResourceType.Wood -> R.drawable.pin_wood
-                                ResourceType.Brick -> R.drawable.pin_brick
-                                ResourceType.Stone -> R.drawable.pin_stone
-                                ResourceType.Emerald -> R.drawable.pin_emerald
-                                null -> R.drawable.pin_house_discovery_shot
-                            }
-                        )
+                        resourcesHashMap[it]?.let {
+                            if (it.type!=null)
+                            CustomPin(
+                                when (it.type) {
+                                    ResourceType.Wood -> R.drawable.pin_wood
+                                    ResourceType.Brick -> R.drawable.pin_brick
+                                    ResourceType.Stone -> R.drawable.pin_stone
+                                    ResourceType.Emerald -> R.drawable.pin_emerald
+                                }
+                            )
+                        }
                     }
                 }
                 is TotemData -> {

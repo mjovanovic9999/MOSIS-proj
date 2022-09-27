@@ -39,7 +39,7 @@ class MapViewModelRepositoryImpl(
         if (squadId == "")
             firebaseMapDataSource.addHome(preferenceDataSource.getUserId(), l)
         else
-            firebaseMapDataSource.addHome(squadId, l)
+            firebaseMapDataSource.updateHome(squadId, null, l)
 
     }
 
