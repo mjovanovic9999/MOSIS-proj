@@ -6,16 +6,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import mosis.streetsandtotems.R
 import mosis.streetsandtotems.core.ImageContentDescriptionConstants
+import mosis.streetsandtotems.core.TitleConstants
 import mosis.streetsandtotems.core.presentation.components.CustomPage
 import mosis.streetsandtotems.core.presentation.navigation.navgraphs.MainNavGraph
 import mosis.streetsandtotems.core.presentation.utils.drawVerticalScrollbar
@@ -49,7 +53,13 @@ fun TotemsScreen(viewModel: TotemsViewModel, destinationsNavigator: Destinations
             )
         },
         content = {
-            LazyColumn(
+            if (state.totems.isEmpty())
+                Text(
+                    text = TitleConstants.NO_TOTEMS,
+                    style = MaterialTheme.typography.displaySmall.plus(TextStyle(fontWeight = FontWeight.ExtraBold)),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            else LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(bottom = MaterialTheme.sizes.lazy_column_spacing)
@@ -58,8 +68,13 @@ fun TotemsScreen(viewModel: TotemsViewModel, destinationsNavigator: Destinations
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 itemsIndexed(state.totems) { index, item ->
-                    TotemListItem(totem = item,
-                        onButtonClick = { viewModel.onEvent(TotemViewModelEvents.ShowDialog(index)) })
+                    TotemListItem(totem = item, onButtonClick = {
+                        viewModel.onEvent(
+                            TotemViewModelEvents.ShowDialog(
+                                index
+                            )
+                        )
+                    })
                 }
             }
         })

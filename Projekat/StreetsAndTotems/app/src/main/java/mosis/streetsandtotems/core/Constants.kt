@@ -314,6 +314,7 @@ object MessageConstants {
 }
 
 object TitleConstants {
+    const val NO_TOTEMS = "No totems!"
     const val SEARCH_RESULTS = "Search results"
     const val SEARCH = "Search"
     const val PASSWORD_RESET = "Reset password"
