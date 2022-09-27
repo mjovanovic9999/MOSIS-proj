@@ -40,7 +40,9 @@ import mosis.streetsandtotems.core.FireStoreConstants.TOTEMS_COLLECTION
 import mosis.streetsandtotems.core.FireStoreConstants.USER_NAME_FIELD
 import mosis.streetsandtotems.core.PointsConversion.MAX_SQUAD_MEMBERS_COUNT
 import mosis.streetsandtotems.core.PointsConversion.SQUAD_MEMBERS_POINTS_COEFFICIENT
+import mosis.streetsandtotems.core.presentation.components.IconType
 import mosis.streetsandtotems.feature_map.domain.model.*
+import mosis.streetsandtotems.feature_map.presentation.util.convertIconResourceTypeToResourceType
 import org.imperiumlabs.geofirestore.GeoFirestore
 import org.imperiumlabs.geofirestore.extension.getAtLocation
 import kotlin.random.Random
@@ -89,8 +91,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             if (text != null) data["text"] = text as Any
 
             if (data.isNotEmpty()) db.collection(FireStoreConstants.CUSTOM_PINS_COLLECTION)
-                .document(id)
-                .update(data).await()
+                .document(id).update(data).await()
         } catch (e: Exception) {
             Log.d("tag", e.message.toString())
         }
@@ -132,8 +133,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             if (l != null) data[L] = l
 
             if (data.isNotEmpty()) db.collection(FireStoreConstants.HOMES_COLLECTION)
-                .document(homeId)
-                .update(data).await()
+                .document(homeId).update(data).await()
         } catch (e: Exception) {
             Log.d("tag", e.message.toString())
         }
@@ -147,14 +147,82 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         }
     }
 
-    fun deleteHomeTransaction(transaction: Transaction, myId: String) {
+    private fun deleteHomeAndDropTransaction(transaction: Transaction, myId: String) {
         try {
+            val home =
+                transaction.get(db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId))
+                    .toObject(HomeData::class.java)
+            home?.l?.let { l ->
+
+                home.inventory?.brick?.let {
+                    if (it > 0) addResourceTransaction(
+                        transaction,
+                        l,
+                        it,
+                        IconType.ResourceType.Brick
+                    )
+                }
+                home.inventory?.stone?.let {
+                    if (it > 0) addResourceTransaction(
+                        transaction,
+                        l,
+                        it,
+                        IconType.ResourceType.Stone
+                    )
+                }
+                home.inventory?.emerald?.let {
+                    if (it > 0) addResourceTransaction(
+                        transaction,
+                        l,
+                        it,
+                        IconType.ResourceType.Emerald
+                    )
+                }
+                home.inventory?.wood?.let {
+                    if (it > 0) addResourceTransaction(
+                        transaction,
+                        l,
+                        it,
+                        IconType.ResourceType.Wood
+                    )
+                }
+                home.inventory?.totem?.let {
+                    for (i in 1..it) {
+                        addTotemTransaction(transaction, l)
+                    }
+                }
+            }
             transaction.delete(
                 db.collection(FireStoreConstants.HOMES_COLLECTION).document(myId)
             )
         } catch (e: Exception) {
             Log.d("tag", e.message.toString())
         }
+    }
+
+    private fun addResourceTransaction(
+        transaction: Transaction,
+        l: GeoPoint,
+        itemCount: Int,
+        type: IconType.ResourceType,
+    ) {
+        val resourceReference =
+            db.collection(FireStoreConstants.RESOURCES_COLLECTION).document()
+
+        val resourceGeoFirestore =
+            GeoFirestore(db.collection(FireStoreConstants.RESOURCES_COLLECTION))
+
+        val resourceType = convertIconResourceTypeToResourceType(type)
+
+        transaction.update(
+            resourceReference,
+            mapOf(
+                "type" to resourceType,
+                L to l,
+                "remaining" to itemCount,
+            )
+        )
+        resourceGeoFirestore.setLocation(resourceReference.id, l)
     }
 
     suspend fun updateResource(resourceId: String, remaining: Int) {
@@ -178,8 +246,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     suspend fun getUserInventory(userId: String): UserInventoryData? {
         return try {
-            db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION).document(userId)
-                .get()
+            db.collection(FireStoreConstants.USER_INVENTORY_COLLECTION).document(userId).get()
                 .await().toObject(UserInventoryData::class.java)
         } catch (e: Exception) {
             Log.d("tag", e.message.toString())
@@ -210,8 +277,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     suspend fun getUserData(userId: String): UserData? {
         return try {
-            db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION).document(userId).get()
-                .await().toObject(UserData::class.java)
+            db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION).document(userId).get().await()
+                .toObject(UserData::class.java)
         } catch (e: Exception) {
             Log.d("tag", e.message.toString())
             null
@@ -235,6 +302,26 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         }
     }
 
+
+    private fun addTotemTransaction(transaction: Transaction, l: GeoPoint) {
+        try {
+            val totemReference = db.collection(FireStoreConstants.TOTEMS_COLLECTION).document()
+            transaction.update(
+                totemReference,
+                mapOf(
+                    L to l,
+                )
+            )
+            GeoFirestore(db.collection(FireStoreConstants.TOTEMS_COLLECTION)).setLocation(
+                totemReference.id,
+                l
+            )
+
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
+    }
+
     suspend fun deleteTotem(totemId: String) {
         try {
             db.collection(TOTEMS_COLLECTION).document(totemId).delete().await()
@@ -251,9 +338,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                 ProtectionLevel.RiddleProtectionLevel.High -> HARD_RIDDLES_COLLECTION
             }
 
-            val count =
-                db.collection(collection).document(ITEM_COUNT).get().await()
-                    .getLong(RIDDLE_COUNT_VALUE)
+            val count = db.collection(collection).document(ITEM_COUNT).get().await()
+                .getLong(RIDDLE_COUNT_VALUE)
             val riddles = db.collection(collection).whereEqualTo(
                 ORDER_NUMBER, Random.nextInt(0, count?.toInt() ?: 10)
             ).get().await().toObjects(RiddleData::class.java)
@@ -279,9 +365,8 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     suspend fun updateSquadLeaderboard(squadId: String, addSquadLeaderboardPoints: Int) {
         try {
-            val ids = db.collection(SQUADS_COLLECTION).document(squadId)
-                .get()
-                .await().get(FIELD_USERS) as List<*>
+            val ids = db.collection(SQUADS_COLLECTION).document(squadId).get().await()
+                .get(FIELD_USERS) as List<*>
             for (item in ids) {
                 if (item is String) updateLeaderboard(
                     item, (addSquadLeaderboardPoints * SQUAD_MEMBERS_POINTS_COEFFICIENT).toInt()
@@ -293,40 +378,40 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     //region squad interaction
-
     private suspend fun onAcceptInviteMergeHouse(myId: String, joinedSquadId: String) {
-        db.runTransaction { transaction ->
+        try {
             val homesCollectionRef = db.collection(HOMES_COLLECTION)
 
             val myOldHomeDocRef = homesCollectionRef.document(myId)
-            val myOldHome = transaction.get(myOldHomeDocRef).toObject(HomeData::class.java)
+            val myOldHome = db.collection(HOMES_COLLECTION).document(myId).get().await()
+                .toObject(HomeData::class.java)
+                ?.copy(id = myOldHomeDocRef.id)
 
-            transaction.get(homesCollectionRef.document(joinedSquadId))
-                .toObject(HomeData::class.java)?.let { squadHome ->
+
+            db.collection(HOMES_COLLECTION).document(joinedSquadId).get().await()
+                .toObject(HomeData::class.java)
+                ?.copy(id = homesCollectionRef.document(joinedSquadId).id)?.let { squadHome ->
                     homesCollectionRef.document(joinedSquadId).set(
                         squadHome.copy(
-                            inventory = squadHome.inventory?.copy(
-                                emerald = (squadHome.inventory.emerald
-                                    ?: 0) + (myOldHome?.inventory?.emerald
-                                    ?: 0),
-                                stone = (squadHome.inventory.stone
-                                    ?: 0) + (myOldHome?.inventory?.stone
-                                    ?: 0),
-                                brick = (squadHome.inventory.brick
-                                    ?: 0) + (myOldHome?.inventory?.brick
-                                    ?: 0),
-                                wood = (squadHome.inventory.wood
-                                    ?: 0) + (myOldHome?.inventory?.wood
-                                    ?: 0),
-                                totem = (squadHome.inventory.totem
-                                    ?: 0) + (myOldHome?.inventory?.totem
-                                    ?: 0)
+                            inventory = InventoryData(
+                                emerald = (squadHome.inventory?.emerald
+                                    ?: 0) + (myOldHome?.inventory?.emerald ?: 0),
+                                stone = (squadHome.inventory?.stone
+                                    ?: 0) + (myOldHome?.inventory?.stone ?: 0),
+                                brick = (squadHome.inventory?.brick
+                                    ?: 0) + (myOldHome?.inventory?.brick ?: 0),
+                                wood = (squadHome.inventory?.wood
+                                    ?: 0) + (myOldHome?.inventory?.wood ?: 0),
+                                totem = (squadHome.inventory?.totem
+                                    ?: 0) + (myOldHome?.inventory?.totem ?: 0)
                             )
                         )
                     )
-                    transaction.delete(myOldHomeDocRef)
+                    db.collection(HOMES_COLLECTION).document(myId).delete().await()
                 }
-        }.await()
+        } catch (e: Exception) {
+            Log.d("tag", e.message.toString())
+        }
     }
 
     private fun addUserToSquadAndUpdateUser(
@@ -353,9 +438,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     private fun createSquadAndReturnSquadId(
-        transaction: Transaction,
-        inviterId: String,
-        inviteeId: String
+        transaction: Transaction, inviterId: String, inviteeId: String
     ): String? {
         try {
             val newSquadId = db.collection(SQUADS_COLLECTION).document().id
@@ -383,13 +466,14 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     suspend fun initInviteToSquad(inviterId: String, inviteeId: String) {
         try {
-            if (getInviteIdOrNull(inviterId, inviteeId) == null)
-                db.collection(SQUAD_INVITES_COLLECTION).document().set(
-                    mapOf(
-                        FIELD_INVITER_ID to inviterId,
-                        FIELD_INVITEE_ID to inviteeId,
-                    )
-                ).await()
+            if (getInviteIdOrNull(inviterId, inviteeId) == null) db.collection(
+                SQUAD_INVITES_COLLECTION
+            ).document().set(
+                mapOf(
+                    FIELD_INVITER_ID to inviterId,
+                    FIELD_INVITEE_ID to inviteeId,
+                )
+            ).await()
         } catch (e: Exception) {
             Log.d("tag", e.message.toString())
         }
@@ -444,7 +528,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                     if (list.isNotEmpty()) {
                         list.remove(userId)
                         if (list.size == 1) {
-                            deleteHomeTransaction(transaction, squadId)
+                            deleteHomeAndDropTransaction(transaction, squadId)
                             transaction.delete(docRefSquads)
                             transaction.update(
                                 db.collection(PROFILE_DATA_COLLECTION).document(list[0]),
@@ -452,8 +536,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
                                 ""
                             )
                             otherUserId = list[0]
-                        } else
-                            transaction.update(docRefSquads, FIELD_USERS, list)
+                        } else transaction.update(docRefSquads, FIELD_USERS, list)
                     }
 
                     transaction.update(docRefProfile, FIELD_SQUAD_ID, "")
@@ -471,16 +554,11 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     private suspend fun handleMyPinsOnSquadJoin(
-        userId: String,
-        squadId: String
+        userId: String, squadId: String
     ) {
         try {
-            for (pinSnapshot in
-            db.collection(CUSTOM_PINS_COLLECTION)
-                .whereEqualTo(FIELD_PLACED_BY, userId)
-                .get()
-                .await().documents.toList()
-            ) {
+            for (pinSnapshot in db.collection(CUSTOM_PINS_COLLECTION)
+                .whereEqualTo(FIELD_PLACED_BY, userId).get().await().documents.toList()) {
                 db.collection(CUSTOM_PINS_COLLECTION).document(pinSnapshot.id).update(
                     FIELD_VISIBLE_TO,
                     squadId,
@@ -493,14 +571,10 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     private suspend fun handleMyPinsOnSquadRemove(userId: String) {
         try {
-            for (pinSnapshot in
-            db.collection(CUSTOM_PINS_COLLECTION)
-                .whereEqualTo(FIELD_PLACED_BY, userId).get()
-                .await().documents.toList()
-            ) {
+            for (pinSnapshot in db.collection(CUSTOM_PINS_COLLECTION)
+                .whereEqualTo(FIELD_PLACED_BY, userId).get().await().documents.toList()) {
                 db.collection(CUSTOM_PINS_COLLECTION).document(pinSnapshot.id).update(
-                    FIELD_VISIBLE_TO,
-                    ""
+                    FIELD_VISIBLE_TO, ""
                 )
             }
         } catch (e: Exception) {
@@ -509,16 +583,11 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
     }
 
     private suspend fun handleMyTotemsOnSquadJoin(
-        userId: String,
-        squadId: String
+        userId: String, squadId: String
     ) {
         try {
-            for (totemSnapshot in
-            db.collection(TOTEMS_COLLECTION)
-                .whereEqualTo(FIELD_PLACED_BY, userId)
-                .get()
-                .await().documents.toList()
-            ) {
+            for (totemSnapshot in db.collection(TOTEMS_COLLECTION)
+                .whereEqualTo(FIELD_PLACED_BY, userId).get().await().documents.toList()) {
                 db.collection(CUSTOM_PINS_COLLECTION).document(totemSnapshot.id).update(
                     FIELD_VISIBLE_TO,
                     squadId,
@@ -531,14 +600,10 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
 
     private suspend fun handleMyTotemsOnSquadRemove(userId: String) {
         try {
-            for (totemSnapshot in
-            db.collection(TOTEMS_COLLECTION)
-                .whereEqualTo(FIELD_PLACED_BY, userId).get()
-                .await().documents.toList()
-            ) {
+            for (totemSnapshot in db.collection(TOTEMS_COLLECTION)
+                .whereEqualTo(FIELD_PLACED_BY, userId).get().await().documents.toList()) {
                 db.collection(CUSTOM_PINS_COLLECTION).document(totemSnapshot.id).update(
-                    FIELD_VISIBLE_TO,
-                    ""
+                    FIELD_VISIBLE_TO, ""
                 )
             }
         } catch (e: Exception) {
@@ -744,7 +809,7 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
         }
     }
 
-    //endregion
+//endregion
 
     //region search
     private val userGeoFirestore = GeoFirestore(db.collection(PROFILE_DATA_COLLECTION))
@@ -794,6 +859,6 @@ class FirebaseMapDataSource(private val db: FirebaseFirestore) {
             radius
         )
     }
-    //endregion
+//endregion
 }
 
