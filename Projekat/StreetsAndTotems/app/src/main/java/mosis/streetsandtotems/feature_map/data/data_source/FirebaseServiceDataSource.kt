@@ -2,16 +2,90 @@ package mosis.streetsandtotems.feature_map.data.data_source
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.toObject
 import mosis.streetsandtotems.core.FireStoreConstants
+import mosis.streetsandtotems.core.MapConstants
 import mosis.streetsandtotems.core.domain.util.collectionSnapshotListenerCallback
 import mosis.streetsandtotems.feature_map.domain.model.*
 import org.imperiumlabs.geofirestore.GeoFirestore
+import org.imperiumlabs.geofirestore.listeners.GeoQueryEventListener
 
 class FirebaseServiceDataSource(private val db: FirebaseFirestore) {
     private val userGeoFirestore =
         GeoFirestore(db.collection(FireStoreConstants.PROFILE_DATA_COLLECTION))
+
+    private val totemsGeoFirestore =
+        GeoFirestore(db.collection(FireStoreConstants.TOTEMS_COLLECTION))
+
+    private val resourcesGeoFirestore =
+        GeoFirestore(db.collection(FireStoreConstants.RESOURCES_COLLECTION))
+
+    private val totemsGeoQuery = totemsGeoFirestore.queryAtLocation(
+        GeoPoint(.0, .0), (MapConstants.MAXIMUM_INTERACTION_DISTANCE_IN_METERS / 1000).toDouble()
+    )
+
+    private var resourcesGeoQuery = resourcesGeoFirestore.queryAtLocation(
+        GeoPoint(.0, .0), (MapConstants.MAXIMUM_INTERACTION_DISTANCE_IN_METERS / 1000).toDouble()
+    )
+
+    fun registerNotifications(onKeyEntered: () -> Unit) {
+        totemsGeoQuery.addGeoQueryEventListener(object : GeoQueryEventListener {
+            override fun onGeoQueryError(exception: Exception) {
+
+            }
+
+            override fun onGeoQueryReady() {
+
+            }
+
+            override fun onKeyEntered(documentID: String, location: GeoPoint) {
+                onKeyEntered()
+            }
+
+            override fun onKeyExited(documentID: String) {
+
+            }
+
+            override fun onKeyMoved(documentID: String, location: GeoPoint) {
+
+            }
+        })
+
+        resourcesGeoQuery.addGeoQueryEventListener(object : GeoQueryEventListener {
+            override fun onGeoQueryError(exception: Exception) {
+
+            }
+
+            override fun onGeoQueryReady() {
+
+            }
+
+            override fun onKeyEntered(documentID: String, location: GeoPoint) {
+                onKeyEntered()
+            }
+
+            override fun onKeyExited(documentID: String) {
+
+            }
+
+            override fun onKeyMoved(documentID: String, location: GeoPoint) {
+
+            }
+        })
+    }
+
+    fun removeNotifications() {
+        totemsGeoQuery.removeAllListeners()
+        resourcesGeoQuery.removeAllListeners()
+    }
+
+    fun updateNotificationQueries(center: GeoPoint) {
+        totemsGeoQuery.center = center
+        resourcesGeoQuery.center = center
+    }
 
     fun updateUserLocation(user: FirebaseUser, newLocation: GeoPoint) {
         userGeoFirestore.setLocation(user.uid, newLocation)

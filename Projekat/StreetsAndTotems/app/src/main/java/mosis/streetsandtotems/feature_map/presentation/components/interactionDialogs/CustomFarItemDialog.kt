@@ -30,7 +30,7 @@ fun CustomFarItemDialog(
 ) {
     CustomDialog(
         isOpen = farItemDialogOpen,
-        modifier = Modifier.height(110.dp),
+        modifier = Modifier.height(115.dp),
         title = {
             CustomFarItemDialogTitle(
                 resourceId = farResourceIconId,

@@ -63,6 +63,12 @@ interface MapServiceRepository {
         marketRemovedCallback: (market: MarketData) -> Unit,
     )
 
+    fun registerNotifications(onKeyEntered: () -> Unit)
+
+    fun removeNotifications()
+
+    fun updateNotificationQueries(center: GeoPoint)
+
     fun removeAllCallbacks()
 
 

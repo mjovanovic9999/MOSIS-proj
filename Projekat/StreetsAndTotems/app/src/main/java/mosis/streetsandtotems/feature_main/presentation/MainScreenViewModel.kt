@@ -96,13 +96,11 @@ class MainScreenViewModel @Inject constructor(
 
                         preferenceUseCases.setSquadId(it.newUserData.squad_id ?: "")
 
-                        if(it.newUserData.squad_id == ""){
+                        if (it.newUserData.squad_id == "") {
                             locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveSquadInviteCallback)
                             locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RegisterSquadInviteCallback)
                             locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveKickVoteCallback)
-                        }
-                        else
-                        {
+                        } else {
                             locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RegisterKickVoteCallback)
                             locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveSquadInviteCallback)
                         }
@@ -183,6 +181,9 @@ class MainScreenViewModel @Inject constructor(
                 notificationProvider.notifyDisable(true)
                 viewModelScope.launch {
                     locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RemoveCallbacks)
+                    if (preferenceUseCases.getUserSettings().showNotifications) locationServiceControlEventsFlow.emit(
+                        LocationServiceControlEvents.RegisterNotifications
+                    )
                 }
             } else {
                 application.stopService(Intent(application, LocationService::class.java))
@@ -233,6 +234,9 @@ class MainScreenViewModel @Inject constructor(
                 }
 
                 locationServiceControlEventsFlow.emit(LocationServiceControlEvents.RegisterCallbacks)
+                if (preferenceUseCases.getUserSettings().showNotifications) locationServiceControlEventsFlow.emit(
+                    LocationServiceControlEvents.RemoveNotifications
+                )
             }
         }
     }

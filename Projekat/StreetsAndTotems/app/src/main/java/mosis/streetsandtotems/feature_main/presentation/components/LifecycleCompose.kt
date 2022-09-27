@@ -8,27 +8,23 @@ import androidx.lifecycle.LifecycleEventObserver
 
 @Composable
 fun LifecycleCompose(
-    onResume: () -> Unit,
-    onPause: () -> Unit
+    onResume: () -> Unit, onPause: () -> Unit
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(
-        key1 = lifecycleOwner,
-        effect = {
-            val observer = LifecycleEventObserver { _, event ->
-                when (event) {
-                    Lifecycle.Event.ON_RESUME -> onResume()
-                    Lifecycle.Event.ON_PAUSE -> onPause()
-                    else -> {
-//                        notificationProvider.notifyNearbyPass()
-                    }
+    DisposableEffect(key1 = lifecycleOwner, effect = {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> onResume()
+                Lifecycle.Event.ON_PAUSE -> onPause()
+                else -> {
+
                 }
             }
-            lifecycleOwner.lifecycle.addObserver(observer)
-
-            onDispose {
-                lifecycleOwner.lifecycle.removeObserver(observer)
-            }
         }
-    )
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    })
 }

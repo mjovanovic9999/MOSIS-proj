@@ -177,6 +177,18 @@ class MapServiceRepositoryImpl(
         }
     }
 
+    override fun registerNotifications(onKeyEntered: () -> Unit) {
+        firebaseServiceDataSource.registerNotifications(onKeyEntered)
+    }
+
+    override fun removeNotifications() {
+        firebaseServiceDataSource.removeNotifications()
+    }
+
+    override fun updateNotificationQueries(center: GeoPoint) {
+        firebaseServiceDataSource.updateNotificationQueries(center)
+    }
+
     override fun removeAllCallbacks() {
         listenerRegistrations.forEach {
             it.remove()

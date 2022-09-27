@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import mosis.streetsandtotems.core.data.data_source.PreferencesDataStore
 import mosis.streetsandtotems.core.domain.repository.PreferenceRepository
 import mosis.streetsandtotems.core.domain.repository.UserOnlineStatusRepository
+import mosis.streetsandtotems.core.presentation.utils.notification.NotificationProvider
 import mosis.streetsandtotems.feature_map.data.data_source.FirebaseServiceDataSource
 import mosis.streetsandtotems.feature_map.data.repository.MapServiceRepositoryImpl
 import mosis.streetsandtotems.feature_map.domain.repository.MapServiceRepository
@@ -54,6 +55,7 @@ object LocationServiceModule {
         preferenceRepository: PreferenceRepository,
         locationServiceMainScreenEventsFlow: MutableSharedFlow<LocationServiceMainScreenEvents>,
         locationServiceInventoryEventsFlow: MutableSharedFlow<LocationServiceInventoryEvents>,
+        notificationProvider: NotificationProvider
     ): LocationServiceUseCases = LocationServiceUseCases(
         UpdatePlayerLocation(mapServiceRepository),
         RegisterCallbacks(
@@ -71,6 +73,9 @@ object LocationServiceModule {
             preferenceRepository, mapServiceRepository, locationServiceMapScreenEventsFlow
         ),
         RemoveCallbackOnKickVote(mapServiceRepository),
-        RemoveCallbackOnSquadInvite(mapServiceRepository)
+        RemoveCallbackOnSquadInvite(mapServiceRepository),
+        RegisterNotifications(mapServiceRepository, notificationProvider),
+        RemoveNotifications(mapServiceRepository),
+        UpdateNotificationQueries(mapServiceRepository)
     )
 }

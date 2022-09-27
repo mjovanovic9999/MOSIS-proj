@@ -7,4 +7,6 @@ sealed class LocationServiceControlEvents {
     object RemoveSquadInviteCallback : LocationServiceControlEvents()
     object RegisterKickVoteCallback : LocationServiceControlEvents()
     object RemoveKickVoteCallback : LocationServiceControlEvents()
+    object RegisterNotifications : LocationServiceControlEvents()
+    object RemoveNotifications : LocationServiceControlEvents()
 }

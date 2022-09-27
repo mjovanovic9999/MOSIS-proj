@@ -42,9 +42,9 @@ class LeaderboardRepositoryImpl(
     override suspend fun getUserData(username: String): Flow<Response<ProfileData>> = flow {
         try {
             emit(Response.Loading)
-            val user = leaderboardDataSource.getUserData(username).await()
-                .toObjects(ProfileData::class.java).firstOrNull()
-            if (user != null) emit(Response.Success(user))
+            val userSnapshot = leaderboardDataSource.getUserData(username).await()
+            val user = userSnapshot.toObjects(ProfileData::class.java).firstOrNull()
+            if (user != null) emit(Response.Success(user.copy(id = userSnapshot.documents.firstOrNull()?.id)))
             else emit(Response.Error(message = MessageConstants.USER_NOT_FOUND))
         } catch (e: Exception) {
             emit(Response.Error(MessageConstants.DEFAULT_ERROR_MESSAGE))

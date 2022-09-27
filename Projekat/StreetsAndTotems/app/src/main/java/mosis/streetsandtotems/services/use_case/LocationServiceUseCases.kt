@@ -9,4 +9,7 @@ data class LocationServiceUseCases(
     val registerCallbackOnKickVote: RegisterCallbackOnKickVote,
     val removeCallbackOnKickVote: RemoveCallbackOnKickVote,
     val removeCallbackOnSquadInvite: RemoveCallbackOnSquadInvite,
+    val registerNotifications: RegisterNotifications,
+    val removeNotifications: RemoveNotifications,
+    val updateNotificationQueries: UpdateNotificationQueries
 )

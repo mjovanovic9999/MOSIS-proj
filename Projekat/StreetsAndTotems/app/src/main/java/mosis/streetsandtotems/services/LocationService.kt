@@ -69,6 +69,11 @@ class LocationService : Service() {
                         )
                         locationServiceUseCases.updatePlayerLocation(it.latitude, it.longitude)
                         lastKnownLocation = GeoPoint(it.latitude, it.longitude)
+                        locationServiceUseCases.updateNotificationQueries(
+                            GeoPoint(
+                                it.latitude, it.longitude
+                            )
+                        )
                         Log.d("tag", lastKnownLocation.toString())
                     }
                 }
@@ -101,6 +106,8 @@ class LocationService : Service() {
                     LocationServiceControlEvents.RegisterSquadInviteCallback -> locationServiceUseCases.registerCallbackOnSquadInvite()
                     LocationServiceControlEvents.RemoveKickVoteCallback -> locationServiceUseCases.removeCallbackOnKickVote()
                     LocationServiceControlEvents.RemoveSquadInviteCallback -> locationServiceUseCases.removeCallbackOnSquadInvite()
+                    LocationServiceControlEvents.RegisterNotifications -> locationServiceUseCases.registerNotifications()
+                    LocationServiceControlEvents.RemoveNotifications -> locationServiceUseCases.removeNotifications()
                 }
             }
         }
