@@ -1,0 +1,167 @@
+
+//profile_data
+{
+    "id": "auth_id",
+    "data": {
+        "user_name": "",
+        "first_name": "",
+        "last_name": "",
+        "phone_number": "",
+        "username": "",
+        "squad_id": "",
+		"email":"",
+    }
+}
+
+//user_game_data
+{
+    "id": "auth_id",
+    "data": {
+        "latitude": "",
+        "longitude": "",
+        "calls_allowed": "",
+        "messaging_allowed": "",
+		"display_data":"",
+    }
+}
+
+//user_invertory
+{
+    "id": "auth_id",
+    "data": {
+        "inventory":{
+            "wood": "",
+            "brick": "",
+            "stone": "",
+            "emerald": "",
+            "totem": ""
+        },
+    }
+}
+
+//leaderboard
+{
+    "id": "auth_id",
+    "data": {
+        "username": "",
+        "points": "",
+    }
+}
+
+//squad
+{
+    "id": "squad_id",
+    "data":{
+        "users": [
+             "auth_id1",
+             "2",
+        ],
+    }
+}
+
+//custom_pins
+{
+    "id": "",
+    "data":{
+        "placed_by": "auth_id",
+        "visible_to": "auth_id || squad_id",
+        "text": "",
+        "latitude": "",
+        "longitude": ""
+    }
+}
+
+//resources
+{
+    "id": "wood || brick || stone || emerald",
+    "data": [
+        {
+            "latitude": "",
+            "longitude": "",
+            "remaining": ""
+        }
+    ]
+}
+
+//placed_totems
+{
+    "id": "",
+    "data":{
+        "latitude": "",
+        "longitude": "",
+        "placed_by": "auth_id",
+        "placing_time": "",
+        "last_visited": "",
+        "bonus_points": "",
+        "protection_level": "unprotected || low || medium || high",
+    }
+}
+
+//homes
+{
+    "id": "auth_id || squad_id",
+    "data": {
+        "latitude": "",
+        "longitude": "",
+        "inventory": {
+            "wood": "",
+            "brick": "",
+            "stone": "",
+            "emerald": "",
+            "totem": ""
+        },
+     ///////////////////////////////////////////   "protection_level": "unprotected || low || medium || high"
+    }
+}
+
+//markets
+{
+    "id": "",
+    "data":{
+        "latitude": "",
+        "longitude": "",
+        "items": {
+            "wood": {
+                "currency_type": "",
+                "amount_left": "",
+                "price": ""
+            },
+            "brick": {
+                "currency": "",
+                "amount_left": "",
+                "price": ""
+            },
+            "stone": {
+                "currency": "",
+                "amount_left": "",
+                "price": ""
+            },
+            "emerald": {
+                "currency": "",
+                "amount_left": "",
+                "price": ""
+            },
+        }
+    }
+}
+
+//squad_invites
+{
+    "id":"",
+    "data":{
+        "squad_id":"",
+        "user_id":"",
+    }
+}
+
+//"kick_vote":
+{    "id":"",
+     "data":{
+        "squad_id":"",
+        "user_id":"",
+        "votes":{
+            "user_id":"yes no unanswered",
+        }
+     },
+
+}
